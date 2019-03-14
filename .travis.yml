@@ -14,6 +14,14 @@ matrix:
       env: TOXENV=py36
     - python: 3.7
       env: TOXENV=py37
+    - python: 3.5
+      env: TOXENV=packaging
+    - python: 3.6
+      env: TOXENV=packaging
+    - python: 3.5
+      env: TOXENV=coverage
+    - python: 3.6
+      env: TOXENV=coverage
     - env: TOXENV=flake8
 
 before_install:
