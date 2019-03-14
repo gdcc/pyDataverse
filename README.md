@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/AUSSDA/pyDataverse.svg?branch=master)](https://travis-ci.org/AUSSDA/pyDataverse) [![Coverage Status](https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg?branch=master)](https://coveralls.io/github/AUSSDA/pyDataverse?branch=master)
+
 # pyDataverse
 
 A Python wrapper for the Dataverse API. Developed by [Stefan Kasberger](http://stefankasberger.at) for [AUSSDA - The Austrian Social Science Data Archive](http://aussda.at/).
@@ -5,7 +7,7 @@ A Python wrapper for the Dataverse API. Developed by [Stefan Kasberger](http://s
 
 **Features**
 
-* Tests written in [pytest](https://docs.pytest.org/en/latest/) and tested via [Travis CI](URL). Test coverage by [pytest-cov](https://pypi.org/project/pytest-cov/) and [python-coveralls](https://github.com/z4r/python-coveralls), viewable on [coveralls.io](URL).
+* Tests written in [pytest](https://docs.pytest.org/en/latest/) and tested via [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse).
 * auto-generated documentation through functions and class documentation with [sphinx](http://www.sphinx-doc.org/).
 
 
@@ -67,9 +69,8 @@ pytest
 Use Sphinx to create class and function documentation out of the doc-strings.
 
 ```
-cd src/pyDataverse/docs/
-sphinx-build -b html source build
-sphinx-apidoc -f -o source ..
+sphinx-build -b html docs/source docs/build/html
+sphinx-apidoc -f -o docs/source ..
 make html
 ```
 

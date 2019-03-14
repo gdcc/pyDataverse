@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, print_function
-import configparser
 from datetime import datetime
 import os
-import pytest
 from pyDataverse.api import Api
 
 
@@ -19,7 +17,7 @@ def test_connection_to_api():
         Description of returned object.
 
     """
-    # TODO: falschen auth-token, falschen host übergeben, falsche api version übergeben
+    # TODO: pass wrong auth-token, host, api-version
     host = os.environ.get('HOST')
     api_auth_token = os.environ.get('API_AUTH_TOKEN')
     dataverse_api_version = os.environ.get('DATAVERSE_API_VERSION')

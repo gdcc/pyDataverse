@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *.so
+venv/
+venv_home/
 
 # Misc
 *~
@@ -9,10 +11,14 @@ __pycache__/
 .env/
 
 # Personal
-docs/
-data/
+src/pyDataverse/docs/build
+src/pyDataverse/docs/Makefile
 notes.md
+notes_v2.md
 snippets.md
+stash_*.*
+src/dev/
+src/testing.py
 
 # Distribution / packaging
 build/
@@ -34,3 +40,4 @@ htmlcov/
 coverage.xml
 *.cover
 pip-wheel-metadata
+pytest.ini

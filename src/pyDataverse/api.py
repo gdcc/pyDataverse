@@ -9,12 +9,10 @@ Connect and request the Dataverse API Endpoints. Save and use request results.
 
 
 class Api(object):
-    """
-    DEFAULT
+    """DEFAULT."""
 
-    """
     def __init__(self, host, api_token=None, use_https=True, api_version='v1'):
-        """Inits an Api() class.
+        """Init an Api() class.
 
         Parameters
         ----------
@@ -47,7 +45,8 @@ class Api(object):
         self.base_url = '{0}{1}'.format(url_scheme, self.host)
         self.native_base_url = '{0}/api/{1}'.format(self.base_url,
                                                     self.api_version)
-        self.dataverse_version = self.get_info_version('json_as_dict')['data']['version']
+        self.dataverse_version = \
+            self.get_info_version('json_as_dict')['data']['version']
 
     def __str__(self):
         """Return naming of Api() class for users.
@@ -167,7 +166,8 @@ class Api(object):
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def create_dataverse(self, identifier, json, parent=None, return_data_type='json_as_dict'):
+    def create_dataverse(self, identifier, json, parent=None,
+                         return_data_type='json_as_dict'):
         """Create a dataverse.
 
         Generates a new dataverse under $id. Expects a JSON content describing
@@ -179,7 +179,8 @@ class Api(object):
 
         Download the JSON example file and modified to create dataverses to
         suit your needs. The fields name, alias, and dataverseContacts are
-        required. http://guides.dataverse.org/en/latest/_downloads/dataverse-complete.json
+        required. http://guides.dataverse.org/en/latest/
+        _downloads/dataverse-complete.json
 
         Parameters
         ----------
@@ -213,24 +214,28 @@ class Api(object):
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def get_dataset(self, identifier, is_doi=True, return_data_type='json_as_dict'):
+    def get_dataset(self, identifier, is_doi=True,
+                    return_data_type='json_as_dict'):
         """Get JSON representation of a dataset.
 
         With Dataverse identifier:
             GET http://$SERVER/api/datasets/$identifier
         With PID:
             GET http://$SERVER/api/datasets/:persistentId/?persistentId=$ID
-            GET http://$SERVER/api/datasets/:persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
+            GET http://$SERVER/api/datasets/:persistentId/
+            ?persistentId=doi:10.5072/FK2/J8SJZB
         """
         if is_doi:
-            query_str = '/datasets/:persistentId/?persistentId={0}'.format(identifier)
+            query_str = '/datasets/:persistentId/?persistentId={0}'.format(
+                identifier)
         else:
             query_str = '/datasets/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def get_dataset_export(self, export_format, identifier, return_data_type='content'):
+    def get_dataset_export(self, export_format, identifier,
+                           return_data_type='content'):
         """Get metadata of a dataset exported in different formats.
 
         CORS Export the metadata of the current published version of a dataset
@@ -239,14 +244,17 @@ class Api(object):
         Formats: 'ddi', 'oai_ddi', 'dcterms', 'oai_dc', 'schema.org',
             'dataverse_json'
 
-        GET http://$SERVER/api/datasets/export?exporter=ddi&persistentId=$persistentId
+        GET http://$SERVER/api/datasets/
+        export?exporter=ddi&persistentId=$persistentId
         """
-        query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(export_format, identifier)
+        query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
+            export_format, identifier)
         resp = self.make_get_request(query_str)
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def get_dataset_files(self, doi, version='1', return_data_type='json_as_dict'):
+    def get_dataset_files(self, doi, version='1',
+                          return_data_type='json_as_dict'):
         # TODO: add passing of dataset and version as string
         """List files in a dataset.
 
@@ -255,11 +263,13 @@ class Api(object):
         doi = string
 
         http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
-        GET http://$SERVER/api/datasets/$id/versions/$versionId/files?key=$apiKey
+        GET http://$SERVER/api/datasets/$id/versions/$versionId/
+        files?key=$apiKey
 
         dataset muss eine Dataset() Classe sein.
         """
-        query_str = '/datasets/:persistentId/versions/{0}/files?persistentId={1}'.format(version, doi)
+        base_str = '/datasets/:persistentId/versions/'
+        query_str = base_str+'{0}/files?persistentId={1}'.format(version, doi)
         resp = self.make_get_request(query_str)
         data = self.__get_request_return(resp, return_data_type)
         return data
@@ -270,7 +280,8 @@ class Api(object):
         File ID
             GET /api/access/datafile/$id
         DOI
-            GET http://$SERVER/api/access/datafile/:persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
+            GET http://$SERVER/api/access/datafile/
+            :persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
         """
         query_str = '/access/datafile/{0}'.format(identifier)
         resp = self.make_get_request(query_str)

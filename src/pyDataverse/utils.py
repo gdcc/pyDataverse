@@ -21,7 +21,7 @@ def read_file(filename):
             data = f.read()
         return data
     except Exception as e:
-        raise
+        raise e
 
 
 def read_json_file(filename):
