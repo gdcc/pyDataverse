@@ -5,6 +5,7 @@ import os
 import pytest
 from pyDataverse.api import Api
 
+
 def test_connection_to_api():
     """Test setup of Dataverse API connection.
 
