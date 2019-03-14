@@ -1,0 +1,16 @@
+codecov
+coverage
+coveralls
+check-manifest
+future
+pycodestyle
+pytest>=3.0.0
+pytest-cov
+pytest-env>=0.6.2
+pytest-runner
+pytest-xdist
+requests
+setuptools
+tox
+tox-pyenv
+wheel

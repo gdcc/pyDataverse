@@ -1,0 +1,30 @@
+language: python
+cache: pip
+dist: xenial
+python:
+  - '3.5'
+  - '3.6'
+
+before_install:
+  - python --version
+
+install:
+  - pip install tox-travis
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
+
+script:
+  - tox
+
+after_success:
+  - pip install codecov
+  - coveralls
+
+notifications:
+  email:
+    recipients:
+      - stefan.kasberger@univie.ac.at
+    on_success: never
+    on_failure: always
