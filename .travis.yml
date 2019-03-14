@@ -19,6 +19,10 @@ matrix:
     - python: 3.6
       env: TOXENV=packaging
     - python: 3.5
+      env: TOXENV=docs
+    - python: 3.6
+      env: TOXENV=docs
+    - python: 3.5
       env: TOXENV=coverage
     - python: 3.6
       env: TOXENV=coverage
