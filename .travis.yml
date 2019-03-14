@@ -2,7 +2,7 @@ language: python
 cache: pip
 dist: xenial
 python:
-  - '3.6'
+  - '3.5'
 
 before_install:
   - python --version
