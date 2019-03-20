@@ -152,6 +152,14 @@ class Api(object):
             resp = requests.get(query_str)
         return resp
 
+    def make_delete_request(self, query_str):
+        """Make a DELETE request."""
+        resp = requests.delete(
+            '{0}{1}'.format(self.native_base_url, query_str),
+            params={'key': self.api_token}
+        )
+        return resp
+
     def get_dataverse(self, identifier, return_data_type='json_as_dict'):
         """Get a dataverse.
 
@@ -166,7 +174,7 @@ class Api(object):
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def create_dataverse(self, identifier, json, parent=None,
+    def create_dataverse(self, identifier, json, parent=':root',
                          return_data_type='json_as_dict'):
         """Create a dataverse.
 
@@ -202,15 +210,36 @@ class Api(object):
         """
         if not parent:
             print('No parent dataverse passed.')
-            return False
 
-        query_str = '/dataverses/{1}'.format(parent)
+        query_str = '/dataverses/{0}'.format(parent)
         resp = self.make_post_request(query_str, json)
 
         if resp.status_code == 404:
             print('Dataverse {0} was not found.'.format(parent))
-        elif resp.status_code != 201:
+        elif resp.status_code == 201:
+            print('{0} Dataverse has been created.'.format(identifier))
+        else:
             print('{0} Dataverse could not be created.'.format(identifier))
+        data = self.__get_request_return(resp, return_data_type)
+        return data
+
+    def delete_dataverse(self, identifier, return_data_type='json_as_dict'):
+        """Delete dataverse.
+
+        Deletes the dataverse whose ID is given:
+
+        DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
+
+        """
+        query_str = '/dataverses/{0}'.format(identifier)
+        resp = self.make_delete_request(query_str)
+
+        if resp.status_code == 404:
+            print('Dataverse {0} was not found.'.format(identifier))
+        elif resp.status_code == 200:
+            print('{0} Dataverse has been deleted.'.format(identifier))
+        else:
+            print('{0} Dataverse could not be deleted.'.format(identifier))
         data = self.__get_request_return(resp, return_data_type)
         return data
 
