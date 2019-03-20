@@ -14,10 +14,10 @@ def dict_to_json(data):
     return json.dumps(data, ensure_ascii=False, indent=2)
 
 
-def read_file(filename):
+def read_file(filename, mode='r'):
     """Read in a file."""
     try:
-        with open(filename) as f:
+        with open(filename, mode) as f:
             data = f.read()
         return data
     except Exception as e:
