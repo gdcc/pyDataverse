@@ -1,7 +1,8 @@
 from __future__ import absolute_import
-
 from datetime import datetime
+import json
 import requests
+import subprocess as sp
 
 """
 Connect and request the Dataverse API Endpoints. Save and use request results.
@@ -95,15 +96,20 @@ class Api(object):
             print('No valid return_data_type passed.')
             return False
 
-    def make_post_request(self, query_str, json, auth=True):
+    def make_post_request(self, query_str, data, headers=None, params=None,
+                          auth=True):
         """Make a POST request.
 
         Parameters
         ----------
         query_str : string
             Description of parameter `query_str`.
-        json : string
-            Description of parameter `json`.
+        data : ??
+            Description of parameter `data`.
+        headers : dict()
+            Description.
+        params : dict()
+            Description.
         auth : boolean
             Is authentication used (True/False).
 
@@ -114,17 +120,17 @@ class Api(object):
 
         """
         if auth:
-            resp = requests.post(
-                '{0}{1}'.format(self.native_base_url, query_str),
-                json,
-                params={'key': self.api_token}
-            )
-        else:
-            resp = requests.post(
-                query_str,
-                json
-            )
+            if not params:
+                params = {}
+            params['key'] = self.api_token
 
+        resp = requests.post(
+            '{0}{1}'.format(self.native_base_url, query_str),
+            data=data,
+            headers=headers,
+            params=params
+
+        )
         return resp
 
     def make_get_request(self, query_str, auth=True):
@@ -227,8 +233,19 @@ class Api(object):
         """Delete dataverse.
 
         Deletes the dataverse whose ID is given:
-
         DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
+
+        Parameters
+        ----------
+        identifier : string
+            Description of parameter `identifier`.
+        return_data_type : string
+            Description of parameter `return_data_type`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
@@ -282,8 +299,79 @@ class Api(object):
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def get_dataset_files(self, doi, version='1',
-                          return_data_type='json_as_dict'):
+    def create_dataset(self, dataverse, json, return_data_type='json_as_dict'):
+        """Add dataset to dataverse.
+
+        http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
+        POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file FILENAME
+        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&release=yes --upload-file dataset.json
+        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets --upload-file dataset-finch1.json
+
+        To create a dataset, you must create a JSON file containing all the
+        metadata you want such as in this example file: dataset-finch1.json.
+        Then, you must decide which dataverse to create the dataset in and
+        target that datavese with either the “alias” of the dataverse (e.g.
+        “root” or the database id of the dataverse (e.g. “1”). The initial
+        version state will be set to DRAFT:
+        http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
+
+        Parameters
+        ----------
+        dataverse : string
+            Description of parameter `dataverse`.
+        json : string
+            json-formatted string.
+        return_data_type : string
+            Description of parameter `return_data_type`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        """
+        query_str = '/dataverses/{0}/datasets'.format(dataverse)
+        resp = self.make_post_request(query_str, json)
+
+        if resp.status_code == 404:
+            print('Dataverse {0} was not found.'.format(dataverse))
+        elif resp.status_code == 201:
+            print('Dataset has been created.')
+        else:
+            print('Dataset could not be created.')
+        data = self.__get_request_return(resp, return_data_type)
+        return data
+
+    def delete_dataset(self, identifier, return_data_type='json_as_dict'):
+        """Delete dataset.
+
+        Delete the dataset whose id is passed:
+        DELETE http://$SERVER/api/datasets/$id?key=$apiKey
+
+        """
+        query_str = '/datasets/:persistentId/?persistentId={0}'.format(
+            identifier)
+        resp = self.make_delete_request(query_str)
+        print(resp.status_code)
+        print(resp.text)
+
+        if resp.status_code == 404:
+            print('Dataset {0} was not found.'.format(identifier))
+        elif resp.status_code == 200:
+            print('{0} Dataset has been deleted.'.format(identifier))
+        elif resp.status_code == 405:
+            print(
+                'Published datasets can only be deleted from the GUI. For '
+                'more information, please refer to '
+                'https://github.com/IQSS/dataverse/issues/778'
+            )
+        else:
+            print('{0} Dataset could not be deleted.'.format(identifier))
+        data = self.__get_request_return(resp, return_data_type)
+        return data
+
+    def get_files(self, doi, version='1',
+                  return_data_type='json_as_dict'):
         # TODO: add passing of dataset and version as string
         """List files in a dataset.
 
@@ -303,7 +391,7 @@ class Api(object):
         data = self.__get_request_return(resp, return_data_type)
         return data
 
-    def get_datafile(self, identifier, format='original'):
+    def get_file(self, identifier, format='original'):
         """Download a datafile.
 
         File ID
@@ -316,7 +404,7 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def get_datafile_bundle(self, identifier):
+    def get_file_bundle(self, identifier):
         """Download a datafile in all its formats.
 
         GET /api/access/datafile/bundle/$id
@@ -331,6 +419,29 @@ class Api(object):
         query_str = '/access/datafile/bundle/{0}'.format(identifier)
         data = self.make_get_request(query_str)
         return data
+
+    def upload_file(self, identifier, filename, return_data_type='json_as_dict'):
+        """Add file to dataset.
+
+        Add a file to an existing Dataset. Description and tags are optional:
+        POST http://$SERVER/api/datasets/$id/add?key=$apiKey
+
+        The upload endpoint checks the content of the file, compares it with
+        existing files and tells if already in the database (most likely via
+        hashing)
+
+        Only json as response possible, cause the shell commands responds
+        as a byte-string.
+
+        """
+        query_str = self.native_base_url+'/datasets/:persistentId/add?persistentId={0}'.format(
+            identifier)
+        shell_command = 'curl -H "X-Dataverse-key: {0}" -X POST {1} -F file=@{2}'.format(
+            self.api_token, query_str, filename)
+        # TODO: is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        resp = json.loads(result.stdout)
+        return resp
 
     def get_info_version(self, return_data_type='json_as_dict'):
         """Get the Dataverse version and build number.
