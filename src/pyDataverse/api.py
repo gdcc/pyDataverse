@@ -303,9 +303,13 @@ class Api(object):
         """Add dataset to dataverse.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
-        POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file FILENAME
-        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&release=yes --upload-file dataset.json
-        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets --upload-file dataset-finch1.json
+        POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file
+         FILENAME
+        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/
+        dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&
+        release=yes --upload-file dataset.json
+        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/
+        dataverses/$DV_ALIAS/datasets --upload-file dataset-finch1.json
 
         To create a dataset, you must create a JSON file containing all the
         metadata you want such as in this example file: dataset-finch1.json.
@@ -420,7 +424,8 @@ class Api(object):
         data = self.make_get_request(query_str)
         return data
 
-    def upload_file(self, identifier, filename, return_data_type='json_as_dict'):
+    def upload_file(self, identifier, filename,
+                    return_data_type='json_as_dict'):
         """Add file to dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -434,9 +439,13 @@ class Api(object):
         as a byte-string.
 
         """
-        query_str = self.native_base_url+'/datasets/:persistentId/add?persistentId={0}'.format(
+        # TODO: Remove curl and implement it natively in python
+        query_str = self.native_base_url
+        query_str += '/datasets/:persistentId/add?persistentId={0}'.format(
             identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}" -X POST {1} -F file=@{2}'.format(
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
+            self.api_token)
+        shell_command += ' -X POST {0} -F file=@{2}'.format(
             self.api_token, query_str, filename)
         # TODO: is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)

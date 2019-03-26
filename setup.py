@@ -31,6 +31,7 @@ def find_version(*file_paths):
 INSTALL_REQUIREMENTS = [
     # A string or list of strings specifying what other distributions need to
     # be installed when this one is.
+    'curl'
 ]
 
 TESTS_REQUIREMENTS = [
