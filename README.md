@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/AUSSDA/pyDataverse.svg?branch=master)](https://travis-ci.org/AUSSDA/pyDataverse) [![Coverage Status](https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg?branch=master)](https://coveralls.io/github/AUSSDA/pyDataverse?branch=master)
+[![Build Status](https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master)](https://travis-ci.com/AUSSDA/pyDataverse) [![Coverage Status](https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg?branch=master)](https://coveralls.io/github/AUSSDA/pyDataverse?branch=master)
 
 # pyDataverse
 
