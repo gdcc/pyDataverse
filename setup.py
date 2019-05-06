@@ -66,7 +66,7 @@ setup(
     long_description_content_type="text/markdown",
     license='MIT',
     url='https://github.com/AUSSDA/pyDataverse',
-    python_requires='>=3.5',
+    python_requires='>=2.7',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=INSTALL_REQUIREMENTS,
