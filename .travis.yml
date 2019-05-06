@@ -23,8 +23,12 @@ matrix:
     - python: 3.6
       env: TOXENV=flake8
 
+branches:
+  only:
+    - master
+
 before_install:
-  - python --version
+  - echo $TRAVIS_PYTHON_VERSION
 
 install:
   - pip install tox-travis
