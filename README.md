@@ -2,7 +2,7 @@
 
 # pyDataverse
 
-A Python wrapper for the Dataverse API. Developed by [Stefan Kasberger](http://stefankasberger.at) for [AUSSDA - The Austrian Social Science Data Archive](http://aussda.at/).
+A Python wrapper to work with the Dataverse API. It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. The module is developed by [Stefan Kasberger](http://stefankasberger.at) for [AUSSDA - The Austrian Social Science Data Archive](http://aussda.at/). Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired.
 
 
 **Features**
@@ -13,7 +13,7 @@ A Python wrapper for the Dataverse API. Developed by [Stefan Kasberger](http://s
 
 **Copyright**
 
-* Code:  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+* Code:  ![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)
 * Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
 ## INSTALL
