@@ -4,19 +4,17 @@ import json
 import requests
 import subprocess as sp
 
+
 """
 Connect and request the Dataverse API Endpoints. Save and use request results.
 """
 
 
 class Api(object):
-    """DEFAULT."""
+    """API class.
 
-    def __init__(self, host, api_token=None, use_https=True, api_version='v1'):
-        """Init an Api() class.
-
-        Parameters
-        ----------
+    Parameters
+    ----------
         host : string
             Description of parameter `host`.
         api_token : string
@@ -26,35 +24,51 @@ class Api(object):
         api_version : string
             Dataverse API version.
 
-        Returns
-        -------
-        type
-            Description of returned object.
+    Attributes
+    ----------
+    conn_started : type
+        Description of attribute `conn_started`.
+    base_url : type
+        Description of attribute `base_url`.
+    native_base_url : type
+        Description of attribute `native_base_url`.
+    dataverse_version : type
+        Description of attribute `dataverse_version`.
+    get_info_version : type
+        Description of attribute `get_info_version`.
+    host
+    api_token
+    use_https
+    api_version
+
+    """
+
+    def __init__(self, base_url, api_token=None, use_https=True,
+                 api_version='v1'):
+        """Init an Api() class.
+
+        Scheme, host and path combined create the base-url for the API.
+        See more about url at https://en.wikipedia.org/wiki/URL
 
         """
-        # set passed values
-        self.host = host
+        # set mandatory variables
+        self.base_url = base_url
+        # set optional variables
         self.api_token = api_token
-        self.use_https = use_https
-        self.api_version = api_version
-        # set derived values
-        self.conn_started = datetime.now()
-        if use_https:
-            url_scheme = 'https://'
+        if self.base_url.find('https', 0, 5):
+            self.use_https = True
         else:
-            url_scheme = 'http://'
-        self.base_url = '{0}{1}'.format(url_scheme, self.host)
-        self.native_base_url = '{0}/api/{1}'.format(self.base_url,
-                                                    self.api_version)
+            self.use_https = False
+        self.api_version = api_version
+        # set derived variables
+        self.conn_started = datetime.now()
+        self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
+                                                        self.api_version)
         self.dataverse_version = \
             self.get_info_version('json_as_dict')['data']['version']
 
     def __str__(self):
-        """Return naming of Api() class for users.
-
-        Parameters
-        ----------
-
+        """Return name of Api() class for users.
 
         Returns
         -------
@@ -64,84 +78,18 @@ class Api(object):
         """
         return 'pyDataverse API class'
 
-    def __get_request_return(self, resp, return_data_type='json_as_dict'):
-        """Return the needed data type for the request made.
-
-        Parameters
-        ----------
-        resp : requests.Response
-            Return of the requests.request function call.
-        return_data_type : string
-            Wanted data type to return, 'text', 'json_as_dict', 'content'
-            and 'response_object' as options.
-
-        Returns
-        -------
-        dict(), response object, string or boolean
-            Returns the requested data, or False if error occurs.
-
-        All other specific options can be accessed directly via the response
-        object.
-
-        """
-        if return_data_type == 'text':
-            return resp.text
-        elif return_data_type == 'json_as_dict':
-            return resp.json()
-        elif return_data_type == 'content':
-            return resp.content
-        elif return_data_type == 'response_object':
-            return resp
-        else:
-            print('No valid return_data_type passed.')
-            return False
-
-    def make_post_request(self, query_str, data, headers=None, params=None,
-                          auth=True):
-        """Make a POST request.
-
-        Parameters
-        ----------
-        query_str : string
-            Description of parameter `query_str`.
-        data : ??
-            Description of parameter `data`.
-        headers : dict()
-            Description.
-        params : dict()
-            Description.
-        auth : boolean
-            Is authentication used (True/False).
-
-        Returns
-        -------
-        requests.Response
-            Response object of requerst library.
-
-        """
-        if auth:
-            if not params:
-                params = {}
-            params['key'] = self.api_token
-
-        resp = requests.post(
-            '{0}{1}'.format(self.native_base_url, query_str),
-            data=data,
-            headers=headers,
-            params=params
-
-        )
-        return resp
-
-    def make_get_request(self, query_str, auth=True):
+    def make_get_request(self, query_str, params=None, auth=False):
         """Make a GET request.
 
         Parameters
         ----------
         query_str : string
             Description of parameter `query_str`.
-        auth : boolean
-            Is authentication used (True/False).
+        auth : bool
+            Should an api token be used for authentication? By default = False.
+        params : dict
+            Dictionary of parameters to be passed with the request.
+            Default: None
 
         Returns
         -------
@@ -150,38 +98,115 @@ class Api(object):
 
         """
         if auth:
-            resp = requests.get(
-                '{0}{1}'.format(self.native_base_url, query_str),
-                params={'key': self.api_token}
-            )
-        else:
-            resp = requests.get(query_str)
-        return resp
+            if self.api_token:
+                if not params:
+                    params = {}
+                params['key'] = self.api_token
+            else:
+                print('ERROR: API token not available for GET request.')
 
-    def make_delete_request(self, query_str):
-        """Make a DELETE request."""
+        try:
+            resp = requests.get(
+                '{0}{1}'.format(self.native_api_base_url, query_str),
+                params=params
+            )
+            return resp
+        except Exception as e:
+            raise e
+
+    def make_post_request(self, query_str, data, auth=False, headers=None,
+                          params=None):
+        """Make a POST request.
+
+        Parameters
+        ----------
+        query_str : string
+            Description of parameter `query_str`.
+        data : ??
+            Description of parameter `data`.
+        auth : bool
+            Should an api token be used for authentication? By default = False.
+        headers : dict()
+            Description.
+        params : dict
+            Dictionary of parameters to be passed with the request.
+            Default: None
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
+        """
+        if auth:
+            if self.api_token:
+                if not params:
+                    params = {}
+                params['key'] = self.api_token
+            else:
+                print('ERROR: API token not available for POST request.')
+
+        try:
+            resp = requests.post(
+                '{0}{1}'.format(self.native_api_base_url, query_str),
+                data=data,
+                headers=headers,
+                params=params
+            )
+            return resp
+        except Exception as e:
+            raise e
+
+    def make_delete_request(self, query_str, auth=False, params=None):
+        """Make a DELETE request.
+
+        auth : bool
+            Should an api token be used for authentication? By default = False.
+        params : dict
+            Dictionary of parameters to be passed with the request.
+            Default: None
+
+        """
+        if auth:
+            if self.api_token:
+                if not params:
+                    params = {}
+                params['key'] = self.api_token
+            else:
+                print('ERROR: API token not available for DELETE request.')
+
         resp = requests.delete(
             '{0}{1}'.format(self.native_base_url, query_str),
             params={'key': self.api_token}
         )
         return resp
 
-    def get_dataverse(self, identifier, return_data_type='json_as_dict'):
-        """Get a dataverse.
+    def get_dataverse(self, identifier):
+        """Get dataverse metadata by alias or id.
 
         View data about the dataverse $identified by identifier. Identifier can
         be the id number of the dataverse, its alias, or the special
         value :root.
 
         GET http://$SERVER/api/dataverses/$id
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long) or a dataverse alias (more
+            robust).
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/dataverses/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def create_dataverse(self, identifier, json, parent=':root',
-                         return_data_type='json_as_dict'):
+    def create_dataverse(self, identifier, json, parent=':root'):
         """Create a dataverse.
 
         Generates a new dataverse under $id. Expects a JSON content describing
@@ -202,16 +227,14 @@ class Api(object):
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
         json : string
-            Description of parameter `json`.
+            JSON-formatted string for upload.
         parent : string
-            Parent dataverse if existing.
-        return_data_type : string
-            Description of parameter `return_data_type`.
+            Parent dataverse if existing. Default is `:root`.
 
         Returns
         -------
-        type
-            Description of returned object.
+        requests.Response
+            Response object of requerst library.
 
         """
         if not parent:
@@ -226,11 +249,10 @@ class Api(object):
             print('{0} Dataverse has been created.'.format(identifier))
         else:
             print('{0} Dataverse could not be created.'.format(identifier))
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def delete_dataverse(self, identifier, return_data_type='json_as_dict'):
-        """Delete dataverse.
+    def delete_dataverse(self, identifier):
+        """Delete dataverse by alias or id.
 
         Deletes the dataverse whose ID is given:
         DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
@@ -238,14 +260,13 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Description of parameter `identifier`.
-        return_data_type : string
-            Description of parameter `return_data_type`.
+            Can either be a dataverse id (long) or a dataverse alias (more
+            robust).
 
         Returns
         -------
-        type
-            Description of returned object.
+        requests.Response
+            Response object of requerst library.
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
@@ -257,12 +278,10 @@ class Api(object):
             print('{0} Dataverse has been deleted.'.format(identifier))
         else:
             print('{0} Dataverse could not be deleted.'.format(identifier))
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_dataset(self, identifier, is_doi=True,
-                    return_data_type='json_as_dict'):
-        """Get JSON representation of a dataset.
+    def get_dataset(self, identifier, is_doi=True):
+        """Get metadata of a dataset.
 
         With Dataverse identifier:
             GET http://$SERVER/api/datasets/$identifier
@@ -270,6 +289,20 @@ class Api(object):
             GET http://$SERVER/api/datasets/:persistentId/?persistentId=$ID
             GET http://$SERVER/api/datasets/:persistentId/
             ?persistentId=doi:10.5072/FK2/J8SJZB
+
+        Parameters
+        ----------
+        identifier : string
+            Doi of the dataset.
+        is_doi : bool
+            Is the identifier a Doi? Defaul: True, cause so far the module only
+            supports Doi's.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         if is_doi:
             query_str = '/datasets/:persistentId/?persistentId={0}'.format(
@@ -277,29 +310,38 @@ class Api(object):
         else:
             query_str = '/datasets/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_dataset_export(self, export_format, identifier,
-                           return_data_type='content'):
-        """Get metadata of a dataset exported in different formats.
+    def get_dataset_export(self, export_format, identifier):
+        """Get metadata of dataset exported in different formats.
 
         CORS Export the metadata of the current published version of a dataset
-        in various formats see Note below:
-
+        in various formats:
         Formats: 'ddi', 'oai_ddi', 'dcterms', 'oai_dc', 'schema.org',
             'dataverse_json'
 
         GET http://$SERVER/api/datasets/
         export?exporter=ddi&persistentId=$persistentId
+
+        Parameters
+        ----------
+        export_format : string
+            Export format as a string.
+        identifier : string
+            Doi of the dataset.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
             export_format, identifier)
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def create_dataset(self, dataverse, json, return_data_type='json_as_dict'):
+    def create_dataset(self, dataverse, json):
         """Add dataset to dataverse.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
@@ -322,16 +364,14 @@ class Api(object):
         Parameters
         ----------
         dataverse : string
-            Description of parameter `dataverse`.
+            Alias for dataverse.
         json : string
-            json-formatted string.
-        return_data_type : string
-            Description of parameter `return_data_type`.
+            Dataverse metadata as json-formatted string.
 
         Returns
         -------
-        type
-            Description of returned object.
+        requests.Response
+            Response object of requerst library.
 
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
@@ -343,14 +383,23 @@ class Api(object):
             print('Dataset has been created.')
         else:
             print('Dataset could not be created.')
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def delete_dataset(self, identifier, return_data_type='json_as_dict'):
+    def delete_dataset(self, identifier):
         """Delete dataset.
 
         Delete the dataset whose id is passed:
         DELETE http://$SERVER/api/datasets/$id?key=$apiKey
+
+        Parameters
+        ----------
+        identifier : string
+            Dataverse id or alias.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
 
         """
         query_str = '/datasets/:persistentId/?persistentId={0}'.format(
@@ -371,31 +420,34 @@ class Api(object):
             )
         else:
             print('{0} Dataset could not be deleted.'.format(identifier))
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_files(self, doi, version='1',
-                  return_data_type='json_as_dict'):
-        # TODO: add passing of dataset and version as string
-        """List files in a dataset.
-
-        Lists all the file metadata, for the given dataset and version:
-
-        doi = string
+    def get_files(self, doi, version='1'):
+        """List metadata of all files of a dataset.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
         GET http://$SERVER/api/datasets/$id/versions/$versionId/
         files?key=$apiKey
 
-        dataset muss eine Dataset() Classe sein.
+        Parameters
+        ----------
+        doi : string
+            Doi of dataset.
+        version : string
+            Version of dataset.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         base_str = '/datasets/:persistentId/versions/'
         query_str = base_str+'{0}/files?persistentId={1}'.format(version, doi)
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_file(self, identifier, format='original'):
+    def get_file(self, identifier):
         """Download a datafile.
 
         File ID
@@ -403,6 +455,17 @@ class Api(object):
         DOI
             GET http://$SERVER/api/access/datafile/
             :persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
+
+        Parameters
+        ----------
+        identifier : string
+            Doi of datafile.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/access/datafile/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
@@ -419,14 +482,23 @@ class Api(object):
         passing the actual persistent id as a query parameter with the name
         persistentId.
 
+        Parameters
+        ----------
+        identifier : string
+            Doi of Datafile.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/access/datafile/bundle/{0}'.format(identifier)
         data = self.make_get_request(query_str)
         return data
 
-    def upload_file(self, identifier, filename,
-                    return_data_type='json_as_dict'):
-        """Add file to dataset.
+    def upload_file(self, identifier, filename):
+        """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
         POST http://$SERVER/api/datasets/$id/add?key=$apiKey
@@ -435,83 +507,121 @@ class Api(object):
         existing files and tells if already in the database (most likely via
         hashing)
 
-        Only json as response possible, cause the shell commands responds
-        as a byte-string.
+        Parameters
+        ----------
+        identifier : string
+            Doi of dataset.
+        filename : string
+            Full filename with path.
+
+        Returns
+        -------
+        dict
+            Response of CURL request, converted to dict().
 
         """
-        # TODO: Remove curl and implement it natively in python
-        query_str = self.native_base_url
+        query_str = self.native_api_base_url
         query_str += '/datasets/:persistentId/add?persistentId={0}'.format(
             identifier)
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{2}'.format(
-            self.api_token, query_str, filename)
+            query_str, filename)
         # TODO: is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
         return resp
 
-    def get_info_version(self, return_data_type='json_as_dict'):
+    def get_info_version(self):
         """Get the Dataverse version and build number.
 
         The response contains the version and build numbers.
 
         Requires no api_token
         GET http://$SERVER/api/info/version
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/info/version'
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_info_server(self, return_data_type='json_as_dict'):
+    def get_info_server(self):
         """Get Dataverse Server Name.
 
         This is useful when a Dataverse system is
         composed of multiple Java EE servers behind a load balancer.
 
         GET http://$SERVER/api/info/server
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/info/server'
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_info_apiTermsOfUse(self, return_data_type='json_as_dict'):
+    def get_info_apiTermsOfUse(self):
         """Get API Terms of Use URL.
 
         The response contains the text value inserted as API Terms of use which
         uses the database setting :ApiTermsOfUse.
 
         GET http://$SERVER/api/info/apiTermsOfUse
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/info/apiTermsOfUse'
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_metadatablocks(self, return_data_type='json_as_dict'):
+    def get_metadatablocks(self):
         """Get info about all metadata blocks.
 
         Lists brief info about all metadata blocks registered in the system.
 
         GET http://$SERVER/api/metadatablocks
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/metadatablocks'
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
 
-    def get_metadatablock(self, identifier, return_data_type='json_as_dict'):
+    def get_metadatablock(self, identifier):
         """Get info about single metadata block.
 
         Returns data about the block whose identifier is passed. identifier can
         either be the block’s id, or its name.
 
         GET http://$SERVER/api/metadatablocks/$identifier
+
+        Parameters
+        ----------
+        identifier : string
+            Can be block's id, or it's name.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requerst library.
+
         """
         query_str = '/metadatablocks/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
-        data = self.__get_request_return(resp, return_data_type)
-        return data
+        return resp
