@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import absolute_import
 
 import csv
@@ -24,7 +25,7 @@ def json_to_dict(data):
     try:
         return json.loads(data)
     except Exception as e:
-        raise
+        raise e
 
 
 def dict_to_json(data):
@@ -47,7 +48,7 @@ def dict_to_json(data):
     try:
         return json.dumps(data, ensure_ascii=False, indent=2)
     except Exception as e:
-        raise
+        raise e
 
 
 def read_file(filename, mode='r'):
@@ -93,7 +94,7 @@ def write_file(filename, string, mode='w'):
         with open(filename, mode) as f:
             f.write(string)
     except Exception as e:
-        raise
+        raise e
 
 
 def read_file_json(filename):
@@ -116,7 +117,7 @@ def read_file_json(filename):
     try:
         return json.loads(read_file(filename), 'r')
     except Exception as e:
-        raise
+        raise e
 
 
 def write_file_json(filename, data, mode='w'):
@@ -156,4 +157,4 @@ def read_file_csv(filename):
         with open(filename, newline='') as csvfile:
             return csv.reader(csvfile, delimiter=',', quotechar='"')
     except Exception as e:
-        raise
+        raise e
