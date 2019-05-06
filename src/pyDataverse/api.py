@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import absolute_import
 from datetime import datetime
 import json
@@ -65,7 +66,7 @@ class Api(object):
         self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                         self.api_version)
         self.dataverse_version = \
-            self.get_info_version('json_as_dict')['data']['version']
+            self.get_info_version().json()['data']['version']
 
     def __str__(self):
         """Return name of Api() class for users.
@@ -356,8 +357,8 @@ class Api(object):
         To create a dataset, you must create a JSON file containing all the
         metadata you want such as in this example file: dataset-finch1.json.
         Then, you must decide which dataverse to create the dataset in and
-        target that datavese with either the “alias” of the dataverse (e.g.
-        “root” or the database id of the dataverse (e.g. “1”). The initial
+        target that datavese with either the "alias" of the dataverse (e.g.
+        "root" or the database id of the dataverse (e.g. "1"). The initial
         version state will be set to DRAFT:
         http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
 
