@@ -25,6 +25,7 @@ matrix:
 
 before_install:
   - python --version
+  - sudo apt-get install -y curl
 
 install:
   - pip install tox-travis
