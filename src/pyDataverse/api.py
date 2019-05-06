@@ -2,6 +2,10 @@
 from __future__ import absolute_import
 from datetime import datetime
 import json
+from pyDataverse.exceptions import ConnectionError
+from pyDataverse.exceptions import DataverseNotFoundError
+from pyDataverse.exceptions import OperationFailedError
+from pyDataverse.exceptions import UnauthorizedError
 import requests
 import subprocess as sp
 
@@ -65,8 +69,11 @@ class Api(object):
         self.conn_started = datetime.now()
         self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                         self.api_version)
-        self.dataverse_version = \
-            self.get_info_version().json()['data']['version']
+        try:
+            self.dataverse_version = \
+                self.get_info_version().json()['data']['version']
+        except KeyError:
+            print('Key `data` not in response or key `version` not in `data`.')
 
     def __str__(self):
         """Return name of Api() class for users.
@@ -111,6 +118,10 @@ class Api(object):
                 '{0}{1}'.format(self.native_api_base_url, query_str),
                 params=params
             )
+            if resp.status_code == 403:
+                raise UnauthorizedError('Authorization proveded is invalid.')
+            elif resp.status_code != 200:
+                raise ConnectionError('Could not connect to Dataverse API.')
             return resp
         except Exception as e:
             raise e
@@ -245,11 +256,14 @@ class Api(object):
         resp = self.make_post_request(query_str, json)
 
         if resp.status_code == 404:
-            print('Dataverse {0} was not found.'.format(parent))
-        elif resp.status_code == 201:
-            print('{0} Dataverse has been created.'.format(identifier))
+            raise DataverseNotFoundError(
+                'Dataverse {0} was not found.'.format(parent))
+        elif resp.status_code != 201:
+            raise OperationFailedError(
+                '{0} Dataverse could not be created.'.format(identifier)
+                )
         else:
-            print('{0} Dataverse could not be created.'.format(identifier))
+            print('{0} Dataverse has been created.'.format(identifier))
         return resp
 
     def delete_dataverse(self, identifier):
@@ -273,8 +287,18 @@ class Api(object):
         query_str = '/dataverses/{0}'.format(identifier)
         resp = self.make_delete_request(query_str)
 
-        if resp.status_code == 404:
-            print('Dataverse {0} was not found.'.format(identifier))
+        if resp.status_code == 401:
+            raise UnauthorizedError(
+                'Delete Dataverse {0} unauthorized.'.format(identifier)
+            )
+        elif resp.status_code == 404:
+            raise DataverseNotFoundError(
+                'Dataverse {0} was not found.'.format(identifier)
+                )
+        elif resp.status_code != 200:
+            raise OperationFailedError(
+                'Dataverse {0} could not be deleted.'.format(identifier)
+            )
         elif resp.status_code == 200:
             print('{0} Dataverse has been deleted.'.format(identifier))
         else:
