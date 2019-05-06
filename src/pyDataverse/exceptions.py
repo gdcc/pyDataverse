@@ -25,12 +25,6 @@ class UnauthorizedError(OperationFailedError):
     pass
 
 
-class ConnectionError(OperationFailedError):
-    """Raised when connection fails for an unknown reason."""
-
-    pass
-
-
 class DataverseNotFoundError(OperationFailedError):
     """Raised when a Dataverse cannot be found."""
 

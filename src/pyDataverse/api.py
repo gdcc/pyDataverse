@@ -2,11 +2,11 @@
 from __future__ import absolute_import
 from datetime import datetime
 import json
-from pyDataverse.exceptions import ConnectionError
 from pyDataverse.exceptions import DataverseNotFoundError
 from pyDataverse.exceptions import OperationFailedError
 from pyDataverse.exceptions import UnauthorizedError
 import requests
+from requests.exceptions.RequestException import ConnectionError
 import subprocess as sp
 
 
@@ -120,9 +120,9 @@ class Api(object):
             )
             if resp.status_code == 403:
                 raise UnauthorizedError('Authorization proveded is invalid.')
-            elif resp.status_code != 200:
-                raise ConnectionError('Could not connect to Dataverse API.')
             return resp
+        except ConnectionError:
+            raise ConnectionError('Could not establish connection to API.')
         except Exception as e:
             raise e
 
@@ -166,6 +166,8 @@ class Api(object):
                 params=params
             )
             return resp
+        except ConnectionError:
+            raise ConnectionError('Could not establish connection to API.')
         except Exception as e:
             raise e
 
@@ -187,11 +189,14 @@ class Api(object):
             else:
                 print('ERROR: API token not available for DELETE request.')
 
-        resp = requests.delete(
-            '{0}{1}'.format(self.native_base_url, query_str),
-            params={'key': self.api_token}
-        )
-        return resp
+        try:
+            resp = requests.delete(
+                '{0}{1}'.format(self.native_base_url, query_str),
+                params={'key': self.api_token}
+            )
+            return resp
+        except ConnectionError:
+            raise ConnectionError('Could not establish connection to API.')
 
     def get_dataverse(self, identifier):
         """Get dataverse metadata by alias or id.
