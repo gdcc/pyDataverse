@@ -8,7 +8,7 @@ class DataverseError(Exception):
 
 
 class DataverseApiError(DataverseError):
-    """Base exception class for Dataverse-related API error."""
+    """Base exception class for Dataverse-related api error."""
 
     pass
 
@@ -20,13 +20,13 @@ class OperationFailedError(DataverseApiError):
 
 
 class ApiUrlError(DataverseApiError):
-    """Raised when an operation fails for an unknown reason."""
+    """Raised when the request url is not valid."""
 
     pass
 
 
 class ApiResponseError(DataverseApiError):
-    """Raised when an operation fails for an unknown reason."""
+    """Raised when the requests response fails."""
 
     pass
 
