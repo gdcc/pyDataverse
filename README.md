@@ -7,16 +7,18 @@ A Python wrapper to work with the Dataverse API. It allows to create, update and
 
 **Features**
 
-* Requests: GET, POST (Curl) and DELETE
-* Open Source (MIT)
 * Python 2 and 3 (>=2.7)
+* Open Source (MIT)
+* Object-oriented programming approach
+* Many different Dataverse Api Requests (based on GET, POST (Curl) and DELETE)
+* Custom exceptions
 * Tests with [pytest](https://docs.pytest.org/en/latest/), [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) and [tox](http://tox.readthedocs.io/).
 * Documentation with [sphinx](http://www.sphinx-doc.org/).
 
 
 **Copyright**
 
-* Code:  ![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)
+* Code:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
 * Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
 ## INSTALL
