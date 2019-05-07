@@ -1,8 +1,8 @@
-from setuptools import setup
-from setuptools import find_packages
 import codecs
 import os
 import re
+from setuptools import find_packages
+from setuptools import setup
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
