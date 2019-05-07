@@ -52,17 +52,17 @@ class Api(object):
 
         """
         # Check and set basic variables.
-        if not isinstance(base_url, str):
+        if not isinstance(base_url, ("".__class__, u"".__class__)):
             raise ApiUrlError('base_url {0} is not a string.'.format(base_url))
         self.base_url = base_url
 
-        if not isinstance(api_version, str):
+        if not isinstance(api_version, ("".__class__, u"".__class__)):
             raise ApiUrlError('api_version {0} is not a string.'.format(
                 api_version))
         self.api_version = api_version
 
         if api_token:
-            if not isinstance(api_token, str):
+            if not isinstance(api_token, ("".__class__, u"".__class__)):
                 raise ApiAuthorizationError(
                     'Api token passed is not a string.')
         self.api_token = api_token
