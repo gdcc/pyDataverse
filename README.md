@@ -98,4 +98,4 @@ When you are ready, submit a [pull request](https://github.com/AUSSDA/pyDatavers
 
 ### Submitting an Issue
 
-We use the [GitHub issue tracker](https://github.com/OKFNat/lobbyscraper/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting a bug report, please try to provide a screenshot that demonstrates the problem.
+We use the [GitHub issue tracker](https://github.com/AUSSDA/pyDataverse/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting a bug report, please try to provide a screenshot that demonstrates the problem.
