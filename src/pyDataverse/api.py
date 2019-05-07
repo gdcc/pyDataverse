@@ -2,11 +2,15 @@
 from __future__ import absolute_import
 from datetime import datetime
 import json
+from pyDataverse.exceptions import ApiAuthorizationError
+from pyDataverse.exceptions import ApiResponseError
+from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.exceptions import DataverseNotFoundError
 from pyDataverse.exceptions import OperationFailedError
-from pyDataverse.exceptions import UnauthorizedError
-import requests
-from requests.exceptions.RequestException import ConnectionError
+from requests import ConnectionError
+from requests import delete
+from requests import get
+from requests import post
 import subprocess as sp
 
 
@@ -20,60 +24,74 @@ class Api(object):
 
     Parameters
     ----------
-        host : string
-            Description of parameter `host`.
+        base_url : string
+            Base URL of Dataverse instance. Without trailing `/` at the end.
+            e.g. `http://demo.dataverse.org`
         api_token : string
-            Description of parameter `api_token`.
-        use_https : boolean
-            Is the api https secured or not.
+            Authenication token for the api.
         api_version : string
-            Dataverse API version.
+            Dataverse API version. Default: `v1`
 
     Attributes
     ----------
-    conn_started : type
+    conn_started : datetime
         Description of attribute `conn_started`.
-    base_url : type
-        Description of attribute `base_url`.
     native_base_url : type
         Description of attribute `native_base_url`.
-    dataverse_version : type
-        Description of attribute `dataverse_version`.
-    get_info_version : type
-        Description of attribute `get_info_version`.
-    host
+    base_url
     api_token
-    use_https
     api_version
 
     """
 
-    def __init__(self, base_url, api_token=None, use_https=True,
-                 api_version='v1'):
+    def __init__(self, base_url, api_token=None, api_version='v1'):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the API.
         See more about url at https://en.wikipedia.org/wiki/URL
 
         """
-        # set mandatory variables
+        # Check and set basic variables.
+        if not isinstance(base_url, str):
+            raise ApiUrlError('base_url {0} is not a string.'.format(base_url))
         self.base_url = base_url
-        # set optional variables
-        self.api_token = api_token
-        if self.base_url.find('https', 0, 5):
-            self.use_https = True
-        else:
-            self.use_https = False
+
+        if not isinstance(api_version, str):
+            raise ApiUrlError('api_version {0} is not a string.'.format(
+                api_version))
         self.api_version = api_version
-        # set derived variables
+
+        if api_token:
+            if not isinstance(api_token, str):
+                raise ApiAuthorizationError(
+                    'Api token passed is not a string.')
+        self.api_token = api_token
         self.conn_started = datetime.now()
-        self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
-                                                        self.api_version)
-        try:
-            self.dataverse_version = \
-                self.get_info_version().json()['data']['version']
-        except KeyError:
-            print('Key `data` not in response or key `version` not in `data`.')
+
+        # Test connection.
+        query_str = '/info/server'
+        if base_url and api_version:
+            self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
+                                                            self.api_version)
+            url = '{0}{1}'.format(self.native_api_base_url, query_str)
+            try:
+                resp = get(url)
+                if resp:
+                    self.status = resp.json()['status']
+                else:
+                    self.status = 'ERROR'
+                    raise ApiResponseError(
+                        'No response from api request {0}.'.format(url)
+                        )
+            except KeyError as e:
+                print('Key not in response {0} {1}.'.format(e, url))
+            except ConnectionError as e:
+                self.status = 'ERROR'
+                print('Could not establish connection to api {0} {1}.'.format(
+                    url, e))
+        else:
+            self.status = 'ERROR'
+            self.native_api_base_url = None
 
     def __str__(self):
         """Return name of Api() class for users.
@@ -105,26 +123,36 @@ class Api(object):
             Response object of request library.
 
         """
+        url = '{0}{1}'.format(self.native_api_base_url, query_str)
         if auth:
             if self.api_token:
                 if not params:
                     params = {}
                 params['key'] = self.api_token
             else:
-                print('ERROR: API token not available for GET request.')
+                raise ApiAuthorizationError(
+                    'GET api token not available {}.'.format(url)
+                    )
 
         try:
-            resp = requests.get(
-                '{0}{1}'.format(self.native_api_base_url, query_str),
+            resp = get(
+                url,
                 params=params
             )
-            if resp.status_code == 403:
-                raise UnauthorizedError('Authorization proveded is invalid.')
+            if resp:
+                if resp.status_code == 401:
+                    raise ApiAuthorizationError(
+                        'GET Authorization provided is invalid {}.'.format(url)
+                        )
+                elif resp.status_code != 200:
+                    raise OperationFailedError(
+                        'GET {} {} not working'.format(resp.status_code, url)
+                        )
             return resp
         except ConnectionError:
-            raise ConnectionError('Could not establish connection to API.')
-        except Exception as e:
-            raise e
+            raise ConnectionError(
+                'GET Could not establish connection to api {}.'.format(url)
+                )
 
     def make_post_request(self, query_str, data, auth=False, headers=None,
                           params=None):
@@ -150,26 +178,33 @@ class Api(object):
             Response object of requerst library.
 
         """
+        url = '{0}{1}'.format(self.native_api_base_url, query_str)
         if auth:
             if self.api_token:
                 if not params:
                     params = {}
                 params['key'] = self.api_token
             else:
-                print('ERROR: API token not available for POST request.')
+                print(
+                    'POST api token not available {}.'.format(url)
+                    )
 
         try:
-            resp = requests.post(
-                '{0}{1}'.format(self.native_api_base_url, query_str),
+            resp = post(
+                url,
                 data=data,
                 headers=headers,
                 params=params
             )
+            if resp.status_code != 201:
+                raise OperationFailedError(
+                    'POST {} {}'.format(resp.status_code, url)
+                    )
             return resp
         except ConnectionError:
-            raise ConnectionError('Could not establish connection to API.')
-        except Exception as e:
-            raise e
+            raise ConnectionError(
+                'POST Could not establish connection to api {}.'.format(url)
+                )
 
     def make_delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
@@ -181,22 +216,27 @@ class Api(object):
             Default: None
 
         """
+        url = '{0}{1}'.format(self.native_base_url, query_str)
         if auth:
             if self.api_token:
                 if not params:
                     params = {}
                 params['key'] = self.api_token
             else:
-                print('ERROR: API token not available for DELETE request.')
+                print(
+                    'DELETE api token not available {}.'.format(url)
+                      )
 
         try:
-            resp = requests.delete(
-                '{0}{1}'.format(self.native_base_url, query_str),
+            resp = delete(
+                url,
                 params={'key': self.api_token}
             )
             return resp
         except ConnectionError:
-            raise ConnectionError('Could not establish connection to API.')
+            raise ConnectionError(
+                'DELETE Could not establish connection to api {}.'.format(url)
+                )
 
     def get_dataverse(self, identifier):
         """Get dataverse metadata by alias or id.
@@ -293,7 +333,7 @@ class Api(object):
         resp = self.make_delete_request(query_str)
 
         if resp.status_code == 401:
-            raise UnauthorizedError(
+            raise ApiAuthorizationError(
                 'Delete Dataverse {0} unauthorized.'.format(identifier)
             )
         elif resp.status_code == 404:

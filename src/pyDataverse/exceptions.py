@@ -19,7 +19,19 @@ class OperationFailedError(DataverseApiError):
     pass
 
 
-class UnauthorizedError(OperationFailedError):
+class ApiUrlError(DataverseApiError):
+    """Raised when an operation fails for an unknown reason."""
+
+    pass
+
+
+class ApiResponseError(DataverseApiError):
+    """Raised when an operation fails for an unknown reason."""
+
+    pass
+
+
+class ApiAuthorizationError(OperationFailedError):
     """Raised if a user provides invalid credentials."""
 
     pass
