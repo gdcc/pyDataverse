@@ -7,8 +7,11 @@ A Python wrapper to work with the Dataverse API. It allows to create, update and
 
 **Features**
 
-* Tests written in [pytest](https://docs.pytest.org/en/latest/) and tested via [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse).
-* auto-generated documentation through functions and class documentation with [sphinx](http://www.sphinx-doc.org/).
+* Requests: GET, POST (Curl) and DELETE
+* Open Source (MIT)
+* Python 2 and 3 (>=2.7)
+* Tests with [pytest](https://docs.pytest.org/en/latest/), [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) and [tox](http://tox.readthedocs.io/).
+* Documentation with [sphinx](http://www.sphinx-doc.org/).
 
 
 **Copyright**
@@ -30,29 +33,30 @@ pip install -r requirements.txt
 
 ```python
 from pyDataverse.api import Api
-host = 'www.dataverse.org'
-auth_token = '' # your Dataverse API authentication token
-api = Api(host, auth_token)
+base_url = 'http://demo.dataverse.org'
+api = Api(base_url)
 ```
 **Get dataverse**
 
 ```python
-dv = ''  # dataverse alias or id
+dv = 'ecastro'  # dataverse alias or id
 resp = api.get_dataverse(dv)
+print(resp.json())
 ```
 
 **Get dataset**
 
 ```python
-doi = '' # doi of the dataset
-resp = api.get_dataset(doi)
+identifier = 'doi:10.5072/FK2/U6AEZM' # doi of the dataset
+resp = api.get_dataset(identifier)
 ```
 
 **Get datafile**
 
 ```python
-file_id = '' # file id of the datafile
-resp = api.get_datafile(file_id, 'content')
+file_id = '32' # file id of the datafile
+resp = api.get_datafile(file_id)
+resp.content
 ```
 
 ## DEVELOPMENT
@@ -62,7 +66,6 @@ resp = api.get_datafile(file_id, 'content')
 ```
 pytest
 ```
-
 
 ### Documentation
 
@@ -74,8 +77,23 @@ sphinx-apidoc -f -o docs/source ..
 make html
 ```
 
-
 ## CONTRIBUTE
 
+In the spirit of free software, everyone is encouraged to help improve this project.
 
-## COPYRIGHT
+Here are some ways you can contribute:
+
+- by reporting bugs
+- by suggesting new features
+- by translating to a new language
+- by writing or editing documentation
+- by writing code (**no pull request is too small**: fix typos in the user interface, add code comments, clean up inconsistent whitespace)
+- by refactoring code or adding new features (please get in touch with us before you do, so we can syncronize the efforts and prevent misunderstandings)
+- by [closing issues](https://github.com/AUSSDA/pyDataverse/issues)
+- by [reviewing pull requests](https://github.com/AUSSDA/pyDataverse/pulls)
+
+When you are ready, submit a [pull request](https://github.com/AUSSDA/pyDataverse).
+
+### Submitting an Issue
+
+We use the [GitHub issue tracker](https://github.com/OKFNat/lobbyscraper/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting a bug report, please try to provide a screenshot that demonstrates the problem.
