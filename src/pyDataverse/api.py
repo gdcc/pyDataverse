@@ -30,14 +30,14 @@ class Api(object):
         api_token : string
             Authenication token for the api.
         api_version : string
-            Dataverse API version. Default: `v1`
+            Dataverse api version. Defaults to `v1`.
 
     Attributes
     ----------
     conn_started : datetime
-        Description of attribute `conn_started`.
-    native_base_url : type
-        Description of attribute `native_base_url`.
+        Time when `Api()` was instantiated, the connection got established.
+    native_api_base_url : string
+        Url of Dataverse's native Api.
     base_url
     api_token
     api_version
@@ -45,9 +45,9 @@ class Api(object):
     """
 
     def __init__(self, base_url, api_token=None, api_version='v1'):
-        """Init an Api() class.
+        """Init an `Api()` class.
 
-        Scheme, host and path combined create the base-url for the API.
+        Scheme, host and path combined create the base-url for the api.
         See more about url at https://en.wikipedia.org/wiki/URL
 
         """
@@ -110,17 +110,18 @@ class Api(object):
         Parameters
         ----------
         query_str : string
-            Description of parameter `query_str`.
-        auth : bool
-            Should an api token be used for authentication? By default = False.
+            Query string for the request. Will be concatenated to
+            `native_api_base_url`.
         params : dict
             Dictionary of parameters to be passed with the request.
-            Default: None
+            Defaults to `None`.
+        auth : bool
+            Should an api token be sent in the request. Defaults to `False`.
 
         Returns
         -------
         requests.Response
-            Response object of request library.
+            Response object of requests library.
 
         """
         url = '{0}{1}'.format(self.native_api_base_url, query_str)
@@ -161,23 +162,26 @@ class Api(object):
         Parameters
         ----------
         query_str : string
-            Description of parameter `query_str`.
-        data : ??
+            Query string for the request. Will be concatenated to
+            `native_api_base_url`.
+        data : type
             Description of parameter `data`.
         auth : bool
-            Should an api token be used for authentication? By default = False.
-        headers : dict()
-            Description.
+            Should an api token be sent in the request. Defaults to `False`.
+        headers : dict
+            Data for the request header.
         params : dict
             Dictionary of parameters to be passed with the request.
-            Default: None
+            Defaults to `None`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
+        # TODO: update to docstring the data data-type and description.
+        # TODO: update to docstring the headers data-type and description.
         url = '{0}{1}'.format(self.native_api_base_url, query_str)
         if auth:
             if self.api_token:
@@ -209,14 +213,24 @@ class Api(object):
     def make_delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
 
+        Parameters
+        ----------
+        query_str : string
+            Query string for the request. Will be concatenated to
+            `native_api_base_url`.
         auth : bool
-            Should an api token be used for authentication? By default = False.
+            Should an api token be sent in the request. Defaults to `False`.
         params : dict
             Dictionary of parameters to be passed with the request.
-            Default: None
+            Defaults to `None`.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
 
         """
-        url = '{0}{1}'.format(self.native_base_url, query_str)
+        url = '{0}{1}'.format(self.native_api_base_url, query_str)
         if auth:
             if self.api_token:
                 if not params:
@@ -256,20 +270,20 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
         resp = self.make_get_request(query_str)
         return resp
 
-    def create_dataverse(self, identifier, json, parent=':root'):
+    def create_dataverse(self, identifier, metadata, parent=':root'):
         """Create a dataverse.
 
-        Generates a new dataverse under $id. Expects a JSON content describing
-        the dataverse, as in the example below. If $id is omitted, a root
-        dataverse is created. $id can either be a dataverse id (long) or a
-        dataverse alias (more robust).
+        Generates a new dataverse under identifier. Expects a JSON content
+        describing the dataverse, as in the example below. If identifier is
+        omitted, a root dataverse is created. $id can either be a dataverse id
+        (long) or a dataverse alias (more robust).
 
         POST http://$SERVER/api/dataverses/$id?key=$apiKey
 
@@ -283,22 +297,23 @@ class Api(object):
         identifier : string
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
-        json : string
-            JSON-formatted string for upload.
+        metadata : string
+            Metadata of the Dataverse as a json-formatted string.
         parent : string
-            Parent dataverse if existing. Default is `:root`.
+            Parent dataverse, if existing, to which the Dataverse gets attached
+            to. Defaults to `:root`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         if not parent:
             print('No parent dataverse passed.')
 
         query_str = '/dataverses/{0}'.format(parent)
-        resp = self.make_post_request(query_str, json)
+        resp = self.make_post_request(query_str, metadata)
 
         if resp.status_code == 404:
             raise DataverseNotFoundError(
@@ -326,7 +341,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
@@ -351,7 +366,7 @@ class Api(object):
         return resp
 
     def get_dataset(self, identifier, is_doi=True):
-        """Get metadata of a dataset.
+        """Get metadata of dataset.
 
         With Dataverse identifier:
             GET http://$SERVER/api/datasets/$identifier
@@ -363,15 +378,15 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Doi of the dataset.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
         is_doi : bool
-            Is the identifier a Doi? Defaul: True, cause so far the module only
-            supports Doi's.
+            Is the identifier a Doi? Defauls to `True`. So far, the module only
+            supports Doi's as PID's.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         if is_doi:
@@ -387,8 +402,6 @@ class Api(object):
 
         CORS Export the metadata of the current published version of a dataset
         in various formats:
-        Formats: 'ddi', 'oai_ddi', 'dcterms', 'oai_dc', 'schema.org',
-            'dataverse_json'
 
         GET http://$SERVER/api/datasets/
         export?exporter=ddi&persistentId=$persistentId
@@ -396,14 +409,15 @@ class Api(object):
         Parameters
         ----------
         export_format : string
-            Export format as a string.
+            Export format as a string. Formats: 'ddi', 'oai_ddi', 'dcterms',
+            'oai_dc', 'schema.org', 'dataverse_json'.
         identifier : string
-            Doi of the dataset.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
@@ -411,12 +425,14 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def create_dataset(self, dataverse, json):
-        """Add dataset to dataverse.
+    def create_dataset(self, dataverse, metadata):
+        """Add dataset to a dataverse.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
+
         POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file
          FILENAME
+
         curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/
         dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&
         release=yes --upload-file dataset.json
@@ -434,18 +450,18 @@ class Api(object):
         Parameters
         ----------
         dataverse : string
-            Alias for dataverse.
-        json : string
+            Alias of dataverse to which the dataset should be added to.
+        metadata : string
             Dataverse metadata as json-formatted string.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
-        resp = self.make_post_request(query_str, json)
+        resp = self.make_post_request(query_str, metadata)
 
         if resp.status_code == 404:
             print('Dataverse {0} was not found.'.format(dataverse))
@@ -456,7 +472,7 @@ class Api(object):
         return resp
 
     def delete_dataset(self, identifier):
-        """Delete dataset.
+        """Delete a dataset.
 
         Delete the dataset whose id is passed:
         DELETE http://$SERVER/api/datasets/$id?key=$apiKey
@@ -464,12 +480,12 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Dataverse id or alias.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/datasets/:persistentId/?persistentId={0}'.format(
@@ -493,7 +509,7 @@ class Api(object):
         return resp
 
     def get_files(self, doi, version='1'):
-        """List metadata of all files of a dataset.
+        """List metadata of all datafiles of a dataset.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
         GET http://$SERVER/api/datasets/$id/versions/$versionId/
@@ -502,14 +518,14 @@ class Api(object):
         Parameters
         ----------
         doi : string
-            Doi of dataset.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
         version : string
-            Version of dataset.
+            Version of dataset. Defaults to `1`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         base_str = '/datasets/:persistentId/versions/'
@@ -529,12 +545,12 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Doi of datafile.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/access/datafile/{0}'.format(identifier)
@@ -555,12 +571,12 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Doi of Datafile.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
 
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/access/datafile/bundle/{0}'.format(identifier)
@@ -580,14 +596,15 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Doi of dataset.
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
         filename : string
             Full filename with path.
 
         Returns
         -------
         dict
-            Response of CURL request, converted to dict().
+            The json string responded by the CURL request, converted to a
+            dict().
 
         """
         query_str = self.native_api_base_url
@@ -613,7 +630,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/info/version'
@@ -621,7 +638,7 @@ class Api(object):
         return resp
 
     def get_info_server(self):
-        """Get Dataverse Server Name.
+        """Get dataverse server name.
 
         This is useful when a Dataverse system is
         composed of multiple Java EE servers behind a load balancer.
@@ -631,7 +648,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/info/server'
@@ -639,7 +656,7 @@ class Api(object):
         return resp
 
     def get_info_apiTermsOfUse(self):
-        """Get API Terms of Use URL.
+        """Get API Terms of Use url.
 
         The response contains the text value inserted as API Terms of use which
         uses the database setting :ApiTermsOfUse.
@@ -649,7 +666,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/info/apiTermsOfUse'
@@ -666,7 +683,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/metadatablocks'
@@ -689,7 +706,7 @@ class Api(object):
         Returns
         -------
         requests.Response
-            Response object of requerst library.
+            Response object of requests library.
 
         """
         query_str = '/metadatablocks/{0}'.format(identifier)
