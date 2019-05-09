@@ -2,18 +2,18 @@
 
 # pyDataverse
 
-A Python wrapper to work with the Dataverse API. It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. The module is developed by [Stefan Kasberger](http://stefankasberger.at) for [AUSSDA - The Austrian Social Science Data Archive](http://aussda.at/). Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired.
+A Python module to work with the Dataverse API. It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
 
 
 **Features**
 
 * Python 2 and 3 (>=2.7)
 * Open Source (MIT)
-* Object-oriented programming approach
-* Many different Dataverse Api Requests (based on GET, POST (Curl) and DELETE)
-* Custom exceptions
+* Many different Dataverse Api Requests (use GET, POST (Curl) and DELETE)
+* Utils functions to support the core-functions
 * Tests with [pytest](https://docs.pytest.org/en/latest/), [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) and [tox](http://tox.readthedocs.io/).
 * Documentation with [sphinx](http://www.sphinx-doc.org/).
+* Custom exceptions
 
 
 **Copyright**
