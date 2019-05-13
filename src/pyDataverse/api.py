@@ -164,8 +164,8 @@ class Api(object):
                 ''.format(url)
             )
 
-    def make_post_request(self, query_str, metadata=None, auth=False, headers=None,
-                          params=None):
+    def make_post_request(self, query_str, metadata=None, auth=False,
+                          headers=None, params=None):
         """Make a POST request.
 
         Parameters
