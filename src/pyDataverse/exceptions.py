@@ -37,7 +37,25 @@ class ApiAuthorizationError(OperationFailedError):
     pass
 
 
+class DataverseNotEmptyError(OperationFailedError):
+    """Raised when a Dataverse cannot be found."""
+
+    pass
+
+
 class DataverseNotFoundError(OperationFailedError):
     """Raised when a Dataverse cannot be found."""
+
+    pass
+
+
+class DatasetNotFoundError(OperationFailedError):
+    """Raised when a Dataset cannot be found."""
+
+    pass
+
+
+class DatafileNotFoundError(OperationFailedError):
+    """Raised when a Dataset cannot be found."""
 
     pass
