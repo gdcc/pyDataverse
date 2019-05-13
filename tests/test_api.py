@@ -17,25 +17,6 @@ from requests import Response
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-# @pytest.fixture(scope="function")
-# def read_json(filename):
-#     """Read in json file.
-#
-#     Parameters
-#     ----------
-#     filename : string
-#         Filename with full path.
-#
-#     Returns
-#     -------
-#     dict
-#         Data represented as a dict().
-#
-#     """
-#     # do something here?
-#     return read_file_json(filename)
-
-
 class TestApiConnect(object):
     """Test the Api() class initalization."""
 
@@ -88,12 +69,21 @@ class TestApiRequests(object):
     @classmethod
     def setup_class(cls):
         """Create the api connection for later use."""
-        # cls.base_url = 'http://demo.dataverse.org'
-        cls.base_url =
-        cls.api_token =
+        if 'API_TOKEN' in os.environ:
+            cls.api_token = os.environ['API_TOKEN']
+        else:
+            print('ERROR: Environment variable API_TOKEN for test missing.')
+        if 'BASE_URL' in os.environ:
+            cls.base_url = os.environ['BASE_URL']
+        else:
+            print('ERROR: Environment variable BASE_URL for test missing.')
         cls.api = Api(cls.base_url, cls.api_token)
-        cls.dataverse_id = 'test-pyDataverse'
+        cls.dataverse_id = 'test-pyDataverse-3'
+        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse_3.json'
+        cls.dataset_id = 'doi:10.5072/FK2/U6AEZM'
         assert cls.api
+        assert cls.api_token
+        assert cls.base_url
 
     def test_make_get_request(self):
         """Test successfull `.make_get_request()` request."""
@@ -105,8 +95,7 @@ class TestApiRequests(object):
 
     def test_create_dataverse(self):
         """Test successfull `.create_dataverse()` request`."""
-        filename = TEST_DIR+'/data/create_dataverse.json'
-        metadata = read_file_json(filename)
+        metadata = read_file_json(self.filename_dataverse)
         query_str = '/dataverses/{0}'.format(self.dataverse_id)
         resp = self.api.create_dataverse(query_str, dict_to_json(metadata))
         assert isinstance(resp, Response)
@@ -120,9 +109,8 @@ class TestApiRequests(object):
 
     def test_get_dataset(self):
         """Test successfull `.get_dataset()` request`."""
-        identifier = 'doi:10.5072/FK2/U6AEZM'
         query_str = '/datasets/:persistentId/?persistentId={0}'.format(
-            identifier)
+            self.dataset_id)
         resp = self.api.get_dataset(query_str)
         assert self.api.status == 'OK'
         assert isinstance(resp, Response)
