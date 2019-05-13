@@ -7,9 +7,8 @@ import os
 from pyDataverse.api import Api
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
-from pyDataverse.utils import read_file_json
 from pyDataverse.utils import dict_to_json
-from pyDataverse.utils import json_to_dict
+from pyDataverse.utils import read_file_json
 import pytest
 from requests import Response
 
@@ -66,6 +65,8 @@ class TestApiConnect(object):
 class TestApiRequests(object):
     """Test the api requests."""
 
+    dataset_id = None
+
     @classmethod
     def setup_class(cls):
         """Create the api connection for later use."""
@@ -80,7 +81,7 @@ class TestApiRequests(object):
         cls.api = Api(cls.base_url, cls.api_token)
         cls.dataverse_id = 'test-pyDataverse-3'
         cls.filename_dataverse = TEST_DIR+'/data/create_dataverse_3.json'
-        cls.dataset_id = 'doi:10.5072/FK2/U6AEZM'
+        cls.filename_dataset = TEST_DIR+'/data/create_dataset.json'
         assert cls.api
         assert cls.api_token
         assert cls.base_url
@@ -96,23 +97,34 @@ class TestApiRequests(object):
     def test_create_dataverse(self):
         """Test successfull `.create_dataverse()` request`."""
         metadata = read_file_json(self.filename_dataverse)
-        query_str = '/dataverses/{0}'.format(self.dataverse_id)
-        resp = self.api.create_dataverse(query_str, dict_to_json(metadata))
+        resp = self.api.create_dataverse(
+            self.dataverse_id, dict_to_json(metadata))
         assert isinstance(resp, Response)
         assert self.api.get_dataverse(self.dataverse_id).json()
 
     def test_get_dataverse(self):
         """Test successfull `.get_dataverse()` request`."""
-        query_str = '/dataverses/{0}'.format(self.dataverse_id)
-        resp = self.api.get_dataverse(query_str)
+        resp = self.api.get_dataverse(self.dataverse_id)
         assert isinstance(resp, Response)
+
+    def test_create_dataset(self):
+        """Test successfull `.create_dataset()` request`."""
+        metadata = read_file_json(self.filename_dataset)
+        resp = self.api.create_dataset(
+            self.dataverse_id, dict_to_json(metadata))
+        TestApiRequests.dataset_id = resp.json()['data']['persistentId']
+        assert isinstance(resp, Response)
+        global dataset_id
 
     def test_get_dataset(self):
         """Test successfull `.get_dataset()` request`."""
-        query_str = '/datasets/:persistentId/?persistentId={0}'.format(
-            self.dataset_id)
-        resp = self.api.get_dataset(query_str)
-        assert self.api.status == 'OK'
+        print(self.dataset_id)
+        resp = self.api.get_dataset(TestApiRequests.dataset_id)
+        assert isinstance(resp, Response)
+
+    def test_delete_dataset(self):
+        """Test successfull `.delete_dataset()` request`."""
+        resp = self.api.delete_dataset(TestApiRequests.dataset_id)
         assert isinstance(resp, Response)
 
     def test_delete_dataverse(self):
