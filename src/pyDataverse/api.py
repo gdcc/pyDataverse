@@ -5,6 +5,8 @@ import json
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
+from pyDataverse.exceptions import DatasetNotFoundError
+from pyDataverse.exceptions import DataverseNotEmptyError
 from pyDataverse.exceptions import DataverseNotFoundError
 from pyDataverse.exceptions import OperationFailedError
 from requests import ConnectionError
@@ -84,11 +86,12 @@ class Api(object):
                         'No response from api request {0}.'.format(url)
                         )
             except KeyError as e:
-                print('Key not in response {0} {1}.'.format(e, url))
+                print('ERROR: Key not in response {0} {1}.'.format(e, url))
             except ConnectionError as e:
                 self.status = 'ERROR'
-                print('Could not establish connection to api {0} {1}.'.format(
-                    url, e))
+                print(
+                    'ERROR: Could not establish connection to api {0} {1}.'
+                    ''.format(url, e))
         else:
             self.status = 'ERROR'
             self.native_api_base_url = None
@@ -131,9 +134,10 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                raise ApiAuthorizationError(
-                    'GET api token not available {}.'.format(url)
-                    )
+                ApiAuthorizationError(
+                    'ERROR: GET - Api token not passed to '
+                    '`make_get_request` {}.'.format(url)
+                      )
 
         try:
             resp = get(
@@ -142,20 +146,25 @@ class Api(object):
             )
             if resp:
                 if resp.status_code == 401:
+                    error_msg = resp.json()['message']
                     raise ApiAuthorizationError(
-                        'GET Authorization provided is invalid {}.'.format(url)
+                        'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
+                        ''.format(url, error_msg)
                         )
                 elif resp.status_code != 200:
+                    error_msg = resp.json()['message']
                     raise OperationFailedError(
-                        'GET {} {} not working'.format(resp.status_code, url)
+                        'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
+                            resp.status_code, url, error_msg)
                         )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'GET Could not establish connection to api {}.'.format(url)
+                'ERROR: GET - Could not establish connection to api {}.'
+                ''.format(url)
                 )
 
-    def make_post_request(self, query_str, data, auth=False, headers=None,
+    def make_post_request(self, query_str, metadata=None, auth=False, headers=None,
                           params=None):
         """Make a POST request.
 
@@ -189,25 +198,30 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                print(
-                    'POST api token not available {}.'.format(url)
-                    )
+                ApiAuthorizationError(
+                    'ERROR: POST - Api token not passed to '
+                    '`make_post_request` {}.'.format(url)
+                      )
 
         try:
             resp = post(
                 url,
-                data=data,
+                data=metadata,
                 headers=headers,
                 params=params
             )
-            if resp.status_code != 201:
-                raise OperationFailedError(
-                    'POST {} {}'.format(resp.status_code, url)
+            print(resp.json())
+            if resp.status_code == 401:
+                error_msg = resp.json()['message']
+                raise ApiAuthorizationError(
+                    'ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}'
+                    ''.format(url, error_msg)
                     )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'POST Could not establish connection to api {}.'.format(url)
+                'ERROR: POST - Could not establish connection to api {}.'
+                ''.format(url)
                 )
 
     def make_delete_request(self, query_str, auth=False, params=None):
@@ -237,22 +251,24 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                print(
-                    'DELETE api token not available {}.'.format(url)
+                ApiAuthorizationError(
+                    'ERROR: DELETE - Api token not passed to '
+                    '`make_delete_request` {}.'.format(url)
                       )
 
         try:
             resp = delete(
                 url,
-                params={'key': self.api_token}
+                params=params
             )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'DELETE Could not establish connection to api {}.'.format(url)
+                'ERROR: DELETE could not establish connection to api {}.'
+                ''.format(url)
                 )
 
-    def get_dataverse(self, identifier):
+    def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
 
         View data about the dataverse $identified by identifier. Identifier can
@@ -274,10 +290,11 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.make_get_request(query_str)
+        resp = self.make_get_request(query_str, auth=auth)
         return resp
 
-    def create_dataverse(self, identifier, metadata, parent=':root'):
+    def create_dataverse(self, identifier, metadata, auth=True,
+                         parent=':root'):
         """Create a dataverse.
 
         Generates a new dataverse under identifier. Expects a JSON content
@@ -299,6 +316,8 @@ class Api(object):
             robust).
         metadata : string
             Metadata of the Dataverse as a json-formatted string.
+        auth : bool
+            True if api authorization is necessary. Defaults to `True`.
         parent : string
             Parent dataverse, if existing, to which the Dataverse gets attached
             to. Defaults to `:root`.
@@ -310,23 +329,78 @@ class Api(object):
 
         """
         if not parent:
-            print('No parent dataverse passed.')
+            raise DataverseNotFoundError(
+                'Dataverse {} not found. No parent dataverse passed to '
+                '`create_dataverse()`.'.format(identifier)
+                )
 
         query_str = '/dataverses/{0}'.format(parent)
-        resp = self.make_post_request(query_str, metadata)
+        resp = self.make_post_request(query_str, metadata, auth)
 
         if resp.status_code == 404:
+            error_msg = resp.json()['message']
             raise DataverseNotFoundError(
-                'Dataverse {0} was not found.'.format(parent))
+                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
+                    parent, error_msg))
         elif resp.status_code != 201:
+            error_msg = resp.json()['message']
             raise OperationFailedError(
-                '{0} Dataverse could not be created.'.format(identifier)
+                'ERROR: HTTP {0} - Dataverse {1} could not be created. MSG: '
+                ''.format(resp.status_code, identifier, error_msg)
                 )
         else:
-            print('{0} Dataverse has been created.'.format(identifier))
+            print('Dataverse {0} has been created.'.format(identifier))
         return resp
 
-    def delete_dataverse(self, identifier):
+    def publish_dataverse(self, identifier, auth=True):
+        """Publish a dataverse.
+
+        Publish the Dataverse pointed by identifier, which can either by the
+        dataverse alias or its numerical id.
+
+        POST http://$SERVER/api/dataverses/$identifier/actions/:publish
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long) or a dataverse alias (more
+            robust).
+        auth : bool
+            True if api authorization is necessary. Defaults to `False`.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        query_str = '/dataverses/{0}/actions/:publish'.format(identifier)
+        resp = self.make_post_request(query_str, auth)
+
+        if resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - Publish Dataverse {0} unauthorized. '
+                'MSG: {1}'.format(identifier, error_msg)
+            )
+        elif resp.status_code == 404:
+            error_msg = resp.json()['message']
+            raise DataverseNotFoundError(
+                'ERROR: HTTP 404 - Dataverse {} was not found. MSG: {1}'
+                ''.format(
+                    identifier, error_msg)
+                )
+        elif resp.status_code != 200:
+            error_msg = resp.json()['message']
+            raise OperationFailedError(
+                'ERROR: HTTP {0} - Dataverse {1} could not be published. MSG: '
+                '{2}'.format(resp.status_code, identifier, error_msg)
+            )
+        elif resp.status_code == 200:
+            print('Dataverse {} has been published.'.format(identifier))
+        return resp
+
+    def delete_dataverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
 
         Deletes the dataverse whose ID is given:
@@ -345,27 +419,38 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.make_delete_request(query_str)
+        resp = self.make_delete_request(query_str, auth)
 
         if resp.status_code == 401:
+            error_msg = resp.json()['message']
             raise ApiAuthorizationError(
-                'Delete Dataverse {0} unauthorized.'.format(identifier)
+                'ERROR: HTTP 401 - Delete Dataverse {0} unauthorized. '
+                'MSG: {1}'.format(identifier, error_msg)
             )
         elif resp.status_code == 404:
+            error_msg = resp.json()['message']
             raise DataverseNotFoundError(
-                'Dataverse {0} was not found.'.format(identifier)
+                'ERROR: HTTP 404 - Dataverse {} was not found. MSG: {1}'
+                ''.format(
+                    identifier, error_msg)
+                )
+        elif resp.status_code == 403:
+            error_msg = resp.json()['message']
+            raise DataverseNotEmptyError(
+                'ERROR: HTTP 403 - Dataverse {0} not empty. MSG: {1}'.format(
+                    identifier, error_msg)
                 )
         elif resp.status_code != 200:
+            error_msg = resp.json()['message']
             raise OperationFailedError(
-                'Dataverse {0} could not be deleted.'.format(identifier)
+                'ERROR: HTTP {0} - Dataverse {1} could not be deleted. MSG: '
+                '{2}'.format(resp.status_code, identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print('{0} Dataverse has been deleted.'.format(identifier))
-        else:
-            print('{0} Dataverse could not be deleted.'.format(identifier))
+            print('Dataverse {} has been deleted.'.format(identifier))
         return resp
 
-    def get_dataset(self, identifier, is_doi=True):
+    def get_dataset(self, identifier, auth=True, is_doi=True):
         """Get metadata of dataset.
 
         With Dataverse identifier:
@@ -394,10 +479,10 @@ class Api(object):
                 identifier)
         else:
             query_str = '/datasets/{0}'.format(identifier)
-        resp = self.make_get_request(query_str)
+        resp = self.make_get_request(query_str, auth=auth)
         return resp
 
-    def get_dataset_export(self, export_format, identifier):
+    def get_dataset_export(self, identifier, export_format):
         """Get metadata of dataset exported in different formats.
 
         CORS Export the metadata of the current published version of a dataset
@@ -408,11 +493,11 @@ class Api(object):
 
         Parameters
         ----------
+        identifier : string
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
         export_format : string
             Export format as a string. Formats: 'ddi', 'oai_ddi', 'dcterms',
             'oai_dc', 'schema.org', 'dataverse_json'.
-        identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
 
         Returns
         -------
@@ -425,7 +510,7 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def create_dataset(self, dataverse, metadata):
+    def create_dataset(self, dataverse, metadata, auth=True):
         """Add dataset to a dataverse.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
@@ -461,17 +546,84 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
-        resp = self.make_post_request(query_str, metadata)
+        resp = self.make_post_request(query_str, metadata, auth)
 
         if resp.status_code == 404:
-            print('Dataverse {0} was not found.'.format(dataverse))
+            error_msg = resp.json()['message']
+            raise DataverseNotFoundError(
+                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}'
+                ''.format(dataverse, error_msg))
+        elif resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - Delete Dataset unauthorized. MSG: '
+                ''.format(error_msg)
+            )
         elif resp.status_code == 201:
-            print('Dataset has been created.')
-        else:
-            print('Dataset could not be created.')
+            identifier = resp.json()['data']['persistentId']
+            print('Dataset {} created.'.format(identifier))
         return resp
 
-    def delete_dataset(self, identifier):
+    def publish_dataset(self, identifier, type='minor', auth=True):
+        """Publish dataset.
+
+        Publishes the dataset whose id is passed. If this is the first version
+        of the dataset, its version number will be set to 1.0. Otherwise, the
+        new dataset version number is determined by the most recent version
+        number and the type parameter. Passing type=minor increases the minor
+        version number (2.3 is updated to 2.4). Passing type=major increases
+        the major version number (2.3 is updated to 3.0). Superusers can pass
+        type=updatecurrent to update metadata without changing the version
+        number.
+
+        POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type
+
+        When there are no default workflows, a successful publication process
+        will result in 200 OK response. When there are workflows, it is
+        impossible for Dataverse to know how long they are going to take and
+        whether they will succeed or not (recall that some stages might require
+        human intervention). Thus, a 202 ACCEPTED is returned immediately. To
+        know whether the publication process succeeded or not, the client code
+        has to check the status of the dataset periodically, or perform some
+        push request in the post-publish workflow.
+
+        Parameters
+        ----------
+        identifier : string
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        type : string
+            Passing `minor` increases the minor version number (2.3 is
+            updated to 2.4).
+            Passing `major` increases the major version number (2.3 is
+            updated to 3.0). Superusers can pass `updatecurrent` to update
+            metadata without changing the version number:
+        auth : bool
+            True if api authorization is necessary. Defaults to `False`.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        query_str = '/datasets/:persistentId/actions/:publish?persistentId={0}&type={1}'.format(identifier, type)
+        resp = self.make_post_request(query_str, auth=auth)
+
+        if resp.status_code == 404:
+            error_msg = resp.json()['message']
+            raise DatasetNotFoundError(
+                'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
+                ''.format(identifier, error_msg))
+        elif resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - User not allowed to publish dataset {0}. '
+                'MSG: {1}'.format(identifier, error_msg))
+        elif resp.status_code == 200:
+            print('Dataset {} published'.format(identifier))
+        return resp
+
+    def delete_dataset(self, identifier, auth=True):
         """Delete a dataset.
 
         Delete the dataset whose id is passed:
@@ -490,22 +642,29 @@ class Api(object):
         """
         query_str = '/datasets/:persistentId/?persistentId={0}'.format(
             identifier)
-        resp = self.make_delete_request(query_str)
-        print(resp.status_code)
-        print(resp.text)
+        resp = self.make_delete_request(query_str, auth=auth)
 
         if resp.status_code == 404:
-            print('Dataset {0} was not found.'.format(identifier))
-        elif resp.status_code == 200:
-            print('{0} Dataset has been deleted.'.format(identifier))
+            error_msg = resp.json()['message']
+            raise DatasetNotFoundError(
+                'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
+                ''.format(identifier, error_msg))
         elif resp.status_code == 405:
-            print(
+            error_msg = resp.json()['message']
+            raise OperationFailedError(
+                'ERROR: HTTP 405 - '
                 'Published datasets can only be deleted from the GUI. For '
                 'more information, please refer to '
                 'https://github.com/IQSS/dataverse/issues/778'
+                ' MSG: {}'.format(error_msg)
             )
-        else:
-            print('{0} Dataset could not be deleted.'.format(identifier))
+        elif resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - User not allowed to delete dataset {0}. '
+                'MSG: {1}'.format(identifier, error_msg))
+        elif resp.status_code == 200:
+            print('Dataset {} deleted'.format(identifier))
         return resp
 
     def get_files(self, doi, version='1'):
@@ -568,6 +727,17 @@ class Api(object):
         passing the actual persistent id as a query parameter with the name
         persistentId.
 
+        This is a convenience packaging method available for tabular data
+        files. It returns a zipped bundle that contains the data in the
+        following formats:
+            - Tab-delimited;
+            - “Saved Original”, the proprietary (SPSS, Stata, R, etc.) file
+            from which the tabular data was ingested;
+            - Generated R Data frame (unless the “original” above was in R);
+            - Data (Variable) metadata record, in DDI XML;
+            - File citation, in Endnote and RIS formats.
+
+
         Parameters
         ----------
         identifier : string
@@ -612,7 +782,7 @@ class Api(object):
             identifier)
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
             self.api_token)
-        shell_command += ' -X POST {0} -F file=@{2}'.format(
+        shell_command += ' -X POST {0} -F file=@{1}'.format(
             query_str, filename)
         # TODO: is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
