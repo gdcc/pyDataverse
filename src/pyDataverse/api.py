@@ -84,7 +84,7 @@ class Api(object):
                     self.status = 'ERROR'
                     raise ApiResponseError(
                         'No response from api request {0}.'.format(url)
-                        )
+                    )
             except KeyError as e:
                 print('ERROR: Key not in response {0} {1}.'.format(e, url))
             except ConnectionError as e:
@@ -137,7 +137,7 @@ class Api(object):
                 ApiAuthorizationError(
                     'ERROR: GET - Api token not passed to '
                     '`make_get_request` {}.'.format(url)
-                      )
+                )
 
         try:
             resp = get(
@@ -150,19 +150,19 @@ class Api(object):
                     raise ApiAuthorizationError(
                         'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
                         ''.format(url, error_msg)
-                        )
+                    )
                 elif resp.status_code != 200:
                     error_msg = resp.json()['message']
                     raise OperationFailedError(
                         'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
                             resp.status_code, url, error_msg)
-                        )
+                    )
             return resp
         except ConnectionError:
             raise ConnectionError(
                 'ERROR: GET - Could not establish connection to api {}.'
                 ''.format(url)
-                )
+            )
 
     def make_post_request(self, query_str, metadata=None, auth=False, headers=None,
                           params=None):
@@ -201,7 +201,7 @@ class Api(object):
                 ApiAuthorizationError(
                     'ERROR: POST - Api token not passed to '
                     '`make_post_request` {}.'.format(url)
-                      )
+                )
 
         try:
             resp = post(
@@ -210,19 +210,18 @@ class Api(object):
                 headers=headers,
                 params=params
             )
-            print(resp.json())
             if resp.status_code == 401:
                 error_msg = resp.json()['message']
                 raise ApiAuthorizationError(
                     'ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}'
                     ''.format(url, error_msg)
-                    )
+                )
             return resp
         except ConnectionError:
             raise ConnectionError(
                 'ERROR: POST - Could not establish connection to api {}.'
                 ''.format(url)
-                )
+            )
 
     def make_delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
@@ -254,7 +253,7 @@ class Api(object):
                 ApiAuthorizationError(
                     'ERROR: DELETE - Api token not passed to '
                     '`make_delete_request` {}.'.format(url)
-                      )
+                )
 
         try:
             resp = delete(
@@ -266,7 +265,7 @@ class Api(object):
             raise ConnectionError(
                 'ERROR: DELETE could not establish connection to api {}.'
                 ''.format(url)
-                )
+            )
 
     def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
@@ -332,7 +331,7 @@ class Api(object):
             raise DataverseNotFoundError(
                 'Dataverse {} not found. No parent dataverse passed to '
                 '`create_dataverse()`.'.format(identifier)
-                )
+            )
 
         query_str = '/dataverses/{0}'.format(parent)
         resp = self.make_post_request(query_str, metadata, auth)
@@ -345,9 +344,9 @@ class Api(object):
         elif resp.status_code != 201:
             error_msg = resp.json()['message']
             raise OperationFailedError(
-                'ERROR: HTTP {0} - Dataverse {1} could not be created. MSG: '
-                ''.format(resp.status_code, identifier, error_msg)
-                )
+                'ERROR: HTTP {0} - Dataverse {1} could not be created. '
+                'MSG: {2}'.format(resp.status_code, identifier, error_msg)
+            )
         else:
             print('Dataverse {0} has been created.'.format(identifier))
         return resp
@@ -375,7 +374,7 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}/actions/:publish'.format(identifier)
-        resp = self.make_post_request(query_str, auth)
+        resp = self.make_post_request(query_str, auth=auth)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -389,7 +388,7 @@ class Api(object):
                 'ERROR: HTTP 404 - Dataverse {} was not found. MSG: {1}'
                 ''.format(
                     identifier, error_msg)
-                )
+            )
         elif resp.status_code != 200:
             error_msg = resp.json()['message']
             raise OperationFailedError(
@@ -430,16 +429,15 @@ class Api(object):
         elif resp.status_code == 404:
             error_msg = resp.json()['message']
             raise DataverseNotFoundError(
-                'ERROR: HTTP 404 - Dataverse {} was not found. MSG: {1}'
-                ''.format(
-                    identifier, error_msg)
-                )
+                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}'
+                ''.format(identifier, error_msg)
+            )
         elif resp.status_code == 403:
             error_msg = resp.json()['message']
             raise DataverseNotEmptyError(
                 'ERROR: HTTP 403 - Dataverse {0} not empty. MSG: {1}'.format(
                     identifier, error_msg)
-                )
+            )
         elif resp.status_code != 200:
             error_msg = resp.json()['message']
             raise OperationFailedError(
@@ -606,7 +604,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/datasets/:persistentId/actions/:publish?persistentId={0}&type={1}'.format(identifier, type)
+        query_str = '/datasets/:persistentId/actions/:publish'
+        query_str += '?persistentId={0}&type={1}'.format(identifier, type)
         resp = self.make_post_request(query_str, auth=auth)
 
         if resp.status_code == 404:
