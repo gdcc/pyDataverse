@@ -16,23 +16,31 @@ from requests import Response
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+if 'API_TOKEN' in os.environ:
+    API_TOKEN = os.environ['API_TOKEN']
+else:
+    print('ERROR: Environment variable API_TOKEN for test missing.')
+if 'BASE_URL' in os.environ:
+    BASE_URL = os.environ['BASE_URL']
+else:
+    print('ERROR: Environment variable BASE_URL for test missing.')
+
+
 class TestApiConnect(object):
     """Test the Api() class initalization."""
 
     def test_api_connect(self):
         """Test successfull connection without api_token."""
-        # TODO: add api_token
-        # api_token = os.environ.get('API_AUTH_TOKEN')
-        base_url = 'http://demo.dataverse.org'
-        api = Api(base_url)
+        api = Api(BASE_URL)
         time_window_start = datetime.now() - timedelta(seconds=10)
         assert isinstance(api, Api)
         assert not api.api_token
         assert api.api_version == 'v1'
         assert api.conn_started > time_window_start
         assert isinstance(api.conn_started, datetime)
-        assert api.base_url == 'http://demo.dataverse.org'
-        assert api.native_api_base_url == 'http://demo.dataverse.org/api/v1'
+        assert api.base_url == BASE_URL
+        assert api.native_api_base_url == '{0}/api/{1}'.format(
+            BASE_URL, api.api_version)
         assert api.status == 'OK'
 
     def test_api_connect_base_url_wrong(self):
@@ -70,21 +78,13 @@ class TestApiRequests(object):
     @classmethod
     def setup_class(cls):
         """Create the api connection for later use."""
-        if 'API_TOKEN' in os.environ:
-            cls.api_token = os.environ['API_TOKEN']
-        else:
-            print('ERROR: Environment variable API_TOKEN for test missing.')
-        if 'BASE_URL' in os.environ:
-            cls.base_url = os.environ['BASE_URL']
-        else:
-            print('ERROR: Environment variable BASE_URL for test missing.')
-        cls.api = Api(cls.base_url, cls.api_token)
+        cls.api = Api(BASE_URL, API_TOKEN)
         cls.dataverse_id = 'test-pyDataverse-3'
         cls.filename_dataverse = TEST_DIR+'/data/create_dataverse_3.json'
         cls.filename_dataset = TEST_DIR+'/data/create_dataset.json'
         assert cls.api
-        assert cls.api_token
-        assert cls.base_url
+        assert cls.api.api_token
+        assert cls.api.base_url
 
     def test_make_get_request(self):
         """Test successfull `.make_get_request()` request."""
@@ -114,7 +114,6 @@ class TestApiRequests(object):
             self.dataverse_id, dict_to_json(metadata))
         TestApiRequests.dataset_id = resp.json()['data']['persistentId']
         assert isinstance(resp, Response)
-        global dataset_id
 
     def test_get_dataset(self):
         """Test successfull `.get_dataset()` request`."""
