@@ -73,11 +73,9 @@ def read_file(filename, mode='r'):
             data = f.read()
         return data
     except IOError:
-        print('An error occured trying to read the file.')
+        print('An error occured trying to read the file {}.'.format(filename))
     except Exception as e:
         raise e
-    finally:
-        f.close()
 
 
 def write_file(filename, string, mode='w'):
@@ -98,11 +96,9 @@ def write_file(filename, string, mode='w'):
         with open(filename, mode) as f:
             f.write(string)
     except IOError:
-        print('An error occured trying to write the file.')
+        print('An error occured trying to write the file {}.'.format(filename))
     except Exception as e:
         raise e
-    finally:
-        f.close()
 
 
 def read_file_json(filename):
@@ -123,7 +119,7 @@ def read_file_json(filename):
 
     """
     try:
-        return json.loads(read_file(filename), 'r')
+        return json.loads(read_file(filename, 'r'))
     except Exception as e:
         raise e
 
