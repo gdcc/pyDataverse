@@ -11,14 +11,8 @@ venv_home/
 .env/
 
 # Personal
-src/pyDataverse/docs/build
-src/pyDataverse/docs/Makefile
-notes.md
-notes_*.md
-snippets.md
-stash_*.*
-src/dev/
-src/testing.py
+notes*.md
+stash*.*
 
 # Distribution / packaging
 build/
@@ -30,10 +24,12 @@ MANIFEST
 
 # Documentation
 docs/build/
+src/pyDataverse/docs/build
+src/pyDataverse/docs/Makefile
 
 # Unit test / coverage reports
 .tox
-htmlcov/
+docs/coverage_html/
 .coverage
 .coverage.*
 .*cache

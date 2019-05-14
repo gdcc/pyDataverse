@@ -1,3 +1,6 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Find out more at https://github.com/AUSSDA/pyDataverse."""
 from __future__ import absolute_import
 
 
@@ -38,7 +41,7 @@ class ApiAuthorizationError(OperationFailedError):
 
 
 class DataverseNotEmptyError(OperationFailedError):
-    """Raised when a Dataverse cannot be found."""
+    """Raised when a Dataverse has accessioned Datasets."""
 
     pass
 
@@ -56,6 +59,6 @@ class DatasetNotFoundError(OperationFailedError):
 
 
 class DatafileNotFoundError(OperationFailedError):
-    """Raised when a Dataset cannot be found."""
+    """Raised when a Datafile cannot be found."""
 
     pass

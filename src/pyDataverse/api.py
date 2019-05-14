@@ -1,4 +1,6 @@
-# coding: utf-8
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Find out more at https://github.com/AUSSDA/pyDataverse."""
 from __future__ import absolute_import
 from datetime import datetime
 import json
@@ -165,7 +167,7 @@ class Api(object):
             )
 
     def make_post_request(self, query_str, metadata=None, auth=False,
-                          headers=None, params=None):
+                          params=None):
         """Make a POST request.
 
         Parameters
@@ -173,12 +175,10 @@ class Api(object):
         query_str : string
             Query string for the request. Will be concatenated to
             `native_api_base_url`.
-        data : type
-            Description of parameter `data`.
+        metadata : string
+            Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
-        headers : dict
-            Data for the request header.
         params : dict
             Dictionary of parameters to be passed with the request.
             Defaults to `None`.
@@ -189,8 +189,6 @@ class Api(object):
             Response object of requests library.
 
         """
-        # TODO: update to docstring the data data-type and description.
-        # TODO: update to docstring the headers data-type and description.
         url = '{0}{1}'.format(self.native_api_base_url, query_str)
         if auth:
             if self.api_token:
@@ -207,7 +205,6 @@ class Api(object):
             resp = post(
                 url,
                 data=metadata,
-                headers=headers,
                 params=params
             )
             if resp.status_code == 401:
@@ -535,7 +532,7 @@ class Api(object):
         dataverse : string
             Alias of dataverse to which the dataset should be added to.
         metadata : string
-            Dataverse metadata as json-formatted string.
+            Metadata of the Dataset as a json-formatted string.
 
         Returns
         -------

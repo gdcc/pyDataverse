@@ -1,7 +1,7 @@
-# coding: utf-8
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Find out more at https://github.com/AUSSDA/pyDataverse."""
 from __future__ import absolute_import
-
-import csv
 import json
 
 
@@ -14,12 +14,12 @@ def json_to_dict(data):
     Parameters
     ----------
     data : string
-        `data` as JSON-formatted string.
+        Data as a json-formatted string.
 
     Returns
     -------
     dict
-        `data` represented as dict().
+        Data as Python Dictionary.
 
     """
     try:
@@ -37,12 +37,12 @@ def dict_to_json(data):
     Parameters
     ----------
     data : dict
-        `data` represented as dict().
+        Data as Python Dictionary.
 
     Returns
     -------
     string
-        `data` as JSON-formatted string
+        Data as a json-formatted string.
 
     """
     try:
@@ -52,20 +52,20 @@ def dict_to_json(data):
 
 
 def read_file(filename, mode='r'):
-    """Read in data from a file.
+    """Read in a file.
 
     Parameters
     ----------
-    filename : type
-        Description of parameter `filename`.
+    filename : string
+        Filename with full path.
     mode : string
-        Read mode of file. Default is `r`. See more at
+        Read mode of file. Defaults to `r`. See more at
         https://docs.python.org/3.5/library/functions.html#open
 
     Returns
     -------
     string
-        Returns the whole content as string.
+        Returns data as string.
 
     """
     try:
@@ -78,23 +78,23 @@ def read_file(filename, mode='r'):
         raise e
 
 
-def write_file(filename, string, mode='w'):
+def write_file(filename, data, mode='w'):
     """Write data in a file.
 
     Parameters
     ----------
     filename : string
-        Full filename with path of file.
-    string : string
-        String of data to be written.
+        Filename with full path.
+    data : string
+        Data to be stored.
     mode : string
-        Read mode of file. Default is `w`. See more at
+        Read mode of file. Defaults to `w`. See more at
         https://docs.python.org/3.5/library/functions.html#open
 
     """
     try:
         with open(filename, mode) as f:
-            f.write(string)
+            f.write(data)
     except IOError:
         print('An error occured trying to write the file {}.'.format(filename))
     except Exception as e:
@@ -102,7 +102,7 @@ def write_file(filename, string, mode='w'):
 
 
 def read_file_json(filename):
-    """Read in JSON file.
+    """Read in a json file.
 
     See more about the json module at
     https://docs.python.org/3.5/library/json.html
@@ -110,12 +110,12 @@ def read_file_json(filename):
     Parameters
     ----------
     filename : string
-        Full filename with path of file.
+        Filename with full path.
 
     Returns
     -------
     dict
-        Data represented as a dict().
+        Data as a json-formatted string.
 
     """
     try:
@@ -125,42 +125,17 @@ def read_file_json(filename):
 
 
 def write_file_json(filename, data, mode='w'):
-    """Write dict() in a JSON file.
+    """Write data to a json file.
 
     Parameters
     ----------
     filename : string
-        Full filename with path of file.
+        Filename with full path.
     data : dict
-        Data to be written in the JSON file.
+        Data to be written in the json file.
     mode : string
-        Write mode of file. Default is `w`. See more at
+        Write mode of file. Defaults to `w`. See more at
         https://docs.python.org/3/library/functions.html#open
 
     """
     write_file(filename, dict_to_json(data), mode)
-
-
-def read_file_csv(filename):
-    """Read in CSV file.
-
-    See more about csv.reader() at https://docs.python.org/3.5/library/csv.html
-
-    Parameters
-    ----------
-    filename : string
-        Full filename with path of file.
-
-    Returns
-    -------
-    reader
-        Reader object, which can be iterated over.
-
-    """
-    try:
-        with open(filename, newline='') as csvfile:
-            return csv.reader(csvfile, delimiter=',', quotechar='"')
-    except Exception as e:
-        raise e
-    finally:
-        csvfile.close()
