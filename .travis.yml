@@ -26,6 +26,7 @@ matrix:
 branches:
   only:
     - master
+    - develop
 
 before_install:
   - echo $TRAVIS_PYTHON_VERSION
