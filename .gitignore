@@ -14,6 +14,7 @@ venv_home/
 notes*.md
 stash*.*
 setup.sh
+.pypirc
 
 # Distribution / packaging
 build/
@@ -24,7 +25,7 @@ dist/
 MANIFEST
 
 # Documentation
-docs/build/
+docs/
 src/pyDataverse/docs/build
 src/pyDataverse/docs/Makefile
 
