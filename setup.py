@@ -4,8 +4,10 @@
 import codecs
 import os
 import re
+from setuptools.command.test import test as TestCommand
 from setuptools import find_packages
 from setuptools import setup
+import sys
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
@@ -28,7 +30,24 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
 
-    raise RuntimeError("Unable to find version string.")
+    raise RuntimeError('Unable to find version string.')
+
+
+class Tox(TestCommand):
+    """Tox class."""
+
+    def finalize_options(self):
+        """Finalize options."""
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        """Run tests."""
+        # import here, cause outside the eggs aren't loaded
+        import tox
+        errcode = tox.cmdline(self.test_args)
+        sys.exit(errcode)
 
 
 INSTALL_REQUIREMENTS = [
@@ -37,6 +56,7 @@ INSTALL_REQUIREMENTS = [
 ]
 
 TESTS_REQUIREMENTS = [
+    'tox'
 ]
 
 CLASSIFIERS = [
@@ -62,7 +82,7 @@ setup(
     author='Stefan Kasberger',
     author_email='stefan.kasberger@univie.ac.at',
     name='pyDataverse',
-    version=find_version("src", "pyDataverse", "__init__.py"),
+    version=find_version('src', 'pyDataverse', '__init__.py'),
     description='A Dataverse API wrapper',
     long_description=read_file('README.md'),
     long_description_content_type="text/markdown",
@@ -76,6 +96,7 @@ setup(
     package_dir={'': 'src'},
     setup_requires=['pytest-runner'],
     tests_require=TESTS_REQUIREMENTS,
+    cmdclass={'test': Tox},
     include_package_data=True,
     keywords=['pydataverse', 'dataverse', 'api'],
     zip_safe=False,

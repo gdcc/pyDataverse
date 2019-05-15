@@ -32,16 +32,19 @@ before_install:
 
 install:
   - pip install tox-travis
+  - pip install coverage
+  - pip install coveralls
   - virtualenv --version
   - easy_install --version
   - pip --version
   - tox --version
 
+
 script:
   - tox
+  - pytest tests/ --cov=pyDataverse --cov-report=term-missing --cov-report=xml --cov-report=html
 
 after_success:
-  - pip install codecov
   - coveralls
 
 notifications:

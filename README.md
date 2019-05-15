@@ -23,13 +23,19 @@ A Python module to work with the Dataverse API. It allows to create, update and 
 
 ## INSTALL
 
-```bash
+**Requirements**
+
+* curl
+
+**Install**
+
+```shell
 virtualenv --python=/usr/bin/python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## USE
+## QUICKSTART
 
 **Connect to API**
 
@@ -49,24 +55,60 @@ print(resp.json())
 **Get dataset**
 
 ```python
-identifier = 'doi:10.5072/FK2/U6AEZM' # doi of the dataset
+identifier = 'doi:10.5072/FK2/U6AEZM'  # doi of the dataset
 resp = api.get_dataset(identifier)
 ```
 
 **Get datafile**
 
 ```python
-file_id = '32' # file id of the datafile
-resp = api.get_datafile(file_id)
-resp.content
+datafile_id = '32'  # file id of the datafile
+resp = api.get_datafile(datafile_id)
+print(resp.content)
 ```
 
 ## DEVELOPMENT
 
+### Install
+
+```bash
+virtualenv --python=/usr/bin/python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Testing
 
+[Tox](http://tox.readthedocs.io/) together with [pytest](https://docs.pytest.org/en/latest/) is used für testing.
+
+First, you need to set the needed ENV variables. You can create a pytest.ini file with the ENV variables in it:
+
+Example:
+```ini
+[pytest]
+env =
+    API_TOKEN=<SECRET>
+    DATAVERSE_VERSION=4.8.4
+    BASE_URL=https://data.aussda.at
+    ```
+
+or define it in the shell.
+
+Example:
+```shell
+export API_TOKEN=<SECRET>
+export DATAVERSE_VERSION=4.8.4
+export BASE_URL=https://data.aussda.at
 ```
-pytest
+
+To run through all tests (e. g. different python versions, packaging, docs, flake8, etc.), simply call tox from the root directory:
+```shell
+tox
+```
+
+When you only want to run the py36 test:
+```shell
+tox -e py36
 ```
 
 ### Documentation

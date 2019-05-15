@@ -23,7 +23,7 @@ else:
 if 'BASE_URL' in os.environ:
     BASE_URL = os.environ['BASE_URL']
 else:
-        print('ERROR: Environment variable BASE_URL for test missing.')
+    print('ERROR: Environment variable BASE_URL for test missing.')
 
 
 class TestApiConnect(object):
