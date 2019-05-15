@@ -16,14 +16,22 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'A Dataverse API wrapper for Python'
+import os
+import sys
+sys.path.insert(0, os.path.abspath("../../.."))
+
+import pyDataverse
+
+
+project = 'pyDataverse'
 copyright = '2019, Stefan Kasberger'
 author = 'Stefan Kasberger'
 
+
 # The short X.Y version
-version = '0.1.0'
+version = pyDataverse.__version__
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = pyDataverse.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -38,7 +46,10 @@ release = '0.1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.coverage'
+    'sphinx.ext.coverage',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -84,7 +95,15 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'description': 'pyDataverse is a simple API wrapper for Dataverse.',
+    'show_powered_by': False,
+    'github_button': True,
+    'github_user': 'aussda',
+    'github_repo': 'pyDataverse',
+    'github_banner': True,
+    'travis_button': True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -99,7 +118,22 @@ html_static_path = ['_static']
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {
+    'index': [
+        'sidebar_intro.html',
+        'navigation.html',
+        'sidebar_related-links.html',
+        'sourcelink.html',
+        'searchbox.html'
+        ],
+    '**': [
+        'sidebar_intro.html',
+        'navigation.html',
+        'sidebar_related-links.html',
+        'sourcelink.html',
+        'searchbox.html'
+        ]
+}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

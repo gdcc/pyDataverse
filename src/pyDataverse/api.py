@@ -46,6 +46,15 @@ class Api(object):
     api_token
     api_version
 
+    Example
+    ----------
+    Create an Api connection::
+
+        >>> base_url = 'http://demo.dataverse.org'
+        >>> api = Api(base_url)
+        >>> api.status
+        'OK'
+
     """
 
     def __init__(self, base_url, api_token=None, api_version='v1'):
@@ -663,7 +672,7 @@ class Api(object):
             print('Dataset {} deleted'.format(identifier))
         return resp
 
-    def get_files(self, doi, version='1'):
+    def get_datafiles(self, doi, version='1'):
         """List metadata of all datafiles of a dataset.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
@@ -688,8 +697,8 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def get_file(self, identifier):
-        """Download a datafile.
+    def get_datafile(self, identifier):
+        """Download a datafile via the Dataverse Data Access API.
 
         File ID
             GET /api/access/datafile/$id
@@ -712,8 +721,8 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def get_file_bundle(self, identifier):
-        """Download a datafile in all its formats.
+    def get_datafile_bundle(self, identifier):
+        """Download a datafile in all its formats via the Dataverse Data Access API.
 
         GET /api/access/datafile/bundle/$id
 
@@ -726,13 +735,12 @@ class Api(object):
         This is a convenience packaging method available for tabular data
         files. It returns a zipped bundle that contains the data in the
         following formats:
-            - Tab-delimited;
-            - “Saved Original”, the proprietary (SPSS, Stata, R, etc.) file
-            from which the tabular data was ingested;
-            - Generated R Data frame (unless the “original” above was in R);
-            - Data (Variable) metadata record, in DDI XML;
-            - File citation, in Endnote and RIS formats.
-
+        - Tab-delimited;
+        - “Saved Original”, the proprietary (SPSS, Stata, R, etc.) file
+        from which the tabular data was ingested;
+        - Generated R Data frame (unless the “original” above was in R);
+        - Data (Variable) metadata record, in DDI XML;
+        - File citation, in Endnote and RIS formats.
 
         Parameters
         ----------
