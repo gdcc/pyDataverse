@@ -39,12 +39,11 @@ install:
   - pip --version
   - tox --version
 
-
 script:
   - tox
-  - pytest tests/ --cov=pyDataverse --cov-report=term-missing --cov-report=xml --cov-report=html
 
 after_success:
+  - pytest tests/ --cov=pyDataverse --cov-report=term-missing --cov-report=xml --cov-report=html
   - coveralls
 
 notifications:

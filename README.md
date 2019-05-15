@@ -1,19 +1,19 @@
-[![Build Status](https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master)](https://travis-ci.com/AUSSDA/pyDataverse) [![Coverage Status](https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg?branch=master)](https://coveralls.io/github/AUSSDA/pyDataverse?branch=master)
+[![Build Status](https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master)](https://travis-ci.com/AUSSDA/pyDataverse) [![Documentation Status](https://readthedocs.org/projects/pydataverse/badge/?version=latest)](https://pydataverse.readthedocs.io/en/latest) [![Coverage Status](https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg?branch=master)](https://coveralls.io/github/AUSSDA/pyDataverse?branch=master)
 
 # pyDataverse
 
-A Python module to work with the Dataverse API. It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
+pyDataverse is a Python module to work with the Dataverse API. It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
 
 
 **Features**
 
 * Python 2 and 3 (>=2.7)
-* Open Source (MIT)
-* Many different Dataverse Api Requests (use GET, POST (Curl) and DELETE)
-* Utils functions to support the core-functions
-* Tests with [pytest](https://docs.pytest.org/en/latest/), [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) and [tox](http://tox.readthedocs.io/).
-* Documentation with [sphinx](http://www.sphinx-doc.org/).
-* Custom exceptions
+* Open Source ([MIT](https://opensource.org/licenses/MIT))
+* `api.py`: Api funcionalities to create, get, publish and delete Dataverses, Datasets and Datafiles.
+* `utils.py`: Functions to support the core functionalities.
+* `exceptions.py`: Custom exceptions
+* `tests/*`: Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
+* [Documentation](https://pydataverse.readthedocs.io/en/latest/).
 
 
 **Copyright**
@@ -21,7 +21,7 @@ A Python module to work with the Dataverse API. It allows to create, update and 
 * Code:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
 * Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
-## INSTALL
+## QUICKSTART
 
 **Requirements**
 
@@ -34,8 +34,6 @@ virtualenv --python=/usr/bin/python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-## QUICKSTART
 
 **Connect to API**
 
@@ -67,6 +65,27 @@ resp = api.get_datafile(datafile_id)
 print(resp.content)
 ```
 
+## CONTRIBUTE
+
+In the spirit of free software, everyone is encouraged to help improve this project.
+
+Here are some ways you can contribute:
+
+- by reporting bugs
+- by suggesting new features
+- by translating to a new language
+- by writing or editing documentation
+- by writing code (**no pull request is too small**: fix typos in the user interface, add code comments, clean up inconsistent whitespace)
+- by refactoring code or adding new features (please get in touch with us before you do, so we can syncronize the efforts and prevent misunderstandings)
+- by [closing issues](https://github.com/AUSSDA/pyDataverse/issues)
+- by [reviewing pull requests](https://github.com/AUSSDA/pyDataverse/pulls)
+
+When you are ready, submit a [pull request](https://github.com/AUSSDA/pyDataverse).
+
+### Submitting an Issue
+
+We use the [GitHub issue tracker](https://github.com/AUSSDA/pyDataverse/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting a bug report, please try to provide a screenshot that demonstrates the problem.
+
 ## DEVELOPMENT
 
 ### Install
@@ -92,7 +111,7 @@ env =
     BASE_URL=https://data.aussda.at
     ```
 
-or define it in the shell.
+Or define them manually:
 
 Example:
 ```shell
@@ -106,7 +125,7 @@ To run through all tests (e. g. different python versions, packaging, docs, flak
 tox
 ```
 
-When you only want to run the py36 test:
+When you only want to run one test, e.g. the py36 test:
 ```shell
 tox -e py36
 ```
@@ -120,24 +139,3 @@ sphinx-build -b html docs/source docs/build/html
 sphinx-apidoc -f -o docs/source ..
 make html
 ```
-
-## CONTRIBUTE
-
-In the spirit of free software, everyone is encouraged to help improve this project.
-
-Here are some ways you can contribute:
-
-- by reporting bugs
-- by suggesting new features
-- by translating to a new language
-- by writing or editing documentation
-- by writing code (**no pull request is too small**: fix typos in the user interface, add code comments, clean up inconsistent whitespace)
-- by refactoring code or adding new features (please get in touch with us before you do, so we can syncronize the efforts and prevent misunderstandings)
-- by [closing issues](https://github.com/AUSSDA/pyDataverse/issues)
-- by [reviewing pull requests](https://github.com/AUSSDA/pyDataverse/pulls)
-
-When you are ready, submit a [pull request](https://github.com/AUSSDA/pyDataverse).
-
-### Submitting an Issue
-
-We use the [GitHub issue tracker](https://github.com/AUSSDA/pyDataverse/issues) to track bugs and features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting a bug report, please try to provide a screenshot that demonstrates the problem.
