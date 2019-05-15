@@ -13,7 +13,7 @@ sphinx:
 formats: all
 
 # Optionally set the version of Python and requirements required to build your docs
-ython:
+python:
    version: 3.6
    install:
       - requirements: tools/docs-requirements.txt
