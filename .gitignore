@@ -25,13 +25,12 @@ dist/
 MANIFEST
 
 # Documentation
-docs/
+/docs
 src/pyDataverse/docs/build
 src/pyDataverse/docs/Makefile
 
 # Unit test / coverage reports
 .tox
-docs/coverage_html/
 .coverage
 .coverage.*
 .*cache
