@@ -10,4 +10,5 @@ pytest-env>=0.6.2
 pytest-runner
 pytest-xdist
 setuptools
+tox==3.11.0
 wheel

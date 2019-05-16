@@ -9,21 +9,21 @@ important right here and provide links to the canonical documentation.
 
 
 Api Interface
---------------
+-----------------------------
 
 .. automodule:: pyDataverse.api
    :members:
 
 
 Utils Interface
---------------
+-----------------------------
 
 .. automodule:: pyDataverse.utils
   :members:
 
 
 Exceptions
---------------
+-----------------------------
 
 .. automodule:: pyDataverse.exceptions
   :members:
