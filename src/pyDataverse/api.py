@@ -87,7 +87,7 @@ class Api(object):
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
             url = '{0}{1}'.format(self.native_api_base_url, query_str)
-            print('INIT'. self.native_api_base_url, url, query_str)
+            print('INIT', self.native_api_base_url, url, query_str)
             try:
                 resp = get(url)
                 if resp:
