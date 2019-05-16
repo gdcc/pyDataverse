@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Find out more at https://github.com/AUSSDA/pyDataverse."""
-from __future__ import absolute_import
 
 
 class DataverseError(Exception):

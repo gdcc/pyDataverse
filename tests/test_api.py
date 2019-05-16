@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import unicode_literals
-from __future__ import print_function
 from datetime import datetime
 from datetime import timedelta
 import os
