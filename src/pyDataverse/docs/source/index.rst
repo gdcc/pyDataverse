@@ -3,12 +3,6 @@ pyDataverse
 
 Release v\ |version|.
 
-.. image:: https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master
-    :target: https://travis-ci.com/AUSSDA/pyDataverse
-
-.. image:: https://readthedocs.org/projects/pydataverse/badge/?version=latest
-    :target: https://pydataverse.readthedocs.io/en/latest
-
 .. image:: https://img.shields.io/github/license/aussda/pydataverse.svg
     :target: https://opensource.org/licenses/MIT
 
