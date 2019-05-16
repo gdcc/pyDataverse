@@ -2,7 +2,7 @@
 
 # pyDataverse
 
-pyDataverse is a Python module to work with the api of [Dataverse](http://dataverse.org/). It uses the [Native API](http://guides.dataverse.org/en/latest/api/native-api.html) and [Data Access API](http://guides.dataverse.org/en/latest/api/dataaccess.html). It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
+pyDataverse is a Python module for [Dataverse](http://dataverse.org/). It uses the [Native API](http://guides.dataverse.org/en/latest/api/native-api.html) and [Data Access API](http://guides.dataverse.org/en/latest/api/dataaccess.html). It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
 
 
 **Features**
@@ -12,13 +12,13 @@ pyDataverse is a Python module to work with the api of [Dataverse](http://datave
 * `utils.py`: Functions to support the core functionalities.
 * `exceptions.py`: Custom exceptions
 * `tests/*`: Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
-* [Documentation](https://pydataverse.readthedocs.io/en/latest/).
+* [Documentation](https://pydataverse.readthedocs.io/en/latest/)
 * Python 2 and 3 (>=2.7)
 
 
 **Copyright**
 
-* Code:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
+* Sourcecode:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
 * Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
 ## QUICKSTART
@@ -30,7 +30,7 @@ pyDataverse is a Python module to work with the api of [Dataverse](http://datave
 **Install**
 
 ```shell
-virtualenv --python=/usr/bin/python3 venv
+virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -91,7 +91,7 @@ We use the [GitHub issue tracker](https://github.com/AUSSDA/pyDataverse/issues) 
 ### Install
 
 ```bash
-virtualenv --python=/usr/bin/python3 venv
+virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -100,22 +100,18 @@ pip install -r requirements.txt
 
 [Tox](http://tox.readthedocs.io/) together with [pytest](https://docs.pytest.org/en/latest/) is used für testing.
 
-First, you need to set the needed ENV variables. You can create a pytest.ini file with the ENV variables in it:
-
-Example:
+First, you need to set the needed ENV variables. You can create a `pytest.ini` file with the ENV variables in it:
 ```ini
 [pytest]
 env =
-    API_TOKEN=<SECRET>
+    API_TOKEN=**SECRET**
     DATAVERSE_VERSION=4.8.4
     BASE_URL=https://data.aussda.at
     ```
 
 Or define them manually:
-
-Example:
 ```shell
-export API_TOKEN=<SECRET>
+export API_TOKEN=**SECRET**
 export DATAVERSE_VERSION=4.8.4
 export BASE_URL=https://data.aussda.at
 ```
@@ -132,8 +128,24 @@ tox -e py36
 
 ### Documentation
 
-Use Sphinx to create class and function documentation out of the doc-strings. You can call it via `tox`:
+**Create Sphinx Docs**
+
+Use Sphinx to create class and function documentation out of the doc-strings. You can call it via `tox`. This creates the created docs inside `docs/build`.
 
 ```
 tox -e docs
+```
+
+**Create Coverage Reports**
+
+Run tests with coverage to create html and xml reports as an output. Again, call it via `tox`. This creates the created docs inside `docs/coverage_html/`.
+```shell
+tox -e coverage
+```
+
+**Run Coveralls**
+
+To use Coveralls on local development:
+```shell
+tox -e coveralls
 ```

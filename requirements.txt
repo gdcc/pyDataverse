@@ -20,4 +20,3 @@ twine==1.13.0
 urllib3==1.24.3
 virtualenv==16.6.0
 webencodings==0.5.1
--e git+git@github.com:AUSSDA/pyDataverse.git@861a00e63c29aefe6f5b2c8d8b2e8efffbea0374#egg=pyDataverse
