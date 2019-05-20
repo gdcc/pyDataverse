@@ -563,8 +563,6 @@ class Api(object):
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
         resp = self.make_post_request(query_str, metadata, auth)
-        print(query_str)
-        print(metadata)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']

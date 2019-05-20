@@ -76,7 +76,6 @@ class TestApiRequests(object):
     @classmethod
     def setup_class(cls):
         """Create the api connection for later use."""
-        print('TEST setup_class', BASE_URL, API_TOKEN)
         cls.api = Api(BASE_URL, api_token=API_TOKEN)
         cls.dataverse_id = 'test-pyDataverse'
         cls.filename_dataverse = TEST_DIR+'/data/create_dataverse.json'
@@ -100,8 +99,4 @@ class TestApiRequests(object):
             self.dataverse_id, dict_to_json(metadata))
         assert isinstance(resp, Response)
         assert self.api.get_dataverse(self.dataverse_id).json()
-
-    def test_get_dataverse(self):
-        """Test successfull `.get_dataverse()` request`."""
-        resp = self.api.get_dataverse(self.dataverse_id)
-        assert isinstance(resp, Response)
+        resp = self.api.delete_dataverse(self.dataverse_id)

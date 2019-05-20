@@ -44,7 +44,6 @@ script:
   - tox
 
 after_success:
-  - pytest tests/ --doctest-modules -v --cov=src/pyDataverse
   - coveralls
 
 notifications:
