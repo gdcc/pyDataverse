@@ -98,20 +98,24 @@ pip install -r requirements.txt
 
 [Tox](http://tox.readthedocs.io/) together with [pytest](https://docs.pytest.org/en/latest/) is used für testing.
 
-First, you need to set the needed ENV variables. You can create a `pytest.ini` file with the ENV variables in it:
+Before you can execute the tests, you need a Dataverse account with an api token on a working Dataverse instance, which can be used for tests. We recommend to use [demo.dataverse.org](https://demo.dataverse.org/), but you also can use your own instance or any other, but beware: To use a production instance can cause problems.
+
+Before you can run the tests, you have to set the ENV variables for the Dataverse Api connection.
+
+You can set the ENV variables via creation of a `pytest.ini`:
 ```ini
 [pytest]
 env =
     API_TOKEN=**SECRET**
     DATAVERSE_VERSION=4.8.4
     BASE_URL=https://data.aussda.at
-    ```
+```
 
-Or define them manually:
+or define them manually:
 ```shell
 export API_TOKEN=**SECRET**
-export DATAVERSE_VERSION=4.8.4
-export BASE_URL=https://data.aussda.at
+export DATAVERSE_VERSION=4.14
+export BASE_URL=https://demo.dataverse.org/
 ```
 
 To run through all tests (e. g. different python versions, packaging, docs, flake8, etc.), simply call tox from the root directory:
