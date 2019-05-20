@@ -127,7 +127,7 @@ class TestApiRequests(object):
     #     resp = self.api.delete_dataset(TestApiRequests.dataset_id)
     #     assert isinstance(resp, Response)
 
-    def test_delete_dataverse(self):
-        """Test successfull `.delete_dataverse()` request`."""
-        resp = self.api.delete_dataverse(self.dataverse_id)
-        assert isinstance(resp, Response)
+    # def test_delete_dataverse(self):
+    #     """Test successfull `.delete_dataverse()` request`."""
+    #     resp = self.api.delete_dataverse(self.dataverse_id)
+    #     assert isinstance(resp, Response)
