@@ -13,6 +13,8 @@ venv_home/
 # Personal
 notes*.md
 stash*.*
+setup.sh
+.pypirc
 
 # Distribution / packaging
 build/
@@ -23,13 +25,12 @@ dist/
 MANIFEST
 
 # Documentation
-docs/build/
+/docs
 src/pyDataverse/docs/build
 src/pyDataverse/docs/Makefile
 
 # Unit test / coverage reports
 .tox
-docs/coverage_html/
 .coverage
 .coverage.*
 .*cache

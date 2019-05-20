@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Find out more at https://github.com/AUSSDA/pyDataverse."""
-from __future__ import absolute_import
 from datetime import datetime
 import json
 from pyDataverse.exceptions import ApiAuthorizationError
@@ -45,6 +44,15 @@ class Api(object):
     base_url
     api_token
     api_version
+
+    Example
+    ----------
+    Create an Api connection::
+
+        >>> base_url = 'http://demo.dataverse.org'
+        >>> api = Api(base_url)
+        >>> api.status
+        'OK'
 
     """
 
@@ -92,7 +100,7 @@ class Api(object):
             except ConnectionError as e:
                 self.status = 'ERROR'
                 print(
-                    'ERROR: Could not establish connection to api {0} {1}.'
+                    'ERROR: Could not establish connection to url {0} {1}.'
                     ''.format(url, e))
         else:
             self.status = 'ERROR'
@@ -153,7 +161,7 @@ class Api(object):
                         'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
                         ''.format(url, error_msg)
                     )
-                elif resp.status_code != 200:
+                elif resp.status_code >= 300:
                     error_msg = resp.json()['message']
                     raise OperationFailedError(
                         'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
@@ -305,6 +313,10 @@ class Api(object):
         required. http://guides.dataverse.org/en/latest/
         _downloads/dataverse-complete.json
 
+        resp.status_code:
+            200: dataverse created
+            201: dataverse created
+
         Parameters
         ----------
         identifier : string
@@ -338,14 +350,14 @@ class Api(object):
             raise DataverseNotFoundError(
                 'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
                     parent, error_msg))
-        elif resp.status_code != 201:
+        elif resp.status_code != 200 and resp.status_code != 201:
             error_msg = resp.json()['message']
             raise OperationFailedError(
                 'ERROR: HTTP {0} - Dataverse {1} could not be created. '
                 'MSG: {2}'.format(resp.status_code, identifier, error_msg)
             )
         else:
-            print('Dataverse {0} has been created.'.format(identifier))
+            print('Dataverse {0} created.'.format(identifier))
         return resp
 
     def publish_dataverse(self, identifier, auth=True):
@@ -355,6 +367,9 @@ class Api(object):
         dataverse alias or its numerical id.
 
         POST http://$SERVER/api/dataverses/$identifier/actions/:publish
+
+        resp.status_code:
+            200: dataverse published
 
         Parameters
         ----------
@@ -393,7 +408,7 @@ class Api(object):
                 '{2}'.format(resp.status_code, identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print('Dataverse {} has been published.'.format(identifier))
+            print('Dataverse {} published.'.format(identifier))
         return resp
 
     def delete_dataverse(self, identifier, auth=True):
@@ -401,6 +416,9 @@ class Api(object):
 
         Deletes the dataverse whose ID is given:
         DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
+
+        resp.status_code:
+            200: dataverse deleted
 
         Parameters
         ----------
@@ -442,7 +460,7 @@ class Api(object):
                 '{2}'.format(resp.status_code, identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print('Dataverse {} has been deleted.'.format(identifier))
+            print('Dataverse {} deleted.'.format(identifier))
         return resp
 
     def get_dataset(self, identifier, auth=True, is_doi=True):
@@ -527,6 +545,9 @@ class Api(object):
         version state will be set to DRAFT:
         http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
 
+        resp.status_code:
+            201: dataset created
+
         Parameters
         ----------
         dataverse : string
@@ -582,6 +603,9 @@ class Api(object):
         has to check the status of the dataset periodically, or perform some
         push request in the post-publish workflow.
 
+        resp.status_code:
+            200: dataset published
+
         Parameters
         ----------
         identifier : string
@@ -625,6 +649,9 @@ class Api(object):
         Delete the dataset whose id is passed:
         DELETE http://$SERVER/api/datasets/$id?key=$apiKey
 
+        resp.status_code:
+            200: dataset deleted
+
         Parameters
         ----------
         identifier : string
@@ -663,7 +690,7 @@ class Api(object):
             print('Dataset {} deleted'.format(identifier))
         return resp
 
-    def get_files(self, doi, version='1'):
+    def get_datafiles(self, doi, version='1'):
         """List metadata of all datafiles of a dataset.
 
         http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
@@ -688,8 +715,8 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def get_file(self, identifier):
-        """Download a datafile.
+    def get_datafile(self, identifier):
+        """Download a datafile via the Dataverse Data Access API.
 
         File ID
             GET /api/access/datafile/$id
@@ -712,8 +739,8 @@ class Api(object):
         resp = self.make_get_request(query_str)
         return resp
 
-    def get_file_bundle(self, identifier):
-        """Download a datafile in all its formats.
+    def get_datafile_bundle(self, identifier):
+        """Download a datafile in all its formats via the Dataverse Data Access API.
 
         GET /api/access/datafile/bundle/$id
 
@@ -726,13 +753,12 @@ class Api(object):
         This is a convenience packaging method available for tabular data
         files. It returns a zipped bundle that contains the data in the
         following formats:
-            - Tab-delimited;
-            - “Saved Original”, the proprietary (SPSS, Stata, R, etc.) file
-            from which the tabular data was ingested;
-            - Generated R Data frame (unless the “original” above was in R);
-            - Data (Variable) metadata record, in DDI XML;
-            - File citation, in Endnote and RIS formats.
-
+        - Tab-delimited;
+        - “Saved Original”, the proprietary (SPSS, Stata, R, etc.) file
+        from which the tabular data was ingested;
+        - Generated R Data frame (unless the “original” above was in R);
+        - Data (Variable) metadata record, in DDI XML;
+        - File citation, in Endnote and RIS formats.
 
         Parameters
         ----------

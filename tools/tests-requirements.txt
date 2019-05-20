@@ -9,8 +9,6 @@ pytest-cov
 pytest-env>=0.6.2
 pytest-runner
 pytest-xdist
-requests
 setuptools
-tox
-tox-pyenv
+tox==3.11.0
 wheel

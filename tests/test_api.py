@@ -1,20 +1,17 @@
 # coding: utf-8
-from __future__ import unicode_literals
-from __future__ import print_function
 from datetime import datetime
 from datetime import timedelta
 import os
 from pyDataverse.api import Api
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
-from pyDataverse.utils import dict_to_json
-from pyDataverse.utils import read_file_json
 import pytest
 from requests import Response
+from time import sleep
 
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
-
+SLEEP_TIME = 1
 
 if 'API_TOKEN' in os.environ:
     API_TOKEN = os.environ['API_TOKEN']
@@ -32,6 +29,7 @@ class TestApiConnect(object):
     def test_api_connect(self):
         """Test successfull connection without api_token."""
         api = Api(BASE_URL)
+        sleep(SLEEP_TIME)
         time_window_start = datetime.now() - timedelta(seconds=10)
         assert isinstance(api, Api)
         assert not api.api_token
@@ -49,6 +47,7 @@ class TestApiConnect(object):
         with pytest.raises(ApiResponseError):
             base_url = 'http://wikipedia.org'
             api = Api(base_url)
+            sleep(SLEEP_TIME)
             time_window_start = datetime.now() - timedelta(seconds=10)
             assert not api.api_token
             assert api.api_version == 'v1'
@@ -61,6 +60,7 @@ class TestApiConnect(object):
         with pytest.raises(ApiUrlError):
             base_url = None
             api = Api(base_url)
+            sleep(SLEEP_TIME)
             time_window_start = datetime.now() - timedelta(seconds=10)
             assert not api.api_token
             assert api.api_version == 'v1'
@@ -78,10 +78,11 @@ class TestApiRequests(object):
     @classmethod
     def setup_class(cls):
         """Create the api connection for later use."""
-        cls.api = Api(BASE_URL, API_TOKEN)
-        cls.dataverse_id = 'test-pyDataverse-3'
-        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse_3.json'
+        cls.dataverse_id = 'test-pyDataverse'
+        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse.json'
         cls.filename_dataset = TEST_DIR+'/data/create_dataset.json'
+        cls.api = Api(BASE_URL, api_token=API_TOKEN)
+        sleep(SLEEP_TIME)
         assert cls.api
         assert cls.api.api_token
         assert cls.api.base_url
@@ -91,42 +92,12 @@ class TestApiRequests(object):
         # TODO: test params und auth default
         query_str = '/info/server'
         resp = self.api.make_get_request(query_str)
+        sleep(SLEEP_TIME)
         assert self.api.status == 'OK'
         assert isinstance(resp, Response)
 
-    def test_create_dataverse(self):
-        """Test successfull `.create_dataverse()` request`."""
-        metadata = read_file_json(self.filename_dataverse)
-        resp = self.api.create_dataverse(
-            self.dataverse_id, dict_to_json(metadata))
-        assert isinstance(resp, Response)
-        assert self.api.get_dataverse(self.dataverse_id).json()
-
     def test_get_dataverse(self):
         """Test successfull `.get_dataverse()` request`."""
-        resp = self.api.get_dataverse(self.dataverse_id)
-        assert isinstance(resp, Response)
-
-    def test_create_dataset(self):
-        """Test successfull `.create_dataset()` request`."""
-        metadata = read_file_json(self.filename_dataset)
-        resp = self.api.create_dataset(
-            self.dataverse_id, dict_to_json(metadata))
-        TestApiRequests.dataset_id = resp.json()['data']['persistentId']
-        assert isinstance(resp, Response)
-
-    def test_get_dataset(self):
-        """Test successfull `.get_dataset()` request`."""
-        print(self.dataset_id)
-        resp = self.api.get_dataset(TestApiRequests.dataset_id)
-        assert isinstance(resp, Response)
-
-    def test_delete_dataset(self):
-        """Test successfull `.delete_dataset()` request`."""
-        resp = self.api.delete_dataset(TestApiRequests.dataset_id)
-        assert isinstance(resp, Response)
-
-    def test_delete_dataverse(self):
-        """Test successfull `.delete_dataverse()` request`."""
-        resp = self.api.delete_dataverse(self.dataverse_id)
+        resp = self.api.get_dataverse(':root')
+        sleep(SLEEP_TIME)
         assert isinstance(resp, Response)
