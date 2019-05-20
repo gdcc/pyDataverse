@@ -106,26 +106,26 @@ class TestApiRequests(object):
         resp = self.api.get_dataverse(self.dataverse_id)
         assert isinstance(resp, Response)
 
-    def test_create_dataset(self):
-        """Test successfull `.create_dataset()` request`."""
-        metadata = read_file_json(self.filename_dataset)
-        resp = self.api.create_dataset(
-            self.dataverse_id, dict_to_json(metadata))
-        print(resp.status_code)
-        print(resp.json())
-        TestApiRequests.dataset_id = resp.json()['data']['persistentId']
-        assert isinstance(resp, Response)
+    # def test_create_dataset(self):
+    #     """Test successfull `.create_dataset()` request`."""
+    #     metadata = read_file_json(self.filename_dataset)
+    #     resp = self.api.create_dataset(
+    #         self.dataverse_id, dict_to_json(metadata))
+    #     print(resp.status_code)
+    #     print(resp.json())
+    #     TestApiRequests.dataset_id = resp.json()['data']['persistentId']
+    #     assert isinstance(resp, Response)
 
-    def test_get_dataset(self):
-        """Test successfull `.get_dataset()` request`."""
-        print(self.dataset_id)
-        resp = self.api.get_dataset(TestApiRequests.dataset_id)
-        assert isinstance(resp, Response)
-
-    def test_delete_dataset(self):
-        """Test successfull `.delete_dataset()` request`."""
-        resp = self.api.delete_dataset(TestApiRequests.dataset_id)
-        assert isinstance(resp, Response)
+    # def test_get_dataset(self):
+    #     """Test successfull `.get_dataset()` request`."""
+    #     print(self.dataset_id)
+    #     resp = self.api.get_dataset(TestApiRequests.dataset_id)
+    #     assert isinstance(resp, Response)
+    #
+    # def test_delete_dataset(self):
+    #     """Test successfull `.delete_dataset()` request`."""
+    #     resp = self.api.delete_dataset(TestApiRequests.dataset_id)
+    #     assert isinstance(resp, Response)
 
     def test_delete_dataverse(self):
         """Test successfull `.delete_dataverse()` request`."""
