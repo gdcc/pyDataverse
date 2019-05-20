@@ -75,7 +75,7 @@ pyDataverse ecosystem and community.
    community/releases
 
 
-Developer Documentation
+Developer Guide
 -----------------------------
 
 If you are looking for information on a specific function, class, or method,
@@ -85,3 +85,29 @@ this part of the documentation is for you.
    :maxdepth: 2
 
    developer
+
+
+Contributor Guide
+-----------------------------
+
+In the spirit of free software, everyone is encouraged to help improve this project.
+
+Here are some ways you can contribute:
+
+- by reporting bugs
+- by suggesting new features
+- by translating to a new language
+- by writing or editing documentation
+- by writing code (**no pull request is too small**: fix typos in the user interface, add code comments, clean up inconsistent whitespace)
+- by refactoring code or adding new features (please get in touch with us before you do, so we can syncronize the efforts and prevent misunderstandings)
+- by `closing issues <https://github.com/AUSSDA/pyDataverse/issues>`_
+- by `reviewing pull requests <https://github.com/AUSSDA/pyDataverse/pulls>`_
+
+When you are ready, submit a `pull request <https://github.com/AUSSDA/pyDataverse>`_.
+
+**Submitting an Issue**
+
+We use the `GitHub issue tracker <https://github.com/AUSSDA/pyDataverse/issues>`_
+to track bugs and features. Before submitting a bug report or feature request,
+check to make sure it hasn't already been submitted. When submitting a bug report,
+please try to provide a screenshot that demonstrates the problem.
