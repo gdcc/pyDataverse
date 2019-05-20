@@ -340,6 +340,8 @@ class Api(object):
 
         query_str = '/dataverses/{0}'.format(parent)
         resp = self.make_post_request(query_str, metadata, auth)
+        print(resp.status_code)
+        print(resp.json())
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
