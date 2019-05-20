@@ -161,7 +161,7 @@ class Api(object):
                         'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
                         ''.format(url, error_msg)
                     )
-                elif resp.status_code != 200:
+                elif resp.status_code >= 300:
                     error_msg = resp.json()['message']
                     raise OperationFailedError(
                         'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
@@ -345,8 +345,6 @@ class Api(object):
         query_str = '/dataverses/{0}'.format(parent)
         resp = self.make_post_request(query_str, metadata, auth)
 
-        print(resp.status_code)
-        print(resp.json())
         if resp.status_code == 404:
             error_msg = resp.json()['message']
             raise DataverseNotFoundError(
@@ -369,6 +367,9 @@ class Api(object):
         dataverse alias or its numerical id.
 
         POST http://$SERVER/api/dataverses/$identifier/actions/:publish
+
+        resp.status_code:
+            200: dataverse published
 
         Parameters
         ----------
@@ -415,6 +416,9 @@ class Api(object):
 
         Deletes the dataverse whose ID is given:
         DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
+
+        resp.status_code:
+            200: dataverse deleted
 
         Parameters
         ----------
@@ -541,6 +545,9 @@ class Api(object):
         version state will be set to DRAFT:
         http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
 
+        resp.status_code:
+            201: dataset created
+
         Parameters
         ----------
         dataverse : string
@@ -596,6 +603,9 @@ class Api(object):
         has to check the status of the dataset periodically, or perform some
         push request in the post-publish workflow.
 
+        resp.status_code:
+            200: dataset published
+
         Parameters
         ----------
         identifier : string
@@ -638,6 +648,9 @@ class Api(object):
 
         Delete the dataset whose id is passed:
         DELETE http://$SERVER/api/datasets/$id?key=$apiKey
+
+        resp.status_code:
+            200: dataset deleted
 
         Parameters
         ----------

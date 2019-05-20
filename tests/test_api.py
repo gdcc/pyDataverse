@@ -111,6 +111,8 @@ class TestApiRequests(object):
         metadata = read_file_json(self.filename_dataset)
         resp = self.api.create_dataset(
             self.dataverse_id, dict_to_json(metadata))
+        print(resp.status_code)
+        print(resp.json())
         TestApiRequests.dataset_id = resp.json()['data']['persistentId']
         assert isinstance(resp, Response)
 
