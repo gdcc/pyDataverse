@@ -108,6 +108,7 @@ class TestApiRequests(object):
         """Test successfull `.create_dataset()` request`."""
         metadata = read_file_json(self.filename_dataset)
         resp = self.api.create_dataset(':root', dict_to_json(metadata))
+        print(resp.json())
         TestApiRequests.dataset_id = resp.json()['data']['persistentId']
         assert isinstance(resp, Response)
 

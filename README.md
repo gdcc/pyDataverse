@@ -4,7 +4,6 @@
 
 pyDataverse is a Python module for [Dataverse](http://dataverse.org/). It uses the [Native API](http://guides.dataverse.org/en/latest/api/native-api.html) and [Data Access API](http://guides.dataverse.org/en/latest/api/dataaccess.html). It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
 
-
 **Features**
 
 * Open Source ([MIT](https://opensource.org/licenses/MIT))
@@ -14,7 +13,6 @@ pyDataverse is a Python module for [Dataverse](http://dataverse.org/). It uses t
 * `tests/*`: Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
 * [Documentation](https://pydataverse.readthedocs.io/en/latest/)
 * Python 2 and 3 (>=2.7)
-
 
 **Copyright**
 
