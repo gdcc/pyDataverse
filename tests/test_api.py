@@ -113,26 +113,6 @@ class TestApiRequests(object):
         sleep(SLEEP_TIME)
         assert isinstance(resp, Response)
 
-    def test_create_dataset(self):
-        """Test successfull `.create_dataset()` request`."""
-        metadata = read_file_json(self.filename_dataset)
-        resp = self.api.create_dataset(':root', dict_to_json(metadata))
-        sleep(SLEEP_TIME)
-        TestApiRequests.dataset_id = resp.json()['data']['persistentId']
-        assert isinstance(resp, Response)
-
-    def test_get_dataset(self):
-        """Test successfull `.get_dataset()` request`."""
-        resp = self.api.get_dataset(TestApiRequests.dataset_id)
-        sleep(SLEEP_TIME)
-        assert isinstance(resp, Response)
-
-    def test_delete_dataset(self):
-        """Test successfull `.delete_dataset()` request`."""
-        resp = self.api.delete_dataset(TestApiRequests.dataset_id)
-        sleep(SLEEP_TIME)
-        assert isinstance(resp, Response)
-
     def test_delete_dataverse(self):
         """Test successfull `.delete_dataverse()` request`."""
         resp = self.api.delete_dataverse(self.dataverse_id)
