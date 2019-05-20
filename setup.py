@@ -65,7 +65,7 @@ CLASSIFIERS = [
     #   3 - Alpha
     #   4 - Beta
     #   5 - Production/Stable
-    'Development Status :: 2 - Pre-Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
     'Operating System :: OS Independent',
     'License :: OSI Approved :: MIT License',
@@ -101,6 +101,8 @@ setup(
     keywords=['pydataverse', 'dataverse', 'api'],
     zip_safe=False,
     project_urls={
-        'Issue Tracker': 'https://github.com/AUSSDA/pyDataverse/issues'
+        'Documentation': 'https://pydataverse.readthedocs.io/',
+        'Issue Tracker': 'https://github.com/AUSSDA/pyDataverse/issues',
+        'Changelog': 'https://pydataverse.readthedocs.io/en/latest/community/releases.html'
     }
 )

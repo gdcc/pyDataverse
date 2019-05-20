@@ -16,10 +16,10 @@ to create, update and remove Dataverses, Datasets and Datafiles.
 -------------------
 
 
-**Getting started**::
+Quickstart
+-----------------------------
 
     >>> from pyDataverse.api import Api
-
     >>> # establish connection
     >>> base_url = 'http://demo.dataverse.org'
     >>> api = Api(base_url)
@@ -60,6 +60,19 @@ Features
 - Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_).
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
 
+
+
+Community Guide
+-----------------------------
+
+This part of the documentation, which is mostly prose, details the
+pyDataverse ecosystem and community.
+
+.. toctree::
+   :maxdepth: 2
+
+   community/contact
+   community/releases
 
 
 Developer Documentation
