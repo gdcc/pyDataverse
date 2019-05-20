@@ -63,7 +63,6 @@ class Api(object):
         See more about url at https://en.wikipedia.org/wiki/URL
 
         """
-        print('INIT #1', base_url, api_token)
         # Check and set basic variables.
         if not isinstance(base_url, ("".__class__, u"".__class__)):
             raise ApiUrlError('base_url {0} is not a string.'.format(base_url))
@@ -87,7 +86,6 @@ class Api(object):
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
             url = '{0}{1}'.format(self.native_api_base_url, query_str)
-            print('INIT #2', self.native_api_base_url, url, query_str)
             try:
                 resp = get(url)
                 if resp:
@@ -102,7 +100,7 @@ class Api(object):
             except ConnectionError as e:
                 self.status = 'ERROR'
                 print(
-                    'ERROR: Could not establish connection to api {0} {1}.'
+                    'ERROR: Could not establish connection to url {0} {1}.'
                     ''.format(url, e))
         else:
             self.status = 'ERROR'
@@ -355,7 +353,7 @@ class Api(object):
                 'MSG: {2}'.format(resp.status_code, identifier, error_msg)
             )
         else:
-            print('Dataverse {0} has been created.'.format(identifier))
+            print('Dataverse {0} created.'.format(identifier))
         return resp
 
     def publish_dataverse(self, identifier, auth=True):
@@ -403,7 +401,7 @@ class Api(object):
                 '{2}'.format(resp.status_code, identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print('Dataverse {} has been published.'.format(identifier))
+            print('Dataverse {} published.'.format(identifier))
         return resp
 
     def delete_dataverse(self, identifier, auth=True):
@@ -452,7 +450,7 @@ class Api(object):
                 '{2}'.format(resp.status_code, identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print('Dataverse {} has been deleted.'.format(identifier))
+            print('Dataverse {} deleted.'.format(identifier))
         return resp
 
     def get_dataset(self, identifier, auth=True, is_doi=True):

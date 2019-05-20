@@ -23,15 +23,12 @@ if 'BASE_URL' in os.environ:
 else:
     print('ERROR: Environment variable BASE_URL for test missing.')
 
-print('TEST START', BASE_URL, API_TOKEN)
-
 
 class TestApiConnect(object):
     """Test the Api() class initalization."""
 
     def test_api_connect(self):
         """Test successfull connection without api_token."""
-        print('TEST api_connect', BASE_URL, API_TOKEN)
         api = Api(BASE_URL)
         time_window_start = datetime.now() - timedelta(seconds=10)
         assert isinstance(api, Api)
