@@ -5,8 +5,6 @@ import os
 from pyDataverse.api import Api
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
-from pyDataverse.utils import dict_to_json
-from pyDataverse.utils import read_file_json
 import pytest
 from requests import Response
 from time import sleep
@@ -98,23 +96,8 @@ class TestApiRequests(object):
         assert self.api.status == 'OK'
         assert isinstance(resp, Response)
 
-    def test_create_dataverse(self):
-        """Test successfull `.create_dataverse()` request`."""
-        metadata = read_file_json(self.filename_dataverse)
-        resp = self.api.create_dataverse(
-            self.dataverse_id, dict_to_json(metadata))
-        sleep(SLEEP_TIME)
-        assert isinstance(resp, Response)
-        assert self.api.get_dataverse(self.dataverse_id).json()
-
     def test_get_dataverse(self):
         """Test successfull `.get_dataverse()` request`."""
         resp = self.api.get_dataverse(':root')
-        sleep(SLEEP_TIME)
-        assert isinstance(resp, Response)
-
-    def test_delete_dataverse(self):
-        """Test successfull `.delete_dataverse()` request`."""
-        resp = self.api.delete_dataverse(self.dataverse_id)
         sleep(SLEEP_TIME)
         assert isinstance(resp, Response)
