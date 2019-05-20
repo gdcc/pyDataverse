@@ -78,8 +78,8 @@ class TestApiRequests(object):
         """Create the api connection for later use."""
         print('TEST setup_class', BASE_URL, API_TOKEN)
         cls.api = Api(BASE_URL, api_token=API_TOKEN)
-        cls.dataverse_id = 'test-pyDataverse-3'
-        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse_3.json'
+        cls.dataverse_id = 'test-pyDataverse'
+        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse.json'
         cls.filename_dataset = TEST_DIR+'/data/create_dataset.json'
         assert cls.api
         assert cls.api.api_token

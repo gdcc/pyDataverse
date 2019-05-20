@@ -346,7 +346,7 @@ class Api(object):
             raise DataverseNotFoundError(
                 'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
                     parent, error_msg))
-        elif resp.status_code != 200:
+        elif resp.status_code != 201:
             error_msg = resp.json()['message']
             raise OperationFailedError(
                 'ERROR: HTTP {0} - Dataverse {1} could not be created. '
@@ -550,11 +550,6 @@ class Api(object):
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
         resp = self.make_post_request(query_str, metadata, auth)
-
-        print(query_str)
-        print(metadata)
-        print(resp.status_code)
-        print(resp.json())
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
