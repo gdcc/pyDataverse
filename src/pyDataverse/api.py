@@ -63,7 +63,7 @@ class Api(object):
         See more about url at https://en.wikipedia.org/wiki/URL
 
         """
-        print('INIT', base_url, api_token)
+        print('INIT #1', base_url, api_token)
         # Check and set basic variables.
         if not isinstance(base_url, ("".__class__, u"".__class__)):
             raise ApiUrlError('base_url {0} is not a string.'.format(base_url))
@@ -87,7 +87,7 @@ class Api(object):
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
             url = '{0}{1}'.format(self.native_api_base_url, query_str)
-            print('INIT', self.native_api_base_url, url, query_str)
+            print('INIT #2', self.native_api_base_url, url, query_str)
             try:
                 resp = get(url)
                 if resp:
