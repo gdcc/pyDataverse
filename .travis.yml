@@ -44,7 +44,7 @@ script:
   - tox
 
 after_success:
-  - pytest tests/ --cov=pyDataverse --cov-report=term-missing --cov-report=xml --cov-report=html
+  - pytest tests/ --doctest-modules -v --cov=src/pyDataverse
   - coveralls
 
 notifications:
