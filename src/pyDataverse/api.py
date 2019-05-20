@@ -348,7 +348,7 @@ class Api(object):
             raise DataverseNotFoundError(
                 'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
                     parent, error_msg))
-        elif resp.status_code != 201:
+        elif resp.status_code != 200:
             error_msg = resp.json()['message']
             raise OperationFailedError(
                 'ERROR: HTTP {0} - Dataverse {1} could not be created. '
