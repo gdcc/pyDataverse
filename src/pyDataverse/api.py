@@ -313,7 +313,9 @@ class Api(object):
         required. http://guides.dataverse.org/en/latest/
         _downloads/dataverse-complete.json
 
-        RESPONSES:
+        resp.status_code:
+            200: dataverse created
+            201: dataverse created
 
         Parameters
         ----------
@@ -350,7 +352,7 @@ class Api(object):
             raise DataverseNotFoundError(
                 'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
                     parent, error_msg))
-        elif resp.status_code != 201:
+        elif resp.status_code != 200 and resp.status_code != 201:
             error_msg = resp.json()['message']
             raise OperationFailedError(
                 'ERROR: HTTP {0} - Dataverse {1} could not be created. '
