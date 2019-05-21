@@ -19,6 +19,16 @@ to create, update and remove Dataverses, Datasets and Datafiles.
 Quickstart
 -----------------------------
 
+**Install**
+
+.. code-block:: shell
+
+    pip install pyDataverse
+
+**Usage**
+
+.. code-block:: python
+
     >>> from pyDataverse.api import Api
     >>> # establish connection
     >>> base_url = 'http://demo.dataverse.org'
