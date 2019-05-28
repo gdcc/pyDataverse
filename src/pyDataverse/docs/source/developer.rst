@@ -35,6 +35,8 @@ Install from the local git repository, with all it's dependencies:
 
 .. code-block:: shell
 
+    git clone git@github.com:AUSSDA/pyDataverse.git
+    cd pyDataverse
     virtualenv venv
     source venv/bin/activate
     pip install -r tools/tests-requirements.txt
