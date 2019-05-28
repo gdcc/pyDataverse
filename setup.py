@@ -53,10 +53,13 @@ class Tox(TestCommand):
 INSTALL_REQUIREMENTS = [
     # A string or list of strings specifying what other distributions need to
     # be installed when this one is.
+    'requests'
+]
+
+SETUP_REQUIREMENTS = [
 ]
 
 TESTS_REQUIREMENTS = [
-    'tox'
 ]
 
 CLASSIFIERS = [
@@ -83,7 +86,7 @@ setup(
     author_email='stefan.kasberger@univie.ac.at',
     name='pyDataverse',
     version=find_version('src', 'pyDataverse', '__init__.py'),
-    description='A Dataverse API wrapper',
+    description='A wrapper for the Dataverse API',
     long_description=read_file('README.md'),
     long_description_content_type="text/markdown",
     license='MIT',
@@ -94,11 +97,11 @@ setup(
     install_requires=INSTALL_REQUIREMENTS,
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    setup_requires=['pytest-runner'],
+    setup_requires=SETUP_REQUIREMENTS,
     tests_require=TESTS_REQUIREMENTS,
     cmdclass={'test': Tox},
     include_package_data=True,
-    keywords=['pydataverse', 'dataverse', 'api'],
+    keywords=['pyDataverse', 'dataverse', 'api'],
     zip_safe=False,
     project_urls={
         'Documentation': 'https://pydataverse.readthedocs.io/',
