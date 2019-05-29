@@ -230,7 +230,7 @@ class Api(object):
             )
 
     def put_request(self, query_str, metadata=None, auth=False,
-                          params=None):
+                         params=None):
         """Make a PUT request.
 
         Parameters
@@ -282,6 +282,7 @@ class Api(object):
                 'ERROR: PUT - Could not establish connection to api {}.'
                 ''.format(url)
             )
+
 
     def delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
