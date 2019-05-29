@@ -176,7 +176,7 @@ class Api(object):
             )
 
     def post_request(self, query_str, metadata=None, auth=False,
-                          params=None):
+                      params=None):
         """Make a POST request.
 
         Parameters
