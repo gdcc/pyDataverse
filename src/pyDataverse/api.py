@@ -118,7 +118,7 @@ class Api(object):
         """
         return 'pyDataverse API class'
 
-    def make_get_request(self, query_str, params=None, auth=False):
+    def get_request(self, query_str, params=None, auth=False):
         """Make a GET request.
 
         Parameters
@@ -147,7 +147,7 @@ class Api(object):
             else:
                 ApiAuthorizationError(
                     'ERROR: GET - Api token not passed to '
-                    '`make_get_request` {}.'.format(url)
+                    '`get_request` {}.'.format(url)
                 )
 
         try:
@@ -175,7 +175,7 @@ class Api(object):
                 ''.format(url)
             )
 
-    def make_post_request(self, query_str, metadata=None, auth=False,
+    def post_request(self, query_str, metadata=None, auth=False,
                           params=None):
         """Make a POST request.
 
@@ -207,7 +207,7 @@ class Api(object):
             else:
                 ApiAuthorizationError(
                     'ERROR: POST - Api token not passed to '
-                    '`make_post_request` {}.'.format(url)
+                    '`post_request` {}.'.format(url)
                 )
 
         try:
@@ -229,7 +229,7 @@ class Api(object):
                 ''.format(url)
             )
 
-    def make_put_request(self, query_str, metadata=None, auth=False,
+    def put_request(self, query_str, metadata=None, auth=False,
                           params=None):
         """Make a PUT request.
 
@@ -261,7 +261,7 @@ class Api(object):
             else:
                 ApiAuthorizationError(
                     'ERROR: PUT - Api token not passed to '
-                    '`make_post_request` {}.'.format(url)
+                    '`put_request` {}.'.format(url)
                 )
 
         try:
@@ -283,7 +283,7 @@ class Api(object):
                 ''.format(url)
             )
 
-    def make_delete_request(self, query_str, auth=False, params=None):
+    def delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
 
         Parameters
@@ -312,7 +312,7 @@ class Api(object):
             else:
                 ApiAuthorizationError(
                     'ERROR: DELETE - Api token not passed to '
-                    '`make_delete_request` {}.'.format(url)
+                    '`delete_request` {}.'.format(url)
                 )
 
         try:
@@ -349,7 +349,7 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.make_get_request(query_str, auth=auth)
+        resp = self.get_request(query_str, auth=auth)
         return resp
 
     def create_dataverse(self, identifier, metadata, auth=True,
@@ -398,7 +398,7 @@ class Api(object):
             )
 
         query_str = '/dataverses/{0}'.format(parent)
-        resp = self.make_post_request(query_str, metadata, auth)
+        resp = self.post_request(query_str, metadata, auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -441,7 +441,7 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}/actions/:publish'.format(identifier)
-        resp = self.make_post_request(query_str, auth=auth)
+        resp = self.post_request(query_str, auth=auth)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -488,7 +488,7 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.make_delete_request(query_str, auth)
+        resp = self.delete_request(query_str, auth)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -547,7 +547,7 @@ class Api(object):
                 identifier)
         else:
             query_str = '/datasets/{0}'.format(identifier)
-        resp = self.make_get_request(query_str, auth=auth)
+        resp = self.get_request(query_str, auth=auth)
         return resp
 
     def get_dataset_export(self, identifier, export_format):
@@ -575,7 +575,7 @@ class Api(object):
         """
         query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
             export_format, identifier)
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def create_dataset(self, dataverse, metadata, auth=True):
@@ -617,7 +617,7 @@ class Api(object):
 
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
-        resp = self.make_post_request(query_str, metadata, auth)
+        resp = self.post_request(query_str, metadata, auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -682,7 +682,7 @@ class Api(object):
         """
         query_str = '/datasets/:persistentId/actions/:publish'
         query_str += '?persistentId={0}&type={1}'.format(identifier, type)
-        resp = self.make_post_request(query_str, auth=auth)
+        resp = self.post_request(query_str, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -720,7 +720,7 @@ class Api(object):
         """
         query_str = '/datasets/:persistentId/?persistentId={0}'.format(
             identifier)
-        resp = self.make_delete_request(query_str, auth=auth)
+        resp = self.delete_request(query_str, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -831,7 +831,7 @@ class Api(object):
         params = {'replace': True} if is_replace else {}
         #if is_replace: query_str += "&replace=true"
 
-        resp = self.make_put_request(query_str, metadata, auth, params)
+        resp = self.put_request(query_str, metadata, auth, params)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -873,7 +873,7 @@ class Api(object):
         """
         base_str = '/datasets/:persistentId/versions/'
         query_str = base_str+'{0}/files?persistentId={1}'.format(version, doi)
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_datafile(self, identifier):
@@ -897,7 +897,7 @@ class Api(object):
 
         """
         query_str = '/access/datafile/{0}'.format(identifier)
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_datafile_bundle(self, identifier):
@@ -933,7 +933,7 @@ class Api(object):
 
         """
         query_str = '/access/datafile/bundle/{0}'.format(identifier)
-        data = self.make_get_request(query_str)
+        data = self.get_request(query_str)
         return data
 
     def upload_file(self, identifier, filename):
@@ -987,7 +987,7 @@ class Api(object):
 
         """
         query_str = '/info/version'
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_info_server(self):
@@ -1005,7 +1005,7 @@ class Api(object):
 
         """
         query_str = '/info/server'
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_info_apiTermsOfUse(self):
@@ -1023,7 +1023,7 @@ class Api(object):
 
         """
         query_str = '/info/apiTermsOfUse'
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_metadatablocks(self):
@@ -1040,7 +1040,7 @@ class Api(object):
 
         """
         query_str = '/metadatablocks'
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
 
     def get_metadatablock(self, identifier):
@@ -1063,5 +1063,5 @@ class Api(object):
 
         """
         query_str = '/metadatablocks/{0}'.format(identifier)
-        resp = self.make_get_request(query_str)
+        resp = self.get_request(query_str)
         return resp
