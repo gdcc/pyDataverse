@@ -15,6 +15,7 @@ notes*.md
 stash*.*
 setup.sh
 .pypirc
+data/
 
 # Distribution / packaging
 build/

@@ -176,7 +176,7 @@ class Api(object):
             )
 
     def post_request(self, query_str, metadata=None, auth=False,
-                      params=None):
+                     params=None):
         """Make a POST request.
 
         Parameters
@@ -282,7 +282,6 @@ class Api(object):
                 'ERROR: PUT - Could not establish connection to api {}.'
                 ''.format(url)
             )
-
 
     def delete_request(self, query_str, auth=False, params=None):
         """Make a DELETE request.
@@ -968,7 +967,7 @@ class Api(object):
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
             query_str, filename)
-        # TODO: is shell=True necessary?
+        # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
         return resp

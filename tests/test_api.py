@@ -87,11 +87,11 @@ class TestApiRequests(object):
         assert cls.api.api_token
         assert cls.api.base_url
 
-    def test_make_get_request(self):
-        """Test successfull `.make_get_request()` request."""
+    def test_get_request(self):
+        """Test successfull `.get_request()` request."""
         # TODO: test params und auth default
         query_str = '/info/server'
-        resp = self.api.make_get_request(query_str)
+        resp = self.api.get_request(query_str)
         sleep(SLEEP_TIME)
         assert self.api.status == 'OK'
         assert isinstance(resp, Response)

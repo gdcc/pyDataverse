@@ -3,6 +3,24 @@ pyDataverse
 
 Release v\ |version|.
 
+.. image:: https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master
+    :target: https://travis-ci.com/AUSSDA/pyDataverse
+
+.. image:: https://img.shields.io/pypi/v/pyDataverse.svg
+    :target: https://pypi.org/project/pyDataverse/
+
+.. image:: https://img.shields.io/pypi/wheel/pyDataverse.svg
+    :target: https://pypi.org/project/pyDataverse/
+
+.. image:: https://img.shields.io/pypi/pyversions/pyDataverse.svg
+    :target: https://pypi.org/project/pyDataverse/
+
+.. image:: https://readthedocs.org/projects/pydataverse/badge/?version=latest
+    :target: https://pydataverse.readthedocs.io/en/latest
+
+.. image:: https://coveralls.io/repos/github/AUSSDA/pyDataverse/badge.svg
+    :target: https://coveralls.io/github/AUSSDA/pyDataverse
+
 .. image:: https://img.shields.io/github/license/aussda/pydataverse.svg
     :target: https://opensource.org/licenses/MIT
 
@@ -19,26 +37,34 @@ to create, update and remove Dataverses, Datasets and Datafiles.
 Quickstart
 -----------------------------
 
-    >>> from pyDataverse.api import Api
-    >>> # establish connection
-    >>> base_url = 'http://demo.dataverse.org'
-    >>> api = Api(base_url)
-    >>> api.status
-    'OK'
-    >>> # get dataverse
-    >>> dv = 'ecastro'  # dataverse alias or id
-    >>> resp = api.get_dataverse(dv)
-    >>> resp.json()['data']['creationDate']
-    '2015-04-20T09:29:39Z'
-    >>> # get dataset
-    >>> resp = api.get_dataset(identifier)
-    >>> resp.json()['data']['id']
-    24
-    >>> # get datafile
-    >>> datafile_id = '32'  # file id of the datafile
-    >>> resp = api.get_datafile(datafile_id)
-    >>> resp
-    <Response [200]>
+**Install**
+
+.. code-block:: shell
+
+    pip install pyDataverse
+
+**Usage**
+
+>>> from pyDataverse.api import Api
+>>> # establish connection
+>>> base_url = 'http://demo.dataverse.org'
+>>> api = Api(base_url)
+>>> api.status
+'OK'
+>>> # get dataverse
+>>> dv = 'ecastro'  # dataverse alias or id
+>>> resp = api.get_dataverse(dv)
+>>> resp.json()['data']['creationDate']
+'2015-04-20T09:29:39Z'
+>>> # get dataset
+>>> resp = api.get_dataset(identifier)
+>>> resp.json()['data']['id']
+24
+>>> # get datafile
+>>> datafile_id = '32'  # file id of the datafile
+>>> resp = api.get_datafile(datafile_id)
+>>> resp
+<Response [200]>
 
 
 Requirements

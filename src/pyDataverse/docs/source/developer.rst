@@ -31,13 +31,19 @@ Exceptions
 Install
 -----------------------------
 
-Install from the local git repository:
+Install from the local git repository, with all it's dependencies:
 
 .. code-block:: shell
 
+    git clone git@github.com:AUSSDA/pyDataverse.git
+    cd pyDataverse
     virtualenv venv
     source venv/bin/activate
-    pip install -r requirements.txt
+    pip install -r tools/tests-requirements.txt
+    pip install -r tools/lint-requirements.txt
+    pip install -r tools/docs-requirements.txt
+    pip install -r tools/packaging-requirements.txt
+    pip install -e .
 
 
 Testing
@@ -79,6 +85,8 @@ When you only want to run one test, e.g. the py36 test:
 .. code-block:: shell
 
     tox -e py36
+
+To find out more about which tests are available, have a look inside the tox.ini file.
 
 
 Documentation
