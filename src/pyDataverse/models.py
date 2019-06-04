@@ -23,6 +23,18 @@ class Dataverse(object):
     * does: set metadata functions: dicts mit key-value pairs übergeben. die keys müssen wie die metadata attribute
 
     """
+    __attr_required = [
+        'alias',
+        'name',
+        'contactEmail'
+    ]
+    __attr_flat = [
+        'alias',
+        'name',
+        'affiliation',
+        'description',
+        'dataverseType'
+    ]
 
     def __init__(self):
         """Init `Dataverse()` class."""
@@ -35,45 +47,88 @@ class Dataverse(object):
         self.datasets = []
         self.dataverses = []
 
+
+
     def __str__(self):
         """Return name of Dataverse() class for users."""
         return 'pyDataverse Dataverse() model class.'
 
     def set(self, data):
-        """Set attributes."""
-        if isinstance(data, list):
-            # TODO: prüfen, ob die struktur passt
-            data = dict(data)
-        elif not isinstance(data, dict):
-            # TODO: Exception raisen
-            print('Data was not passed in the correct data type. Dict() or '
-                  'List() required.')
+        """Set attributes.
 
+        Takes a dict with Key-Value pairs containing dataverse metadata.
+        Keys: attribute name. named after dataverse up standard.
+        Value: attribute value. types must be compatible for dataverse up.
+
+        """
         for key, val in data.items():
-            # TODO: prüfen, ob es sich immer um strings handelt bei den keys und values.
-            if key == 'alias':
-                self.alias = val
-            elif key == 'name':
-                self.name = val
-            elif key == 'contactEmail':
-                # TODO: add oder overwrite??
-                if isinstance(val, list):
-                    for email in val:
-                        self.contactEmail.append(email)
-                elif isinstance(val, str):
-                    self.contactEmail.append(val)
-                else:
-                    # TODO: Exception
-                    print('contactEmail "{}" not a list or a string. Do not'
-                          ' know what to do'.format(val))
-            elif key == 'affiliation':
-                self.affiliation = val
-            elif key == 'description':
-                self.description = val
-            elif key == 'dataverseType':
-                self.dataverseType = val
-            else:
-                print('Key "{}" passed is not valid'.format(key))
+            self.__setattr__(key, val)
+
+    def is_valid(self):
+        """Check if metadata stored in attributes is valid for dataverse api upload.
+
+        name, alias and dataverseContact are required fields. dataverseContact
+        is stored as list of emails in contactEmail, so contactEmail can not be
+        none.
+        """
+        is_valid = True
+        for attr in DS_ATTR_REQUIRED:
+            if not self.__getattribute__(attr):
+                is_valid = False
+                print('attribute \'{0}\' missing.'.format(attr))
+        return is_valid
+
+    def import_metadata(self, filename, format):
+        """Import data from different sources.
+
+        It is allowed to import incomplete Dataverses, where required
+        attributes are missing.
+
+        Simmply parse in the data. No validation needed. This will be done
+        later before the export.
+
+        Example: Default dataverse metadata json:
+        {
+          "name": "Scientific Research",
+          "alias": "science",
+          "dataverseContacts": [
+            {
+              "contactEmail": "pi@example.edu"
+            },
+            {
+              "contactEmail": "student@example.edu"
+            }
+          ],
+          "affiliation": "Scientific Research University",
+          "description": "We do all the science.",
+          "dataverseType": "LABORATORY"
+        }
+
+        filename: string
+        format: `dv_up`, `dv_down`
+
+        """
+        data = {}
+        if format == 'dv_up':
+            metadata = read_file_json(filename)
+            # get first level metadata and parse it automatically
+            for attr in DV_ATTR_FLAT:
+                data[attr] = metadata[attr]
+
+            # get nested metadata and parse it manually
+            if 'dataverseContacts' in metadata:
+                data['contactEmail'] = []
+                for contact in metadata['dataverseContacts']:
+                    for key, val in contact.items():
+                        if key == 'contactEmail':
+                            data['contactEmail'].append(val)
+            self.set(data)
+        elif format == 'dv_down':
+            metadata = read_file_json(filename)
+            self.set(data)
+        else:
+            # TODO: Exception
+            print('Data-format not right')
 
     @property
     def dict(self):
@@ -82,25 +137,31 @@ class Dataverse(object):
         TODO: Validate standard
 
         """
-        data = {}
+        if self.is_valid():
+            data = {}
+            """
+            dv_attr_list contains all metadata related attributes, which are
+            mapped on the first level of the dataverse up metadata structure.
+            This should help to shorten code
+            """
+            for attr in DV_ATTR_FLAT:
+                if self.__getattribute__(attr):
+                    data[attr] = self.__getattribute__(attr)
+                else:
+                    print('attr {0} not in data model.'.format(attr))
 
-        # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
-        if self.alias:
-            data['alias'] = self.alias
-        if self.name:
-            data['name'] = self.name
-        if self.contactEmail:
-            data['dataverseContacts'] = []
-            for email in self.contactEmail:
-                data['dataverseContacts'].append({'contactEmail': email})
-        if self.affiliation:
-            data['affiliation'] = self.affiliation
-        if self.description:
-            data['description'] = self.description
-        if self.dataverseType:
-            data['dataverseType'] = self.dataverseType
+            # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
+            if self.contactEmail:
+                data['dataverseContacts'] = []
+                for email in self.contactEmail:
+                    data['dataverseContacts'].append({'contactEmail': email})
+            else:
+                print('Key contactEmail not in data model.')
 
-        return data
+            return data
+        else:
+            print('dict can not be created. Data is not valid')
+            return None
 
     @property
     def json(self):
@@ -128,60 +189,7 @@ class Dataverse(object):
         """
         return dict_to_json(self.dict)
 
-    def import_data(self, filename, format):
-        """Import data from different sources.
-
-        does: mappen der metadaten in die interne datenstruktur -> set()
-
-        Example: Default dataverse metadata json:
-        {
-          "name": "Scientific Research",
-          "alias": "science",
-          "dataverseContacts": [
-            {
-              "contactEmail": "pi@example.edu"
-            },
-            {
-              "contactEmail": "student@example.edu"
-            }
-          ],
-          "affiliation": "Scientific Research University",
-          "description": "We do all the science.",
-          "dataverseType": "LABORATORY"
-        }
-
-        filename: string
-        format: `dv_up`, `dv_down`
-        return: True
-
-        dv = Dataverse()
-        dv.import_data('data/dataverse/dataverse-complete.json', 'dv_up')
-        dv.contactEmail
-
-        """
-        if format == 'dv_up' or format == 'dv_down':
-            data = read_file_json(filename)
-            # TODO: welche der variablen sind den required? wie soll damit umgegangen werden?
-            if 'name' in data:
-                self.name = data['name']
-            if 'alias' in data:
-                self.alias = data['alias']
-            if 'dataverseContacts' in data:
-                for contact in data['dataverseContacts']:
-                    for key, val in contact.items():
-                        if key == 'contactEmail':
-                            self.contactEmail.append(val)
-            if 'affiliation' in data:
-                self.affiliation = data['affiliation']
-            if 'description' in data:
-                self.description = data['description']
-            if 'dataverseType' in data:
-                self.dataverseType = data['dataverseType']
-        else:
-            # TODO: Exception
-            print('Data-format not right')
-
-    def export_data(self, filename, format):
+    def export_metadata(self, filename, format):
         """Export data to different file-formats.
 
         format: `dv_up`
@@ -191,90 +199,151 @@ class Dataverse(object):
             return write_file_json(filename, self.dict)
         else:
             # TODO: Exception
-            print('Data-format not right')
+            print('Data-format not right.')
 
 
 class Dataset(object):
     """Base class for the Dataset model."""
 
+    __attr_required = [
+        'displayName',
+        'title',
+        'author',
+        'datasetContact',
+        'dsDescription',
+        'subject'
+    ]
+
+    __attr_flat = [
+        'license',
+        'termsOfUse',
+        'termsOfAccess'
+    ]
+    __attr_citation_flat = [
+        'title',
+        'subtitle',
+        'alternativeTitle',
+        'alternativeURL',
+        'subject',
+        'notesText',
+        'productionDate',
+        'productionPlace',
+        'grantNumber',
+        'distributor',
+        'distributionDate',
+        'depositor',
+        'dateOfDeposit',
+        'kindOfData',
+        'relatedMaterial',
+        'relatedDatasets',
+        'otherReferences',
+        'dataSources',
+        'originOfSources',
+        'characteristicOfSources',
+        'accessToSources',
+        'kindOfData',
+        'subject'
+    ]
+
+    __attr_citation_arrays = {
+        'otherId': ['otherIdAgency', 'otherIdValue'],
+        'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme', 'authorIdentifier'],
+        'datasetContact': ['datasetContactName', 'datasetContactAffiliation', 'datasetContactEmail'],
+        'dsDescription': ['dsDescriptionValue', 'dsDescriptionDate'],
+        'keyword': ['keywordValue', 'keywordVocabulary', 'keywordVocabularyURI'],
+        'producer': ['producerName', 'producerAffiliation', 'producerAbbreviation', 'producerURL', 'producerLogoURL'],
+        'contributor': ['contributorType', 'contributorName'],
+        'grantNumber': ['grantNumberAgency', 'grantNumberValue'],
+        'topicClassification': ['topicClassValue', 'topicClassVocab'],
+        'publication': ['publicationCitation', 'publicationIDType', 'publicationIDNumber', 'publicationURL'],
+        'distributor': ['distributorName', 'distributorAffiliation', 'distributorAbbreviation', 'distributorURL', 'distributorLogoURL'],
+        'timePeriodCovered': ['timePeriodCoveredStart', 'timePeriodCoveredEnd'],
+        'dateOfCollection': ['dateOfCollectionStart', 'dateOfCollectionEnd'],
+        'software': ['softwareName', 'softwareVersion']
+    }
+
+    __attr_geospatial_flat = [
+        'geographicUnit',
+        'geographicBoundingBox'
+    ]
+
+    __attr_geospatial_arrays = {
+        'geographicCoverage': ['country', 'state', 'city', 'otherGeographicCoverage'],
+        'geographicBoundingBox': ['westLongitude', 'eastLongitude', 'northLongitude', 'southLongitude']
+    }
+
+    __attr_socialscience_flat = [
+        'unitOfAnalysis',
+        'universe',
+        'timeMethod',
+        'dataCollector',
+        'collectorTraining',
+        'frequencyOfDataCollection',
+        'samplingProcedure',
+        'deviationsFromSampleDesign',
+        'collectionMode',
+        'researchInstrument',
+        'dataCollectionSituation',
+        'actionsToMinimizeLoss',
+        'controlOperations',
+        'weighting',
+        'cleaningOperations',
+        'datasetLevelErrorNotes',
+        'responseRate',
+        'samplingErrorEstimates',
+        'otherDataAppraisal',
+    ]
+
+    __attr_socialscience_arrays = {
+        'targetSampleSize': ['targetSampleActualSize', 'targetSampleSizeFormula'],
+        'socialScienceNotes': ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText']
+    }
+
+    __attr_journal_flat = [
+        'journalVolumeIssue',
+        'journalArticleType'
+    ]
+
+    __attr_journal_arrays = {
+        'journalVolumeIssue': ['journalVolume', 'journalIssue', 'journalPubDate']
+    }
+
     def __init__(self):
         """Init Dataset() class."""
-        """Dataset"""
+        """dataset"""
         self.license = None
         self.termsOfUse = None
         self.termsOfAccess = None
 
-        """Citation"""
+        """citation"""
         self.citation_displayName = None
         self.title = None
         self.subtitle = None
         self.alternativeTitle = None
         self.alternativeURL = None
         self.otherId = []
-        # self.otherIdAgency
-        # self.otherIdValue
         self.author = []
-        # self.authorName
-        # self.authorAffiliation
-        # self.authorIdentifierScheme
-        # self.authorIdentifier
         self.datasetContact = []
-        # self.datasetContactName
-        # self.datasetContactAffiliation
-        # self.datasetContactEmail
         self.dsDescription = []
-        # self.dsDescriptionValue
-        # self.dsDescriptionDate
         self.subject = []
         self.keyword = []
-        # self.keywordValue
-        # self.keywordVocabulary
-        # self.keywordVocabularyURI
         self.topicClassification = []
-        # self.topicClassValue
-        # self.topicClassVocab
         self.publication = []
-        # self.publicationCitation
-        # self.publicationIDType
-        # self.publicationIDNumber
-        # self.publicationURL
         self.notesText = None
         self.producer = []
-        # self.producerName
-        # self.producerAffiliation
-        # self.producerAbbreviation
-        # self.producerURL
-        # self.producerLogoURL
         self.productionDate = None
         self.productionPlace = None
         self.contributor = []
-        # self.contributorType
-        # self.contributorName
         self.grantNumber = []
-        # self.grantNumberAgency
-        # self.grantNumberValue
         self.distributor = []
-        # self.distributorName
-        # self.distributorAffiliation
-        # self.distributorAbbreviation
-        # self.distributorURL
-        # self.distributorLogoURL
         self.distributionDate = None
         self.depositor = None
         self.dateOfDeposit = None
         self.timePeriodCovered = []
-        # self.timePeriodCoveredStart
-        # self.timePeriodCoveredEnd
         self.dateOfCollection = []
-        # self.dateOfCollectionStart
-        # self.dateOfCollectionEnd
         self.kindOfData = []
         self.series = []
-        # self.seriesName
-        # self.seriesInformation
         self.software = []
-        # self.softwareName
-        # self.softwareVersion
         self.relatedMaterial = []
         self.relatedDatasets = []
         self.otherReferences = []
@@ -283,21 +352,13 @@ class Dataset(object):
         self.characteristicOfSources = None
         self.accessToSources = None
 
-        """Geospatial"""
+        """geospatial"""
         self.geospatial_displayName = None
         self.geographicCoverage = []
-        # self.country
-        # self.state
-        # self.city
-        # self.otherGeographicCoverage
         self.geographicUnit = None
         self.geographicBoundingBox = []
-        # self.westLongitude
-        # self.eastLongitude
-        # self.northLongitude
-        # self.southLongitude
 
-        """SocialScience"""
+        """socialscience"""
         self.socialscience_displayName = None
         self.unitOfAnalysis = []
         self.universe = []
@@ -307,8 +368,6 @@ class Dataset(object):
         self.frequencyOfDataCollection = None
         self.samplingProcedure = None
         self.targetSampleSize = []
-        # self.targetSampleActualSize
-        # self.targetSampleSizeFormula
         self.deviationsFromSampleDesign = None
         self.collectionMode = None
         self.researchInstrument = None
@@ -325,17 +384,166 @@ class Dataset(object):
         self.socialScienceNotesSubject = None
         self.socialScienceNotesText = None
 
-        """Journal"""
+        """journal"""
         self.journal_displayName = None
         self.journalVolumeIssue = []
-        # self.journalVolume
-        # self.journalIssue
-        # self.journalPubDate
         self.journalArticleType = None
 
     def __str__(self):
         """Return name of Dataset() class for users."""
         return 'pyDataverse Dataset() model class.'
+
+    def set(self, data):
+        """Set attributes.
+
+        Takes a dict with Key-Value pairs containing dataverse metadata.
+        Keys: attribute name. named after dataverse up standard.
+        Value: attribute value. types must be compatible for dataverse up.
+
+        """
+        for key, val in data.items():
+            self.__setattr__(key, val)
+
+    def is_valid(self):
+        """Check if metadata stored in attributes is valid for dataverse api upload.
+
+        required: ??
+        TODO: Test out required fields or ask Harvard.
+
+        """
+        is_valid = True
+        for attr in self.__attr_required:
+            if not self.__getattribute__(attr):
+                is_valid = False
+                print('attribute \'{0}\' missing.'.format(attr))
+        return is_valid
+
+    def import_metadata(self, filename, format):
+        """Import metadata."""
+        data = {}
+        if format == 'dv_up':
+            metadata = read_file_json(filename)
+            """dataset"""
+            # get first level metadata and parse it automatically
+            for key, val in metadata['datasetVersion'].items():
+                if key in self.__attr_flat:
+                    data[key] = val
+
+            # get nested metadata and parse it manually
+            if 'dataverseContacts' in metadata:
+                data['contactEmail'] = []
+                for contact in metadata['dataverseContacts']:
+                    for key, val in contact.items():
+                        if key == 'contactEmail':
+                            data['contactEmail'].append(val)
+
+            """citation"""
+            if 'citation' in metadata['datasetVersion']['metadataBlocks']:
+                citation = metadata['datasetVersion']['metadataBlocks']['citation']
+                if 'displayName' in citation:
+                    data['citation_displayName'] = citation['displayName']
+
+                for field in citation['fields']:
+                    if field['typeName'] in self.__attr_citation_flat:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_citation_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_citation_arrays[field['typeName']])
+
+                    if field['typeName'] == 'series':
+                        if 'seriesName' in field['value']:
+                            data['seriesName'] = field['value']['seriesName']
+                        if 'seriesInformation' in field['value']:
+                            data['seriesInformation'] = field['value']['seriesInformation']
+            else:
+                # TODO: Exception
+                print('citation not in json')
+
+            """geospatial"""
+            if 'geospatial' in metadata['datasetVersion']['metadataBlocks']:
+                geospatial = metadata['datasetVersion']['metadataBlocks']['geospatial']
+                if 'displayName' in geospatial:
+                    self.__setattr__('geospatial_displayName', geospatial['displayName'])
+
+                for field in geospatial['fields']:
+                    if field['typeName'] in self.__attr_geospatial_flat:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_geospatial_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_geospatial_arrays[field['typeName']])
+            else:
+                # TODO: Exception
+                print('geospatial not in json')
+
+            """socialscience"""
+            if 'socialscience' in metadata['datasetVersion']['metadataBlocks']:
+                socialscience = metadata['datasetVersion']['metadataBlocks']['socialscience']
+                if 'displayName' in socialscience:
+                    self.__setattr__('socialscience_displayName', socialscience['displayName'])
+
+                for field in socialscience['fields']:
+                    if field['typeName'] in self.__attr_socialscience_flat:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_socialscience_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_socialscience_arrays[field['typeName']])
+            else:
+                # TODO: Exception
+                print('socialscience not in json')
+
+            """journal"""
+            if 'journal' in metadata['datasetVersion']['metadataBlocks']:
+                journal = metadata['datasetVersion']['metadataBlocks']['journal']
+                if 'displayName' in journal:
+                    self.__setattr__('journal_displayName', journal['displayName'])
+
+                for field in journal['fields']:
+                    if field['typeName'] in self.__attr_journal_flat:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_journal_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_journal_arrays[field['typeName']])
+            else:
+                # TODO: Exception
+                print('journal not in json')
+
+            self.set(data)
+        elif format == 'dv_down':
+            metadata = read_file_json(filename)
+            self.set(data)
+        else:
+            # TODO: Exception
+            print('Data-format not right')
+
+    def __parse_dicts(self, data, attr_list):
+        """Parse out list of dicts.
+
+        data: list of dicts
+        attr_list: list of attributes to be parsed out.
+
+        return: list of dicts
+
+        """
+        data_tmp = []
+
+        for d in data:
+            tmp_dict = {}
+            for key, val in d.items():
+                if key in attr_list:
+                    tmp_dict[key] = val['value']
+                else:
+                    print('Key \'{0}\' not in attribute list'.format(key))
+            data_tmp.append(tmp_dict)
+
+        return data_tmp
 
     @property
     def dict(self):
@@ -356,6 +564,7 @@ class Dataset(object):
         # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
 
         """Dataset"""
+
         if self.license:
             data['datasetVersion']['license'] = self.license
         if self.termsOfUse:
@@ -364,6 +573,8 @@ class Dataset(object):
             data['datasetVersion']['termsOfAccess'] = self.termsOfAccess
 
         """Citation"""
+
+        # Fields[]
         if self.citation_displayName:
             citation['displayName'] = self.citation_displayName
         if self.title:
@@ -507,9 +718,9 @@ class Dataset(object):
             data['journalArticleType'] = self.journalArticleType
 
         data['datasetVersion']['metadataBlocks']['citation'] = citation
-        data['datasetVersion']['metadataBlocks'][''] = socialscience
-        data['datasetVersion']['metadataBlocks'][''] = geospatial
-        data['datasetVersion']['metadataBlocks'][''] = journal
+        data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
+        data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
+        data['datasetVersion']['metadataBlocks']['journal'] = journal
 
         return data
 
@@ -522,3 +733,15 @@ class Dataset(object):
 
         """
         return dict_to_json(self.dict)
+
+    def export_metadata(self, filename, format):
+        """Export data to different file-formats.
+
+        format: `dv_up`
+
+        """
+        if format == 'dv_up':
+            return write_file_json(filename, self.dict)
+        else:
+            # TODO: Exception
+            print('Data-format not right.')
