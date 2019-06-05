@@ -205,7 +205,6 @@ class Dataset(object):
     """Base class for the Dataset model."""
 
     __attr_required = [
-        'displayName',
         'title',
         'author',
         'datasetContact',
@@ -399,11 +398,69 @@ class Dataset(object):
 
         """
         is_valid = True
+
         # check if all required attributes are set
         for attr in self.__attr_required:
             if not self.__getattribute__(attr):
                 is_valid = False
                 print('attribute \'{0}\' missing.'.format(attr))
+
+        # check if attribute sets are complete where necessary
+        tp_cov = self.__getattribute__('timePeriodCovered')
+        if tp_cov:
+            for tp in tp_cov:
+                if tp['timePeriodCoveredStart'] or tp['timePeriodCoveredEnd']:
+                    if not (tp['timePeriodCoveredStart'] and tp['timePeriodCoveredEnd']):
+                        is_valid = False
+
+        d_coll = self.__getattribute__('dateOfCollection')
+        if d_coll:
+            for d in d_coll:
+                if d['dateOfCollectionStart'] or d['dateOfCollectionEnd']:
+                    if not (d['dateOfCollectionStart'] and d['dateOfCollectionEnd']):
+                        is_valid = False
+
+        authors = self.__getattribute__('author')
+        if authors:
+            for a in authors:
+                if a['authorAffiliation'] or a['authorIdentifierScheme'] or a['authorIdentifier']:
+                    if not a['authorName']:
+                        is_valid = False
+
+        ds_contac = self.__getattribute__('datasetContact')
+        if ds_contac:
+            for c in ds_contac:
+                if c['datasetContactAffiliation'] or c['datasetContactEmail']:
+                    if not c['datasetContactName']:
+                        is_valid = False
+
+        producer = self.__getattribute__('producer')
+        if producer:
+            for p in producer:
+                if p['producerAffiliation'] or p['producerAbbreviation'] or p['producerURL'] or p['producerLogoURL']:
+                    if not p['producerName']:
+                        is_valid = False
+
+        contributor = self.__getattribute__('contributor')
+        if contributor:
+            for c in contributor:
+                if c['contributorType']:
+                    if not c['contributorName']:
+                        is_valid = False
+
+        distributor = self.__getattribute__('distributor')
+        if distributor:
+            for d in distributor:
+                if d['distributorAffiliation'] or d['distributorAbbreviation'] or d['distributorURL'] or d['distributorLogoURL']:
+                    if not d['distributorName']:
+                        is_valid = False
+
+        bbox = self.__getattribute__('geographicBoundingBox')
+        if bbox:
+            for b in bbox:
+                if b:
+                    if not (b['westLongitude'] and b['eastLongitude'] and b['northLongitude'] and b['southLongitude']):
+                        is_valid = False
 
         return is_valid
 
@@ -550,175 +607,165 @@ class Dataset(object):
         TODO: Validate standard
 
         """
-        data = {}
-        data['datasetVersion'] = {}
-        data['datasetVersion']['metadataBlocks'] = {}
-        citation = {}
-        citation['fields'] = []
-        geospatial = {}
-        geospatial['fields'] = []
-        socialscience = {}
-        socialscience['fields'] = []
-        journal = {}
-        journal['fields'] = []
+        if self.is_valid():
+            data = {}
+            data['datasetVersion'] = {}
+            data['datasetVersion']['metadataBlocks'] = {}
+            citation = {}
+            citation['fields'] = []
+            geospatial = {}
+            geospatial['fields'] = []
+            socialscience = {}
+            socialscience['fields'] = []
+            journal = {}
+            journal['fields'] = []
+
+            """dataset"""
+            # Generate first level attributes
+            for attr in self.__attr_flat:
+                data['datasetVersion'][attr] = self.__getattribute__(attr)
+
+            """citation"""
+            if self.citation_displayName:
+                citation['displayName'] = self.citation_displayName
+
+            # Generate first level attributes
+            for attr in self.__attr_citation_flat:
+                citation['fields'].append({
+                    'typeName': attr,
+                    'value': self.__getattribute__(attr)
+                    })
+
+            # Generate fields attributes
+            for key, val in self.__attr_citation_arrays.items():
+                citation['fields'].append({
+                    'typeName': key,
+                    'value': self.__generate_dicts(key, val)
+                    })
+
+            # Generate series attributes
+            if self.__getattribute__('series'):
+                tmp_dict = {}
+                tmp_dict['value'] = {}
+                if 'seriesName' in self.__getattribute__('series'):
+                    tmp_dict['value']['seriesName'] = {}
+                    tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
+                    tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
+                if 'seriesInformation' in self.__getattribute__('series'):
+                    tmp_dict['value']['seriesInformation'] = {}
+                    tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
+                    tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
+                citation['fields'].append({
+                    'typeName': 'series',
+                    'value': tmp_dict
+                    })
+
+            """geospatial"""
+            # Generate first level attributes
+            for attr in self.__attr_geospatial_flat:
+                geospatial['fields'].append({
+                    'typeName': attr,
+                    'value': self.__getattribute__(attr)
+                    })
+
+            # Generate fields attributes
+            for key, val in self.__attr_geospatial_arrays.items():
+                # check if attribute exists
+                geospatial['fields'].append({
+                    'typeName': key,
+                    'value': self.__generate_dicts(key, val)
+                    })
+
+            """socialscience"""
+            # Generate first level attributes
+            for attr in self.__attr_socialscience_flat:
+                socialscience['fields'].append({
+                    'typeName': attr,
+                    'value': self.__getattribute__(attr)
+                    })
+
+            # Generate targetSampleSize attributes
+            if self.__getattribute__('targetSampleSize'):
+                tmp_dict = {}
+                tmp_dict['value'] = {}
+                if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
+                    tmp_dict['value']['targetSampleActualSize'] = {}
+                    tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
+                    tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
+                if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
+                    tmp_dict['value']['targetSampleSizeFormula'] = {}
+                    tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
+                    tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
+                socialscience['fields'].append({
+                    'typeName': 'series',
+                    'value': tmp_dict
+                    })
+
+            # Generate socialScienceNotes attributes
+            if self.__getattribute__('socialScienceNotes'):
+                tmp_dict = {}
+                tmp_dict['value'] = {}
+                if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
+                    tmp_dict['value']['socialScienceNotesType'] = {}
+                    tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                    tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
+                if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
+                    tmp_dict['value']['socialScienceNotesSubject'] = {}
+                    tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                    tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
+                if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
+                    tmp_dict['value']['socialScienceNotesText'] = {}
+                    tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                    tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
+                socialscience['fields'].append({
+                    'typeName': 'series',
+                    'value': tmp_dict
+                    })
+
+            """journal"""
+            # Generate first level attributes
+            for attr in self.__attr_journal_flat:
+                journal['fields'].append({
+                    'typeName': attr,
+                    'value': self.__getattribute__(attr)
+                    })
+
+            # Generate fields attributes
+            for key, val in self.__attr_journal_arrays.items():
+                journal['fields'].append({
+                    'typeName': key,
+                    'value': self.__generate_dicts(key, val)
+                    })
+
+            # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
+            data['datasetVersion']['metadataBlocks']['citation'] = citation
+            data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
+            data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
+            data['datasetVersion']['metadataBlocks']['journal'] = journal
+
+            return data
+        else:
+            print('dict can not be created. Data is not valid')
+            return None
+
+    def __generate_dicts(self, key, val):
+        """Parse out list of dicts of metadata attributes for dict export."""
+        # check if attribute exists
         tmp_list = []
+        if self.__getattribute__(key):
+            # loop over list of attribute dicts()
+            for d in self.__getattribute__(key):
+                tmp_dict = {}
+                # iterate over key-value pairs
+                for k, v in d.items():
+                    # check if key is in attribute list
+                    if k in val:
+                        tmp_dict[k] = {}
+                        tmp_dict[k]['typeName'] = k
+                        tmp_dict[k]['value'] = v
+                tmp_list.append(tmp_dict)
 
-        """dataset"""
-        for attr in self.__attr_flat:
-            data['datasetVersion'][attr] = self.__getattribute__(attr)
-
-        """citation"""
-        if self.citation_displayName:
-            citation['displayName'] = self.citation_displayName
-
-        for attr in self.__attr_citation_flat:
-            citation['fields'].append({
-                'typeName': attr,
-                'value': self.__getattribute__(attr)
-                })
-
-        for key, val in self.__attr_citation_arrays.items():
-            # check if attribute exists
-            tmp_list = []
-            if self.__getattribute__(key):
-                # loop over list of attribute dicts()
-                for d in self.__getattribute__(key):
-                    tmp_dict = {}
-                    # iterate over key-value pairs
-                    for k, v in d.items():
-                        # check if key is in attribute list
-                        if k in val:
-                            tmp_dict[k] = {}
-                            tmp_dict[k]['typeName'] = k
-                            tmp_dict[k]['value'] = v
-                    tmp_list.append(tmp_dict)
-            citation['fields'].append({
-                'typeName': key,
-                'value': tmp_list
-                })
-
-        if self.__getattribute__('series'):
-            tmp_dict = {}
-            tmp_dict['value'] = {}
-            if 'seriesName' in self.__getattribute__('series'):
-                tmp_dict['value']['seriesName'] = {}
-                tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
-                tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
-            if 'seriesInformation' in self.__getattribute__('series'):
-                tmp_dict['value']['seriesInformation'] = {}
-                tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
-                tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
-            citation['fields'].append({
-                'typeName': 'series',
-                'value': tmp_dict
-                })
-
-        """geospatial"""
-        for attr in self.__attr_geospatial_flat:
-            geospatial['fields'].append({
-                'typeName': attr,
-                'value': self.__getattribute__(attr)
-                })
-
-        for key, val in self.__attr_geospatial_arrays.items():
-            # check if attribute exists
-            tmp_list = []
-            if self.__getattribute__(key):
-                # loop over list of attribute dicts()
-                for d in self.__getattribute__(key):
-                    tmp_dict = {}
-                    # iterate over key-value pairs
-                    for k, v in d.items():
-                        # check if key is in attribute list
-                        if k in val:
-                            tmp_dict[k] = {}
-                            tmp_dict[k]['typeName'] = k
-                            tmp_dict[k]['value'] = v
-                    tmp_list.append(tmp_dict)
-            geospatial['fields'].append({
-                'typeName': key,
-                'value': tmp_list
-                })
-
-        """socialscience"""
-
-        for attr in self.__attr_socialscience_flat:
-            socialscience['fields'].append({
-                'typeName': attr,
-                'value': self.__getattribute__(attr)
-                })
-
-        if self.__getattribute__('targetSampleSize'):
-            tmp_dict = {}
-            tmp_dict['value'] = {}
-            if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
-                tmp_dict['value']['targetSampleActualSize'] = {}
-                tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
-                tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
-            if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
-                tmp_dict['value']['targetSampleSizeFormula'] = {}
-                tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
-                tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
-            socialscience['fields'].append({
-                'typeName': 'series',
-                'value': tmp_dict
-                })
-
-        if self.__getattribute__('socialScienceNotes'):
-            tmp_dict = {}
-            tmp_dict['value'] = {}
-            if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
-                tmp_dict['value']['socialScienceNotesType'] = {}
-                tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
-            if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
-                tmp_dict['value']['socialScienceNotesSubject'] = {}
-                tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
-            if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
-                tmp_dict['value']['socialScienceNotesText'] = {}
-                tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
-            socialscience['fields'].append({
-                'typeName': 'series',
-                'value': tmp_dict
-                })
-
-        """journal"""
-        for attr in self.__attr_journal_flat:
-            journal['fields'].append({
-                'typeName': attr,
-                'value': self.__getattribute__(attr)
-                })
-
-        for key, val in self.__attr_journal_arrays.items():
-            # check if attribute exists
-            tmp_list = []
-            if self.__getattribute__(key):
-                # loop over list of attribute dicts()
-                for d in self.__getattribute__(key):
-                    tmp_dict = {}
-                    # iterate over key-value pairs
-                    for k, v in d.items():
-                        # check if key is in attribute list
-                        if k in val:
-                            tmp_dict[k] = {}
-                            tmp_dict[k]['typeName'] = k
-                            tmp_dict[k]['value'] = v
-                    tmp_list.append(tmp_dict)
-            journal['fields'].append({
-                'typeName': key,
-                'value': tmp_list
-                })
-
-        # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
-
-        data['datasetVersion']['metadataBlocks']['citation'] = citation
-        data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
-        data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
-        data['datasetVersion']['metadataBlocks']['journal'] = journal
-
-        return data
+        return tmp_list
 
     @property
     def json(self):
