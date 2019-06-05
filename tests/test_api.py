@@ -79,8 +79,8 @@ class TestApiRequests(object):
     def setup_class(cls):
         """Create the api connection for later use."""
         cls.dataverse_id = 'test-pyDataverse'
-        cls.filename_dataverse = TEST_DIR+'/data/create_dataverse.json'
-        cls.filename_dataset = TEST_DIR+'/data/create_dataset.json'
+        cls.filename_dataverse = TEST_DIR+'/data/dataverse_minimum_1.json.json'
+        cls.filename_dataset = TEST_DIR+'/data/dataset_full.json.json'
         cls.api = Api(BASE_URL, api_token=API_TOKEN)
         sleep(SLEEP_TIME)
         assert cls.api
