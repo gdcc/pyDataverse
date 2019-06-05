@@ -298,6 +298,8 @@ class Dataset(object):
 
     def __init__(self):
         """Init Dataset() class."""
+        self.datafiles = []
+
         """dataset"""
         self.license = None
         self.termsOfUse = None
@@ -770,6 +772,114 @@ class Dataset(object):
     @property
     def json(self):
         """Get Dataset metadata as json for Dataverse API upload.
+
+        TODO: Validate standard
+        TODO: Link to default json file
+
+        """
+        return dict_to_json(self.dict)
+
+    def export_metadata(self, filename, format):
+        """Export data to different file-formats.
+
+        format: `dv_up`
+
+        """
+        if format == 'dv_up':
+            return write_file_json(filename, self.dict)
+        else:
+            # TODO: Exception
+            print('Data-format not right.')
+
+
+class Datafile(object):
+    """Base class for the Datafile model."""
+
+    __attr_required = [
+        'filename',
+        'pid'
+    ]
+
+    __attr_flat = [
+        'description',
+        'categories'
+    ]
+
+    def __init__(self, filename=None, pid=None):
+        """Init `Datafile()` class."""
+        self.filename = filename
+        self.pid = pid
+        self.description = None
+        self.categories = []
+
+    def __str__(self):
+        """Return name of Datafile() class for users."""
+        return 'pyDataverse Datafile() model class.'
+
+    def set(self, data):
+        """Set attributes.
+
+        Takes a dict with Key-Value pairs containing Datafile metadata.
+        Keys: attribute name. named after dataverse up standard.
+        Value: attribute value. types must be compatible for dataverse up.
+
+        """
+        for key, val in data.items():
+            self.__setattr__(key, val)
+
+    def is_valid(self):
+        """Check if metadata stored in attributes is valid for dataverse api upload.
+
+        more
+
+        """
+        is_valid = True
+
+        for attr in self.__attr_required:
+            if not self.__getattribute__(attr):
+                is_valid = False
+                print('attribute \'{0}\' missing.'.format(attr))
+
+        return is_valid
+
+    def import_metadata(self, filename, format):
+        """Import metadata."""
+        data = {}
+        if format == 'dv_up':
+            metadata = read_file_json(filename)
+
+            for key, val in metadata['datasetVersion'].items():
+                if key in self.__attr_flat:
+                    data[key] = val
+            self.set(data)
+        elif format == 'dv_down':
+            metadata = read_file_json(filename)
+            self.set(data)
+        else:
+            # TODO: Exception
+            print('Data-format not right')
+
+    @property
+    def dict(self):
+        """Get Dataset metadata as dict for Dataverse API upload.
+
+        TODO: Validate standard
+
+        """
+        if self.is_valid():
+            data = {}
+
+            for attr in self.__attr_flat:
+                data[attr] = self.__getattribute__(attr)
+
+            return data
+        else:
+            print('dict can not be created. Data is not valid')
+            return None
+
+    @property
+    def json(self):
+        """Get Datafile metadata as json for Dataverse API upload.
 
         TODO: Validate standard
         TODO: Link to default json file
