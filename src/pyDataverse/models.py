@@ -39,7 +39,8 @@ class Dataverse(object):
     ]
     __attr_misc = [
         'datasets',
-        'dataverses'
+        'dataverses',
+        'pid'
     ]
 
     def __init__(self):
@@ -47,6 +48,7 @@ class Dataverse(object):
         """Misc"""
         self.datasets = []
         self.dataverses = []
+        self.pid = None
 
         """Metadata"""
         self.name = None

@@ -141,10 +141,22 @@ def write_file_json(filename, data, mode='w'):
     write_file(filename, dict_to_json(data), mode)
 
 
-def read_csv_to_dict(filename):
-    """Read in csv file and convert it into a list of dicts."""
+def csv_to_dict(filename):
+    """Read in csv file and convert it into a list of dicts.
+
+    Parameters
+    ----------
+    filename : string
+        Filename with full path.
+
+    Returns
+    -------
+    dict
+        List with dicts for each row.
+
+    """
     reader = csv.DictReader(open(filename), 'r')
     data = []
     for row in reader:
-        data.append(row)
+        data.append(dict(row))
     return data
