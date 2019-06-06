@@ -3,7 +3,6 @@
 """Find out more at https://github.com/AUSSDA/pyDataverse."""
 from __future__ import absolute_import
 from pyDataverse.utils import dict_to_json
-from pyDataverse.utils import json_to_dict
 from pyDataverse.utils import read_file_json
 from pyDataverse.utils import write_file_json
 
@@ -37,6 +36,10 @@ class Dataverse(object):
         'affiliation',
         'description',
         'dataverseType'
+    ]
+    __attr_misc = [
+        'datasets',
+        'dataverses'
     ]
 
     def __init__(self):
@@ -91,6 +94,8 @@ class Dataverse(object):
         Simmply parse in the data. No validation needed. This will be done
         later before the export.
 
+        format: dv_up
+
         Example: Default dataverse metadata json:
         {
           "name": "Scientific Research",
@@ -133,41 +138,48 @@ class Dataverse(object):
             self.set(data)
         else:
             # TODO: Exception
-            print('Data-format not right')
+            print('Data-format not right.')
 
-    @property
-    def dict(self):
+    def dict(self, format='dv_up'):
         """Get Dataverse metadata as dict for Dataverse API upload.
 
         TODO: Validate standard
 
+        format: all, dv_up
+
+        if data is valid will be checked here. so it is not necessary anymore in json().
+
         """
-        if self.is_valid():
-            data = {}
-            """
-            dv_attr_list contains all metadata related attributes, which are
-            mapped on the first level of the dataverse up metadata structure.
-            This should help to shorten code
-            """
-            for attr in self.__attr_valid:
+        data = {}
+        if format == 'dv_up':
+            if self.is_valid():
+                for attr in self.__attr_valid:
+                    if self.__getattribute__(attr):
+                        data[attr] = self.__getattribute__(attr)
+
+                # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
+                if self.contactEmail:
+                    data['dataverseContacts'] = []
+                    for email in self.contactEmail:
+                        data['dataverseContacts'].append({'contactEmail': email})
+                else:
+                    print('Key contactEmail not in data model.')
+
+                return data
+            else:
+                print('dict can not be created. Data is not valid for format')
+                return None
+        elif format == 'all':
+            for attr in self.__attr_misc + self.__attr_valid:
                 if self.__getattribute__(attr):
                     data[attr] = self.__getattribute__(attr)
-
-            # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
-            if self.contactEmail:
-                data['dataverseContacts'] = []
-                for email in self.contactEmail:
-                    data['dataverseContacts'].append({'contactEmail': email})
-            else:
-                print('Key contactEmail not in data model.')
-
             return data
         else:
-            print('dict can not be created. Data is not valid')
+            # TODO: Exception
+            print('Format not right for dict.')
             return None
 
-    @property
-    def json(self):
+    def json(self, format='dv_up'):
         """Get Dataverse metadata as json for Dataverse API upload.
 
         TODO: Validate standard
@@ -190,16 +202,24 @@ class Dataverse(object):
         }
 
         """
-        return dict_to_json(self.dict)
+        if format == 'dv_up':
+            return dict_to_json(self.dict())
+        elif format == 'all':
+            return dict_to_json(self.dict('all'))
+        else:
+            # TODO Exception
+            print('data format not valid.')
 
     def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.
+
+        exports only to metadata standards.
 
         format: `dv_up`
 
         """
         if format == 'dv_up':
-            return write_file_json(filename, self.dict)
+            return write_file_json(filename, self.dict())
         else:
             # TODO: Exception
             print('Data-format not right.')
@@ -413,7 +433,8 @@ class Dataset(object):
 
         """
         for key, val in data.items():
-            self.__setattr__(key, val)
+            if key:
+                self.__setattr__(key, val)
 
     def is_valid(self):
         """Check if metadata stored in attributes is valid for dataverse api upload.
@@ -490,7 +511,11 @@ class Dataset(object):
         return is_valid
 
     def import_metadata(self, filename, format='dv_up'):
-        """Import metadata."""
+        """Import metadata.
+
+        format: dv_up
+
+        """
         data = {}
         if format == 'dv_up':
             metadata = read_file_json(filename)
@@ -625,152 +650,166 @@ class Dataset(object):
 
         return data_tmp
 
-    @property
-    def dict(self):
+    def dict(self, format='dv_up'):
         """Get Dataset metadata as dict for Dataverse API upload.
 
         TODO: Validate standard
 
+        format: dv_up, all
+
         """
-        if self.is_valid():
-            data = {}
-            data['datasetVersion'] = {}
-            data['datasetVersion']['metadataBlocks'] = {}
-            citation = {}
-            citation['fields'] = []
-            geospatial = {}
-            geospatial['fields'] = []
-            socialscience = {}
-            socialscience['fields'] = []
-            journal = {}
-            journal['fields'] = []
+        if format == 'dv_up':
+            if self.is_valid():
+                data = {}
+                data['datasetVersion'] = {}
+                data['datasetVersion']['metadataBlocks'] = {}
+                citation = {}
+                citation['fields'] = []
+                geospatial = {}
+                geospatial['fields'] = []
+                socialscience = {}
+                socialscience['fields'] = []
+                journal = {}
+                journal['fields'] = []
 
-            """dataset"""
-            # Generate first level attributes
-            for attr in self.__attr_datasetVersion:
-                data['datasetVersion'][attr] = self.__getattribute__(attr)
+                """dataset"""
+                # Generate first level attributes
+                for attr in self.__attr_datasetVersion:
+                    data['datasetVersion'][attr] = self.__getattribute__(attr)
 
-            """citation"""
-            if self.citation_displayName:
-                citation['displayName'] = self.citation_displayName
+                """citation"""
+                if self.citation_displayName:
+                    citation['displayName'] = self.citation_displayName
 
-            # Generate first level attributes
-            for attr in self.__attr_citation:
-                citation['fields'].append({
-                    'typeName': attr,
-                    'value': self.__getattribute__(attr)
-                    })
+                # Generate first level attributes
+                for attr in self.__attr_citation:
+                    citation['fields'].append({
+                        'typeName': attr,
+                        'value': self.__getattribute__(attr)
+                        })
 
-            # Generate fields attributes
-            for key, val in self.__attr_citation_fields.items():
-                citation['fields'].append({
-                    'typeName': key,
-                    'value': self.__generate_dicts(key, val)
-                    })
+                # Generate fields attributes
+                for key, val in self.__attr_citation_fields.items():
+                    citation['fields'].append({
+                        'typeName': key,
+                        'value': self.__generate_dicts(key, val)
+                        })
 
-            # Generate series attributes
-            if self.__getattribute__('series'):
-                tmp_dict = {}
-                tmp_dict['value'] = {}
-                if 'seriesName' in self.__getattribute__('series'):
-                    tmp_dict['value']['seriesName'] = {}
-                    tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
-                    tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
-                if 'seriesInformation' in self.__getattribute__('series'):
-                    tmp_dict['value']['seriesInformation'] = {}
-                    tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
-                    tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
-                citation['fields'].append({
-                    'typeName': 'series',
-                    'value': tmp_dict
-                    })
+                # Generate series attributes
+                if self.__getattribute__('series'):
+                    tmp_dict = {}
+                    tmp_dict['value'] = {}
+                    if 'seriesName' in self.__getattribute__('series'):
+                        tmp_dict['value']['seriesName'] = {}
+                        tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
+                        tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
+                    if 'seriesInformation' in self.__getattribute__('series'):
+                        tmp_dict['value']['seriesInformation'] = {}
+                        tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
+                        tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
+                    citation['fields'].append({
+                        'typeName': 'series',
+                        'value': tmp_dict
+                        })
 
-            """geospatial"""
-            # Generate first level attributes
-            for attr in self.__attr_geospatial:
-                geospatial['fields'].append({
-                    'typeName': attr,
-                    'value': self.__getattribute__(attr)
-                    })
+                """geospatial"""
+                # Generate first level attributes
+                for attr in self.__attr_geospatial:
+                    geospatial['fields'].append({
+                        'typeName': attr,
+                        'value': self.__getattribute__(attr)
+                        })
 
-            # Generate fields attributes
-            for key, val in self.__attr_geospatial_fields.items():
-                # check if attribute exists
-                geospatial['fields'].append({
-                    'typeName': key,
-                    'value': self.__generate_dicts(key, val)
-                    })
+                # Generate fields attributes
+                for key, val in self.__attr_geospatial_fields.items():
+                    # check if attribute exists
+                    geospatial['fields'].append({
+                        'typeName': key,
+                        'value': self.__generate_dicts(key, val)
+                        })
 
-            """socialscience"""
-            # Generate first level attributes
-            for attr in self.__attr_socialscience:
-                socialscience['fields'].append({
-                    'typeName': attr,
-                    'value': self.__getattribute__(attr)
-                    })
+                """socialscience"""
+                # Generate first level attributes
+                for attr in self.__attr_socialscience:
+                    socialscience['fields'].append({
+                        'typeName': attr,
+                        'value': self.__getattribute__(attr)
+                        })
 
-            # Generate targetSampleSize attributes
-            if self.__getattribute__('targetSampleSize'):
-                tmp_dict = {}
-                tmp_dict['value'] = {}
-                if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
-                    tmp_dict['value']['targetSampleActualSize'] = {}
-                    tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
-                    tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
-                if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
-                    tmp_dict['value']['targetSampleSizeFormula'] = {}
-                    tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
-                    tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
-                socialscience['fields'].append({
-                    'typeName': 'series',
-                    'value': tmp_dict
-                    })
+                # Generate targetSampleSize attributes
+                if self.__getattribute__('targetSampleSize'):
+                    tmp_dict = {}
+                    tmp_dict['value'] = {}
+                    if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
+                        tmp_dict['value']['targetSampleActualSize'] = {}
+                        tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
+                        tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
+                    if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
+                        tmp_dict['value']['targetSampleSizeFormula'] = {}
+                        tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
+                        tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
+                    socialscience['fields'].append({
+                        'typeName': 'series',
+                        'value': tmp_dict
+                        })
 
-            # Generate socialScienceNotes attributes
-            if self.__getattribute__('socialScienceNotes'):
-                tmp_dict = {}
-                tmp_dict['value'] = {}
-                if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
-                    tmp_dict['value']['socialScienceNotesType'] = {}
-                    tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                    tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
-                if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
-                    tmp_dict['value']['socialScienceNotesSubject'] = {}
-                    tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                    tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
-                if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
-                    tmp_dict['value']['socialScienceNotesText'] = {}
-                    tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                    tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
-                socialscience['fields'].append({
-                    'typeName': 'series',
-                    'value': tmp_dict
-                    })
+                # Generate socialScienceNotes attributes
+                if self.__getattribute__('socialScienceNotes'):
+                    tmp_dict = {}
+                    tmp_dict['value'] = {}
+                    if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
+                        tmp_dict['value']['socialScienceNotesType'] = {}
+                        tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                        tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
+                    if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
+                        tmp_dict['value']['socialScienceNotesSubject'] = {}
+                        tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                        tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
+                    if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
+                        tmp_dict['value']['socialScienceNotesText'] = {}
+                        tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                        tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
+                    socialscience['fields'].append({
+                        'typeName': 'series',
+                        'value': tmp_dict
+                        })
 
-            """journal"""
-            # Generate first level attributes
-            for attr in self.__attr_journal:
-                journal['fields'].append({
-                    'typeName': attr,
-                    'value': self.__getattribute__(attr)
-                    })
+                """journal"""
+                # Generate first level attributes
+                for attr in self.__attr_journal:
+                    journal['fields'].append({
+                        'typeName': attr,
+                        'value': self.__getattribute__(attr)
+                        })
 
-            # Generate fields attributes
-            for key, val in self.__attr_journal_fields.items():
-                journal['fields'].append({
-                    'typeName': key,
-                    'value': self.__generate_dicts(key, val)
-                    })
+                # Generate fields attributes
+                for key, val in self.__attr_journal_fields.items():
+                    journal['fields'].append({
+                        'typeName': key,
+                        'value': self.__generate_dicts(key, val)
+                        })
 
-            # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
-            data['datasetVersion']['metadataBlocks']['citation'] = citation
-            data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
-            data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
-            data['datasetVersion']['metadataBlocks']['journal'] = journal
+                # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
+                data['datasetVersion']['metadataBlocks']['citation'] = citation
+                data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
+                data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
+                data['datasetVersion']['metadataBlocks']['journal'] = journal
 
+                return data
+            else:
+                print('dict can not be created. Data is not valid for format')
+                return None
+        elif format == 'all':
+            attr_lst = self.__attr_datasetVersion + self.__attr_citation + self.__attr_geospatial + self.__attr_socialscience + self.__attr_journal
+            for key, val in self.__attr_citation_fields.update(self.__attr_geospatial_fields.update(self.__attr_journal_fields)):
+                attr_lst.append(key)
+            for attr in attr_lst:
+                if self.__getattribute__(attr):
+                    data[attr] = self.__getattribute__(attr)
             return data
+
         else:
-            print('dict can not be created. Data is not valid')
+            print('dict can not be created. Format is not valid')
             return None
 
     def __generate_dicts(self, key, val):
@@ -792,15 +831,20 @@ class Dataset(object):
 
         return tmp_list
 
-    @property
-    def json(self):
+    def json(self, format='dv_up'):
         """Get Dataset metadata as json for Dataverse API upload.
 
         TODO: Validate standard
         TODO: Link to default json file
 
         """
-        return dict_to_json(self.dict)
+        if format == 'dv_up':
+            return dict_to_json(self.dict())
+        elif format == 'all':
+            return dict_to_json(self.dict('all'))
+        else:
+            # TODO Exception
+            print('data format not valid.')
 
     def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.
@@ -809,7 +853,7 @@ class Dataset(object):
 
         """
         if format == 'dv_up':
-            return write_file_json(filename, self.dict)
+            return write_file_json(filename, self.dict())
         else:
             # TODO: Exception
             print('Data-format not right.')
@@ -824,18 +868,26 @@ class Datafile(object):
         'pid'
     ]
 
+    """Attributes on first level of Datafile metadata json."""
     __attr_valid = [
         'description',
         'categories',
         'directoryLabel',
         'restrict'
     ]
+    """Attributes on first level of Datafile metadata json."""
+    __attr_misc = [
+        'pid',
+        'filename'
+    ]
 
     def __init__(self, filename=None, pid=None):
         """Init `Datafile()` class."""
-        """Metadata"""
-        self.filename = filename
+        """Misc"""
         self.pid = pid
+        self.filename = filename
+
+        """Metadata"""
         self.description = None
         self.categories = []
         self.directoryLabel = None
@@ -872,7 +924,11 @@ class Datafile(object):
         return is_valid
 
     def import_metadata(self, filename, format='dv_up'):
-        """Import metadata."""
+        """Import metadata.
+
+        format: dv_up
+
+        """
         data = {}
         if format == 'dv_up':
             metadata = read_file_json(filename)
@@ -884,38 +940,52 @@ class Datafile(object):
             self.set(data)
         elif format == 'dv_down':
             metadata = read_file_json(filename)
-            self.set(data)
+            self.set(metadata)
         else:
             # TODO: Exception
             print('Data-format not right')
 
-    @property
-    def dict(self):
+    def dict(self, format='dv_up'):
         """Get Dataset metadata as dict for Dataverse API upload.
 
         TODO: Validate standard
 
         """
-        if self.is_valid():
-            data = {}
+        if format == 'dv_up':
+            if self.is_valid():
+                data = {}
 
-            for attr in self.__attr_valid:
-                data[attr] = self.__getattribute__(attr)
+                for attr in self.__attr_valid:
+                    data[attr] = self.__getattribute__(attr)
 
+                return data
+            else:
+                print('dict can not be created. Data is not valid')
+                return None
+        elif format == 'all':
+            for attr in self.__attr_misc + self.__attr_valid:
+                if self.__getattribute__(attr):
+                    data[attr] = self.__getattribute__(attr)
             return data
         else:
-            print('dict can not be created. Data is not valid')
+            # TODO: Exception
+            print('Format not right for dict.')
             return None
 
-    @property
-    def json(self):
+    def json(self, format='dv_up'):
         """Get Datafile metadata as json for Dataverse API upload.
 
         TODO: Validate standard
         TODO: Link to default json file
 
         """
-        return dict_to_json(self.dict)
+        if format == 'dv_up':
+            return dict_to_json(self.dict())
+        elif format == 'all':
+            return dict_to_json(self.dict('all'))
+        else:
+            # TODO Exception
+            print('data format not valid.')
 
     def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.

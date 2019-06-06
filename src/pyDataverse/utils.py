@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Find out more at https://github.com/AUSSDA/pyDataverse."""
+import csv
 import json
 
 
@@ -138,3 +139,12 @@ def write_file_json(filename, data, mode='w'):
 
     """
     write_file(filename, dict_to_json(data), mode)
+
+
+def read_csv_to_dict(filename):
+    """Read in csv file and convert it into a list of dicts."""
+    reader = csv.DictReader(open(filename), 'r')
+    data = []
+    for row in reader:
+        data.append(row)
+    return data
