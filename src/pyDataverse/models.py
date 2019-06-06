@@ -24,12 +24,14 @@ class Dataverse(object):
 
     """
 
+    """Attributes required to Dataverse metadata json."""
     __attr_required = [
         'alias',
         'name',
         'contactEmail'
     ]
-    __attr_flat = [
+    """Attributes on first level of Dataverse metadata json."""
+    __attr_valid = [
         'alias',
         'name',
         'affiliation',
@@ -39,14 +41,17 @@ class Dataverse(object):
 
     def __init__(self):
         """Init `Dataverse()` class."""
+        """Misc"""
+        self.datasets = []
+        self.dataverses = []
+
+        """Metadata"""
         self.name = None
         self.alias = None
         self.contactEmail = []
         self.affiliation = None
         self.description = None
         self.dataverseType = None
-        self.datasets = []
-        self.dataverses = []
 
     def __str__(self):
         """Return name of Dataverse() class for users."""
@@ -77,7 +82,7 @@ class Dataverse(object):
                 print('attribute \'{0}\' missing.'.format(attr))
         return is_valid
 
-    def import_metadata(self, filename, format):
+    def import_metadata(self, filename, format='dv_up'):
         """Import data from different sources.
 
         It is allowed to import incomplete Dataverses, where required
@@ -111,8 +116,9 @@ class Dataverse(object):
         if format == 'dv_up':
             metadata = read_file_json(filename)
             # get first level metadata and parse it automatically
-            for attr in self.__attr_flat:
-                data[attr] = metadata[attr]
+            for attr in self.__attr_valid:
+                if attr in metadata:
+                    data[attr] = metadata[attr]
 
             # get nested metadata and parse it manually
             if 'dataverseContacts' in metadata:
@@ -143,11 +149,9 @@ class Dataverse(object):
             mapped on the first level of the dataverse up metadata structure.
             This should help to shorten code
             """
-            for attr in self.__attr_flat:
+            for attr in self.__attr_valid:
                 if self.__getattribute__(attr):
                     data[attr] = self.__getattribute__(attr)
-                else:
-                    print('attr {0} not in data model.'.format(attr))
 
             # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
             if self.contactEmail:
@@ -188,7 +192,7 @@ class Dataverse(object):
         """
         return dict_to_json(self.dict)
 
-    def export_metadata(self, filename, format):
+    def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.
 
         format: `dv_up`
@@ -204,6 +208,7 @@ class Dataverse(object):
 class Dataset(object):
     """Base class for the Dataset model."""
 
+    """Attributes required for Dataset metadata json."""
     __attr_required = [
         'title',
         'author',
@@ -212,12 +217,17 @@ class Dataset(object):
         'subject'
     ]
 
-    __attr_flat = [
+    """Attributes on first level of Dataverse metadata json inside
+    [\'datasetVersion\']."""
+    __attr_datasetVersion = [
         'license',
         'termsOfUse',
         'termsOfAccess'
     ]
-    __attr_citation_flat = [
+
+    """Attributes on first level of Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\']."""
+    __attr_citation = [
         'title',
         'subtitle',
         'alternativeTitle',
@@ -240,7 +250,9 @@ class Dataset(object):
         'kindOfData'
     ]
 
-    __attr_citation_arrays = {
+    """Attributes in Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\']."""
+    __attr_citation_fields = {
         'otherId': ['otherIdAgency', 'otherIdValue'],
         'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme', 'authorIdentifier'],
         'datasetContact': ['datasetContactName', 'datasetContactAffiliation', 'datasetContactEmail'],
@@ -257,16 +269,22 @@ class Dataset(object):
         'software': ['softwareName', 'softwareVersion']
     }
 
-    __attr_geospatial_flat = [
+    """Attributes on first level of Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\']."""
+    __attr_geospatial = [
         'geographicUnit'
     ]
 
-    __attr_geospatial_arrays = {
+    """Attributes in Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\']."""
+    __attr_geospatial_fields = {
         'geographicCoverage': ['country', 'state', 'city', 'otherGeographicCoverage'],
         'geographicBoundingBox': ['westLongitude', 'eastLongitude', 'northLongitude', 'southLongitude']
     }
 
-    __attr_socialscience_flat = [
+    """Attributes on first level of Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\']."""
+    __attr_socialscience = [
         'unitOfAnalysis',
         'universe',
         'timeMethod',
@@ -288,24 +306,29 @@ class Dataset(object):
         'otherDataAppraisal',
     ]
 
-    __attr_journal_flat = [
+    """Attributes on first level of Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\']."""
+    __attr_journal = [
         'journalArticleType'
     ]
 
-    __attr_journal_arrays = {
+    """Attributes in Dataverse metadata json inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\']."""
+    __attr_journal_fields = {
         'journalVolumeIssue': ['journalVolume', 'journalIssue', 'journalPubDate']
     }
 
     def __init__(self):
         """Init Dataset() class."""
+        """Misc"""
         self.datafiles = []
 
-        """dataset"""
+        """Metadata: dataset"""
         self.license = None
         self.termsOfUse = None
         self.termsOfAccess = None
 
-        """citation"""
+        """Metadata: citation"""
         self.citation_displayName = None
         self.title = None
         self.subtitle = None
@@ -342,13 +365,13 @@ class Dataset(object):
         self.characteristicOfSources = None
         self.accessToSources = None
 
-        """geospatial"""
+        """Metadata: geospatial"""
         self.geospatial_displayName = None
         self.geographicCoverage = []
         self.geographicUnit = None
         self.geographicBoundingBox = []
 
-        """socialscience"""
+        """Metadata: socialscience"""
         self.socialscience_displayName = None
         self.unitOfAnalysis = []
         self.universe = []
@@ -372,7 +395,7 @@ class Dataset(object):
         self.samplingErrorEstimates = None
         self.otherDataAppraisal = None
 
-        """journal"""
+        """Metadata: journal"""
         self.journal_displayName = None
         self.journalVolumeIssue = []
         self.journalArticleType = None
@@ -411,62 +434,62 @@ class Dataset(object):
         tp_cov = self.__getattribute__('timePeriodCovered')
         if tp_cov:
             for tp in tp_cov:
-                if tp['timePeriodCoveredStart'] or tp['timePeriodCoveredEnd']:
-                    if not (tp['timePeriodCoveredStart'] and tp['timePeriodCoveredEnd']):
+                if 'timePeriodCoveredStart' in tp or 'timePeriodCoveredEnd' in tp:
+                    if not ('timePeriodCoveredStart' in tp and 'timePeriodCoveredEnd' in tp):
                         is_valid = False
 
         d_coll = self.__getattribute__('dateOfCollection')
         if d_coll:
             for d in d_coll:
-                if d['dateOfCollectionStart'] or d['dateOfCollectionEnd']:
-                    if not (d['dateOfCollectionStart'] and d['dateOfCollectionEnd']):
+                if 'dateOfCollectionStart' in d or 'dateOfCollectionEnd' in d:
+                    if not ('dateOfCollectionStart' in d and 'dateOfCollectionEnd' in d):
                         is_valid = False
 
         authors = self.__getattribute__('author')
         if authors:
             for a in authors:
-                if a['authorAffiliation'] or a['authorIdentifierScheme'] or a['authorIdentifier']:
-                    if not a['authorName']:
+                if 'authorAffiliation' in a or 'authorIdentifierScheme' in a or 'authorIdentifier' in a:
+                    if not 'authorName' in a:
                         is_valid = False
 
         ds_contac = self.__getattribute__('datasetContact')
         if ds_contac:
             for c in ds_contac:
-                if c['datasetContactAffiliation'] or c['datasetContactEmail']:
-                    if not c['datasetContactName']:
+                if 'datasetContactAffiliation' in c or 'datasetContactEmail' in c:
+                    if not 'datasetContactName' in c:
                         is_valid = False
 
         producer = self.__getattribute__('producer')
         if producer:
             for p in producer:
-                if p['producerAffiliation'] or p['producerAbbreviation'] or p['producerURL'] or p['producerLogoURL']:
+                if 'producerAffiliation' in p or 'producerAbbreviation' in p or 'producerURL' in p or 'producerLogoURL' in p:
                     if not p['producerName']:
                         is_valid = False
 
         contributor = self.__getattribute__('contributor')
         if contributor:
             for c in contributor:
-                if c['contributorType']:
-                    if not c['contributorName']:
+                if 'contributorType' in c:
+                    if not 'contributorName' in c:
                         is_valid = False
 
         distributor = self.__getattribute__('distributor')
         if distributor:
             for d in distributor:
-                if d['distributorAffiliation'] or d['distributorAbbreviation'] or d['distributorURL'] or d['distributorLogoURL']:
-                    if not d['distributorName']:
+                if 'distributorAffiliation' in d or 'distributorAbbreviation' in d or 'distributorURL' in d or 'distributorLogoURL' in d:
+                    if not 'distributorName' in d:
                         is_valid = False
 
         bbox = self.__getattribute__('geographicBoundingBox')
         if bbox:
             for b in bbox:
                 if b:
-                    if not (b['westLongitude'] and b['eastLongitude'] and b['northLongitude'] and b['southLongitude']):
+                    if not ('westLongitude' in b and 'eastLongitude' in b and 'northLongitude' in b and 'southLongitude' in b):
                         is_valid = False
 
         return is_valid
 
-    def import_metadata(self, filename, format):
+    def import_metadata(self, filename, format='dv_up'):
         """Import metadata."""
         data = {}
         if format == 'dv_up':
@@ -474,7 +497,7 @@ class Dataset(object):
             """dataset"""
             # get first level metadata and parse it automatically
             for key, val in metadata['datasetVersion'].items():
-                if key in self.__attr_flat:
+                if key in self.__attr_datasetVersion:
                     data[key] = val
 
             # get nested metadata and parse it manually
@@ -492,13 +515,13 @@ class Dataset(object):
                     data['citation_displayName'] = citation['displayName']
 
                 for field in citation['fields']:
-                    if field['typeName'] in self.__attr_citation_flat:
+                    if field['typeName'] in self.__attr_citation:
                         data[field['typeName']] = field['value']
 
-                    if field['typeName'] in self.__attr_citation_arrays:
+                    if field['typeName'] in self.__attr_citation_fields:
                         data[field['typeName']] = self.__parse_dicts(
                             field['value'],
-                            self.__attr_citation_arrays[field['typeName']])
+                            self.__attr_citation_fields[field['typeName']])
 
                     if field['typeName'] == 'series':
                         if 'seriesName' in field['value']:
@@ -516,13 +539,13 @@ class Dataset(object):
                     self.__setattr__('geospatial_displayName', geospatial['displayName'])
 
                 for field in geospatial['fields']:
-                    if field['typeName'] in self.__attr_geospatial_flat:
+                    if field['typeName'] in self.__attr_geospatial:
                         data[field['typeName']] = field['value']
 
-                    if field['typeName'] in self.__attr_geospatial_arrays:
+                    if field['typeName'] in self.__attr_geospatial_fields:
                         data[field['typeName']] = self.__parse_dicts(
                             field['value'],
-                            self.__attr_geospatial_arrays[field['typeName']])
+                            self.__attr_geospatial_fields[field['typeName']])
             else:
                 # TODO: Exception
                 print('geospatial not in json')
@@ -534,7 +557,7 @@ class Dataset(object):
                     self.__setattr__('socialscience_displayName', socialscience['displayName'])
 
                 for field in socialscience['fields']:
-                    if field['typeName'] in self.__attr_socialscience_flat:
+                    if field['typeName'] in self.__attr_socialscience:
                         data[field['typeName']] = field['value']
 
                     if field['typeName'] == 'targetSampleSize':
@@ -561,13 +584,13 @@ class Dataset(object):
                     self.__setattr__('journal_displayName', journal['displayName'])
 
                 for field in journal['fields']:
-                    if field['typeName'] in self.__attr_journal_flat:
+                    if field['typeName'] in self.__attr_journal:
                         data[field['typeName']] = field['value']
 
-                    if field['typeName'] in self.__attr_journal_arrays:
+                    if field['typeName'] in self.__attr_journal_fields:
                         data[field['typeName']] = self.__parse_dicts(
                             field['value'],
-                            self.__attr_journal_arrays[field['typeName']])
+                            self.__attr_journal_fields[field['typeName']])
             else:
                 # TODO: Exception
                 print('journal not in json')
@@ -624,7 +647,7 @@ class Dataset(object):
 
             """dataset"""
             # Generate first level attributes
-            for attr in self.__attr_flat:
+            for attr in self.__attr_datasetVersion:
                 data['datasetVersion'][attr] = self.__getattribute__(attr)
 
             """citation"""
@@ -632,14 +655,14 @@ class Dataset(object):
                 citation['displayName'] = self.citation_displayName
 
             # Generate first level attributes
-            for attr in self.__attr_citation_flat:
+            for attr in self.__attr_citation:
                 citation['fields'].append({
                     'typeName': attr,
                     'value': self.__getattribute__(attr)
                     })
 
             # Generate fields attributes
-            for key, val in self.__attr_citation_arrays.items():
+            for key, val in self.__attr_citation_fields.items():
                 citation['fields'].append({
                     'typeName': key,
                     'value': self.__generate_dicts(key, val)
@@ -664,14 +687,14 @@ class Dataset(object):
 
             """geospatial"""
             # Generate first level attributes
-            for attr in self.__attr_geospatial_flat:
+            for attr in self.__attr_geospatial:
                 geospatial['fields'].append({
                     'typeName': attr,
                     'value': self.__getattribute__(attr)
                     })
 
             # Generate fields attributes
-            for key, val in self.__attr_geospatial_arrays.items():
+            for key, val in self.__attr_geospatial_fields.items():
                 # check if attribute exists
                 geospatial['fields'].append({
                     'typeName': key,
@@ -680,7 +703,7 @@ class Dataset(object):
 
             """socialscience"""
             # Generate first level attributes
-            for attr in self.__attr_socialscience_flat:
+            for attr in self.__attr_socialscience:
                 socialscience['fields'].append({
                     'typeName': attr,
                     'value': self.__getattribute__(attr)
@@ -726,14 +749,14 @@ class Dataset(object):
 
             """journal"""
             # Generate first level attributes
-            for attr in self.__attr_journal_flat:
+            for attr in self.__attr_journal:
                 journal['fields'].append({
                     'typeName': attr,
                     'value': self.__getattribute__(attr)
                     })
 
             # Generate fields attributes
-            for key, val in self.__attr_journal_arrays.items():
+            for key, val in self.__attr_journal_fields.items():
                 journal['fields'].append({
                     'typeName': key,
                     'value': self.__generate_dicts(key, val)
@@ -779,7 +802,7 @@ class Dataset(object):
         """
         return dict_to_json(self.dict)
 
-    def export_metadata(self, filename, format):
+    def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.
 
         format: `dv_up`
@@ -795,22 +818,28 @@ class Dataset(object):
 class Datafile(object):
     """Base class for the Datafile model."""
 
+    """Attributes required for Datafile metadata json."""
     __attr_required = [
         'filename',
         'pid'
     ]
 
-    __attr_flat = [
+    __attr_valid = [
         'description',
-        'categories'
+        'categories',
+        'directoryLabel',
+        'restrict'
     ]
 
     def __init__(self, filename=None, pid=None):
         """Init `Datafile()` class."""
+        """Metadata"""
         self.filename = filename
         self.pid = pid
         self.description = None
         self.categories = []
+        self.directoryLabel = None
+        self.restrict = None
 
     def __str__(self):
         """Return name of Datafile() class for users."""
@@ -842,15 +871,16 @@ class Datafile(object):
 
         return is_valid
 
-    def import_metadata(self, filename, format):
+    def import_metadata(self, filename, format='dv_up'):
         """Import metadata."""
         data = {}
         if format == 'dv_up':
             metadata = read_file_json(filename)
 
-            for key, val in metadata['datasetVersion'].items():
-                if key in self.__attr_flat:
-                    data[key] = val
+            for attr in self.__attr_valid:
+                if attr in metadata:
+                    data[attr] = metadata[attr]
+
             self.set(data)
         elif format == 'dv_down':
             metadata = read_file_json(filename)
@@ -869,7 +899,7 @@ class Datafile(object):
         if self.is_valid():
             data = {}
 
-            for attr in self.__attr_flat:
+            for attr in self.__attr_valid:
                 data[attr] = self.__getattribute__(attr)
 
             return data
@@ -887,7 +917,7 @@ class Datafile(object):
         """
         return dict_to_json(self.dict)
 
-    def export_metadata(self, filename, format):
+    def export_metadata(self, filename, format='dv_up'):
         """Export data to different file-formats.
 
         format: `dv_up`
