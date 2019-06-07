@@ -158,7 +158,6 @@ class Dataverse(object):
                 for attr in self.__attr_valid:
                     if self.__getattribute__(attr):
                         data[attr] = self.__getattribute__(attr)
-
                 # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
                 if self.contactEmail:
                     data['dataverseContacts'] = []
@@ -166,7 +165,6 @@ class Dataverse(object):
                         data['dataverseContacts'].append({'contactEmail': email})
                 else:
                     print('Key contactEmail not in data model.')
-
                 return data
             else:
                 print('dict can not be created. Data is not valid for format')

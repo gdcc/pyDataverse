@@ -119,7 +119,7 @@ def read_file_json(filename):
 
     """
     try:
-        return json.loads(read_file(filename, 'r'))
+        return json_to_dict(read_file(filename, 'r'))
     except Exception as e:
         raise e
 
