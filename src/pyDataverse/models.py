@@ -27,7 +27,7 @@ class Dataverse(object):
     __attr_required = [
         'alias',
         'name',
-        'contactEmail'
+        'dataverseContacts'
     ]
     """Attributes on first level of Dataverse metadata json."""
     __attr_valid = [
@@ -35,6 +35,7 @@ class Dataverse(object):
         'name',
         'affiliation',
         'description',
+        'dataverseContacts'
         'dataverseType'
     ]
     __attr_misc = [
@@ -53,7 +54,7 @@ class Dataverse(object):
         """Metadata"""
         self.name = None
         self.alias = None
-        self.contactEmail = []
+        self.dataverseContacts = []
         self.affiliation = None
         self.description = None
         self.dataverseType = None
@@ -126,14 +127,6 @@ class Dataverse(object):
             for attr in self.__attr_valid:
                 if attr in metadata:
                     data[attr] = metadata[attr]
-
-            # get nested metadata and parse it manually
-            if 'dataverseContacts' in metadata:
-                data['contactEmail'] = []
-                for contact in metadata['dataverseContacts']:
-                    for key, val in contact.items():
-                        if key == 'contactEmail':
-                            data['contactEmail'].append(val)
             self.set(data)
         elif format == 'dv_down':
             metadata = read_file_json(filename)
@@ -158,13 +151,7 @@ class Dataverse(object):
                 for attr in self.__attr_valid:
                     if self.__getattribute__(attr):
                         data[attr] = self.__getattribute__(attr)
-                # prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
-                if self.contactEmail:
-                    data['dataverseContacts'] = []
-                    for email in self.contactEmail:
-                        data['dataverseContacts'].append({'contactEmail': email})
-                else:
-                    print('Key contactEmail not in data model.')
+                # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
                 return data
             else:
                 print('dict can not be created. Data is not valid for format')
@@ -228,6 +215,10 @@ class Dataverse(object):
 class Dataset(object):
     """Base class for the Dataset model."""
 
+    __attr_misc = [
+        'datafiles'
+    ]
+
     """Attributes required for Dataset metadata json."""
     __attr_required = [
         'title',
@@ -260,6 +251,8 @@ class Dataset(object):
         'depositor',
         'dateOfDeposit',
         'kindOfData',
+        'seriesName',
+        'seriesInformation',
         'relatedMaterial',
         'relatedDatasets',
         'otherReferences',
@@ -375,7 +368,8 @@ class Dataset(object):
         self.timePeriodCovered = []
         self.dateOfCollection = []
         self.kindOfData = []
-        self.series = []
+        self.seriesName = None
+        self.seriesInformation = None
         self.software = []
         self.relatedMaterial = []
         self.relatedDatasets = []
@@ -400,8 +394,11 @@ class Dataset(object):
         self.collectorTraining = None
         self.frequencyOfDataCollection = None
         self.samplingProcedure = None
-        self.targetSampleSize = []
-        self.socialScienceNotes = []
+        self.targetSampleActualSize = None
+        self.targetSampleSizeFormula = None
+        self.socialScienceNotesType = None
+        self.socialScienceNotesSubject = None
+        self.socialScienceNotesText = None
         self.deviationsFromSampleDesign = None
         self.collectionMode = None
         self.researchInstrument = None
