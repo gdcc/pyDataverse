@@ -3,6 +3,8 @@ import os
 from pyDataverse.api import Api
 import pytest
 
+TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 @pytest.fixture(scope='module')
 def api_connection():
@@ -11,34 +13,54 @@ def api_connection():
     return Api(base_url, api_token)
 
 
-@pytest.fixture
 def read_json(filename):
-    j2d(read_file(filename, 'r'))
+    return j2d(read_file(filename))
 
 
-@pytest.fixture
 def read_file(filename):
     with open(filename, 'r') as f:
         data = f.read()
     return data
 
 
-@pytest.fixture
 def write_file(filename, data):
     with open(filename, 'w') as f:
         f.write(data)
 
 
-@pytest.fixture
 def write_json(filename, data):
     write_file(filename, d2j(data))
 
 
-@pytest.fixture
 def j2d(data):
     return json.loads(data)
 
 
-@pytest.fixture
 def d2j(data):
-    json.dumps(data, ensure_ascii=False, indent=2)
+    return json.dumps(data, ensure_ascii=False, indent=2)
+
+
+@pytest.fixture
+def import_dict():
+    data = {
+        'license': 'CC0',
+        'termsOfUse': 'CC0 Waiver',
+        'termsOfAccess': 'Terms of Access',
+        'citation_displayName': 'Citation Metadata',
+        'title': 'Replication Data for: Title'
+    }
+    return data
+
+@pytest.fixture
+def import_dataset_full():
+    return read_json(TEST_DIR + '/data/dataset_full.json')
+
+
+@pytest.fixture
+def import_dataset_min():
+    return read_json(TEST_DIR + '/data/dataset_min.json')
+
+
+@pytest.fixture
+def import_dataverse_min():
+    return read_json(TEST_DIR + '/data/dataverse_min.json')

@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 from pyDataverse.models import Dataset
+from pyDataverse.models import Dataverse
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -9,22 +10,129 @@ class TestDataset(object):
     """Test the Dataset() class initalization."""
 
     def test_dataset_init(self):
-        pass
+        ds = Dataset()
 
-    def test_dataset_set_dvup(self):
-        pass
+        assert isinstance(ds.datafiles, list)
+        assert len(ds.datafiles) == 0
 
-    def test_dataset_set_dvup_less(self):
-        pass
+        """Metadata: dataset"""
+        assert not ds.license
+        assert not ds.termsOfUse
+        assert not ds.termsOfAccess
 
-    def test_dataset_set_dvup_more(self):
-        pass
+        """Metadata: citation"""
+        assert not ds.citation_displayName
+        assert not ds.title
+        assert not ds.subtitle
+        assert not ds.alternativeTitle
+        assert not ds.alternativeURL
+        assert isinstance(ds.otherId, list)
+        assert len(ds.otherId) == 0
+        assert isinstance(ds.author, list)
+        assert len(ds.author) == 0
+        assert isinstance(ds.datasetContact, list)
+        assert len(ds.datasetContact) == 0
+        assert isinstance(ds.dsDescription, list)
+        assert len(ds.dsDescription) == 0
+        assert isinstance(ds.subject, list)
+        assert len(ds.subject) == 0
+        assert isinstance(ds.subject, list)
+        assert len(ds.subject) == 0
+        assert isinstance(ds.topicClassification, list)
+        assert len(ds.topicClassification) == 0
+        assert isinstance(ds.publication, list)
+        assert len(ds.publication) == 0
+        assert not ds.notesText
+        assert isinstance(ds.producer, list)
+        assert len(ds.producer) == 0
+        assert not ds.productionDate
+        assert not ds.productionPlace
+        assert isinstance(ds.contributor, list)
+        assert len(ds.contributor) == 0
+        assert isinstance(ds.grantNumber, list)
+        assert len(ds.grantNumber) == 0
+        assert isinstance(ds.distributor, list)
+        assert len(ds.distributor) == 0
+        assert not ds.distributionDate
+        assert not ds.depositor
+        assert not ds.dateOfDeposit
+        assert isinstance(ds.timePeriodCovered, list)
+        assert len(ds.timePeriodCovered) == 0
+        assert isinstance(ds.dateOfCollection, list)
+        assert len(ds.dateOfCollection) == 0
+        assert isinstance(ds.kindOfData, list)
+        assert len(ds.kindOfData) == 0
+        assert not ds.seriesName
+        assert not ds.seriesInformation
+        assert isinstance(ds.software, list)
+        assert len(ds.software) == 0
+        assert isinstance(ds.relatedMaterial, list)
+        assert len(ds.relatedMaterial) == 0
+        assert isinstance(ds.relatedDatasets, list)
+        assert len(ds.relatedDatasets) == 0
+        assert isinstance(ds.otherReferences, list)
+        assert len(ds.otherReferences) == 0
+        assert isinstance(ds.dataSources, list)
+        assert len(ds.dataSources) == 0
+        assert not ds.originOfSources
+        assert not ds.characteristicOfSources
+        assert not ds.accessToSources
 
-    def test_dataset_is_valid(self):
-        pass
+        """Metadata: geospatial"""
+        assert not ds.geospatial_displayName
+        assert isinstance(ds.geographicCoverage, list)
+        assert len(ds.geographicCoverage) == 0
+        assert not ds.geographicUnit
+        assert isinstance(ds.geographicBoundingBox, list)
+        assert len(ds.geographicBoundingBox) == 0
 
-    def test_dataset_is_valid_not(self):
-        pass
+        """Metadata: socialscience"""
+        assert not ds.socialscience_displayName
+        assert isinstance(ds.unitOfAnalysis, list)
+        assert len(ds.unitOfAnalysis) == 0
+        assert isinstance(ds.universe, list)
+        assert len(ds.universe) == 0
+        assert not ds.timeMethod
+        assert not ds.dataCollector
+        assert not ds.collectorTraining
+        assert not ds.frequencyOfDataCollection
+        assert not ds.samplingProcedure
+        assert not ds.targetSampleActualSize
+        assert not ds.targetSampleSizeFormula
+        assert not ds.socialScienceNotesType
+        assert not ds.socialScienceNotesSubject
+        assert not ds.socialScienceNotesText
+        assert not ds.deviationsFromSampleDesign
+        assert not ds.collectionMode
+        assert not ds.researchInstrument
+        assert not ds.dataCollectionSituation
+        assert not ds.actionsToMinimizeLoss
+        assert not ds.controlOperations
+        assert not ds.weighting
+        assert not ds.cleaningOperations
+        assert not ds.datasetLevelErrorNotes
+        assert not ds.responseRate
+        assert not ds.samplingErrorEstimates
+        assert not ds.otherDataAppraisal
+
+        """Metadata: journal"""
+        assert not ds.journal_displayName
+        assert isinstance(ds.journalVolumeIssue, list)
+        assert len(ds.journalVolumeIssue) == 0
+        assert not ds.journalArticleType
+
+    def test_dataset_is_valid_valid(self, import_dataset_full):
+        ds = Dataset()
+        ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
+
+        assert ds.is_valid()
+
+    def test_dataset_is_valid_valid_not(self, import_dataset_full):
+        ds = Dataset()
+        ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
+        ds.title = None
+
+        assert not ds.is_valid()
 
     def test_dataset_import_metadata_dv_up(self):
         ds = Dataset()
@@ -197,35 +305,129 @@ class TestDataset(object):
             assert d['journalPubDate'] in ['1008-01-01']
         assert ds.journalArticleType == 'abstract'
 
-    def test_dataset_import_metadata_wrong(self):
-        pass
+    def test_dataset_set_dv_up(self, import_dict):
+        ds = Dataset()
+        data = import_dict
+        ds.set(data)
 
-    def test_dataset_dict_dv_up_valid_minimum(self):
-        pass
+        """dataset"""
+        assert ds.license == 'CC0'
+        assert ds.termsOfUse == 'CC0 Waiver'
+        assert ds.termsOfAccess == 'Terms of Access'
 
-    def test_dataset_dict_dv_up_valid_full(self):
-        pass
+        """citation"""
+        assert ds.citation_displayName == 'Citation Metadata'
+        assert ds.title == 'Replication Data for: Title'
 
-    def test_dataset_dict_dv_up_valid_not(self):
-        pass
+    def test_dataset_import_metadata_format_wrong(self):
+        ds = Dataset()
+        ds.import_metadata(TEST_DIR + '/data/dataset_full.json', 'wrong_data-format')
 
-    def test_dataset_dict_all(self):
-        pass
+        assert isinstance(ds.datafiles, list)
+        assert len(ds.datafiles) == 0
 
-    def test_dataset_dict_wrong(self):
-        pass
+        """Metadata: dataset"""
+        assert not ds.license
+        assert not ds.termsOfUse
+        assert not ds.termsOfAccess
 
-    def test_dataset_json_dv_up(self):
-        pass
+        """Metadata: citation"""
+        assert not ds.citation_displayName
+        assert not ds.title
+        assert not ds.subtitle
+        assert not ds.alternativeTitle
+        assert not ds.alternativeURL
+        assert isinstance(ds.otherId, list)
+        assert len(ds.otherId) == 0
+        assert isinstance(ds.author, list)
+        assert len(ds.author) == 0
+        assert isinstance(ds.datasetContact, list)
+        assert len(ds.datasetContact) == 0
+        assert isinstance(ds.dsDescription, list)
+        assert len(ds.dsDescription) == 0
+        assert isinstance(ds.subject, list)
+        assert len(ds.subject) == 0
+        assert isinstance(ds.subject, list)
+        assert len(ds.subject) == 0
+        assert isinstance(ds.topicClassification, list)
+        assert len(ds.topicClassification) == 0
+        assert isinstance(ds.publication, list)
+        assert len(ds.publication) == 0
+        assert not ds.notesText
+        assert isinstance(ds.producer, list)
+        assert len(ds.producer) == 0
+        assert not ds.productionDate
+        assert not ds.productionPlace
+        assert isinstance(ds.contributor, list)
+        assert len(ds.contributor) == 0
+        assert isinstance(ds.grantNumber, list)
+        assert len(ds.grantNumber) == 0
+        assert isinstance(ds.distributor, list)
+        assert len(ds.distributor) == 0
+        assert not ds.distributionDate
+        assert not ds.depositor
+        assert not ds.dateOfDeposit
+        assert isinstance(ds.timePeriodCovered, list)
+        assert len(ds.timePeriodCovered) == 0
+        assert isinstance(ds.dateOfCollection, list)
+        assert len(ds.dateOfCollection) == 0
+        assert isinstance(ds.kindOfData, list)
+        assert len(ds.kindOfData) == 0
+        assert not ds.seriesName
+        assert not ds.seriesInformation
+        assert isinstance(ds.software, list)
+        assert len(ds.software) == 0
+        assert isinstance(ds.relatedMaterial, list)
+        assert len(ds.relatedMaterial) == 0
+        assert isinstance(ds.relatedDatasets, list)
+        assert len(ds.relatedDatasets) == 0
+        assert isinstance(ds.otherReferences, list)
+        assert len(ds.otherReferences) == 0
+        assert isinstance(ds.dataSources, list)
+        assert len(ds.dataSources) == 0
+        assert not ds.originOfSources
+        assert not ds.characteristicOfSources
+        assert not ds.accessToSources
 
-    def test_dataset_json_all(self):
-        pass
+        """Metadata: geospatial"""
+        assert not ds.geospatial_displayName
+        assert isinstance(ds.geographicCoverage, list)
+        assert len(ds.geographicCoverage) == 0
+        assert not ds.geographicUnit
+        assert isinstance(ds.geographicBoundingBox, list)
+        assert len(ds.geographicBoundingBox) == 0
 
-    def test_dataset_json_wrong(self):
-        pass
+        """Metadata: socialscience"""
+        assert not ds.socialscience_displayName
+        assert isinstance(ds.unitOfAnalysis, list)
+        assert len(ds.unitOfAnalysis) == 0
+        assert isinstance(ds.universe, list)
+        assert len(ds.universe) == 0
+        assert not ds.timeMethod
+        assert not ds.dataCollector
+        assert not ds.collectorTraining
+        assert not ds.frequencyOfDataCollection
+        assert not ds.samplingProcedure
+        assert not ds.targetSampleActualSize
+        assert not ds.targetSampleSizeFormula
+        assert not ds.socialScienceNotesType
+        assert not ds.socialScienceNotesSubject
+        assert not ds.socialScienceNotesText
+        assert not ds.deviationsFromSampleDesign
+        assert not ds.collectionMode
+        assert not ds.researchInstrument
+        assert not ds.dataCollectionSituation
+        assert not ds.actionsToMinimizeLoss
+        assert not ds.controlOperations
+        assert not ds.weighting
+        assert not ds.cleaningOperations
+        assert not ds.datasetLevelErrorNotes
+        assert not ds.responseRate
+        assert not ds.samplingErrorEstimates
+        assert not ds.otherDataAppraisal
 
-    def test_dataset_export_metadata_dv_up(self):
-        pass
-
-    def test_dataset_export_metadata_wrong(self):
-        pass
+        """Metadata: journal"""
+        assert not ds.journal_displayName
+        assert isinstance(ds.journalVolumeIssue, list)
+        assert len(ds.journalVolumeIssue) == 0
+        assert not ds.journalArticleType

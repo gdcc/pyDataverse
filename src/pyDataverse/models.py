@@ -35,12 +35,12 @@ class Dataverse(object):
         'name',
         'affiliation',
         'description',
-        'dataverseContacts'
+        'dataverseContacts',
         'dataverseType'
     ]
     __attr_misc = [
-        'datasets',
-        'dataverses',
+        # 'datasets',
+        # 'dataverses',
         'pid'
     ]
 
@@ -190,9 +190,17 @@ class Dataverse(object):
 
         """
         if format == 'dv_up':
-            return dict_to_json(self.dict())
+            data = self.dict('dv_up')
+            if data:
+                return dict_to_json(data)
+            else:
+                return None
         elif format == 'all':
-            return dict_to_json(self.dict('all'))
+            data = self.dict('all')
+            if data:
+                return dict_to_json(data)
+            else:
+                return None
         else:
             # TODO Exception
             print('data format not valid.')
@@ -430,8 +438,7 @@ class Dataset(object):
 
         """
         for key, val in data.items():
-            if key:
-                self.__setattr__(key, val)
+            self.__setattr__(key, val)
 
     def is_valid(self):
         """Check if metadata stored in attributes is valid for dataverse api upload.

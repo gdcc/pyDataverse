@@ -1,10 +1,10 @@
 # coding: utf-8
 from datetime import datetime
-from datetime import timedelta
 import os
 from pyDataverse.api import Api
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
+from pyDataverse.utils import dict_to_json
 import pytest
 from requests import Response
 from time import sleep
@@ -64,6 +64,51 @@ class TestApiRequests(object):
     def setup_class(cls):
         """Create the api connection for later use."""
         cls.dataverse_id = 'test-pyDataverse'
+
+    def test_create_dataverse(self, import_dataverse_min, api_connection):
+        """Test successfull `.create_dataverse()` request`."""
+        if not os.environ.get('TRAVIS'):
+            api = api_connection
+            metadata = import_dataverse_min
+            resp = api.create_dataverse(
+                self.dataverse_id, dict_to_json(metadata))
+            sleep(SLEEP_TIME)
+            assert isinstance(resp, Response)
+            assert api.get_dataverse(self.dataverse_id).json()
+
+    def test_create_dataset(self, import_dataset_min, api_connection):
+        """Test successfull `.create_dataset()` request`."""
+        if not os.environ.get('TRAVIS'):
+            api = api_connection
+            metadata = import_dataset_min
+            resp = api.create_dataset(':root', dict_to_json(metadata))
+            sleep(SLEEP_TIME)
+            TestApiRequests.dataset_id = resp.json()['data']['persistentId']
+            assert isinstance(resp, Response)
+
+    def test_get_dataset(self, api_connection):
+        """Test successfull `.get_dataset()` request`."""
+        if not os.environ.get('TRAVIS'):
+            api = api_connection
+            resp = api.get_dataset(TestApiRequests.dataset_id)
+            sleep(SLEEP_TIME)
+            assert isinstance(resp, Response)
+
+    def test_delete_dataset(self, api_connection):
+        """Test successfull `.delete_dataset()` request`."""
+        if not os.environ.get('TRAVIS'):
+            api = api_connection
+            resp = api.delete_dataset(TestApiRequests.dataset_id)
+            sleep(SLEEP_TIME)
+            assert isinstance(resp, Response)
+
+    def test_delete_dataverse(self, api_connection):
+        """Test successfull `.delete_dataverse()` request`."""
+        if not os.environ.get('TRAVIS'):
+            api = api_connection
+            resp = api.delete_dataverse(self.dataverse_id)
+            sleep(SLEEP_TIME)
+            assert isinstance(resp, Response)
 
     def test_get_request(self, api_connection):
         """Test successfull `.get_request()` request."""
