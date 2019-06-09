@@ -46,7 +46,7 @@ def dict_to_json(data):
 
     """
     try:
-        return json.dumps(data, ensure_ascii=False, indent=2)
+        return json.dumps(data, ensure_ascii=True, indent=2)
     except Exception as e:
         raise e
 
