@@ -14,6 +14,13 @@ Api Interface
    :members:
 
 
+Models Interface
+-----------------------------
+
+.. automodule:: pyDataverse.models
+  :members:
+
+
 Utils Interface
 -----------------------------
 

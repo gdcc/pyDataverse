@@ -81,6 +81,7 @@ Features
 -----------------------------
 
 - Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles.
+- Dataverse data model for easy manipulation and data conversion.
 - Utils to support the core functionalities.
 - Custom exceptions
 - Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_).
