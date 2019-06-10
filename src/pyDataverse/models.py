@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
+"""Dataverse data-types data model."""
 from __future__ import absolute_import
 from pyDataverse.utils import dict_to_json
 from pyDataverse.utils import read_file_json
@@ -14,26 +14,16 @@ Datafiles - coming from different sources.
 
 
 class Dataverse(object):
-    """Base class for the Dataverse model.
+    """Base class for Dataverse data model."""
 
-    * data
-        * dict: dict mit key value pairs übergeben, wo key exakt das
-        attributist.
-        * optional: list: liste tuples (links key, rechts value) übergeben, wo
-        key exakt das attribut ist.
-    * does: set metadata functions: dicts mit key-value pairs übergeben. die
-    keys müssen wie die metadata attribute
-
-    """
-
-    """Attributes required to Dataverse metadata json."""
-    __attr_required = [
+    """Attributes required for Dataverse metadata json."""
+    __attr_required_metadata = [
         'alias',
         'name',
         'dataverseContacts'
     ]
-    """Attributes on first level of Dataverse metadata json."""
-    __attr_valid = [
+    """Attributes valid for Dataverse metadata json."""
+    __attr_valid_metadata = [
         'alias',
         'name',
         'affiliation',
@@ -41,14 +31,24 @@ class Dataverse(object):
         'dataverseContacts',
         'dataverseType'
     ]
-    __attr_misc = [
+    """Attributes valid for Dataverse class."""
+    __attr_valid_class = [
         # 'datasets',
         # 'dataverses',
         'pid'
-    ]
+    ] + __attr_valid_metadata
 
     def __init__(self):
-        """Init `Dataverse()` class."""
+        """Init a Dataverse() class.
+
+        Examples
+        -------
+        Create a Dataverse::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+
+        """
         """Misc"""
         self.datasets = []
         self.dataverses = []
@@ -67,40 +67,43 @@ class Dataverse(object):
         return 'pyDataverse Dataverse() model class.'
 
     def set(self, data):
-        """Set attributes.
+        """Set class attributes with a flat dict.
 
-        Takes a dict with Key-Value pairs containing dataverse metadata.
-        Keys: attribute name. named after dataverse up standard.
-        Value: attribute value. types must be compatible for dataverse up.
+        Parameters
+        ----------
+        data : dict
+            Flat dict with data. Key's must be name the same as the class
+            attribute, the data should be mapped to.
+
+        Examples
+        -------
+        Set Dataverse attributes via flat dict::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> dv.name
+            'Test pyDataverse'
 
         """
         for key, val in data.items():
-            self.__setattr__(key, val)
-
-    def is_valid(self):
-        """Check if metadata stored in attributes is valid for dataverse api upload.
-
-        name, alias and dataverseContact are required fields. dataverseContact
-        is stored as list of emails in contactEmail, so contactEmail can not be
-        none.
-        """
-        is_valid = True
-        for attr in self.__attr_required:
-            if not self.__getattribute__(attr):
-                is_valid = False
-                print('attribute \'{0}\' missing.'.format(attr))
-        return is_valid
+            if key in self.__attr_valid_class:
+                self.__setattr__(key, val)
+            else:
+                # TODO: Raise Exception
+                print('Key {0} not valid.'.format(key))
 
     def import_metadata(self, filename, format='dv_up'):
-        """Import data from different sources.
+        """Import Dataverse metadata from file.
 
-        It is allowed to import incomplete Dataverses, where required
-        attributes are missing.
-
-        Simmply parse in the data. No validation needed. This will be done
-        later before the export.
-
-        format: dv_up
+        This simply parses in data with valid attribute naming as keys.
+        Data must not be complete, and also attributes required for the
+        metadata json export can be missing.
 
         Example: Default dataverse metadata json:
         {
@@ -119,15 +122,30 @@ class Dataverse(object):
           "dataverseType": "LABORATORY"
         }
 
-        filename: string
-        format: `dv_up`, `dv_down`
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            Api upload compatible format.
+
+        Examples
+        -------
+        Import metadata coming from json file::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> dv.import_metadata('tests/data/dataverse_min.json')
+            >>> dv.name
+            'Test pyDataverse'
 
         """
         data = {}
         if format == 'dv_up':
             metadata = read_file_json(filename)
             # get first level metadata and parse it automatically
-            for attr in self.__attr_valid:
+            for attr in self.__attr_valid_metadata:
                 if attr in metadata:
                     data[attr] = metadata[attr]
             self.set(data)
@@ -138,22 +156,85 @@ class Dataverse(object):
             # TODO: Exception
             print('Data-format not right.')
 
+    def is_valid(self):
+        """Check if set attributes are valid for Dataverse api metadata creation.
+
+        The attributes required are listed in `__attr_required_metadata`.
+
+        Returns
+        -------
+        bool
+            True, if creation of metadata json is possible. False, if not.
+
+        Examples
+        -------
+        Check if metadata is valid for Dataverse api upload::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> dv.is_valid
+            True
+            >>> dv.name = None
+            >>> dv.is_valid
+            False
+
+        """
+        is_valid = True
+        for attr in self.__attr_required_metadata:
+            if not self.__getattribute__(attr):
+                is_valid = False
+                print('attribute \'{0}\' missing.'.format(attr))
+        return is_valid
+
     def dict(self, format='dv_up'):
-        """Get Dataverse metadata as dict for Dataverse API upload.
+        """Create dicts in different data formats.
 
-        TODO: Validate standard
+        `dv_up`: Checks if data is valid for the different dict formats.
 
-        format: all, dv_up
+        Parameters
+        ----------
+        format : string
+            Data format for dict creation. Available formats are: `dv_up` with
+            all metadata for Dataverse api upload, and `all` with all attributes
+            set.
 
-        if data is valid will be checked here. so it is not necessary anymore
-        in json().
+        Returns
+        -------
+        dict
+            Data as dict.
+
+        Examples
+        -------
+        Get dict of Dataverse metadata::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> data = dv.dict()
+            >>> data['name']
+            'Test pyDataverse'
+
+        Todo
+        -------
+        Validate standards.
 
         """
         data = {}
         if format == 'dv_up':
             if self.is_valid():
-                for attr in self.__attr_valid:
-                    if self.__getattribute__(attr):
+                for attr in self.__attr_valid_metadata:
+                    if self.__getattribute__(attr) is not None:
                         data[attr] = self.__getattribute__(attr)
                 # TODO: prüfen, ob required attributes gesetzt sind = Exception
                 return data
@@ -161,8 +242,8 @@ class Dataverse(object):
                 print('dict can not be created. Data is not valid for format')
                 return None
         elif format == 'all':
-            for attr in self.__attr_misc + self.__attr_valid:
-                if self.__getattribute__(attr):
+            for attr in self.__attr_valid_class:
+                if self.__getattribute__(attr) is not None:
                     data[attr] = self.__getattribute__(attr)
             return data
         else:
@@ -171,9 +252,7 @@ class Dataverse(object):
             return None
 
     def json(self, format='dv_up'):
-        """Get Dataverse metadata as json for Dataverse API upload.
-
-        TODO: Validate standard
+        r"""Create json from attributes.
 
         Example: Default dataverse metadata json:
         {
@@ -191,6 +270,38 @@ class Dataverse(object):
           "description": "We do all the science.",
           "dataverseType": "LABORATORY"
         }
+
+        Parameters
+        ----------
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            Api upload compatible format and `all` with all attributes named in
+            `__attr_valid_class`.
+
+        Returns
+        -------
+        string
+            json-formatted string of Dataverse metadata for api upload.
+
+        Examples
+        -------
+        Get dict of Dataverse metadata::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> data = dv.json()
+            >>> data
+            '{\n  "name": "Test pyDataverse",\n  "dataverseContacts": [\n    {\n      "contactEmail": "test@example.com"\n    }\n  ],\n  "alias": "test-pyDataverse"\n}'
+
+        Todo
+        -------
+        Validate standards.
 
         """
         if format == 'dv_up':
@@ -210,11 +321,29 @@ class Dataverse(object):
             print('data format not valid.')
 
     def export_metadata(self, filename, format='dv_up'):
-        """Export data to different file-formats.
+        """Export Dataverse metadata to Dataverse api upload json.
 
-        exports only to metadata standards.
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        format : string
+            Data format for export. Available format is: `dv_up` with all
+            metadata for Dataverse api upload.
 
-        format: `dv_up`
+        Examples
+        -------
+        Export Dataverse metadata::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> dv.export_metadata('tests/data/dataverse_export.json')
 
         """
         if format == 'dv_up':
@@ -225,14 +354,10 @@ class Dataverse(object):
 
 
 class Dataset(object):
-    """Base class for the Dataset model."""
-
-    __attr_misc = [
-        'datafiles'
-    ]
+    """Base class for the Dataset data model."""
 
     """Attributes required for Dataset metadata json."""
-    __attr_required = [
+    __attr_required_metadata = [
         'title',
         'author',
         'datasetContact',
@@ -240,17 +365,21 @@ class Dataset(object):
         'subject'
     ]
 
-    """Attributes on first level of Dataverse metadata json inside
-    [\'datasetVersion\']."""
-    __attr_datasetVersion = [
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'].
+    """
+    __attr_valid_metadata_datasetVersion = [
         'license',
         'termsOfUse',
         'termsOfAccess'
     ]
 
-    """Attributes on first level of Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\']."""
-    __attr_citation = [
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'].
+    """
+    __attr_valid_metadata_citation_dicts = [
         'title',
         'subtitle',
         'alternativeTitle',
@@ -275,9 +404,11 @@ class Dataset(object):
         'kindOfData'
     ]
 
-    """Attributes in Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\']."""
-    __attr_citation_fields = {
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
+    """
+    __attr_valid_metadata_citation_arrays = {
         'otherId': ['otherIdAgency', 'otherIdValue'],
         'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme',
                    'authorIdentifier'],
@@ -302,24 +433,30 @@ class Dataset(object):
         'software': ['softwareName', 'softwareVersion']
     }
 
-    """Attributes on first level of Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\']."""
-    __attr_geospatial = [
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'].
+    """
+    __attr_valid_metadata_geospatial_dicts = [
         'geographicUnit'
     ]
 
-    """Attributes in Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\']."""
-    __attr_geospatial_fields = {
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
+    """
+    __attr_valid_metadata_geospatial_arrays = {
         'geographicCoverage': ['country', 'state', 'city',
                                'otherGeographicCoverage'],
         'geographicBoundingBox': ['westLongitude', 'eastLongitude',
                                   'northLongitude', 'southLongitude']
     }
 
-    """Attributes on first level of Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\']."""
-    __attr_socialscience = [
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'].
+    """
+    __attr_valid_metadata_socialscience_dicts = [
         'unitOfAnalysis',
         'universe',
         'timeMethod',
@@ -341,21 +478,46 @@ class Dataset(object):
         'otherDataAppraisal',
     ]
 
-    """Attributes on first level of Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\']."""
-    __attr_journal = [
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'].
+    """
+    __attr_valid_metadata_journal_dicts = [
         'journalArticleType'
     ]
 
-    """Attributes in Dataverse metadata json inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\']."""
-    __attr_journal_fields = {
+    """
+    Dataset metadata attributes of Dataverse api upload inside
+    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
+    """
+    __attr_valid_metadata_journal_arrays = {
         'journalVolumeIssue': ['journalVolume', 'journalIssue',
                                'journalPubDate']
     }
 
+    """Attributes valid for Dataset class."""
+    __attr_valid_class = [
+        'datafiles'
+    ] + __attr_valid_metadata_datasetVersion \
+        + __attr_valid_metadata_citation_dicts \
+        + list(__attr_valid_metadata_citation_arrays.keys()) \
+        + __attr_valid_metadata_geospatial_dicts \
+        + list(__attr_valid_metadata_geospatial_arrays.keys()) \
+        + __attr_valid_metadata_socialscience_dicts \
+        + __attr_valid_metadata_journal_dicts \
+        + list(__attr_valid_metadata_journal_arrays.keys()) \
+
     def __init__(self):
-        """Init Dataset() class."""
+        """Init a Dataset() class.
+
+        Examples
+        -------
+        Create a Dataverse::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+
+        """
         """Misc"""
         self.datafiles = []
 
@@ -445,30 +607,244 @@ class Dataset(object):
         return 'pyDataverse Dataset() model class.'
 
     def set(self, data):
-        """Set attributes.
+        """Set class attributes with a flat dict as input.
 
-        Takes a dict with Key-Value pairs containing dataverse metadata.
-        Keys: attribute name. named after dataverse up standard.
-        Value: attribute value. types must be compatible for dataverse up.
+        Parameters
+        ----------
+        data : dict
+            Flat dict with data. Key's must be name the same as the class
+            attribute, the data should be mapped to.
+
+        Examples
+        -------
+        Set Dataverse attributes via flat dict::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> data = {
+            >>>     'title': 'pyDataverse study 2019',
+            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>> }
+            >>> ds.set(data)
+            >>> ds.title
+            'pyDataverse study 2019'
 
         """
         for key, val in data.items():
-            self.__setattr__(key, val)
+            if key in self.__attr_valid_class or key == 'citation_displayName' or key == 'geospatial_displayName' or key == 'socialscience_displayName' or key == 'journal_displayName' or key == 'targetSampleActualSize' or key == 'targetSampleSizeFormula' or key == 'socialScienceNotesType' or key == 'socialScienceNotesText' or key == 'socialScienceNotesSubject':
+                self.__setattr__(key, val)
+            else:
+                # TODO: Raise Exception
+                print('Key {0} not valid.'.format(key))
+
+    def import_metadata(self, filename, format='dv_up'):
+        """Import Dataset metadata from file.
+
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            api upload compatible format.
+
+        Examples
+        -------
+        Set Dataverse attributes via flat dict::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> ds.import_metadata('tests/data/dataset_full.json')
+            >>> ds.title
+            'Replication Data for: Title'
+
+        """
+        data = {}
+        if format == 'dv_up':
+            metadata = read_file_json(filename)
+            """dataset"""
+            # get first level metadata and parse it automatically
+            for key, val in metadata['datasetVersion'].items():
+                if key in self.__attr_valid_metadata_datasetVersion:
+                    data[key] = val
+
+            # get nested metadata and parse it manually
+            if 'dataverseContacts' in metadata:
+                data['contactEmail'] = []
+                for contact in metadata['dataverseContacts']:
+                    for key, val in contact.items():
+                        if key == 'contactEmail':
+                            data['contactEmail'].append(val)
+
+            """citation"""
+            if 'citation' in metadata['datasetVersion']['metadataBlocks']:
+                citation = metadata['datasetVersion']['metadataBlocks']['citation']
+                if 'displayName' in citation:
+                    data['citation_displayName'] = citation['displayName']
+
+                for field in citation['fields']:
+                    if field['typeName'] in self.__attr_valid_metadata_citation_dicts:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_valid_metadata_citation_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_valid_metadata_citation_arrays[field['typeName']])
+
+                    if field['typeName'] == 'series':
+                        if 'seriesName' in field['value']:
+                            data['seriesName'] = field['value']['seriesName']['value']
+                        if 'seriesInformation' in field['value']:
+                            data['seriesInformation'] = field['value']['seriesInformation']['value']
+            else:
+                # TODO: Exception
+                print('citation not in json')
+
+            """geospatial"""
+            if 'geospatial' in metadata['datasetVersion']['metadataBlocks']:
+                geospatial = metadata['datasetVersion']['metadataBlocks']['geospatial']
+                if 'displayName' in geospatial:
+                    self.__setattr__('geospatial_displayName',
+                                     geospatial['displayName'])
+
+                for field in geospatial['fields']:
+                    if field['typeName'] in self.__attr_valid_metadata_geospatial_dicts:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_valid_metadata_geospatial_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_valid_metadata_geospatial_arrays[field['typeName']])
+            else:
+                # TODO: Exception
+                print('geospatial not in json')
+
+            """socialscience"""
+            if 'socialscience' in metadata['datasetVersion']['metadataBlocks']:
+                socialscience = metadata['datasetVersion']['metadataBlocks']['socialscience']
+                if 'displayName' in socialscience:
+                    self.__setattr__('socialscience_displayName',
+                                     socialscience['displayName'])
+
+                for field in socialscience['fields']:
+                    if field['typeName'] in self.__attr_valid_metadata_socialscience_dicts:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] == 'targetSampleSize':
+                        if 'targetSampleActualSize' in field['value']:
+                            data['targetSampleActualSize'] = field['value']['targetSampleActualSize']['value']
+                        if 'targetSampleSizeFormula' in field['value']:
+                            data['targetSampleSizeFormula'] = field['value']['targetSampleSizeFormula']['value']
+
+                    if field['typeName'] == 'socialScienceNotes':
+                        if 'socialScienceNotesType' in field['value']:
+                            data['socialScienceNotesType'] = field['value']['socialScienceNotesType']['value']
+                        if 'socialScienceNotesSubject' in field['value']:
+                            data['socialScienceNotesSubject'] = field['value']['socialScienceNotesSubject']['value']
+                        if 'socialScienceNotesText' in field['value']:
+                            data['socialScienceNotesText'] = field['value']['socialScienceNotesText']['value']
+            else:
+                # TODO: Exception
+                print('socialscience not in json')
+
+            """journal"""
+            if 'journal' in metadata['datasetVersion']['metadataBlocks']:
+                journal = metadata['datasetVersion']['metadataBlocks']['journal']
+                if 'displayName' in journal:
+                    self.__setattr__('journal_displayName',
+                                     journal['displayName'])
+
+                for field in journal['fields']:
+                    if field['typeName'] in self.__attr_valid_metadata_journal_dicts:
+                        data[field['typeName']] = field['value']
+
+                    if field['typeName'] in self.__attr_valid_metadata_journal_arrays:
+                        data[field['typeName']] = self.__parse_dicts(
+                            field['value'],
+                            self.__attr_valid_metadata_journal_arrays[field['typeName']])
+            else:
+                # TODO: Exception
+                print('journal not in json')
+
+            self.set(data)
+        elif format == 'dv_down':
+            metadata = read_file_json(filename)
+            self.set(data)
+        else:
+            # TODO: Exception
+            print('Data-format not right')
+
+    def __parse_dicts(self, data, attr_list):
+        """Parse out Dataverse api metadata dicts.
+
+        Parameters
+        ----------
+        data : list
+            List of Dataverse api metadata fields.
+        attr_list : list
+            List of attributes to be parsed.
+
+        Returns
+        -------
+        list
+            List of dicts with parsed out key-value pairs.
+
+        """
+        data_tmp = []
+
+        for d in data:
+            tmp_dict = {}
+            for key, val in d.items():
+                if key in attr_list:
+                    tmp_dict[key] = val['value']
+                else:
+                    print('Key \'{0}\' not in attribute list'.format(key))
+            data_tmp.append(tmp_dict)
+
+        return data_tmp
 
     def is_valid(self):
-        """Check if metadata stored in attributes is valid for dataverse api upload.
+        """Checks if attributes available are valid for Dataverse api metadata
+        creation.
 
-        required: ??
-        TODO: Test out required fields or ask Harvard.
+        The attributes required are listed in `__attr_required_metadata`.
+
+        Returns
+        -------
+        bool
+            True, if creation of metadata json is possible. False, if not.
+
+        Examples
+        -------
+        Check if metadata is valid for Dataverse api upload::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> data = {
+            >>>     'title': 'pyDataverse study 2019',
+            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>> }
+            >>> ds.set(data)
+            >>> ds.is_valid()
+            False
+            >>> ds.author = [{'authorName': 'LastAuthor1, FirstAuthor1'}]
+            >>> ds.datasetContact = [{'datasetContactName': 'LastContact1, FirstContact1'}]
+            >>> ds.subject = ['Engineering']
+            >>> ds.is_valid()
+            True
+
+        Todo
+        -------
+        Test out required fields or ask Harvard.
 
         """
         is_valid = True
 
         # check if all required attributes are set
-        for attr in self.__attr_required:
+        for attr in self.__attr_required_metadata:
             if not self.__getattribute__(attr):
                 is_valid = False
-                print('attribute \'{0}\' missing.'.format(attr))
+                print('Metadata not valid: attribute \'{0}\' missing.'.format(attr))
 
         # check if attribute sets are complete where necessary
         tp_cov = self.__getattribute__('timePeriodCovered')
@@ -529,155 +905,39 @@ class Dataset(object):
 
         return is_valid
 
-    def import_metadata(self, filename, format='dv_up'):
-        """Import metadata.
-
-        format: dv_up
-
-        """
-        data = {}
-        if format == 'dv_up':
-            metadata = read_file_json(filename)
-            """dataset"""
-            # get first level metadata and parse it automatically
-            for key, val in metadata['datasetVersion'].items():
-                if key in self.__attr_datasetVersion:
-                    data[key] = val
-
-            # get nested metadata and parse it manually
-            if 'dataverseContacts' in metadata:
-                data['contactEmail'] = []
-                for contact in metadata['dataverseContacts']:
-                    for key, val in contact.items():
-                        if key == 'contactEmail':
-                            data['contactEmail'].append(val)
-
-            """citation"""
-            if 'citation' in metadata['datasetVersion']['metadataBlocks']:
-                citation = metadata['datasetVersion']['metadataBlocks']['citation']
-                if 'displayName' in citation:
-                    data['citation_displayName'] = citation['displayName']
-
-                for field in citation['fields']:
-                    if field['typeName'] in self.__attr_citation:
-                        data[field['typeName']] = field['value']
-
-                    if field['typeName'] in self.__attr_citation_fields:
-                        data[field['typeName']] = self.__parse_dicts(
-                            field['value'],
-                            self.__attr_citation_fields[field['typeName']])
-
-                    if field['typeName'] == 'series':
-                        if 'seriesName' in field['value']:
-                            data['seriesName'] = field['value']['seriesName']['value']
-                        if 'seriesInformation' in field['value']:
-                            data['seriesInformation'] = field['value']['seriesInformation']['value']
-            else:
-                # TODO: Exception
-                print('citation not in json')
-
-            """geospatial"""
-            if 'geospatial' in metadata['datasetVersion']['metadataBlocks']:
-                geospatial = metadata['datasetVersion']['metadataBlocks']['geospatial']
-                if 'displayName' in geospatial:
-                    self.__setattr__('geospatial_displayName',
-                                     geospatial['displayName'])
-
-                for field in geospatial['fields']:
-                    if field['typeName'] in self.__attr_geospatial:
-                        data[field['typeName']] = field['value']
-
-                    if field['typeName'] in self.__attr_geospatial_fields:
-                        data[field['typeName']] = self.__parse_dicts(
-                            field['value'],
-                            self.__attr_geospatial_fields[field['typeName']])
-            else:
-                # TODO: Exception
-                print('geospatial not in json')
-
-            """socialscience"""
-            if 'socialscience' in metadata['datasetVersion']['metadataBlocks']:
-                socialscience = metadata['datasetVersion']['metadataBlocks']['socialscience']
-                if 'displayName' in socialscience:
-                    self.__setattr__('socialscience_displayName',
-                                     socialscience['displayName'])
-
-                for field in socialscience['fields']:
-                    if field['typeName'] in self.__attr_socialscience:
-                        data[field['typeName']] = field['value']
-
-                    if field['typeName'] == 'targetSampleSize':
-                        if 'targetSampleActualSize' in field['value']:
-                            data['targetSampleActualSize'] = field['value']['targetSampleActualSize']['value']
-                        if 'targetSampleSizeFormula' in field['value']:
-                            data['targetSampleSizeFormula'] = field['value']['targetSampleSizeFormula']['value']
-
-                    if field['typeName'] == 'socialScienceNotes':
-                        if 'socialScienceNotesType' in field['value']:
-                            data['socialScienceNotesType'] = field['value']['socialScienceNotesType']['value']
-                        if 'socialScienceNotesSubject' in field['value']:
-                            data['socialScienceNotesSubject'] = field['value']['socialScienceNotesSubject']['value']
-                        if 'socialScienceNotesText' in field['value']:
-                            data['socialScienceNotesText'] = field['value']['socialScienceNotesText']['value']
-            else:
-                # TODO: Exception
-                print('socialscience not in json')
-
-            """journal"""
-            if 'journal' in metadata['datasetVersion']['metadataBlocks']:
-                journal = metadata['datasetVersion']['metadataBlocks']['journal']
-                if 'displayName' in journal:
-                    self.__setattr__('journal_displayName',
-                                     journal['displayName'])
-
-                for field in journal['fields']:
-                    if field['typeName'] in self.__attr_journal:
-                        data[field['typeName']] = field['value']
-
-                    if field['typeName'] in self.__attr_journal_fields:
-                        data[field['typeName']] = self.__parse_dicts(
-                            field['value'],
-                            self.__attr_journal_fields[field['typeName']])
-            else:
-                # TODO: Exception
-                print('journal not in json')
-
-            self.set(data)
-        elif format == 'dv_down':
-            metadata = read_file_json(filename)
-            self.set(data)
-        else:
-            # TODO: Exception
-            print('Data-format not right')
-
-    def __parse_dicts(self, data, attr_list):
-        """Parse out list of dicts.
-
-        data: list of dicts
-        attr_list: list of attributes to be parsed out.
-
-        return: list of dicts
-
-        """
-        data_tmp = []
-
-        for d in data:
-            tmp_dict = {}
-            for key, val in d.items():
-                if key in attr_list:
-                    tmp_dict[key] = val['value']
-                else:
-                    print('Key \'{0}\' not in attribute list'.format(key))
-            data_tmp.append(tmp_dict)
-
-        return data_tmp
-
     def dict(self, format='dv_up'):
-        """Get Dataset metadata as dict for Dataverse API upload.
+        """Create dicts in different data formats.
 
-        TODO: Validate standard
+        Parameters
+        ----------
+        format : string
+            Data format for dict creation. Available formats are: `dv_up` with
+            all metadata for Dataverse api upload, and `all` with all attributes
+            set.
 
-        format: dv_up, all
+        Returns
+        -------
+        dict
+            Data as dict.
+
+        Examples
+        -------
+        Get dict of Dataverse metadata::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> data = {
+            >>>     'title': 'pyDataverse study 2019',
+            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>> }
+            >>> ds.set(data)
+            >>> data = dv.dict()
+            >>> data['title']
+            'pyDataverse study 2019'
+
+        Todo
+        -------
+        Validate standard
 
         """
         if format == 'dv_up':
@@ -696,39 +956,44 @@ class Dataset(object):
 
                 """dataset"""
                 # Generate first level attributes
-                for attr in self.__attr_datasetVersion:
-                    data['datasetVersion'][attr] = self.__getattribute__(attr)
+                for attr in self.__attr_valid_metadata_datasetVersion:
+                    if self.__getattribute__(attr) is not None:
+                        data['datasetVersion'][attr] = self.__getattribute__(attr)
 
                 """citation"""
                 if self.citation_displayName:
                     citation['displayName'] = self.citation_displayName
 
                 # Generate first level attributes
-                for attr in self.__attr_citation:
-                    citation['fields'].append({
-                        'typeName': attr,
-                        'value': self.__getattribute__(attr)
-                    })
+                for attr in self.__attr_valid_metadata_citation_dicts:
+                    if self.__getattribute__(attr) is not None:
+                        citation['fields'].append({
+                            'typeName': attr,
+                            'value': self.__getattribute__(attr)
+                        })
 
                 # Generate fields attributes
-                for key, val in self.__attr_citation_fields.items():
-                    citation['fields'].append({
-                        'typeName': key,
-                        'value': self.__generate_dicts(key, val)
-                    })
+                for key, val in self.__attr_valid_metadata_citation_arrays.items():
+                    if self.__getattribute__(key) is not None:
+                        citation['fields'].append({
+                            'typeName': key,
+                            'value': self.__generate_dicts(key, val)
+                        })
 
                 # Generate series attributes
-                if self.__getattribute__('series'):
+                if self.__getattribute__('series') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
                     if 'seriesName' in self.__getattribute__('series'):
-                        tmp_dict['value']['seriesName'] = {}
-                        tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
-                        tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
+                        if self.__getattribute__('seriesName') is not None:
+                            tmp_dict['value']['seriesName'] = {}
+                            tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
+                            tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
                     if 'seriesInformation' in self.__getattribute__('series'):
-                        tmp_dict['value']['seriesInformation'] = {}
-                        tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
-                        tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
+                        if self.__getattribute__('seriesInformation') is not None:
+                            tmp_dict['value']['seriesInformation'] = {}
+                            tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
+                            tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
                     citation['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
@@ -736,61 +1001,69 @@ class Dataset(object):
 
                 """geospatial"""
                 # Generate first level attributes
-                for attr in self.__attr_geospatial:
-                    geospatial['fields'].append({
-                        'typeName': attr,
-                        'value': self.__getattribute__(attr)
-                    })
+                for attr in self.__attr_valid_metadata_geospatial_dicts:
+                    if self.__getattribute__(attr) is not None:
+                        geospatial['fields'].append({
+                            'typeName': attr,
+                            'value': self.__getattribute__(attr)
+                        })
 
                 # Generate fields attributes
-                for key, val in self.__attr_geospatial_fields.items():
+                for key, val in self.__attr_valid_metadata_geospatial_arrays.items():
                     # check if attribute exists
-                    geospatial['fields'].append({
-                        'typeName': key,
-                        'value': self.__generate_dicts(key, val)
-                    })
+                    if self.__getattribute__(key) is not None:
+                        geospatial['fields'].append({
+                            'typeName': key,
+                            'value': self.__generate_dicts(key, val)
+                        })
 
                 """socialscience"""
                 # Generate first level attributes
-                for attr in self.__attr_socialscience:
-                    socialscience['fields'].append({
-                        'typeName': attr,
-                        'value': self.__getattribute__(attr)
-                    })
+                for attr in self.__attr_valid_metadata_socialscience_dicts:
+                    if self.__getattribute__(attr) is not None:
+                        socialscience['fields'].append({
+                            'typeName': attr,
+                            'value': self.__getattribute__(attr)
+                        })
 
                 # Generate targetSampleSize attributes
-                if self.__getattribute__('targetSampleSize'):
+                if self.__getattribute__('targetSampleSize') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
                     if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
-                        tmp_dict['value']['targetSampleActualSize'] = {}
-                        tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
-                        tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
+                        if self.__getattribute__('targetSampleActualSize') is not None:
+                            tmp_dict['value']['targetSampleActualSize'] = {}
+                            tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
+                            tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
                     if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
-                        tmp_dict['value']['targetSampleSizeFormula'] = {}
-                        tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
-                        tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
+                        if self.__getattribute__('targetSampleSizeFormula') is not None:
+                            tmp_dict['value']['targetSampleSizeFormula'] = {}
+                            tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
+                            tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
                     socialscience['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
                     })
 
                 # Generate socialScienceNotes attributes
-                if self.__getattribute__('socialScienceNotes'):
+                if self.__getattribute__('socialScienceNotes') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
                     if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
-                        tmp_dict['value']['socialScienceNotesType'] = {}
-                        tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                        tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
+                        if self.__getattribute__('socialScienceNotesType') is not None:
+                            tmp_dict['value']['socialScienceNotesType'] = {}
+                            tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                            tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
                     if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
-                        tmp_dict['value']['socialScienceNotesSubject'] = {}
-                        tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                        tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
+                        if self.__getattribute__('socialScienceNotesSubject') is not None:
+                            tmp_dict['value']['socialScienceNotesSubject'] = {}
+                            tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                            tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
                     if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
-                        tmp_dict['value']['socialScienceNotesText'] = {}
-                        tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                        tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
+                        if self.__getattribute__('socialScienceNotesText') is not None:
+                            tmp_dict['value']['socialScienceNotesText'] = {}
+                            tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                            tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
                     socialscience['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
@@ -798,18 +1071,20 @@ class Dataset(object):
 
                 """journal"""
                 # Generate first level attributes
-                for attr in self.__attr_journal:
-                    journal['fields'].append({
-                        'typeName': attr,
-                        'value': self.__getattribute__(attr)
-                    })
+                for attr in self.__attr_valid_metadata_journal_dicts:
+                    if self.__getattribute__(attr) is not None:
+                        journal['fields'].append({
+                            'typeName': attr,
+                            'value': self.__getattribute__(attr)
+                        })
 
                 # Generate fields attributes
-                for key, val in self.__attr_journal_fields.items():
-                    journal['fields'].append({
-                        'typeName': key,
-                        'value': self.__generate_dicts(key, val)
-                    })
+                for key, val in self.__attr_valid_metadata_journal_arrays.items():
+                    if self.__getattribute__(key) is not None:
+                        journal['fields'].append({
+                            'typeName': key,
+                            'value': self.__generate_dicts(key, val)
+                        })
 
                 # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
                 data['datasetVersion']['metadataBlocks']['citation'] = citation
@@ -822,13 +1097,8 @@ class Dataset(object):
                 print('dict can not be created. Data is not valid for format')
                 return None
         elif format == 'all':
-            attr_lst = self.__attr_datasetVersion + self.__attr_citation + self.__attr_geospatial + self.__attr_socialscience + self.__attr_journal
-            for key, val in self.__attr_citation_fields.update(
-                self.__attr_geospatial_fields.update(
-                    self.__attr_journal_fields)):
-                attr_lst.append(key)
-            for attr in attr_lst:
-                if self.__getattribute__(attr):
+            for attr in self.__attr_valid_class:
+                if self.__getattribute__(attr) is not None:
                     data[attr] = self.__getattribute__(attr)
             return data
 
@@ -837,7 +1107,21 @@ class Dataset(object):
             return None
 
     def __generate_dicts(self, key, val):
-        """Parse out list of dicts of metadata attributes for dict export."""
+        """Generate dicts for array attributes of Dataverse api metadata upload.
+
+        Parameters
+        ----------
+        key : string
+            Name of attribute
+        val : string
+            Value of attribute.
+
+        Returns
+        -------
+        list
+            List of filled dicts of metadata for Dataverse api upload.
+
+        """
         # check if attribute exists
         tmp_list = []
         if self.__getattribute__(key):
@@ -856,8 +1140,38 @@ class Dataset(object):
         return tmp_list
 
     def json(self, format='dv_up'):
-        """Get Dataset metadata as json for Dataverse API upload.
+        """Create Dataset json from attributes.
 
+        Parameters
+        ----------
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            Api upload compatible format and `all` with all attributes named in
+            `__attr_valid_class`.
+
+        Returns
+        -------
+        string
+            json-formatted string of Dataverse metadata for api upload.
+
+        Examples
+        -------
+        Get json of Dataverse api upload::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> data = {
+            >>>     'title': 'pyDataverse study 2019',
+            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'author': [{'authorName': 'LastAuthor1, FirstAuthor1'}],
+            >>>     'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1'}],
+            >>>     'subject': ['Engineering'],
+            >>> }
+            >>> ds.set(data)
+            >>> data = ds.json()
+
+        Todo
+        -------
         TODO: Validate standard
         TODO: Link to default json file
 
@@ -871,9 +1185,30 @@ class Dataset(object):
             print('data format not valid.')
 
     def export_metadata(self, filename, format='dv_up'):
-        """Export data to different file-formats.
+        """Export Dataset metadata to Dataverse api upload json.
 
-        format: `dv_up`
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        format : string
+            Data format for export. Available format is: `dv_up` with all
+            metadata for Dataverse api upload.
+
+        Examples
+        -------
+        Export metadata to json file::
+
+            >>> from pyDataverse.models import Dataset
+            >>> ds = Dataset()
+            >>> data = {
+            >>>     'title': 'pyDataverse study 2019',
+            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'author': [{'authorName': 'LastAuthor1, FirstAuthor1'}],
+            >>>     'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1'}],
+            >>>     'subject': ['Engineering'],
+            >>> }
+            >>> ds.export_metadata('tests/data/export_dataset.json')
 
         """
         if format == 'dv_up':
@@ -887,34 +1222,48 @@ class Datafile(object):
     """Base class for the Datafile model."""
 
     """Attributes required for Datafile metadata json."""
-    __attr_required = [
+    __attr_required_metadata = [
         'filename',
         'pid'
     ]
 
     """Attributes on first level of Datafile metadata json."""
-    __attr_valid = [
+    __attr_valid_metadata = [
         'description',
-        'categories',
-        'directoryLabel',
+        'pid',
         'restrict'
     ]
     """Attributes on first level of Datafile metadata json."""
-    __attr_misc = [
-        'pid',
+    __attr_valid_class = [
         'filename'
-    ]
+    ] + __attr_valid_metadata
 
     def __init__(self, filename=None, pid=None):
-        """Init `Datafile()` class."""
+        """Init a Datafile() class.
+
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        pid : string
+            Persistend identifier, e.g. DOI.
+
+        Examples
+        -------
+        Create a Datafile::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> df
+            <pyDataverse.models.Datafile at 0x7f4dfc0466a0>
+
+        """
         """Misc"""
         self.pid = pid
         self.filename = filename
 
         """Metadata"""
         self.description = None
-        self.categories = []
-        self.directoryLabel = None
         self.restrict = None
 
     def __str__(self):
@@ -922,73 +1271,123 @@ class Datafile(object):
         return 'pyDataverse Datafile() model class.'
 
     def set(self, data):
-        """Set attributes.
+        """Set class attributes with a flat dict.
 
-        Takes a dict with Key-Value pairs containing Datafile metadata.
-        Keys: attribute name. named after dataverse up standard.
-        Value: attribute value. types must be compatible for dataverse up.
+        Parameters
+        ----------
+        data : dict
+            Flat dict with data. Key's must be name the same as the class
+            attribute, the data should be mapped to.
+
+        Examples
+        -------
+        Set Datafile attributes via flat dict::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'filename': 'tests/data/datafile.txt'
+            >>> }
+            >>> df.set(data)
+            >>> df.pid
+            'doi:10.11587/EVMUHP',
 
         """
         for key, val in data.items():
-            self.__setattr__(key, val)
+            if key in self.__attr_valid_class:
+                self.__setattr__(key, val)
+            else:
+                # TODO: Raise Exception
+                print('Key {0} not valid.'.format(key))
 
     def is_valid(self):
-        """Check if metadata stored in attributes is valid for dataverse api upload.
+        """Check if set attributes are valid for Dataverse api metadata creation.
 
-        more
+        Returns
+        -------
+        bool
+            True, if creation of metadata json is possible. False, if not.
+
+        Examples
+        -------
+        Check if metadata is valid for Dataverse api upload::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'filename': 'tests/data/datafile.txt'
+            >>> }
+            >>> df.set(data)
+            >>> df.is_valid
+            True
+            >>> df.filename = None
+            >>> df.is_valid
+            False
 
         """
         is_valid = True
 
-        for attr in self.__attr_required:
-            if not self.__getattribute__(attr):
+        for attr in self.__attr_required_metadata:
+            if self.__getattribute__(attr) is None:
                 is_valid = False
                 print('attribute \'{0}\' missing.'.format(attr))
 
         return is_valid
 
-    def import_metadata(self, filename, format='dv_up'):
-        """Import metadata.
+    def dict(self, format='dv_up'):
+        """Create dict in different data formats.
 
-        format: dv_up
+        Parameters
+        ----------
+        format : string
+            Data format for dict creation. Available formats are: `dv_up` with
+            all metadata for Dataverse api upload, and `all` with all attributes
+            set.
+
+        Returns
+        -------
+        dict
+            Data as dict.
+
+        Examples
+        -------
+        Check if metadata is valid for Dataverse api upload::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'filename': 'tests/data/datafile.txt'
+            >>> }
+            >>> df.set(data)
+            >>> data = df.dict()
+            >>> data['description']
+            'Test file'
+
+        Todo
+        -------
+        Validate standards.
 
         """
         data = {}
         if format == 'dv_up':
-            metadata = read_file_json(filename)
-
-            for attr in self.__attr_valid:
-                if attr in metadata:
-                    data[attr] = metadata[attr]
-
-            self.set(data)
-        elif format == 'dv_down':
-            metadata = read_file_json(filename)
-            self.set(metadata)
-        else:
-            # TODO: Exception
-            print('Data-format not right')
-
-    def dict(self, format='dv_up'):
-        """Get Dataset metadata as dict for Dataverse API upload.
-
-        TODO: Validate standard
-
-        """
-        if format == 'dv_up':
             if self.is_valid():
-                data = {}
-
-                for attr in self.__attr_valid:
-                    data[attr] = self.__getattribute__(attr)
+                for attr in self.__attr_valid_metadata:
+                    if self.__getattribute__(attr) is not None:
+                        data[attr] = self.__getattribute__(attr)
 
                 return data
             else:
                 print('dict can not be created. Data is not valid')
                 return None
         elif format == 'all':
-            for attr in self.__attr_misc + self.__attr_valid:
-                if self.__getattribute__(attr):
+            for attr in self.__attr_valid_class:
+                if self.__getattribute__(attr) is not None:
                     data[attr] = self.__getattribute__(attr)
             return data
         else:
@@ -997,28 +1396,58 @@ class Datafile(object):
             return None
 
     def json(self, format='dv_up'):
-        """Get Datafile metadata as json for Dataverse API upload.
+        r"""Create json from attributes.
 
-        TODO: Validate standard
-        TODO: Link to default json file
+        Parameters
+        ----------
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            Api upload compatible format and `all` with all attributes named in
+            `__attr_valid_class`.
+
+        Returns
+        -------
+        string
+            json-formatted string of Dataverse metadata for api upload.
+
+        Examples
+        -------
+        Get dict of Dataverse metadata::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'filename': 'tests/data/datafile.txt'
+            >>> }
+            >>> df.set(data)
+            >>> df.dict()
+            {'description': 'Test file',
+             'directoryLabel': None,
+             'restrict': None}
+
+        Todo
+        -------
+        Validate standards.
+        Link to default json file
 
         """
         if format == 'dv_up':
-            return dict_to_json(self.dict())
+            data = self.dict('dv_up')
+            if data:
+                return dict_to_json(data)
+            else:
+                print('Dict can not be created')
+                return None
         elif format == 'all':
-            return dict_to_json(self.dict('all'))
+            data = self.dict('all')
+            if data:
+                return dict_to_json(data)
+            else:
+                print('Dict can not be created')
+                return None
         else:
             # TODO Exception
             print('data format not valid.')
-
-    def export_metadata(self, filename, format='dv_up'):
-        """Export data to different file-formats.
-
-        format: `dv_up`
-
-        """
-        if format == 'dv_up':
-            return write_file_json(filename, self.dict)
-        else:
-            # TODO: Exception
-            print('Data-format not right.')
+            return None
