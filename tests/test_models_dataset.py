@@ -1,15 +1,17 @@
-# coding: utf-8
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Dataset data model tests."""
 import os
 from pyDataverse.models import Dataset
-from pyDataverse.models import Dataverse
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestDataset(object):
-    """Test the Dataset() class initalization."""
+    """Tests for Dataset()."""
 
     def test_dataset_init(self):
+        """Test Dataset.__init__()."""
         ds = Dataset()
 
         assert isinstance(ds.datafiles, list)
@@ -121,13 +123,37 @@ class TestDataset(object):
         assert len(ds.journalVolumeIssue) == 0
         assert not ds.journalArticleType
 
-    def test_dataset_is_valid_valid(self, import_dataset_full):
+    def test_dataset_set_dv_up(self, import_dataset_min_dict):
+        """Test Dataset.set() with format=`dv_up`.
+
+        Parameters
+        ----------
+        import_dataset_min_dict : dict
+            Fixture, which returns a flat dataset dict().
+
+        """
+        ds = Dataset()
+        data = import_dataset_min_dict
+        ds.set(data)
+
+        """dataset"""
+        assert ds.license == 'CC0'
+        assert ds.termsOfUse == 'CC0 Waiver'
+        assert ds.termsOfAccess == 'Terms of Access'
+
+        """citation"""
+        assert ds.citation_displayName == 'Citation Metadata'
+        assert ds.title == 'Replication Data for: Title'
+
+    def test_dataset_is_valid_valid(self):
+        """Test Dataset.is_valid() with valid data."""
         ds = Dataset()
         ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
 
         assert ds.is_valid()
 
-    def test_dataset_is_valid_valid_not(self, import_dataset_full):
+    def test_dataset_is_valid_valid_not(self):
+        """Test Dataset.is_valid() with non-valid data."""
         ds = Dataset()
         ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
         ds.title = None
@@ -135,6 +161,7 @@ class TestDataset(object):
         assert not ds.is_valid()
 
     def test_dataset_import_metadata_dv_up(self):
+        """Test Dataset.import_metadata() with format=`dv_up`."""
         ds = Dataset()
         ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
 
@@ -305,23 +332,10 @@ class TestDataset(object):
             assert d['journalPubDate'] in ['1008-01-01']
         assert ds.journalArticleType == 'abstract'
 
-    def test_dataset_set_dv_up(self, import_dict):
-        ds = Dataset()
-        data = import_dict
-        ds.set(data)
-
-        """dataset"""
-        assert ds.license == 'CC0'
-        assert ds.termsOfUse == 'CC0 Waiver'
-        assert ds.termsOfAccess == 'Terms of Access'
-
-        """citation"""
-        assert ds.citation_displayName == 'Citation Metadata'
-        assert ds.title == 'Replication Data for: Title'
-
     def test_dataset_import_metadata_format_wrong(self):
+        """Test Dataset.import_metadata() with non-valid format."""
         ds = Dataset()
-        ds.import_metadata(TEST_DIR + '/data/dataset_full.json', 'wrong_data-format')
+        ds.import_metadata(TEST_DIR + '/data/dataset_full.json', 'wrong')
 
         assert isinstance(ds.datafiles, list)
         assert len(ds.datafiles) == 0
