@@ -21,6 +21,7 @@ class TestApiConnect(object):
         """Test successfull connection without api_token."""
         api = Api(os.environ['BASE_URL'])
         sleep(SLEEP_TIME)
+
         assert isinstance(api, Api)
         assert not api.api_token
         assert api.api_version == 'v1'
@@ -37,6 +38,7 @@ class TestApiConnect(object):
             base_url = 'http://wikipedia.org'
             api = Api(base_url)
             sleep(SLEEP_TIME)
+
             assert not api.api_token
             assert api.api_version == 'v1'
             assert api.base_url == 'http://wikipedia.org'
@@ -48,6 +50,7 @@ class TestApiConnect(object):
             base_url = None
             api = Api(base_url)
             sleep(SLEEP_TIME)
+
             assert not api.api_token
             assert api.api_version == 'v1'
             assert not api.base_url
@@ -64,26 +67,29 @@ class TestApiRequests(object):
     def setup_class(cls):
         """Create the api connection for later use."""
         cls.dataverse_id = 'test-pyDataverse'
+        cls.dataset_id = None
 
-    def test_create_dataverse(self, import_dataverse_min, api_connection):
+    def test_create_dataverse(self, import_dataverse_min_dict, api_connection):
         """Test successfull `.create_dataverse()` request`."""
         if not os.environ.get('TRAVIS'):
             api = api_connection
-            metadata = import_dataverse_min
+            metadata = import_dataverse_min_dict
             resp = api.create_dataverse(
                 self.dataverse_id, dict_to_json(metadata))
             sleep(SLEEP_TIME)
+
             assert isinstance(resp, Response)
             assert api.get_dataverse(self.dataverse_id).json()
 
-    def test_create_dataset(self, import_dataset_min, api_connection):
+    def test_create_dataset(self, import_dataset_min_dict, api_connection):
         """Test successfull `.create_dataset()` request`."""
         if not os.environ.get('TRAVIS'):
             api = api_connection
-            metadata = import_dataset_min
+            metadata = import_dataset_min_dict
             resp = api.create_dataset(':root', dict_to_json(metadata))
             sleep(SLEEP_TIME)
             TestApiRequests.dataset_id = resp.json()['data']['persistentId']
+
             assert isinstance(resp, Response)
 
     def test_get_dataset(self, api_connection):
@@ -92,6 +98,7 @@ class TestApiRequests(object):
             api = api_connection
             resp = api.get_dataset(TestApiRequests.dataset_id)
             sleep(SLEEP_TIME)
+
             assert isinstance(resp, Response)
 
     def test_delete_dataset(self, api_connection):
@@ -108,6 +115,7 @@ class TestApiRequests(object):
             api = api_connection
             resp = api.delete_dataverse(self.dataverse_id)
             sleep(SLEEP_TIME)
+
             assert isinstance(resp, Response)
 
     def test_get_request(self, api_connection):
@@ -117,6 +125,7 @@ class TestApiRequests(object):
         query_str = '/info/server'
         resp = api.get_request(query_str)
         sleep(SLEEP_TIME)
+
         assert api.status == 'OK'
         assert isinstance(resp, Response)
 
@@ -125,4 +134,5 @@ class TestApiRequests(object):
         api = api_connection
         resp = api.get_dataverse(':root')
         sleep(SLEEP_TIME)
+
         assert isinstance(resp, Response)
