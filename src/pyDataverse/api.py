@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
+"""Dataverse API connector."""
 from datetime import datetime
 import json
 from pyDataverse.exceptions import ApiAuthorizationError
@@ -15,11 +15,6 @@ from requests import delete
 from requests import get
 from requests import post
 import subprocess as sp
-
-
-"""
-Connect and request the Dataverse API Endpoints. Save and use request results.
-"""
 
 
 class Api(object):
@@ -45,22 +40,32 @@ class Api(object):
     api_token
     api_version
 
-    Example
-    ----------
-    Create an Api connection::
-
-        >>> base_url = 'http://demo.dataverse.org'
-        >>> api = Api(base_url)
-        >>> api.status
-        'OK'
-
     """
 
     def __init__(self, base_url, api_token=None, api_version='v1'):
-        """Init an `Api()` class.
+        """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
         See more about url at https://en.wikipedia.org/wiki/URL
+
+        Parameters
+        ----------
+        base_url : string
+            Base url for Dataverse api.
+        api_token : string
+            Api token for Dataverse api.
+        api_version : string
+            Api version of Dataverse native api. Default is `v1`.
+
+        Examples
+        -------
+        Create an Api connection::
+
+            >>> from pyDataverse.api import Api
+            >>> base_url = 'http://demo.dataverse.org'
+            >>> api = Api(base_url)
+            >>> api.status
+            'OK'
 
         """
         # Check and set basic variables.
