@@ -105,23 +105,6 @@ class Dataverse(object):
         Data must not be complete, and also attributes required for the
         metadata json export can be missing.
 
-        Example: Default dataverse metadata json:
-        {
-          "name": "Scientific Research",
-          "alias": "science",
-          "dataverseContacts": [
-            {
-              "contactEmail": "pi@example.edu"
-            },
-            {
-              "contactEmail": "student@example.edu"
-            }
-          ],
-          "affiliation": "Scientific Research University",
-          "description": "We do all the science.",
-          "dataverseType": "LABORATORY"
-        }
-
         Parameters
         ----------
         filename : string
@@ -253,23 +236,6 @@ class Dataverse(object):
 
     def json(self, format='dv_up'):
         r"""Create json from attributes.
-
-        Example: Default dataverse metadata json:
-        {
-          "name": "Scientific Research",
-          "alias": "science",
-          "dataverseContacts": [
-            {
-              "contactEmail": "pi@example.edu"
-            },
-            {
-              "contactEmail": "student@example.edu"
-            }
-          ],
-          "affiliation": "Scientific Research University",
-          "description": "We do all the science.",
-          "dataverseType": "LABORATORY"
-        }
 
         Parameters
         ----------
@@ -1219,7 +1185,31 @@ class Dataset(object):
 
 
 class Datafile(object):
-    """Base class for the Datafile model."""
+    """Base class for the Datafile model.
+
+    Parameters
+    ----------
+    filename : string
+        Filename with full path.
+    pid : type
+        Description of parameter `pid` (the default is None).
+
+    Attributes
+    ----------
+    description : string
+        Description of datafile
+    restrict : bool
+        Unknown
+    __attr_required_metadata : list
+        List with required metadata.
+    __attr_valid_metadata : list
+        List with valid metadata for Dataverse api upload.
+    __attr_valid_class : list
+        List of all attributes.
+    pid
+    filename
+
+    """
 
     """Attributes required for Datafile metadata json."""
     __attr_required_metadata = [
