@@ -17,9 +17,12 @@ class Dataverse(object):
     """Base class for the Dataverse model.
 
     * data
-        * dict: dict mit key value pairs übergeben, wo key exakt das attributist.
-        * optional: list: liste tuples (links key, rechts value) übergeben, wo key exakt das attribut ist.
-    * does: set metadata functions: dicts mit key-value pairs übergeben. die keys müssen wie die metadata attribute
+        * dict: dict mit key value pairs übergeben, wo key exakt das
+        attributist.
+        * optional: list: liste tuples (links key, rechts value) übergeben, wo
+        key exakt das attribut ist.
+    * does: set metadata functions: dicts mit key-value pairs übergeben. die
+    keys müssen wie die metadata attribute
 
     """
 
@@ -142,7 +145,8 @@ class Dataverse(object):
 
         format: all, dv_up
 
-        if data is valid will be checked here. so it is not necessary anymore in json().
+        if data is valid will be checked here. so it is not necessary anymore
+        in json().
 
         """
         data = {}
@@ -151,7 +155,7 @@ class Dataverse(object):
                 for attr in self.__attr_valid:
                     if self.__getattribute__(attr):
                         data[attr] = self.__getattribute__(attr)
-                # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
+                # TODO: prüfen, ob required attributes gesetzt sind = Exception
                 return data
             else:
                 print('dict can not be created. Data is not valid for format')
@@ -275,17 +279,25 @@ class Dataset(object):
     [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\']."""
     __attr_citation_fields = {
         'otherId': ['otherIdAgency', 'otherIdValue'],
-        'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme', 'authorIdentifier'],
-        'datasetContact': ['datasetContactName', 'datasetContactAffiliation', 'datasetContactEmail'],
+        'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme',
+                   'authorIdentifier'],
+        'datasetContact': ['datasetContactName', 'datasetContactAffiliation',
+                           'datasetContactEmail'],
         'dsDescription': ['dsDescriptionValue', 'dsDescriptionDate'],
-        'keyword': ['keywordValue', 'keywordVocabulary', 'keywordVocabularyURI'],
-        'producer': ['producerName', 'producerAffiliation', 'producerAbbreviation', 'producerURL', 'producerLogoURL'],
+        'keyword': ['keywordValue', 'keywordVocabulary',
+                    'keywordVocabularyURI'],
+        'producer': ['producerName', 'producerAffiliation',
+                     'producerAbbreviation', 'producerURL', 'producerLogoURL'],
         'contributor': ['contributorType', 'contributorName'],
         'grantNumber': ['grantNumberAgency', 'grantNumberValue'],
         'topicClassification': ['topicClassValue', 'topicClassVocab'],
-        'publication': ['publicationCitation', 'publicationIDType', 'publicationIDNumber', 'publicationURL'],
-        'distributor': ['distributorName', 'distributorAffiliation', 'distributorAbbreviation', 'distributorURL', 'distributorLogoURL'],
-        'timePeriodCovered': ['timePeriodCoveredStart', 'timePeriodCoveredEnd'],
+        'publication': ['publicationCitation', 'publicationIDType',
+                        'publicationIDNumber', 'publicationURL'],
+        'distributor': ['distributorName', 'distributorAffiliation',
+                        'distributorAbbreviation', 'distributorURL',
+                        'distributorLogoURL'],
+        'timePeriodCovered': ['timePeriodCoveredStart',
+                              'timePeriodCoveredEnd'],
         'dateOfCollection': ['dateOfCollectionStart', 'dateOfCollectionEnd'],
         'software': ['softwareName', 'softwareVersion']
     }
@@ -299,8 +311,10 @@ class Dataset(object):
     """Attributes in Dataverse metadata json inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\']."""
     __attr_geospatial_fields = {
-        'geographicCoverage': ['country', 'state', 'city', 'otherGeographicCoverage'],
-        'geographicBoundingBox': ['westLongitude', 'eastLongitude', 'northLongitude', 'southLongitude']
+        'geographicCoverage': ['country', 'state', 'city',
+                               'otherGeographicCoverage'],
+        'geographicBoundingBox': ['westLongitude', 'eastLongitude',
+                                  'northLongitude', 'southLongitude']
     }
 
     """Attributes on first level of Dataverse metadata json inside
@@ -336,7 +350,8 @@ class Dataset(object):
     """Attributes in Dataverse metadata json inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\']."""
     __attr_journal_fields = {
-        'journalVolumeIssue': ['journalVolume', 'journalIssue', 'journalPubDate']
+        'journalVolumeIssue': ['journalVolume', 'journalIssue',
+                               'journalPubDate']
     }
 
     def __init__(self):
@@ -474,14 +489,14 @@ class Dataset(object):
         if authors:
             for a in authors:
                 if 'authorAffiliation' in a or 'authorIdentifierScheme' in a or 'authorIdentifier' in a:
-                    if not 'authorName' in a:
+                    if 'authorName' not in a:
                         is_valid = False
 
         ds_contac = self.__getattribute__('datasetContact')
         if ds_contac:
             for c in ds_contac:
                 if 'datasetContactAffiliation' in c or 'datasetContactEmail' in c:
-                    if not 'datasetContactName' in c:
+                    if 'datasetContactName' not in c:
                         is_valid = False
 
         producer = self.__getattribute__('producer')
@@ -495,14 +510,14 @@ class Dataset(object):
         if contributor:
             for c in contributor:
                 if 'contributorType' in c:
-                    if not 'contributorName' in c:
+                    if 'contributorName' not in c:
                         is_valid = False
 
         distributor = self.__getattribute__('distributor')
         if distributor:
             for d in distributor:
                 if 'distributorAffiliation' in d or 'distributorAbbreviation' in d or 'distributorURL' in d or 'distributorLogoURL' in d:
-                    if not 'distributorName' in d:
+                    if 'distributorName' not in d:
                         is_valid = False
 
         bbox = self.__getattribute__('geographicBoundingBox')
@@ -565,7 +580,8 @@ class Dataset(object):
             if 'geospatial' in metadata['datasetVersion']['metadataBlocks']:
                 geospatial = metadata['datasetVersion']['metadataBlocks']['geospatial']
                 if 'displayName' in geospatial:
-                    self.__setattr__('geospatial_displayName', geospatial['displayName'])
+                    self.__setattr__('geospatial_displayName',
+                                     geospatial['displayName'])
 
                 for field in geospatial['fields']:
                     if field['typeName'] in self.__attr_geospatial:
@@ -583,7 +599,8 @@ class Dataset(object):
             if 'socialscience' in metadata['datasetVersion']['metadataBlocks']:
                 socialscience = metadata['datasetVersion']['metadataBlocks']['socialscience']
                 if 'displayName' in socialscience:
-                    self.__setattr__('socialscience_displayName', socialscience['displayName'])
+                    self.__setattr__('socialscience_displayName',
+                                     socialscience['displayName'])
 
                 for field in socialscience['fields']:
                     if field['typeName'] in self.__attr_socialscience:
@@ -610,7 +627,8 @@ class Dataset(object):
             if 'journal' in metadata['datasetVersion']['metadataBlocks']:
                 journal = metadata['datasetVersion']['metadataBlocks']['journal']
                 if 'displayName' in journal:
-                    self.__setattr__('journal_displayName', journal['displayName'])
+                    self.__setattr__('journal_displayName',
+                                     journal['displayName'])
 
                 for field in journal['fields']:
                     if field['typeName'] in self.__attr_journal:
@@ -690,14 +708,14 @@ class Dataset(object):
                     citation['fields'].append({
                         'typeName': attr,
                         'value': self.__getattribute__(attr)
-                        })
+                    })
 
                 # Generate fields attributes
                 for key, val in self.__attr_citation_fields.items():
                     citation['fields'].append({
                         'typeName': key,
                         'value': self.__generate_dicts(key, val)
-                        })
+                    })
 
                 # Generate series attributes
                 if self.__getattribute__('series'):
@@ -714,7 +732,7 @@ class Dataset(object):
                     citation['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
-                        })
+                    })
 
                 """geospatial"""
                 # Generate first level attributes
@@ -722,7 +740,7 @@ class Dataset(object):
                     geospatial['fields'].append({
                         'typeName': attr,
                         'value': self.__getattribute__(attr)
-                        })
+                    })
 
                 # Generate fields attributes
                 for key, val in self.__attr_geospatial_fields.items():
@@ -730,7 +748,7 @@ class Dataset(object):
                     geospatial['fields'].append({
                         'typeName': key,
                         'value': self.__generate_dicts(key, val)
-                        })
+                    })
 
                 """socialscience"""
                 # Generate first level attributes
@@ -738,7 +756,7 @@ class Dataset(object):
                     socialscience['fields'].append({
                         'typeName': attr,
                         'value': self.__getattribute__(attr)
-                        })
+                    })
 
                 # Generate targetSampleSize attributes
                 if self.__getattribute__('targetSampleSize'):
@@ -755,7 +773,7 @@ class Dataset(object):
                     socialscience['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
-                        })
+                    })
 
                 # Generate socialScienceNotes attributes
                 if self.__getattribute__('socialScienceNotes'):
@@ -776,7 +794,7 @@ class Dataset(object):
                     socialscience['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
-                        })
+                    })
 
                 """journal"""
                 # Generate first level attributes
@@ -784,14 +802,14 @@ class Dataset(object):
                     journal['fields'].append({
                         'typeName': attr,
                         'value': self.__getattribute__(attr)
-                        })
+                    })
 
                 # Generate fields attributes
                 for key, val in self.__attr_journal_fields.items():
                     journal['fields'].append({
                         'typeName': key,
                         'value': self.__generate_dicts(key, val)
-                        })
+                    })
 
                 # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
                 data['datasetVersion']['metadataBlocks']['citation'] = citation
@@ -805,7 +823,9 @@ class Dataset(object):
                 return None
         elif format == 'all':
             attr_lst = self.__attr_datasetVersion + self.__attr_citation + self.__attr_geospatial + self.__attr_socialscience + self.__attr_journal
-            for key, val in self.__attr_citation_fields.update(self.__attr_geospatial_fields.update(self.__attr_journal_fields)):
+            for key, val in self.__attr_citation_fields.update(
+                self.__attr_geospatial_fields.update(
+                    self.__attr_journal_fields)):
                 attr_lst.append(key)
             for attr in attr_lst:
                 if self.__getattribute__(attr):

@@ -711,7 +711,8 @@ class Api(object):
 
         """
         base_str = '/datasets/:persistentId/versions/'
-        query_str = base_str+'{0}/files?persistentId={1}'.format(version, doi)
+        query_str = base_str + '{0}/files?persistentId={1}'.format(
+            version, doi)
         resp = self.get_request(query_str)
         return resp
 
