@@ -750,29 +750,6 @@ class Api(object):
             print('Dataset {} deleted'.format(identifier))
         return resp
 
-    def get_dataset_metadata(self, identifier, auth=True):
-        """Get the metadatablocks of the fiven dataset.
-
-        resp.status_code:
-            200: metadata updated
-
-        Parameters
-        ----------
-        identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
-        auth : bool
-            Should an api token be sent in the request. Defaults to `False`.
-
-        Returns
-        -------
-        dictionary
-            Metadata of given dataset
-
-        """
-        resp = self.get_dataset(identifier,auth=auth)
-        return resp.json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
-
-
     def edit_dataset_metadata(self, identifier, metadata, is_replace=False, auth=True):
         """Edit metadata of a given dataset. `Offical documentation
         <http://guides.dataverse.org/en/latest/api/native-api.html#
