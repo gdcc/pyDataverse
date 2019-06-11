@@ -14,6 +14,7 @@ from requests import ConnectionError
 from requests import delete
 from requests import get
 from requests import post
+from requests import put
 import subprocess as sp
 
 
@@ -230,6 +231,60 @@ class Api(object):
         except ConnectionError:
             raise ConnectionError(
                 'ERROR: POST - Could not establish connection to api {}.'
+                ''.format(url)
+            )
+
+    def put_request(self, query_str, metadata=None, auth=False,
+                         params=None):
+        """Make a PUT request.
+
+        Parameters
+        ----------
+        query_str : string
+            Query string for the request. Will be concatenated to
+            `native_api_base_url`.
+        metadata : string
+            Metadata as a json-formatted string. Defaults to `None`.
+        auth : bool
+            Should an api token be sent in the request. Defaults to `False`.
+        params : dict
+            Dictionary of parameters to be passed with the request.
+            Defaults to `None`.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        url = '{0}{1}'.format(self.native_api_base_url, query_str)
+        if auth:
+            if self.api_token:
+                if not params:
+                    params = {}
+                params['key'] = self.api_token
+            else:
+                ApiAuthorizationError(
+                    'ERROR: PUT - Api token not passed to '
+                    '`put_request` {}.'.format(url)
+                )
+
+        try:
+            resp = put(
+                url,
+                data=metadata,
+                params=params
+            )
+            if resp.status_code == 401:
+                error_msg = resp.json()['message']
+                raise ApiAuthorizationError(
+                    'ERROR: PUT HTTP 401 - Authorization error {0}. MSG: {1}'
+                    ''.format(url, error_msg)
+                )
+            return resp
+        except ConnectionError:
+            raise ConnectionError(
+                'ERROR: PUT - Could not establish connection to api {}.'
                 ''.format(url)
             )
 
@@ -693,6 +748,112 @@ class Api(object):
                 'MSG: {1}'.format(identifier, error_msg))
         elif resp.status_code == 200:
             print('Dataset {} deleted'.format(identifier))
+        return resp
+
+    def get_dataset_metadata(self, identifier, auth=True):
+        """Get the metadatablocks of the fiven dataset.
+
+        resp.status_code:
+            200: metadata updated
+
+        Parameters
+        ----------
+        identifier : string
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        auth : bool
+            Should an api token be sent in the request. Defaults to `False`.
+
+        Returns
+        -------
+        dictionary
+            Metadata of given dataset
+
+        """
+        resp = self.get_dataset(identifier,auth=auth)
+        return resp.json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
+
+
+    def edit_dataset_metadata(self, identifier, metadata, is_replace=False, auth=True):
+        """Edit metadata of a given dataset. `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#
+        edit-dataset-metadata>`_.
+
+        .. code-block:: bash
+
+            PUT http://$SERVER/api/datasets/editMetadata/$id --upload-file FILENAME
+
+        Add data to dataset fields that are blank or accept multiple values with
+        the following
+
+
+        .. code-block:: bash
+
+            curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$PID --upload-file dataset-add-metadata.json
+
+        For these edits your JSON file need only include those dataset fields
+        which you would like to edit. A sample JSON file may be downloaded
+        here: `dataset-edit-metadata-sample.json
+        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
+
+        As an example, one could first get and save the metadate of a dataset
+
+        .. code-block::
+
+            data = api.get_dataset_metadata(DOI,auth=True)
+            utils.write_file_json(fileName,data)
+
+        Make changes to the file and then update the metadata in dataverse
+
+        .. code-block::
+
+            data = utils.dict_to_json(utils.read_file_json(fileName))
+            resp = api.edit_dataset_metadata(DOI,data,is_replace=True,auth=True)
+
+
+        resp.status_code:
+            200: metadata updated
+
+        Parameters
+        ----------
+        identifier : string
+            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        metadata : string
+            Metadata of the Dataset as a json-formatted string.
+        is_replace : bool
+            True to replace already existing metadata.
+        auth : bool
+            Should an api token be sent in the request. Defaults to `False`.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+
+        query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'.format(
+            identifier)
+        params = {'replace': True} if is_replace else {}
+        #if is_replace: query_str += "&replace=true"
+
+        resp = self.put_request(query_str, metadata, auth, params)
+
+        if resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - Updating metadata unauthorized. MSG: '
+                ''.format(error_msg)
+            )
+        elif resp.status_code == 400:
+            if 'Error parsing' in resp.json()['message']:
+                print('Wrong passed data format.')
+            else:
+                print('You may not add data to a field that already has data ' +
+                      'and does not allow multiples. ' +
+                      'Use is_replace=true to replace existing data.')
+        elif resp.status_code == 200:
+            # time = resp.json()['data']['lastUpdateTime']
+            print('Dataset updated')# - {}.'.format(time))
         return resp
 
     def get_datafiles(self, doi, version='1'):
