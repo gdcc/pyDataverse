@@ -47,7 +47,7 @@ class Api(object):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
-        See more about url at https://en.wikipedia.org/wiki/URL
+        See more about URL at `Wikipedia <https://en.wikipedia.org/wiki/URL>`_.
 
         Parameters
         ----------
@@ -235,7 +235,7 @@ class Api(object):
             )
 
     def put_request(self, query_str, metadata=None, auth=False,
-                         params=None):
+                    params=None):
         """Make a PUT request.
 
         Parameters
@@ -335,17 +335,17 @@ class Api(object):
     def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
 
-        View data about the dataverse $identified by identifier. Identifier can
-        be the id number of the dataverse, its alias, or the special
-        value :root.
+        View metadata about a dataverse.
 
-        GET http://$SERVER/api/dataverses/$id
+        .. code-block:: bash
+
+            GET http://$SERVER/api/dataverses/$id
 
         Parameters
         ----------
         identifier : string
-            Can either be a dataverse id (long) or a dataverse alias (more
-            robust).
+            Can either be a dataverse id (long), a dataverse alias (more
+            robust), or the special value ``:root``.
 
         Returns
         -------
@@ -362,18 +362,20 @@ class Api(object):
         """Create a dataverse.
 
         Generates a new dataverse under identifier. Expects a JSON content
-        describing the dataverse, as in the example below. If identifier is
-        omitted, a root dataverse is created. $id can either be a dataverse id
-        (long) or a dataverse alias (more robust).
+        describing the dataverse.
 
-        POST http://$SERVER/api/dataverses/$id?key=$apiKey
+        HTTP Request:
 
-        Download the JSON example file and modified to create dataverses to
-        suit your needs. The fields name, alias, and dataverseContacts are
-        required. http://guides.dataverse.org/en/latest/
-        _downloads/dataverse-complete.json
+        .. code-block:: bash
 
-        resp.status_code:
+            POST http://$SERVER/api/dataverses/$id
+
+        Download the `dataverse.json <http://guides.dataverse.org/en/latest/
+        _downloads/dataverse-complete.json>`_ example file and modify to create
+        dataverses to suit your needs. The fields name, alias, and
+        dataverseContacts are required.
+
+        Status Codes:
             200: dataverse created
             201: dataverse created
 
@@ -381,14 +383,14 @@ class Api(object):
         ----------
         identifier : string
             Can either be a dataverse id (long) or a dataverse alias (more
-            robust).
+            robust). If identifier is omitted, a root dataverse is created.
         metadata : string
             Metadata of the Dataverse as a json-formatted string.
         auth : bool
-            True if api authorization is necessary. Defaults to `True`.
+            True if api authorization is necessary. Defaults to ``True``.
         parent : string
             Parent dataverse, if existing, to which the Dataverse gets attached
-            to. Defaults to `:root`.
+            to. Defaults to ``:root``.
 
         Returns
         -------
@@ -426,10 +428,14 @@ class Api(object):
         Publish the Dataverse pointed by identifier, which can either by the
         dataverse alias or its numerical id.
 
-        POST http://$SERVER/api/dataverses/$identifier/actions/:publish
+        HTTP Request:
 
-        resp.status_code:
-            200: dataverse published
+        .. code-block:: bash
+
+            POST http://$SERVER/api/dataverses/$identifier/actions/:publish
+
+        Status Code:
+            200: Dataverse published
 
         Parameters
         ----------
@@ -437,7 +443,7 @@ class Api(object):
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
         auth : bool
-            True if api authorization is necessary. Defaults to `False`.
+            True if api authorization is necessary. Defaults to ``False``.
 
         Returns
         -------
@@ -474,11 +480,14 @@ class Api(object):
     def delete_dataverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
 
-        Deletes the dataverse whose ID is given:
-        DELETE http://$SERVER/api/dataverses/$id?key=$apiKey
+        HTTP Request:
 
-        resp.status_code:
-            200: dataverse deleted
+        .. code-block:: bash
+
+            DELETE http://$SERVER/api/dataverses/$id
+
+        Status Code:
+            200: Dataverse deleted
 
         Parameters
         ----------
@@ -523,23 +532,30 @@ class Api(object):
             print('Dataverse {} deleted.'.format(identifier))
         return resp
 
-    def get_dataset(self, identifier, auth=True, is_doi=True):
-        """Get metadata of dataset.
+    def get_dataset(self, identifier, auth=True, is_pid=True):
+        """Get metadata of a Dataset.
 
         With Dataverse identifier:
+
+        .. code-block:: bash
+
             GET http://$SERVER/api/datasets/$identifier
-        With PID:
-            GET http://$SERVER/api/datasets/:persistentId/?persistentId=$ID
+
+        With persistent identifier:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/:persistentId/?persistentId=$id
             GET http://$SERVER/api/datasets/:persistentId/
-            ?persistentId=doi:10.5072/FK2/J8SJZB
+            ?persistentId=$pid
 
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
-        is_doi : bool
-            Is the identifier a Doi? Defauls to `True`. So far, the module only
-            supports Doi's as PID's.
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
+        is_pid : bool
+            True, if identifier is a persistent identifier.
 
         Returns
         -------
@@ -547,7 +563,7 @@ class Api(object):
             Response object of requests library.
 
         """
-        if is_doi:
+        if is_pid:
             query_str = '/datasets/:persistentId/?persistentId={0}'.format(
                 identifier)
         else:
@@ -555,22 +571,23 @@ class Api(object):
         resp = self.get_request(query_str, auth=auth)
         return resp
 
-    def get_dataset_export(self, identifier, export_format):
+    def get_dataset_export(self, pid, export_format):
         """Get metadata of dataset exported in different formats.
 
-        CORS Export the metadata of the current published version of a dataset
-        in various formats:
+        Export the metadata of the current published version of a dataset
+        in various formats by its persistend identifier.
 
-        GET http://$SERVER/api/datasets/
-        export?exporter=ddi&persistentId=$persistentId
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/export?exporter=$exportformat&persistentId=$pid
 
         Parameters
         ----------
-        identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        pid : string
+            Persistent identifier of the dataset. (e.g. ``doi:10.11587/8H3N93``).
         export_format : string
-            Export format as a string. Formats: 'ddi', 'oai_ddi', 'dcterms',
-            'oai_dc', 'schema.org', 'dataverse_json'.
+            Export format as a string. Formats: ``ddi``, ``oai_ddi``,
+            ``dcterms``, ``oai_dc``, ``schema.org``, ``dataverse_json``.
 
         Returns
         -------
@@ -579,46 +596,61 @@ class Api(object):
 
         """
         query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
-            export_format, identifier)
+            export_format, pid)
         resp = self.get_request(query_str)
         return resp
 
     def create_dataset(self, dataverse, metadata, auth=True):
         """Add dataset to a dataverse.
 
-        http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
+        `Dataverse Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse>`_
 
-        POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file
-         FILENAME
+        HTTP Request:
 
-        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/
-        dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&
-        release=yes --upload-file dataset.json
-        curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/
-        dataverses/$DV_ALIAS/datasets --upload-file dataset-finch1.json
+        .. code-block:: bash
+
+            POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file <FILENAME>
+
+        Add new dataset with curl:
+
+        .. code-block:: bash
+
+            curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets --upload-file tests/data/dataset_min.json
+
+        Import dataset with existing persistend identifier with curl:
+
+        .. code-block:: bash
+
+            curl -H "X-Dataverse-key: $API_TOKEN" -X POST $SERVER_URL/api/dataverses/$DV_ALIAS/datasets/:import?pid=$PERSISTENT_IDENTIFIER&release=yes --upload-file tests/data/dataset_min.json
 
         To create a dataset, you must create a JSON file containing all the
-        metadata you want such as in this example file: dataset-finch1.json.
+        metadata you want such as example file: `dataset-finch1.json
+        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_.
         Then, you must decide which dataverse to create the dataset in and
         target that datavese with either the "alias" of the dataverse (e.g.
         "root" or the database id of the dataverse (e.g. "1"). The initial
         version state will be set to DRAFT:
-        http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
 
-        resp.status_code:
+        Status Code:
             201: dataset created
 
         Parameters
         ----------
         dataverse : string
-            Alias of dataverse to which the dataset should be added to.
+            "alias" of the dataverse (e.g. ``root``) or the database id of the
+            dataverse (e.g. ``1``)
         metadata : string
-            Metadata of the Dataset as a json-formatted string.
+            Metadata of the Dataset as a json-formatted string (e. g.
+            `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_ `)
 
         Returns
         -------
         requests.Response
             Response object of requests library.
+
+        Todo
+        -------
+        Link Dataset finch1.json
 
         """
         query_str = '/dataverses/{0}/datasets'.format(dataverse)
@@ -640,7 +672,7 @@ class Api(object):
             print('Dataset {} created.'.format(identifier))
         return resp
 
-    def publish_dataset(self, identifier, type='minor', auth=True):
+    def publish_dataset(self, pid, type='minor', auth=True):
         """Publish dataset.
 
         Publishes the dataset whose id is passed. If this is the first version
@@ -652,7 +684,11 @@ class Api(object):
         type=updatecurrent to update metadata without changing the version
         number.
 
-        POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST http://$SERVER/api/datasets/$id/actions/:publish?type=$type
 
         When there are no default workflows, a successful publication process
         will result in 200 OK response. When there are workflows, it is
@@ -663,21 +699,22 @@ class Api(object):
         has to check the status of the dataset periodically, or perform some
         push request in the post-publish workflow.
 
-        resp.status_code:
+        Status Code:
             200: dataset published
 
         Parameters
         ----------
-        identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        pid : string
+            Persistent identifier of the dataset (e.g.
+            ``doi:10.11587/8H3N93``).
         type : string
             Passing `minor` increases the minor version number (2.3 is
-            updated to 2.4).
-            Passing `major` increases the major version number (2.3 is
-            updated to 3.0). Superusers can pass `updatecurrent` to update
-            metadata without changing the version number:
+            updated to 2.4). Passing `major` increases the major version
+            number (2.3 is updated to 3.0). Superusers can pass
+            ``updatecurrent` to update metadata without changing the version
+            number.
         auth : bool
-            True if api authorization is necessary. Defaults to `False`.
+            ``True`` if api authorization is necessary. Defaults to ``False``.
 
         Returns
         -------
@@ -703,19 +740,27 @@ class Api(object):
             print('Dataset {} published'.format(identifier))
         return resp
 
-    def delete_dataset(self, identifier, auth=True):
+    def delete_dataset(self, identifier, is_pid=True, auth=True):
         """Delete a dataset.
 
-        Delete the dataset whose id is passed:
-        DELETE http://$SERVER/api/datasets/$id?key=$apiKey
+        Delete the dataset whose id is passed
 
-        resp.status_code:
+        HTTP Request:
+
+        .. code-block:: bash
+
+            DELETE http://$SERVER/api/datasets/$id
+
+        Status Code:
             200: dataset deleted
 
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
+        is_pid : bool
+            True, if identifier is a persistent identifier.
 
         Returns
         -------
@@ -723,8 +768,11 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/datasets/:persistentId/?persistentId={0}'.format(
-            identifier)
+        if is_pid:
+            query_str = '/datasets/:persistentId/?persistentId={0}'.format(
+                identifier)
+        else:
+            query_str = '/datasets/{0}'.format(identifier)
         resp = self.delete_request(query_str, auth=auth)
 
         if resp.status_code == 404:
@@ -750,10 +798,15 @@ class Api(object):
             print('Dataset {} deleted'.format(identifier))
         return resp
 
-    def edit_dataset_metadata(self, identifier, metadata, is_replace=False, auth=True):
-        """Edit metadata of a given dataset. `Offical documentation
+    def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
+                              is_replace=False, auth=True):
+        """Edit metadata of a given dataset.
+
+        `Offical documentation
         <http://guides.dataverse.org/en/latest/api/native-api.html#
         edit-dataset-metadata>`_.
+
+        HTTP Request:
 
         .. code-block:: bash
 
@@ -762,56 +815,52 @@ class Api(object):
         Add data to dataset fields that are blank or accept multiple values with
         the following
 
+        CURL Request:
 
         .. code-block:: bash
 
-            curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$PID --upload-file dataset-add-metadata.json
+            curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$pid --upload-file dataset-add-metadata.json
 
         For these edits your JSON file need only include those dataset fields
         which you would like to edit. A sample JSON file may be downloaded
         here: `dataset-edit-metadata-sample.json
         <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
 
-        As an example, one could first get and save the metadate of a dataset
-
-        .. code-block::
-
-            data = api.get_dataset_metadata(DOI,auth=True)
-            utils.write_file_json(fileName,data)
-
-        Make changes to the file and then update the metadata in dataverse
-
-        .. code-block::
-
-            data = utils.dict_to_json(utils.read_file_json(fileName))
-            resp = api.edit_dataset_metadata(DOI,data,is_replace=True,auth=True)
-
-
-        resp.status_code:
-            200: metadata updated
-
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         metadata : string
             Metadata of the Dataset as a json-formatted string.
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
         is_replace : bool
-            True to replace already existing metadata.
+            ``True`` to replace already existing metadata. ``False``, if not.
         auth : bool
-            Should an api token be sent in the request. Defaults to `False`.
+            ``True``, if an api token should be sent. Defaults to ``False``.
 
         Returns
         -------
         requests.Response
             Response object of requests library.
 
-        """
+        Examples
+        -------
+        Get dataset metadata::
 
-        query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'.format(
-            identifier)
+            >>> data = api.get_dataset_metadata(doi, auth=True)
+            >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
+            >>> resp.status_code
+            200: metadata updated
+
+        """
+        if is_pid:
+            query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'
+            ''.format(identifier)
+        else:
+            query_str = '/datasets/editMetadata/{0}'.format(identifier)
         params = {'replace': True} if is_replace else {}
-        #if is_replace: query_str += "&replace=true"
 
         resp = self.put_request(query_str, metadata, auth, params)
 
@@ -829,21 +878,24 @@ class Api(object):
                       'and does not allow multiples. ' +
                       'Use is_replace=true to replace existing data.')
         elif resp.status_code == 200:
-            # time = resp.json()['data']['lastUpdateTime']
-            print('Dataset updated')# - {}.'.format(time))
+            print('Dataset {0} updated'.format(identifier))
         return resp
 
-    def get_datafiles(self, doi, version='1'):
+    def get_datafiles(self, pid, version='1'):
         """List metadata of all datafiles of a dataset.
 
-        http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
-        GET http://$SERVER/api/datasets/$id/versions/$versionId/
-        files?key=$apiKey
+        `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/$id/versions/$versionId/files
 
         Parameters
         ----------
-        doi : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+        pid : string
+            Persistent identifier of the dataset. e.g. ``doi:10.11587/8H3N93``.
         version : string
             Version of dataset. Defaults to `1`.
 
@@ -855,23 +907,32 @@ class Api(object):
         """
         base_str = '/datasets/:persistentId/versions/'
         query_str = base_str + '{0}/files?persistentId={1}'.format(
-            version, doi)
+            version, pid)
         resp = self.get_request(query_str)
         return resp
 
-    def get_datafile(self, identifier):
+    def get_datafile(self, identifier, is_pid=True):
         """Download a datafile via the Dataverse Data Access API.
 
-        File ID
+        Get by file id (HTTP Request).
+
+        .. code-block:: bash
+
             GET /api/access/datafile/$id
-        DOI
-            GET http://$SERVER/api/access/datafile/
-            :persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
+
+        Get by persistent identifier (HTTP Request).
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/access/datafile/:persistentId/?persistentId=doi:10.5072/FK2/J8SJZB
 
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+            Identifier of the dataset. Can be datafile id or persistent
+            identifier of the datafile (e. g. doi).
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
 
         Returns
         -------
@@ -879,14 +940,22 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/access/datafile/{0}'.format(identifier)
+        if is_pid:
+            query_str = '/access/datafile/{0}'.format(identifier)
+        else:
+            query_str = '/access/datafile/:persistentId/?persistentId={0}'
+            ''.format(identifier)
         resp = self.get_request(query_str)
         return resp
 
     def get_datafile_bundle(self, identifier):
-        """Download a datafile in all its formats via the Dataverse Data Access API.
+        """Download a datafile in all its formats.
 
-        GET /api/access/datafile/bundle/$id
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET /api/access/datafile/bundle/$id
 
         Data Access API calls can now be made using persistent identifiers (in
         addition to database ids). This is done by passing the constant
@@ -907,7 +976,7 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+            Identifier of the dataset.
 
         Returns
         -------
@@ -919,22 +988,29 @@ class Api(object):
         data = self.get_request(query_str)
         return data
 
-    def upload_file(self, identifier, filename):
+    def upload_file(self, identifier, filename, is_pid=True):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
-        POST http://$SERVER/api/datasets/$id/add?key=$apiKey
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST http://$SERVER/api/datasets/$id/add
 
         The upload endpoint checks the content of the file, compares it with
         existing files and tells if already in the database (most likely via
-        hashing)
+        hashing).
 
         Parameters
         ----------
         identifier : string
-            Doi of the dataset. e.g. `doi:10.11587/8H3N93`.
+            Identifier of the dataset.
         filename : string
             Full filename with path.
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
 
         Returns
         -------
@@ -944,8 +1020,11 @@ class Api(object):
 
         """
         query_str = self.native_api_base_url
-        query_str += '/datasets/:persistentId/add?persistentId={0}'.format(
-            identifier)
+        if is_pid:
+            query_str += '/datasets/:persistentId/add?persistentId={0}'.format(
+                identifier)
+        else:
+            query_str += '/datasets/{0}/add'.format(identifier)
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
@@ -958,10 +1037,14 @@ class Api(object):
     def get_info_version(self):
         """Get the Dataverse version and build number.
 
-        The response contains the version and build numbers.
+        The response contains the version and build numbers. Requires no api
+        token.
 
-        Requires no api_token
-        GET http://$SERVER/api/info/version
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/info/version
 
         Returns
         -------
@@ -976,10 +1059,14 @@ class Api(object):
     def get_info_server(self):
         """Get dataverse server name.
 
-        This is useful when a Dataverse system is
-        composed of multiple Java EE servers behind a load balancer.
+        This is useful when a Dataverse system is composed of multiple Java EE
+        servers behind a load balancer.
 
-        GET http://$SERVER/api/info/server
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/info/server
 
         Returns
         -------
@@ -997,7 +1084,11 @@ class Api(object):
         The response contains the text value inserted as API Terms of use which
         uses the database setting :ApiTermsOfUse.
 
-        GET http://$SERVER/api/info/apiTermsOfUse
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/info/apiTermsOfUse
 
         Returns
         -------
@@ -1014,7 +1105,11 @@ class Api(object):
 
         Lists brief info about all metadata blocks registered in the system.
 
-        GET http://$SERVER/api/metadatablocks
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/metadatablocks
 
         Returns
         -------
@@ -1032,7 +1127,11 @@ class Api(object):
         Returns data about the block whose identifier is passed. identifier can
         either be the block’s id, or its name.
 
-        GET http://$SERVER/api/metadatablocks/$identifier
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/metadatablocks/$identifier
 
         Parameters
         ----------
