@@ -144,6 +144,10 @@ def write_file_json(filename, data, mode='w'):
 def csv_to_dict(filename):
     """Read in csv file and convert it into a list of dicts.
 
+    Header row is used to create keys for each row. So if column attributes are
+    named after Dataverse metadata names, the created dict can directly be used
+    to set Dataset attributes via `Dataset.set(data)`.
+
     Parameters
     ----------
     filename : string
