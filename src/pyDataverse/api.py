@@ -603,13 +603,14 @@ class Api(object):
     def create_dataset(self, dataverse, metadata, auth=True):
         """Add dataset to a dataverse.
 
-        `Dataverse Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse>`_
+        `Dataverse Documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse>`_
 
         HTTP Request:
 
         .. code-block:: bash
 
-            POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file <FILENAME>
+            POST http://$SERVER/api/dataverses/$dataverse/datasets --upload-file FILENAME
 
         Add new dataset with curl:
 
@@ -641,7 +642,7 @@ class Api(object):
             dataverse (e.g. ``1``)
         metadata : string
             Metadata of the Dataset as a json-formatted string (e. g.
-            `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_ `)
+            `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_)
 
         Returns
         -------
@@ -708,10 +709,10 @@ class Api(object):
             Persistent identifier of the dataset (e.g.
             ``doi:10.11587/8H3N93``).
         type : string
-            Passing `minor` increases the minor version number (2.3 is
-            updated to 2.4). Passing `major` increases the major version
+            Passing ``minor`` increases the minor version number (2.3 is
+            updated to 2.4). Passing ``major`` increases the major version
             number (2.3 is updated to 3.0). Superusers can pass
-            ``updatecurrent` to update metadata without changing the version
+            ``updatecurrent`` to update metadata without changing the version
             number.
         auth : bool
             ``True`` if api authorization is necessary. Defaults to ``False``.
