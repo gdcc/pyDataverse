@@ -141,7 +141,32 @@ def write_file_json(filename, data, mode='w'):
     write_file(filename, dict_to_json(data), mode)
 
 
-def csv_to_dict(filename):
+def read_file_csv(filename):
+    """Read in CSV file.
+
+    See more at `csv.reader() <https://docs.python.org/3.5/library/csv.html>`_.
+
+    Parameters
+    ----------
+    filename : string
+        Full filename with path of file.
+
+    Returns
+    -------
+    reader
+        Reader object, which can be iterated over.
+
+    """
+    try:
+        with open(filename, newline='') as csvfile:
+            return csv.reader(csvfile, delimiter=',', quotechar='"')
+    except Exception as e:
+        raise e
+    finally:
+        csvfile.close()
+
+
+def read_csv_to_dict(filename):
     """Read in csv file and convert it into a list of dicts.
 
     This offers an easy import functionality of csv files with dataset metadata.
