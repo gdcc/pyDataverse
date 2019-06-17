@@ -770,8 +770,7 @@ class Dataset(object):
         return data_tmp
 
     def is_valid(self):
-        """Checks if attributes available are valid for Dataverse api metadata
-        creation.
+        """Check if attributes available are valid for Dataverse api metadata creation.
 
         The attributes required are listed in `__attr_required_metadata`.
 
