@@ -27,9 +27,9 @@ Release v\ |version|.
 -------------------
 
 pyDataverse is a Python module for `Dataverse <http://dataverse.org>`_.
-It uses the `Native API <http://guides.dataverse.org/en/latest/api/native-api.html>`_
-and `Data Access API <http://guides.dataverse.org/en/latest/api/dataaccess.html>`_
-to create, update and remove Dataverses, Datasets and Datafiles.
+It uses the `Dataverse API <http://guides.dataverse.org/en/latest/api/index.html>`_
+and it's metadata model to import, manipulate and export Dataverses, Datasets
+and Datafiles.
 
 -------------------
 
@@ -46,22 +46,24 @@ Quickstart
 **Usage**
 
 >>> from pyDataverse.api import Api
+>>> from pyDataverse.models import Dataverse
 >>> # establish connection
->>> base_url = 'http://demo.dataverse.org'
+>>> base_url = 'https://data.aussda.at/'
 >>> api = Api(base_url)
 >>> api.status
 'OK'
 >>> # get dataverse
->>> dv = 'ecastro'  # dataverse alias or id
+>>> dv = 'autnes'  # dataverse alias or id
 >>> resp = api.get_dataverse(dv)
 >>> resp.json()['data']['creationDate']
-'2015-04-20T09:29:39Z'
+'2017-11-09T13:53:27Z'
 >>> # get dataset
+>>> identifier = 'doi:10.11587/IMKDZI'
 >>> resp = api.get_dataset(identifier)
 >>> resp.json()['data']['id']
-24
+345
 >>> # get datafile
->>> datafile_id = '32'  # file id of the datafile
+>>> datafile_id = '399'  # file id of the datafile
 >>> resp = api.get_datafile(datafile_id)
 >>> resp
 <Response [200]>
@@ -80,10 +82,10 @@ External packages:
 Features
 -----------------------------
 
-- Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles.
-- Dataverse data model for easy manipulation and data conversion.
-- Utils to support the core functionalities.
-- Custom exceptions
+- Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles of your Dataverse instance via Api.
+- Dataverse metadata model for easy manipulation and data conversion from and to other formats (e. g. Dataverse Api metadata JSON).
+- Utils to support core functionalities.
+- Custom exceptions.
 - Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_).
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
 
