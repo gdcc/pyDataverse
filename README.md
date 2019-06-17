@@ -2,18 +2,21 @@
 
 # pyDataverse
 
-pyDataverse is a Python module for [Dataverse](http://dataverse.org/). It uses the [Native API](http://guides.dataverse.org/en/latest/api/native-api.html) and [Data Access API](http://guides.dataverse.org/en/latest/api/dataaccess.html). It allows to create, update and remove Dataverses, Datasets and Datafiles via Dataverse's native API. Thanks to the developers of [dataverse-client-python](https://github.com/IQSS/dataverse-client-python), from which the project got inspired from.
+pyDataverse is a Python module for [Dataverse](http://dataverse.org).
+It uses the [Dataverse API](http://guides.dataverse.org/en/latest/api/index.html)
+and it's metadata model to import, manipulate and export Dataverses, Datasets
+and Datafiles.
 
 **Features**
 
-* Open Source ([MIT](https://opensource.org/licenses/MIT))
-* `api.py`: Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles.
-* `models.py`: Data model for easy manipulation and data conversion.
-* `utils.py`: Functions to support the core functionalities.
-* `exceptions.py`: Custom exceptions
-* `tests/*`: Tests, tested on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
+* Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles of your Dataverse instance via Api.
+* Dataverse metadata model for easy manipulation and data conversion from and to other formats (e. g. Dataverse Api metadata JSON).
+* Utils to support core functionalities.
+* Custom exceptions
+* Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
 * [Documentation](https://pydataverse.readthedocs.io/en/latest/) (Sphinx, ReadTheDocs)
 * Python 2 and 3 (>=2.7)
+* Open Source ([MIT](https://opensource.org/licenses/MIT))
 
 **Copyright**
 
