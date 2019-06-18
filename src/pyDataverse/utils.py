@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
+"""Dataverse utility functions."""
+import csv
 import json
 
 
@@ -45,7 +46,7 @@ def dict_to_json(data):
 
     """
     try:
-        return json.dumps(data, ensure_ascii=False, indent=2)
+        return json.dumps(data, ensure_ascii=True, indent=2)
     except Exception as e:
         raise e
 
@@ -118,7 +119,7 @@ def read_file_json(filename):
 
     """
     try:
-        return json.loads(read_file(filename, 'r'))
+        return json_to_dict(read_file(filename, 'r'))
     except Exception as e:
         raise e
 
@@ -138,3 +139,61 @@ def write_file_json(filename, data, mode='w'):
 
     """
     write_file(filename, dict_to_json(data), mode)
+
+
+def read_file_csv(filename):
+    """Read in CSV file.
+
+    See more at `csv.reader() <https://docs.python.org/3.5/library/csv.html>`_.
+
+    Parameters
+    ----------
+    filename : string
+        Full filename with path of file.
+
+    Returns
+    -------
+    reader
+        Reader object, which can be iterated over.
+
+    """
+    try:
+        with open(filename, newline='') as csvfile:
+            return csv.reader(csvfile, delimiter=',', quotechar='"')
+    except Exception as e:
+        raise e
+    finally:
+        csvfile.close()
+
+
+def read_csv_to_dict(filename):
+    """Read in csv file and convert it into a list of dicts.
+
+    This offers an easy import functionality of csv files with dataset metadata.
+
+    Assumptions:
+    1) The header rows contains the column names, named after Dataverse's
+    dataset attribute standard naming convention.
+    2) One row contains one dataset
+
+    After the import, the created dict then can directly be used to set
+    Dataset() attributes via ``Dataset.set(data)``.
+
+    Parameters
+    ----------
+    filename : string
+        Filename with full path.
+
+    Returns
+    -------
+    list
+        List with one dict per row (=dataset). The keys of the dicts are named
+        after the columen names, which must be named after the Dataverse
+        dataset metadata naming convention.
+
+    """
+    reader = csv.DictReader(open(filename), 'r')
+    data = []
+    for row in reader:
+        data.append(dict(row))
+    return data

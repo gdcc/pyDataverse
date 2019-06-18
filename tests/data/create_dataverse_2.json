@@ -1,9 +1,0 @@
-{
-  "alias": "test-pyDataverse-2",
-  "name": "Test pyDataverse 2",
-  "dataverseContacts": [
-    {
-      "contactEmail": "info@aussda.at"
-    }
-  ]
-}

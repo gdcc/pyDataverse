@@ -14,6 +14,13 @@ Api Interface
    :members:
 
 
+Models Interface
+-----------------------------
+
+.. automodule:: pyDataverse.models
+  :members:
+
+
 Utils Interface
 -----------------------------
 
@@ -35,6 +42,8 @@ Install from the local git repository, with all it's dependencies:
 
 .. code-block:: shell
 
+    git clone git@github.com:AUSSDA/pyDataverse.git
+    cd pyDataverse
     virtualenv venv
     source venv/bin/activate
     pip install -r tools/tests-requirements.txt
@@ -86,19 +95,6 @@ When you only want to run one test, e.g. the py36 test:
 
 To find out more about which tests are available, have a look inside the tox.ini file.
 
-
-Documentation
------------------------------
-
-
-**Create Sphinx Docs**
-
-Use Sphinx to create class and function documentation out of the doc-strings. You can call it via `tox`. This creates the created docs inside `docs/build`.
-
-.. code-block:: shell
-
-    tox -e docs
-
 **Create Coverage Reports**
 
 Run tests with coverage to create html and xml reports as an output. Again, call it via `tox`. This creates the created docs inside `docs/coverage_html/`.
@@ -114,3 +110,15 @@ To use Coveralls on local development:
 .. code-block:: shell
 
     tox -e coveralls
+
+Documentation
+-----------------------------
+
+
+**Create Sphinx Docs**
+
+Use Sphinx to create class and function documentation out of the doc-strings. You can call it via `tox`. This creates the created docs inside `docs/build`.
+
+.. code-block:: shell
+
+    tox -e docs
