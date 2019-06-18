@@ -4,7 +4,7 @@
 
 pyDataverse is a Python module for [Dataverse](http://dataverse.org).
 It uses the [Dataverse API](http://guides.dataverse.org/en/latest/api/index.html)
-and it's metadata model to import, manipulate and export Dataverses, Datasets
+and it's metadata data model to import, manipulate and export Dataverses, Datasets
 and Datafiles.
 
 **Features**
