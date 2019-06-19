@@ -946,19 +946,17 @@ class Dataset(object):
                         })
 
                 # Generate series attributes
-                if self.__getattribute__('series') is not None:
+                if self.__getattribute__('seriesName') is not None or self.__getattribute__('seriesInformation') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
-                    if 'seriesName' in self.__getattribute__('series'):
-                        if self.__getattribute__('seriesName') is not None:
-                            tmp_dict['value']['seriesName'] = {}
-                            tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
-                            tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
-                    if 'seriesInformation' in self.__getattribute__('series'):
-                        if self.__getattribute__('seriesInformation') is not None:
-                            tmp_dict['value']['seriesInformation'] = {}
-                            tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
-                            tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
+                    if self.__getattribute__('seriesName') is not None:
+                        tmp_dict['value']['seriesName'] = {}
+                        tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
+                        tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
+                    if self.__getattribute__('seriesInformation') is not None:
+                        tmp_dict['value']['seriesInformation'] = {}
+                        tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
+                        tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
                     citation['fields'].append({
                         'typeName': 'series',
                         'value': tmp_dict
@@ -992,7 +990,7 @@ class Dataset(object):
                         })
 
                 # Generate targetSampleSize attributes
-                if self.__getattribute__('targetSampleSize') is not None:
+                if self.__getattribute__('targetSampleActualSize') is not None or self.__getattribute__('targetSampleSizeFormula') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
                     if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
@@ -1006,31 +1004,28 @@ class Dataset(object):
                             tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
                             tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
                     socialscience['fields'].append({
-                        'typeName': 'series',
+                        'typeName': 'targetSampleSize',
                         'value': tmp_dict
                     })
 
                 # Generate socialScienceNotes attributes
-                if self.__getattribute__('socialScienceNotes') is not None:
+                if self.__getattribute__('socialScienceNotesType') is not None or self.__getattribute__('socialScienceNotesSubject') is not None or self.__getattribute__('socialScienceNotesText') is not None:
                     tmp_dict = {}
                     tmp_dict['value'] = {}
-                    if 'socialScienceNotesType' in self.__getattribute__('socialScienceNotes'):
-                        if self.__getattribute__('socialScienceNotesType') is not None:
-                            tmp_dict['value']['socialScienceNotesType'] = {}
-                            tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                            tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
-                    if 'socialScienceNotesSubject' in self.__getattribute__('socialScienceNotes'):
-                        if self.__getattribute__('socialScienceNotesSubject') is not None:
-                            tmp_dict['value']['socialScienceNotesSubject'] = {}
-                            tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                            tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
-                    if 'socialScienceNotesText' in self.__getattribute__('socialScienceNotes'):
-                        if self.__getattribute__('socialScienceNotesText') is not None:
-                            tmp_dict['value']['socialScienceNotesText'] = {}
-                            tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                            tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
+                    if self.__getattribute__('socialScienceNotesType') is not None:
+                        tmp_dict['value']['socialScienceNotesType'] = {}
+                        tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                        tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
+                    if self.__getattribute__('socialScienceNotesSubject') is not None:
+                        tmp_dict['value']['socialScienceNotesSubject'] = {}
+                        tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                        tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
+                    if self.__getattribute__('socialScienceNotesText') is not None:
+                        tmp_dict['value']['socialScienceNotesText'] = {}
+                        tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                        tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
                     socialscience['fields'].append({
-                        'typeName': 'series',
+                        'typeName': 'socialScienceNotes',
                         'value': tmp_dict
                     })
 
