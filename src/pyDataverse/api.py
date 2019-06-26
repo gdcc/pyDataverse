@@ -850,15 +850,14 @@ class Api(object):
         -------
         Get dataset metadata::
 
-            >>> data = api.get_dataset_metadata(doi, auth=True)
+            >>> data = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
             >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
             >>> resp.status_code
             200: metadata updated
 
         """
         if is_pid:
-            query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'
-            ''.format(identifier)
+            query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'.format(identifier)
         else:
             query_str = '/datasets/editMetadata/{0}'.format(identifier)
         params = {'replace': True} if is_replace else {}
