@@ -19,17 +19,17 @@ class Dataverse(object):
     """Attributes required for Dataverse metadata json."""
     __attr_required_metadata = [
         'alias',
-        'name',
-        'dataverseContacts'
+        'dataverseContacts',
+        'name'
     ]
     """Attributes valid for Dataverse metadata json."""
     __attr_valid_metadata = [
-        'alias',
-        'name',
         'affiliation',
-        'description',
+        'alias',
         'dataverseContacts',
-        'dataverseType'
+        'dataverseType',
+        'description',
+        'name'
     ]
     """Attributes valid for Dataverse class."""
     __attr_valid_class = [
@@ -50,17 +50,17 @@ class Dataverse(object):
 
         """
         """Misc"""
+        self.pid = None
         self.datasets = []
         self.dataverses = []
-        self.pid = None
 
         """Metadata"""
-        self.name = None
+        self.affiliation = None
         self.alias = None
         self.dataverseContacts = []
-        self.affiliation = None
-        self.description = None
         self.dataverseType = None
+        self.description = None
+        self.name = None
 
     def __str__(self):
         """Return name of Dataverse() class for users."""
@@ -324,11 +324,11 @@ class Dataset(object):
 
     """Attributes required for Dataset metadata json."""
     __attr_required_metadata = [
-        'title',
         'author',
         'datasetContact',
         'dsDescription',
-        'subject'
+        'subject',
+        'title'
     ]
 
     """
@@ -337,8 +337,8 @@ class Dataset(object):
     """
     __attr_valid_metadata_datasetVersion = [
         'license',
-        'termsOfUse',
-        'termsOfAccess'
+        'termsOfAccess',
+        'termsOfUse'
     ]
 
     """
@@ -346,28 +346,27 @@ class Dataset(object):
     [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'].
     """
     __attr_valid_metadata_citation_dicts = [
-        'title',
-        'subtitle',
+        'accessToSources',
         'alternativeTitle',
         'alternativeURL',
-        'subject',
+        'characteristicOfSources',
+        'dateOfDeposit',
+        'dataSources',
+        'depositor',
+        'distributionDate',
+        'kindOfData',
         'notesText',
+        'originOfSources',
+        'otherReferences',
         'productionDate',
         'productionPlace',
-        'distributionDate',
-        'depositor',
-        'dateOfDeposit',
-        'kindOfData',
-        'seriesName',
-        'seriesInformation',
-        'relatedMaterial',
         'relatedDatasets',
-        'otherReferences',
-        'dataSources',
-        'originOfSources',
-        'characteristicOfSources',
-        'accessToSources',
-        'kindOfData'
+        'relatedMaterial',
+        'seriesInformation',
+        'seriesName',
+        'subject',
+        'subtitle',
+        'title'
     ]
 
     """
@@ -375,28 +374,28 @@ class Dataset(object):
     [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
     """
     __attr_valid_metadata_citation_arrays = {
-        'otherId': ['otherIdAgency', 'otherIdValue'],
         'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme',
                    'authorIdentifier'],
+        'contributor': ['contributorType', 'contributorName'],
+        'dateOfCollection': ['dateOfCollectionStart', 'dateOfCollectionEnd'],
         'datasetContact': ['datasetContactName', 'datasetContactAffiliation',
                            'datasetContactEmail'],
+        'distributor': ['distributorName', 'distributorAffiliation',
+                        'distributorAbbreviation', 'distributorURL',
+                        'distributorLogoURL'],
         'dsDescription': ['dsDescriptionValue', 'dsDescriptionDate'],
+        'grantNumber': ['grantNumberAgency', 'grantNumberValue'],
         'keyword': ['keywordValue', 'keywordVocabulary',
                     'keywordVocabularyURI'],
         'producer': ['producerName', 'producerAffiliation',
                      'producerAbbreviation', 'producerURL', 'producerLogoURL'],
-        'contributor': ['contributorType', 'contributorName'],
-        'grantNumber': ['grantNumberAgency', 'grantNumberValue'],
-        'topicClassification': ['topicClassValue', 'topicClassVocab'],
+        'otherId': ['otherIdAgency', 'otherIdValue'],
         'publication': ['publicationCitation', 'publicationIDType',
                         'publicationIDNumber', 'publicationURL'],
-        'distributor': ['distributorName', 'distributorAffiliation',
-                        'distributorAbbreviation', 'distributorURL',
-                        'distributorLogoURL'],
+        'software': ['softwareName', 'softwareVersion'],
         'timePeriodCovered': ['timePeriodCoveredStart',
                               'timePeriodCoveredEnd'],
-        'dateOfCollection': ['dateOfCollectionStart', 'dateOfCollectionEnd'],
-        'software': ['softwareName', 'softwareVersion']
+        'topicClassification': ['topicClassValue', 'topicClassVocab']
     }
 
     """
@@ -412,10 +411,10 @@ class Dataset(object):
     [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
     """
     __attr_valid_metadata_geospatial_arrays = {
-        'geographicCoverage': ['country', 'state', 'city',
-                               'otherGeographicCoverage'],
         'geographicBoundingBox': ['westLongitude', 'eastLongitude',
-                                  'northLongitude', 'southLongitude']
+                                  'northLongitude', 'southLongitude'],
+        'geographicCoverage': ['country', 'state', 'city',
+                               'otherGeographicCoverage']
     }
 
     """
@@ -423,25 +422,25 @@ class Dataset(object):
     [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'].
     """
     __attr_valid_metadata_socialscience_dicts = [
+        'actionsToMinimizeLoss',
+        'cleaningOperations',
+        'collectionMode',
+        'collectorTraining',
+        'controlOperations',
+        'dataCollectionSituation',
+        'dataCollector',
+        'datasetLevelErrorNotes',
+        'deviationsFromSampleDesign',
+        'frequencyOfDataCollection',
+        'otherDataAppraisal',
+        'researchInstrument',
+        'responseRate',
+        'samplingErrorEstimates',
+        'samplingProcedure',
         'unitOfAnalysis',
         'universe',
         'timeMethod',
-        'dataCollector',
-        'collectorTraining',
-        'frequencyOfDataCollection',
-        'samplingProcedure',
-        'deviationsFromSampleDesign',
-        'collectionMode',
-        'researchInstrument',
-        'dataCollectionSituation',
-        'actionsToMinimizeLoss',
-        'controlOperations',
-        'weighting',
-        'cleaningOperations',
-        'datasetLevelErrorNotes',
-        'responseRate',
-        'samplingErrorEstimates',
-        'otherDataAppraisal',
+        'weighting'
     ]
 
     """
@@ -489,84 +488,84 @@ class Dataset(object):
 
         """Metadata: dataset"""
         self.license = None
-        self.termsOfUse = None
         self.termsOfAccess = None
+        self.termsOfUse = None
 
         """Metadata: citation"""
-        self.citation_displayName = None
-        self.title = None
-        self.subtitle = None
+        self.accessToSources = None
         self.alternativeTitle = None
         self.alternativeURL = None
-        self.otherId = []
         self.author = []
+        self.characteristicOfSources = None
+        self.citation_displayName = None
+        self.contributor = []
         self.datasetContact = []
+        self.dataSources = []
+        self.dateOfCollection = []
+        self.dateOfDeposit = None
+        self.depositor = None
+        self.distributionDate = None
+        self.distributor = []
         self.dsDescription = []
-        self.subject = []
+        self.grantNumber = []
         self.keyword = []
-        self.topicClassification = []
-        self.publication = []
+        self.kindOfData = []
         self.notesText = None
+        self.originOfSources = None
+        self.otherId = []
+        self.otherReferences = []
+        self.publication = []
         self.producer = []
         self.productionDate = None
         self.productionPlace = None
-        self.contributor = []
-        self.grantNumber = []
-        self.distributor = []
-        self.distributionDate = None
-        self.depositor = None
-        self.dateOfDeposit = None
-        self.timePeriodCovered = []
-        self.dateOfCollection = []
-        self.kindOfData = []
-        self.seriesName = None
-        self.seriesInformation = None
-        self.software = []
-        self.relatedMaterial = []
         self.relatedDatasets = []
-        self.otherReferences = []
-        self.dataSources = []
-        self.originOfSources = None
-        self.characteristicOfSources = None
-        self.accessToSources = None
+        self.relatedMaterial = []
+        self.seriesInformation = None
+        self.seriesName = None
+        self.software = []
+        self.subject = []
+        self.subtitle = None
+        self.timePeriodCovered = []
+        self.title = None
+        self.topicClassification = []
 
         """Metadata: geospatial"""
-        self.geospatial_displayName = None
+        self.geographicBoundingBox = []
         self.geographicCoverage = []
         self.geographicUnit = None
-        self.geographicBoundingBox = []
+        self.geospatial_displayName = None
 
         """Metadata: socialscience"""
-        self.socialscience_displayName = None
-        self.unitOfAnalysis = []
-        self.universe = []
-        self.timeMethod = None
-        self.dataCollector = None
+        self.actionsToMinimizeLoss = None
+        self.cleaningOperations = None
+        self.collectionMode = None
         self.collectorTraining = None
+        self.controlOperations = None
+        self.dataCollectionSituation = None
+        self.dataCollector = None
+        self.datasetLevelErrorNotes = None
+        self.deviationsFromSampleDesign = None
         self.frequencyOfDataCollection = None
+        self.otherDataAppraisal = None
+        self.researchInstrument = None
+        self.responseRate = None
+        self.samplingErrorEstimates = None
         self.samplingProcedure = None
-        self.targetSampleActualSize = None
-        self.targetSampleSizeFormula = None
         self.socialScienceNotesType = None
         self.socialScienceNotesSubject = None
         self.socialScienceNotesText = None
-        self.deviationsFromSampleDesign = None
-        self.collectionMode = None
-        self.researchInstrument = None
-        self.dataCollectionSituation = None
-        self.actionsToMinimizeLoss = None
-        self.controlOperations = None
+        self.socialscience_displayName = None
+        self.targetSampleActualSize = None
+        self.targetSampleSizeFormula = None
+        self.timeMethod = None
+        self.unitOfAnalysis = []
+        self.universe = []
         self.weighting = None
-        self.cleaningOperations = None
-        self.datasetLevelErrorNotes = None
-        self.responseRate = None
-        self.samplingErrorEstimates = None
-        self.otherDataAppraisal = None
 
         """Metadata: journal"""
-        self.journal_displayName = None
-        self.journalVolumeIssue = []
         self.journalArticleType = None
+        self.journalVolumeIssue = []
+        self.journal_displayName = None
 
     def __str__(self):
         """Return name of Dataset() class for users."""
