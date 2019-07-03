@@ -6,7 +6,6 @@ from pyDataverse.utils import dict_to_json
 from pyDataverse.utils import read_file_json
 from pyDataverse.utils import write_file_json
 
-
 """
 Data-structure to work with data and metadata of Dataverses, Datasets and
 Datafiles - coming from different sources.
@@ -16,7 +15,7 @@ Datafiles - coming from different sources.
 class Dataverse(object):
     """Base class for Dataverse data model."""
 
-    """Attributes required for Dataverse metadata json."""
+    """Class attributes required for Dataverse metadata json."""
     __attr_required_metadata = [
         'alias',
         'dataverseContacts',
@@ -322,11 +321,11 @@ class Dataverse(object):
 class Dataset(object):
     """Base class for the Dataset data model."""
 
-    """Attributes required for Dataset metadata json."""
+    """Class attributes required for Dataset metadata json."""
     __attr_required_metadata = [
-        'author',
-        'datasetContact',
-        'dsDescription',
+        'authorName',
+        'datasetContactEmail',
+        'dsDescriptionValue',
         'subject',
         'title'
     ]
@@ -355,6 +354,7 @@ class Dataset(object):
         'depositor',
         'distributionDate',
         'kindOfData',
+        'language',
         'notesText',
         'originOfSources',
         'otherReferences',
@@ -417,6 +417,14 @@ class Dataset(object):
                                'otherGeographicCoverage']
     }
 
+    __attr_valid_metadata_socialscience_pairs = [
+        'targetSampleActualSize',
+        'targetSampleSizeFormula',
+        'socialScienceNotesType',
+        'socialScienceNotesText',
+        'socialScienceNotesSubject'
+    ]
+
     """
     Dataset metadata attributes of Dataverse api upload inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'].
@@ -460,17 +468,42 @@ class Dataset(object):
                                'journalPubDate']
     }
 
+    """Attributes of displayName."""
+    __attr_displayName = [
+        'citation_displayName',
+        'geospatial_displayName',
+        'socialscience_displayName',
+        'journal_displayName',
+        'targetSampleActualSize'
+    ]
+
     """Attributes valid for Dataset class."""
     __attr_valid_class = [
         'datafiles'
     ] + __attr_valid_metadata_datasetVersion \
         + __attr_valid_metadata_citation_dicts \
-        + list(__attr_valid_metadata_citation_arrays.keys()) \
+        + __attr_valid_metadata_citation_arrays['author'] \
+        + __attr_valid_metadata_citation_arrays['contributor'] \
+        + __attr_valid_metadata_citation_arrays['dateOfCollection'] \
+        + __attr_valid_metadata_citation_arrays['datasetContact'] \
+        + __attr_valid_metadata_citation_arrays['distributor'] \
+        + __attr_valid_metadata_citation_arrays['dsDescription'] \
+        + __attr_valid_metadata_citation_arrays['grantNumber'] \
+        + __attr_valid_metadata_citation_arrays['keyword'] \
+        + __attr_valid_metadata_citation_arrays['producer'] \
+        + __attr_valid_metadata_citation_arrays['otherId'] \
+        + __attr_valid_metadata_citation_arrays['publication'] \
+        + __attr_valid_metadata_citation_arrays['software'] \
+        + __attr_valid_metadata_citation_arrays['timePeriodCovered'] \
+        + __attr_valid_metadata_citation_arrays['topicClassification'] \
         + __attr_valid_metadata_geospatial_dicts \
-        + list(__attr_valid_metadata_geospatial_arrays.keys()) \
+        + __attr_valid_metadata_geospatial_arrays['geographicBoundingBox'] \
+        + __attr_valid_metadata_geospatial_arrays['geographicCoverage'] \
         + __attr_valid_metadata_socialscience_dicts \
         + __attr_valid_metadata_journal_dicts \
-        + list(__attr_valid_metadata_journal_arrays.keys()) \
+        + __attr_valid_metadata_journal_arrays['journalVolumeIssue'] \
+        + __attr_displayName \
+        + __attr_valid_metadata_socialscience_pairs
 
     def __init__(self):
         """Init a Dataset() class.
@@ -596,7 +629,7 @@ class Dataset(object):
 
         """
         for key, val in data.items():
-            if key in self.__attr_valid_class or key == 'citation_displayName' or key == 'geospatial_displayName' or key == 'socialscience_displayName' or key == 'journal_displayName' or key == 'targetSampleActualSize' or key == 'targetSampleSizeFormula' or key == 'socialScienceNotesType' or key == 'socialScienceNotesText' or key == 'socialScienceNotesSubject':
+            if key in self.__attr_valid_class:
                 self.__setattr__(key, val)
             else:
                 # TODO: Raise Exception
@@ -1204,7 +1237,7 @@ class Datafile(object):
 
     """
 
-    """Attributes required for Datafile metadata json."""
+    """Class attributes required for Datafile metadata json."""
     __attr_required_metadata = [
         'filename',
         'pid'
