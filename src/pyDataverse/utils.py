@@ -166,7 +166,7 @@ def read_file_csv(filename):
         csvfile.close()
 
 
-def read_csv_to_dict(filename):
+def read_csv_to_dict(filename, delimiter=';', quotechar='"', encoding='utf-8'):
     """Read in csv file and convert it into a list of dicts.
 
     This offers an easy import functionality of csv files with dataset metadata.
@@ -183,6 +183,12 @@ def read_csv_to_dict(filename):
     ----------
     filename : string
         Filename with full path.
+    delimiter : string
+        Cell delimiter of CSV file. Defaults to ';'.
+    quotechar : string
+        Quote-character of CSV file. Defaults to '"'.
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     Returns
     -------
@@ -192,8 +198,9 @@ def read_csv_to_dict(filename):
         dataset metadata naming convention.
 
     """
-    reader = csv.DictReader(open(filename), 'r')
-    data = []
-    for row in reader:
-        data.append(dict(row))
+    with open(filename, 'r', newline='', encoding=encoding) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        data = []
+        for row in reader:
+            data.append(dict(row))
     return data
