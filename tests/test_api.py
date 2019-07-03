@@ -30,10 +30,11 @@ class TestApiConnect(object):
         assert api.native_api_base_url == '{0}/api/{1}'.format(
             os.environ['BASE_URL'], api.api_version)
         assert api.status == 'OK'
+        assert api.dataverse_version
 
     def test_api_connect_base_url_wrong(self):
         """Test api connection with wrong `base_url`."""
-        # wrong string
+        # wrong string as base_url
         with pytest.raises(ApiResponseError):
             base_url = 'http://wikipedia.org'
             api = Api(base_url)
@@ -44,8 +45,9 @@ class TestApiConnect(object):
             assert api.base_url == 'http://wikipedia.org'
             assert api.native_api_base_url == 'http://wikipedia.org/api/v1'
             assert api.status == 'ERROR'
+            assert api.dataverse_version == 'ERROR'
 
-        # None
+        # None as base_url
         with pytest.raises(ApiUrlError):
             base_url = None
             api = Api(base_url)
@@ -56,6 +58,7 @@ class TestApiConnect(object):
             assert not api.base_url
             assert not api.native_api_base_url
             assert api.status == 'ERROR'
+            assert api.dataverse_version == 'ERROR'
 
 
 class TestApiRequests(object):
