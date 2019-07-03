@@ -80,24 +80,6 @@ class Api(object):
                 api_version))
         self.api_version = api_version
 
-        try:
-            resp = self.get_info_version()
-            if 'data' in resp.json():
-                if 'version' in resp.json()['data']:
-                    self.dataverse_version = resp.json()['data']['version']
-                else:
-                    # TODO: raise exception
-                    self.dataverse_version = None
-                    print('Key not in response.')
-            else:
-                self.dataverse_version = None
-                # TODO: raise exception
-                print('Key not in response.')
-        except:
-            self.dataverse_version = 'ERROR'
-            # TODO: raise exception
-            print('Dataverse build version can not be retrieved.')
-
         if api_token:
             if not isinstance(api_token, ("".__class__, u"".__class__)):
                 raise ApiAuthorizationError(
@@ -130,6 +112,24 @@ class Api(object):
         else:
             self.status = 'ERROR'
             self.native_api_base_url = None
+
+        try:
+            resp = self.get_info_version()
+            if 'data' in resp.json().keys():
+                if 'version' in resp.json()['data'].keys():
+                    self.dataverse_version = resp.json()['data']['version']
+                else:
+                    # TODO: raise exception
+                    self.dataverse_version = None
+                    print('Key not in response.')
+            else:
+                self.dataverse_version = None
+                # TODO: raise exception
+                print('Key not in response.')
+        except:
+            self.dataverse_version = 'ERROR'
+            # TODO: raise exception
+            print('Dataverse build version can not be retrieved.')
 
     def __str__(self):
         """Return name of Api() class for users.
