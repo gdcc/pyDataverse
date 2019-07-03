@@ -19,7 +19,7 @@ import subprocess as sp
 
 
 class Api(object):
-    """API class.
+    """Api class.
 
     Parameters
     ----------
@@ -40,6 +40,7 @@ class Api(object):
     base_url
     api_token
     api_version
+    dataverse_version
 
     """
 
@@ -78,6 +79,24 @@ class Api(object):
             raise ApiUrlError('api_version {0} is not a string.'.format(
                 api_version))
         self.api_version = api_version
+
+        try:
+            resp = self.get_info_version()
+            if 'data' in resp.json():
+                if 'version' in resp.json()['data']:
+                    self.dataverse_version = resp.json()['data']['version']
+                else:
+                    # TODO: raise exception
+                    self.dataverse_version = None
+                    print('Key not in response.')
+            else:
+                self.dataverse_version = None
+                # TODO: raise exception
+                print('Key not in response.')
+        except:
+            self.dataverse_version = 'ERROR'
+            # TODO: raise exception
+            print('Dataverse build version can not be retrieved.')
 
         if api_token:
             if not isinstance(api_token, ("".__class__, u"".__class__)):
