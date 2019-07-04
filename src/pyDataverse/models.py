@@ -312,7 +312,7 @@ class Dataverse(object):
 
         """
         if format == 'dv_up':
-            return write_file_json(filename, self.dict())
+            return write_file_json(filename, self.dict(format=format))
         else:
             # TODO: Exception
             print('Data-format not right.')
@@ -1204,7 +1204,7 @@ class Dataset(object):
 
         """
         if format == 'dv_up':
-            return write_file_json(filename, self.dict())
+            return write_file_json(filename, self.dict(format=format))
         else:
             # TODO: Exception
             print('Data-format not right.')
