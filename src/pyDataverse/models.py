@@ -15,27 +15,37 @@ Datafiles - coming from different sources.
 class Dataverse(object):
     """Base class for Dataverse data model."""
 
-    """Class attributes required for Dataverse metadata json."""
-    __attr_required_metadata = [
-        'alias',
-        'dataverseContacts',
-        'name'
-    ]
-    """Attributes valid for Dataverse metadata json."""
-    __attr_valid_metadata = [
+    """Single values to be imported from `dv_up` file."""
+    __attr_import_dv_up_values = [
         'affiliation',
         'alias',
-        'dataverseContacts',
         'dataverseType',
         'description',
         'name'
     ]
-    """Attributes valid for Dataverse class."""
-    __attr_valid_class = [
+
+    """Arrays to be imported from `dv_up` file."""
+    __attr_import_dv_up_arrays = {
+        'dataverseContacts': ['contactEmail']
+    }
+
+    """Required attributes for valid `dv_up` metadata dict creation."""
+    __attr_dict_dv_up_required = [
+        'alias',
+        'contactEmail',
+        'name'
+    ]
+
+    """Valid attributes for `dv_up` metadata dict creation."""
+    __attr_dict_dv_up_valid = __attr_import_dv_up_values + \
+        __attr_import_dv_up_arrays['dataverseContacts']
+
+    """Valid attributes for `all` metadata dict creation."""
+    __attr_dict_all_valid = [
+        'pid'
         # 'datasets',
         # 'dataverses',
-        'pid'
-    ] + __attr_valid_metadata
+    ] + __attr_dict_dv_up_valid
 
     def __init__(self):
         """Init a Dataverse() class.
@@ -49,17 +59,17 @@ class Dataverse(object):
 
         """
         """Misc"""
+        self.datasets = None
+        self.dataverses = None
         self.pid = None
-        self.datasets = []
-        self.dataverses = []
 
         """Metadata"""
-        self.affiliation = None
-        self.alias = None
-        self.dataverseContacts = []
-        self.dataverseType = None
-        self.description = None
         self.name = None
+        self.alias = None
+        self.contactEmail = None
+        self.affiliation = None
+        self.description = None
+        self.dataverseType = None
 
     def __str__(self):
         """Return name of Dataverse() class for users."""
@@ -71,8 +81,8 @@ class Dataverse(object):
         Parameters
         ----------
         data : dict
-            Flat dict with data. Key's must be name the same as the class
-            attribute, the data should be mapped to.
+            Flat dict with data. All keys will be mapped to a similar called
+            attribute.
 
         Examples
         -------
@@ -81,21 +91,17 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'contactEmail': ['test@example.com'],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
             >>> dv.set(data)
-            >>> dv.name
-            'Test pyDataverse'
+            >>> dv.contactEmail
+            ['test@example.com']
 
         """
         for key, val in data.items():
-            if key in self.__attr_valid_class:
-                self.__setattr__(key, val)
-            else:
-                # TODO: Raise Exception
-                print('Key {0} not valid.'.format(key))
+            self.__setattr__(key, val)
 
     def import_metadata(self, filename, format='dv_up'):
         """Import Dataverse metadata from file.
@@ -118,7 +124,7 @@ class Dataverse(object):
 
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
-            >>> dv.import_metadata('tests/data/dataverse_min.json')
+            >>> dv.import_metadata('tests/data/dataverse_full.json')
             >>> dv.name
             'Test pyDataverse'
 
@@ -127,12 +133,20 @@ class Dataverse(object):
         if format == 'dv_up':
             metadata = read_file_json(filename)
             # get first level metadata and parse it automatically
-            for attr in self.__attr_valid_metadata:
+            for attr in self.__attr_import_dv_up_values:
                 if attr in metadata:
                     data[attr] = metadata[attr]
-            self.set(data)
-        elif format == 'dv_down':
-            metadata = read_file_json(filename)
+            for key, val in self.__attr_import_dv_up_arrays.items():
+                if key in metadata:
+                    for d in metadata[key]:
+                        for k, v in d.items():
+                            if k in val:
+                                if k in data:
+                                    print(d[k])
+                                    data[k].append(d[k])
+                                else:
+                                    data[k] = []
+            print(data)
             self.set(data)
         else:
             # TODO: Exception
@@ -141,7 +155,7 @@ class Dataverse(object):
     def is_valid(self):
         """Check if set attributes are valid for Dataverse api metadata creation.
 
-        The attributes required are listed in `__attr_required_metadata`.
+        The attributes required are listed in `__attr_dict_dv_up_required`.
 
         Returns
         -------
@@ -155,7 +169,7 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'contactEmail': ['test@example.com'],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -168,7 +182,7 @@ class Dataverse(object):
 
         """
         is_valid = True
-        for attr in self.__attr_required_metadata:
+        for attr in self.__attr_dict_dv_up_required:
             if not self.__getattribute__(attr):
                 is_valid = False
                 print('attribute \'{0}\' missing.'.format(attr))
@@ -183,8 +197,8 @@ class Dataverse(object):
         ----------
         format : string
             Data format for dict creation. Available formats are: `dv_up` with
-            all metadata for Dataverse api upload, and `all` with all attributes
-            set.
+            all metadata for Dataverse api upload, and `all` with all
+            attributes set.
 
         Returns
         -------
@@ -198,7 +212,7 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'contactEmail': ['test@example.com'],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -215,16 +229,21 @@ class Dataverse(object):
         data = {}
         if format == 'dv_up':
             if self.is_valid():
-                for attr in self.__attr_valid_metadata:
+                for attr in self.__attr_dict_dv_up_valid:
                     if self.__getattribute__(attr) is not None:
-                        data[attr] = self.__getattribute__(attr)
+                        if attr == 'contactEmail':
+                            data['dataverseContacts'] = []
+                            for email in self.__getattribute__(attr):
+                                data['dataverseContacts'].append({attr: email})
+                        else:
+                            data[attr] = self.__getattribute__(attr)
                 # TODO: prüfen, ob required attributes gesetzt sind = Exception
                 return data
             else:
-                print('dict can not be created. Data is not valid for format')
+                print('Dict can not be created. Data is not valid for format')
                 return None
         elif format == 'all':
-            for attr in self.__attr_valid_class:
+            for attr in self.__attr_dict_all_valid:
                 if self.__getattribute__(attr) is not None:
                     data[attr] = self.__getattribute__(attr)
             return data
@@ -255,7 +274,7 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'contactEmail': ['test@example.com'],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -269,18 +288,14 @@ class Dataverse(object):
         Validate standards.
 
         """
-        if format == 'dv_up':
-            data = self.dict('dv_up')
+        if format == 'dv_up' or format == 'all':
+            data = self.dict(format=format)
             if data:
                 return dict_to_json(data)
             else:
                 return None
-        elif format == 'all':
-            data = self.dict('all')
-            if data:
-                return dict_to_json(data)
-            else:
-                return None
+                # TODO Exception
+                print('JSON data can not be read in.')
         else:
             # TODO Exception
             print('data format not valid.')

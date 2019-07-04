@@ -15,20 +15,18 @@ class TestDataverse(object):
         """Test Dataverse.__init__()."""
         dv = Dataverse()
 
-        assert isinstance(dv.datasets, list)
-        assert len(dv.datasets) == 0
-        assert isinstance(dv.dataverses, list)
-        assert len(dv.dataverses) == 0
+        assert not dv.datasets
+        assert not dv.dataverses
         assert not dv.pid
         assert not dv.name
         assert not dv.alias
-        assert isinstance(dv.dataverseContacts, list)
-        assert len(dv.dataverseContacts) == 0
+        assert not dv.contactEmail
         assert not dv.affiliation
         assert not dv.description
         assert not dv.dataverseType
 
-    def test_dataverse_set_dv_up(self, import_dataverse_min_dict):
+    def test_dataverse_set_dv_up(self, import_dataverse_min_dict,
+                                 import_dataverse_full_dict):
         """Test Dataverse.set() with format=`dv_up`.
 
         Parameters
@@ -42,54 +40,75 @@ class TestDataverse(object):
         dv = Dataverse()
         dv.set(data)
 
-        assert isinstance(dv.datasets, list)
         assert not dv.datasets
-        assert isinstance(dv.dataverses, list)
         assert not dv.dataverses
         assert not dv.pid
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
-        assert len(dv.dataverseContacts) == 1
-        assert dv.dataverseContacts[0]['contactEmail'] == 'info@aussda.at'
+        assert len(dv.contactEmail) == 1
+        assert dv.contactEmail[0] == 'info@aussda.at'
+
+        data = import_dataverse_full_dict
+        dv = Dataverse()
+        dv.set(data)
+
+        assert not dv.datasets
+        assert not dv.dataverses
+        assert not dv.pid
+        assert dv.alias == 'science'
+        assert dv.name == 'Scientific Research'
+        assert dv.affiliation == 'Scientific Research University'
+        assert dv.description == 'We do all the science.'
+        assert dv.dataverseType == 'LABORATORY'
+        assert len(dv.contactEmail) == 2
+        assert dv.contactEmail[0] == 'pi@example.edu'
+        assert dv.contactEmail[1] == 'student@example.edu'
 
     def test_dataverse_import_metadata_dv_up(self):
         """Test Dataverse.import_metadata() with format=`dv_up`."""
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_min.json')
 
-        assert isinstance(dv.datasets, list)
         assert not dv.datasets
-        assert isinstance(dv.dataverses, list)
         assert not dv.dataverses
         assert not dv.pid
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
-        assert isinstance(dv.dataverseContacts, list)
-        assert len(dv.dataverseContacts) == 1
-        assert dv.dataverseContacts[0]['contactEmail'] == 'info@aussda.at'
+        assert len(dv.contactEmail) == 1
+        assert dv.contactEmail[0] == 'info@aussda.at'
+
+        dv = Dataverse()
+        dv.import_metadata(TEST_DIR + '/data/dataverse_full.json')
+
+        assert not dv.datasets
+        assert not dv.dataverses
+        assert not dv.pid
+        assert dv.alias == 'science'
+        assert dv.name == 'Scientific Research'
+        assert dv.affiliation == 'Scientific Research University'
+        assert dv.description == 'We do all the science.'
+        assert dv.dataverseType == 'LABORATORY'
+        assert len(dv.contactEmail) == 2
+        assert dv.contactEmail[0] == 'pi@example.edu'
+        assert dv.contactEmail[1] == 'student@example.edu'
 
     def test_dataverse_import_metadata_format_wrong(self):
         """Test Dataverse.import_metadata() with non-valid format."""
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_min.json', 'wrong')
 
-        assert isinstance(dv.datasets, list)
-        assert len(dv.datasets) == 0
         assert not dv.datasets
-        assert isinstance(dv.dataverses, list)
-        assert len(dv.dataverses) == 0
         assert not dv.dataverses
         assert not dv.pid
         assert not dv.name
         assert not dv.alias
-        assert isinstance(dv.dataverseContacts, list)
-        assert len(dv.dataverseContacts) == 0
-        assert not dv.dataverseContacts
+        assert not dv.contactEmail
         assert not dv.affiliation
         assert not dv.description
         assert not dv.dataverseType
 
-    def test_dataverse_is_valid_valid(self, import_dataverse_min_dict):
+    def test_dataverse_is_valid_valid(self, import_dataverse_min_dict,
+                                      import_dataverse_full_dict):
         """Test Dataverse.is_valid() with valid data.
 
         Parameters
@@ -102,7 +121,11 @@ class TestDataverse(object):
         data = import_dataverse_min_dict
         dv = Dataverse()
         dv.set(data)
+        assert dv.is_valid()
 
+        data = import_dataverse_full_dict
+        dv = Dataverse()
+        dv.set(data)
         assert dv.is_valid()
 
     def test_dataverse_is_valid_not(self, import_dataverse_min_dict):
@@ -116,14 +139,20 @@ class TestDataverse(object):
 
         """
         data = import_dataverse_min_dict
-        dv = Dataverse()
-        dv.set(data)
-        dv.name = None
+        attr_required = [
+            'alias',
+            'contactEmail',
+            'name'
+        ]
+        for attr in attr_required:
+            dv = Dataverse()
+            dv.set(data)
+            dv.set({attr: None})
+            assert not hasattr(dv, attr)
+            assert not dv.is_valid()
 
-        assert not dv.name
-        assert not dv.is_valid()
-
-    def test_dataverse_dict_dv_up_valid(self, import_dataverse_min_dict):
+    def test_dataverse_dict_dv_up_valid(self, import_dataverse_min_dict,
+                                        import_dataverse_full_dict):
         """Test Dataverse.dict() with format=`dv_up` and valid data.
 
         Parameters
@@ -140,6 +169,13 @@ class TestDataverse(object):
         assert dv.dict()
         assert isinstance(dv.dict(), dict)
 
+        data = import_dataverse_full_dict
+        dv = Dataverse()
+        dv.set(data)
+
+        assert dv.dict()
+        assert isinstance(dv.dict(), dict)
+
     def test_dataverse_dict_all_valid(self, import_dataverse_min_dict):
         """Test Dataverse.dict() with format=`all` and valid data.
 
@@ -150,20 +186,40 @@ class TestDataverse(object):
             `tests/data/dataverse_min.json`.
 
         """
+
         data = import_dataverse_min_dict
         dv = Dataverse()
         dv.set(data)
-        dv.datasets = [Dataset()]
-        dv.dataverses = [Dataverse()]
-        dv.pid = 'doi:10.11587/EVMUHP'
+        dv.set({
+            'datasets': [Dataset()],
+            'dataverses': [Dataverse()],
+            'pid': 'doi:10.11587/EVMUHP'
+        })
         data = dv.dict('all')
 
         assert data
         assert isinstance(data, dict)
+        assert len(data['datasets']) == 1
+        assert len(data['dataverses']) == 1
+        assert data['pid'] == 'doi:10.11587/EVMUHP'
         assert data['alias'] == 'test-pyDataverse'
         assert data['name'] == 'Test pyDataverse'
-        assert data['dataverseContacts'][0]['contactEmail'] == 'info@aussda.at'
-        assert data['pid'] == 'doi:10.11587/EVMUHP'
+        assert len(data['contactEmail']) == 1
+        assert data['contactEmail'][0] == 'info@aussda.at'
+
+        assert data
+        assert isinstance(data, dict)
+        assert not data['datasets']
+        assert not data['dataverses']
+        assert not data['pid']
+        assert data['alias'] == 'science'
+        assert data['name'] == 'Scientific Research'
+        assert data['affiliation'] == 'Scientific Research University'
+        assert data['description'] == 'We do all the science.'
+        assert data['dataverseType'] == 'LABORATORY'
+        assert len(data['contactEmail']) == 2
+        assert data['contactEmail'][0] == 'pi@example.edu'
+        assert data['contactEmail'][1] == 'student@example.edu'
 
     def test_dataverse_dict_format_wrong(self, import_dataverse_min_dict):
         """Test Dataverse.dict() with non-valid format.

@@ -133,8 +133,33 @@ def import_dataverse_min_dict():
         Minimum Dataverse metadata.
 
     """
-    return read_json(TEST_DIR + '/data/dataverse_min.json')
+    data = {
+        'alias': 'test-pyDataverse',
+        'name': 'Test pyDataverse',
+        'contactEmail': ['info@aussda.at']
+    }
+    return data
 
+
+@pytest.fixture
+def import_dataverse_full_dict():
+    """Import full Dataverse dict.
+
+    Returns
+    -------
+    dict
+        Full Dataverse metadata.
+
+    """
+    data = {
+        'name': 'Scientific Research',
+        'alias': 'science',
+        'contactEmail': ['pi@example.edu', 'student@example.edu'],
+        'affiliation': 'Scientific Research University',
+        'description': 'We do all the science.',
+        'dataverseType': 'LABORATORY'
+    }
+    return data
 
 @pytest.fixture
 def import_dataset_min_dict():
