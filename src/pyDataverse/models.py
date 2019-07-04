@@ -141,12 +141,9 @@ class Dataverse(object):
                     for d in metadata[key]:
                         for k, v in d.items():
                             if k in val:
-                                if k in data:
-                                    print(d[k])
-                                    data[k].append(d[k])
-                                else:
+                                if k not in data:
                                     data[k] = []
-            print(data)
+                                data[k].append(d[k])
             self.set(data)
         else:
             # TODO: Exception

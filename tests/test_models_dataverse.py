@@ -74,8 +74,8 @@ class TestDataverse(object):
         assert not dv.pid
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
-        assert len(dv.contactEmail) == 1
         assert dv.contactEmail[0] == 'info@aussda.at'
+        assert len(dv.contactEmail) == 1
 
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_full.json')
@@ -138,17 +138,16 @@ class TestDataverse(object):
             `tests/data/dataverse_min.json`.
 
         """
-        data = import_dataverse_min_dict
         attr_required = [
             'alias',
             'contactEmail',
             'name'
         ]
         for attr in attr_required:
+            data = import_dataverse_min_dict
             dv = Dataverse()
+            del data[attr]
             dv.set(data)
-            dv.set({attr: None})
-            assert not hasattr(dv, attr)
             assert not dv.is_valid()
 
     def test_dataverse_dict_dv_up_valid(self, import_dataverse_min_dict,
@@ -176,7 +175,8 @@ class TestDataverse(object):
         assert dv.dict()
         assert isinstance(dv.dict(), dict)
 
-    def test_dataverse_dict_all_valid(self, import_dataverse_min_dict):
+    def test_dataverse_dict_all_valid(self, import_dataverse_min_dict,
+                                      import_dataverse_full_dict):
         """Test Dataverse.dict() with format=`all` and valid data.
 
         Parameters
@@ -191,27 +191,29 @@ class TestDataverse(object):
         dv = Dataverse()
         dv.set(data)
         dv.set({
-            'datasets': [Dataset()],
-            'dataverses': [Dataverse()],
             'pid': 'doi:10.11587/EVMUHP'
         })
         data = dv.dict('all')
 
         assert data
         assert isinstance(data, dict)
-        assert len(data['datasets']) == 1
-        assert len(data['dataverses']) == 1
         assert data['pid'] == 'doi:10.11587/EVMUHP'
         assert data['alias'] == 'test-pyDataverse'
         assert data['name'] == 'Test pyDataverse'
         assert len(data['contactEmail']) == 1
         assert data['contactEmail'][0] == 'info@aussda.at'
 
+        data = import_dataverse_full_dict
+        dv = Dataverse()
+        dv.set(data)
+        dv.set({
+            'pid': 'doi:10.11587/EVMUHP'
+        })
+        data = dv.dict('all')
+
         assert data
         assert isinstance(data, dict)
-        assert not data['datasets']
-        assert not data['dataverses']
-        assert not data['pid']
+        assert data['pid'] == 'doi:10.11587/EVMUHP'
         assert data['alias'] == 'science'
         assert data['name'] == 'Scientific Research'
         assert data['affiliation'] == 'Scientific Research University'
