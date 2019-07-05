@@ -22,8 +22,6 @@ matrix:
       env: TOXENV=coveralls
     - python: 3.6
       env: TOXENV=packaging
-    - python: 3.6
-      env: TOXENV=dist
 
 branches:
   only:
