@@ -58,18 +58,8 @@ class Dataverse(object):
             >>> dv = Dataverse()
 
         """
-        """Misc"""
-        self.datasets = None
-        self.dataverses = None
-        self.pid = None
-
-        """Metadata"""
-        self.name = None
-        self.alias = None
-        self.contactEmail = None
-        self.affiliation = None
-        self.description = None
-        self.dataverseType = None
+        for attr in self.__attr_dict_all_valid:
+            self.__setattr__(attr, None)
 
     def __str__(self):
         """Return name of Dataverse() class for users."""
