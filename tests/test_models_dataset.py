@@ -14,114 +14,8 @@ class TestDataset(object):
         """Test Dataset.__init__()."""
         ds = Dataset()
 
-        assert isinstance(ds.datafiles, list)
-        assert len(ds.datafiles) == 0
-
-        """Metadata: dataset"""
-        assert not ds.license
-        assert not ds.termsOfUse
-        assert not ds.termsOfAccess
-
-        """Metadata: citation"""
-        assert not ds.citation_displayName
-        assert not ds.title
-        assert not ds.subtitle
-        assert not ds.alternativeTitle
-        assert not ds.alternativeURL
-        assert isinstance(ds.otherId, list)
-        assert len(ds.otherId) == 0
-        assert isinstance(ds.author, list)
-        assert len(ds.author) == 0
-        assert isinstance(ds.datasetContact, list)
-        assert len(ds.datasetContact) == 0
-        assert isinstance(ds.dsDescription, list)
-        assert len(ds.dsDescription) == 0
-        assert isinstance(ds.subject, list)
-        assert len(ds.subject) == 0
-        assert isinstance(ds.subject, list)
-        assert len(ds.subject) == 0
-        assert isinstance(ds.topicClassification, list)
-        assert len(ds.topicClassification) == 0
-        assert isinstance(ds.publication, list)
-        assert len(ds.publication) == 0
-        assert not ds.notesText
-        assert isinstance(ds.producer, list)
-        assert len(ds.producer) == 0
-        assert not ds.productionDate
-        assert not ds.productionPlace
-        assert isinstance(ds.contributor, list)
-        assert len(ds.contributor) == 0
-        assert isinstance(ds.grantNumber, list)
-        assert len(ds.grantNumber) == 0
-        assert isinstance(ds.distributor, list)
-        assert len(ds.distributor) == 0
-        assert not ds.distributionDate
-        assert not ds.depositor
-        assert not ds.dateOfDeposit
-        assert isinstance(ds.timePeriodCovered, list)
-        assert len(ds.timePeriodCovered) == 0
-        assert isinstance(ds.dateOfCollection, list)
-        assert len(ds.dateOfCollection) == 0
-        assert isinstance(ds.kindOfData, list)
-        assert len(ds.kindOfData) == 0
-        assert not ds.seriesName
-        assert not ds.seriesInformation
-        assert isinstance(ds.software, list)
-        assert len(ds.software) == 0
-        assert isinstance(ds.relatedMaterial, list)
-        assert len(ds.relatedMaterial) == 0
-        assert isinstance(ds.relatedDatasets, list)
-        assert len(ds.relatedDatasets) == 0
-        assert isinstance(ds.otherReferences, list)
-        assert len(ds.otherReferences) == 0
-        assert isinstance(ds.dataSources, list)
-        assert len(ds.dataSources) == 0
-        assert not ds.originOfSources
-        assert not ds.characteristicOfSources
-        assert not ds.accessToSources
-
-        """Metadata: geospatial"""
-        assert not ds.geospatial_displayName
-        assert isinstance(ds.geographicCoverage, list)
-        assert len(ds.geographicCoverage) == 0
-        assert not ds.geographicUnit
-        assert isinstance(ds.geographicBoundingBox, list)
-        assert len(ds.geographicBoundingBox) == 0
-
-        """Metadata: socialscience"""
-        assert not ds.socialscience_displayName
-        assert isinstance(ds.unitOfAnalysis, list)
-        assert len(ds.unitOfAnalysis) == 0
-        assert isinstance(ds.universe, list)
-        assert len(ds.universe) == 0
-        assert not ds.timeMethod
-        assert not ds.dataCollector
-        assert not ds.collectorTraining
-        assert not ds.frequencyOfDataCollection
-        assert not ds.samplingProcedure
-        assert not ds.targetSampleActualSize
-        assert not ds.targetSampleSizeFormula
-        assert not ds.socialScienceNotesType
-        assert not ds.socialScienceNotesSubject
-        assert not ds.socialScienceNotesText
-        assert not ds.deviationsFromSampleDesign
-        assert not ds.collectionMode
-        assert not ds.researchInstrument
-        assert not ds.dataCollectionSituation
-        assert not ds.actionsToMinimizeLoss
-        assert not ds.controlOperations
-        assert not ds.weighting
-        assert not ds.cleaningOperations
-        assert not ds.datasetLevelErrorNotes
-        assert not ds.responseRate
-        assert not ds.samplingErrorEstimates
-        assert not ds.otherDataAppraisal
-
-        """Metadata: journal"""
-        assert not ds.journal_displayName
-        assert isinstance(ds.journalVolumeIssue, list)
-        assert len(ds.journalVolumeIssue) == 0
-        assert not ds.journalArticleType
+        assert isinstance(ds, Dataset)
+        assert len(ds.__dict__.keys()) == 0
 
     def test_dataset_set_dv_up(self, import_dataset_min_dict):
         """Test Dataset.set() with format=`dv_up`.
@@ -136,14 +30,12 @@ class TestDataset(object):
         data = import_dataset_min_dict
         ds.set(data)
 
-        """dataset"""
         assert ds.license == 'CC0'
         assert ds.termsOfUse == 'CC0 Waiver'
         assert ds.termsOfAccess == 'Terms of Access'
-
-        """citation"""
         assert ds.citation_displayName == 'Citation Metadata'
         assert ds.title == 'Replication Data for: Title'
+        assert len(ds.__dict__.keys()) == 5
 
     def test_dataset_is_valid_valid(self):
         """Test Dataset.is_valid() with valid data."""
@@ -165,12 +57,9 @@ class TestDataset(object):
         ds = Dataset()
         ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
 
-        """dataset"""
         assert ds.license == 'CC0'
         assert ds.termsOfUse == 'CC0 Waiver'
         assert ds.termsOfAccess == 'Terms of Access'
-
-        """citation"""
         assert ds.citation_displayName == 'Citation Metadata'
         assert ds.title == 'Replication Data for: Title'
         assert ds.subtitle == 'Subtitle'
@@ -181,6 +70,7 @@ class TestDataset(object):
         for d in ds.otherId:
             assert d['otherIdAgency'] in ['OtherIDAgency1']
             assert d['otherIdValue'] in ['OtherIDIdentifier1']
+            assert len(d.keys()) == 2
         assert isinstance(ds.author, list)
         assert len(ds.author) == 1
         for d in ds.author:
@@ -188,17 +78,20 @@ class TestDataset(object):
             assert d['authorAffiliation'] in ['AuthorAffiliation1']
             assert d['authorIdentifierScheme'] in ['ORCID']
             assert d['authorIdentifier'] in ['AuthorIdentifier1']
+            assert len(d.keys()) == 4
         assert isinstance(ds.datasetContact, list)
         assert len(ds.datasetContact) == 1
         for d in ds.datasetContact:
             assert d['datasetContactName'] in ['LastContact1, FirstContact1']
             assert d['datasetContactAffiliation'] in ['ContactAffiliation1']
             assert d['datasetContactEmail'] in ['ContactEmail1@mailinator.com']
+            assert len(d.keys()) == 3
         assert isinstance(ds.dsDescription, list)
         assert len(ds.dsDescription) == 1
         for d in ds.dsDescription:
             assert d['dsDescriptionValue'] in ['DescriptionText2']
             assert d['dsDescriptionDate'] in ['1000-02-02']
+            assert len(d.keys()) == 2
         assert ds.subject == ['Agricultural Sciences',
                               'Business and Management', 'Engineering', 'Law']
         assert isinstance(ds.keyword, list)
@@ -207,11 +100,13 @@ class TestDataset(object):
             assert d['keywordValue'] in ['KeywordTerm1']
             assert d['keywordVocabulary'] in ['KeywordVocabulary1']
             assert d['keywordVocabularyURI'] in ['http://KeywordVocabularyURL1.org']
+            assert len(d.keys()) == 3
         assert isinstance(ds.topicClassification, list)
         assert len(ds.topicClassification) == 1
         for d in ds.topicClassification:
             assert d['topicClassValue'] in ['Topic Class Value1']
             assert d['topicClassVocab'] in ['Topic Classification Vocabulary']
+            assert len(d.keys()) == 2
         assert isinstance(ds.publication, list)
         assert len(ds.publication) == 1
         for d in ds.publication:
@@ -219,6 +114,7 @@ class TestDataset(object):
             assert d['publicationIDType'] in ['ark']
             assert d['publicationIDNumber'] in ['RelatedPublicationIDNumber1']
             assert d['publicationURL'] in ['http://RelatedPublicationURL1.org']
+            assert len(d.keys()) == 4
         assert ds.notesText == 'Notes1'
         assert isinstance(ds.producer, list)
         assert len(ds.producer) == 1
@@ -228,6 +124,7 @@ class TestDataset(object):
             assert d['producerAbbreviation'] in ['ProducerAbbreviation1']
             assert d['producerURL'] in ['http://ProducerURL1.org']
             assert d['producerLogoURL'] in ['http://ProducerLogoURL1.org']
+            assert len(d.keys()) == 5
         assert ds.productionDate == '1003-01-01'
         assert ds.productionPlace == 'ProductionPlace'
         assert isinstance(ds.contributor, list)
@@ -235,11 +132,13 @@ class TestDataset(object):
         for d in ds.contributor:
             assert d['contributorType'] in ['Data Collector']
             assert d['contributorName'] in ['LastContributor1, FirstContributor1']
+            assert len(d.keys()) == 2
         assert isinstance(ds.grantNumber, list)
         assert len(ds.grantNumber) == 1
         for d in ds.grantNumber:
             assert d['grantNumberAgency'] in ['GrantInformationGrantAgency1']
             assert d['grantNumberValue'] in ['GrantInformationGrantNumber1']
+            assert len(d.keys()) == 2
         assert isinstance(ds.distributor, list)
         assert len(ds.distributor) == 1
         for d in ds.distributor:
@@ -248,6 +147,7 @@ class TestDataset(object):
             assert d['distributorAbbreviation'] in ['DistributorAbbreviation1']
             assert d['distributorURL'] in ['http://DistributorURL1.org']
             assert d['distributorLogoURL'] in ['http://DistributorLogoURL1.org']
+            assert len(d.keys()) == 5
         assert ds.distributionDate == '1004-01-01'
         assert ds.depositor == 'LastDepositor, FirstDepositor'
         assert ds.dateOfDeposit == '1002-01-01'
@@ -256,19 +156,23 @@ class TestDataset(object):
         for d in ds.timePeriodCovered:
             assert d['timePeriodCoveredStart'] in ['1005-01-01']
             assert d['timePeriodCoveredEnd'] in ['1005-01-02']
+            assert len(d.keys()) == 2
         assert isinstance(ds.dateOfCollection, list)
         assert len(ds.dateOfCollection) == 1
         for d in ds.dateOfCollection:
             assert d['dateOfCollectionStart'] in ['1006-01-01']
             assert d['dateOfCollectionEnd'] in ['1006-01-01']
+            assert len(d.keys()) == 2
         assert ds.kindOfData == ['KindOfData1', 'KindOfData2']
-        assert ds.seriesName == 'SeriesName'
-        assert ds.seriesInformation == 'SeriesInformation'
+        assert isinstance(ds.series, dict)
+        assert ds.series['seriesName'] == 'SeriesName'
+        assert ds.series['seriesInformation'] == 'SeriesInformation'
         assert isinstance(ds.software, list)
         assert len(ds.software) == 1
         for d in ds.software:
             assert d['softwareName'] in ['SoftwareName1']
             assert d['softwareVersion'] in ['SoftwareVersion1']
+            assert len(d.keys()) == 2
         assert ds.relatedMaterial == ['RelatedMaterial1', 'RelatedMaterial2']
         assert ds.relatedDatasets == ['RelatedDatasets1', 'RelatedDatasets2']
         assert ds.otherReferences == ['OtherReferences1', 'OtherReferences2']
@@ -286,6 +190,7 @@ class TestDataset(object):
             assert d['state'] in ['GeographicCoverageStateProvince1']
             assert d['city'] in ['GeographicCoverageCity1']
             assert d['otherGeographicCoverage'] in ['GeographicCoverageOther1']
+            assert len(d.keys()) == 4
         assert ds.geographicUnit == ['GeographicUnit1', 'GeographicUnit2']
         assert isinstance(ds.geographicBoundingBox, list)
         assert len(ds.geographicBoundingBox) == 1
@@ -294,6 +199,7 @@ class TestDataset(object):
             assert d['eastLongitude'] in ['20']
             assert d['northLongitude'] in ['30']
             assert d['southLongitude'] in ['40']
+            assert len(d.keys()) == 4
 
         """socialscience"""
         assert ds.socialscience_displayName == 'Social Science and Humanities Metadata'
@@ -304,8 +210,9 @@ class TestDataset(object):
         assert ds.collectorTraining == 'CollectorTraining'
         assert ds.frequencyOfDataCollection == 'Frequency'
         assert ds.samplingProcedure == 'SamplingProcedure'
-        assert ds.targetSampleActualSize == '100'
-        assert ds.targetSampleSizeFormula == 'TargetSampleSizeFormula'
+        assert isinstance(ds.targetSampleSize, dict)
+        assert ds.targetSampleSize['targetSampleActualSize'] == '100'
+        assert ds.targetSampleSize['targetSampleSizeFormula'] == 'TargetSampleSizeFormula'
         assert ds.deviationsFromSampleDesign == 'MajorDeviationsForSampleDesign'
         assert ds.collectionMode == 'CollectionMode'
         assert ds.researchInstrument == 'TypeOfResearchInstrument'
@@ -318,9 +225,10 @@ class TestDataset(object):
         assert ds.responseRate == 'ResponseRate'
         assert ds.samplingErrorEstimates == 'EstimatesOfSamplingError'
         assert ds.otherDataAppraisal == 'OtherFormsOfDataAppraisal'
-        assert ds.socialScienceNotesType == 'NotesType'
-        assert ds.socialScienceNotesSubject == 'NotesSubject'
-        assert ds.socialScienceNotesText == 'NotesText'
+        assert ds.socialScienceNotes['socialScienceNotesType'] == 'NotesType'
+        assert isinstance(ds.socialScienceNotes, dict)
+        assert ds.socialScienceNotes['socialScienceNotesSubject'] == 'NotesSubject'
+        assert ds.socialScienceNotes['socialScienceNotesText'] == 'NotesText'
 
         """journal"""
         assert ds.journal_displayName == 'Journal Metadata'
@@ -330,118 +238,15 @@ class TestDataset(object):
             assert d['journalVolume'] in ['JournalVolume1']
             assert d['journalIssue'] in ['JournalIssue1']
             assert d['journalPubDate'] in ['1008-01-01']
+            assert len(d.keys()) == 3
         assert ds.journalArticleType == 'abstract'
+
+        print(list(ds.__dict__.keys()))
+        assert len(ds.__dict__.keys()) == 67
 
     def test_dataset_import_metadata_format_wrong(self):
         """Test Dataset.import_metadata() with non-valid format."""
         ds = Dataset()
         ds.import_metadata(TEST_DIR + '/data/dataset_full.json', 'wrong')
 
-        assert isinstance(ds.datafiles, list)
-        assert len(ds.datafiles) == 0
-
-        """Metadata: dataset"""
-        assert not ds.license
-        assert not ds.termsOfUse
-        assert not ds.termsOfAccess
-
-        """Metadata: citation"""
-        assert not ds.citation_displayName
-        assert not ds.title
-        assert not ds.subtitle
-        assert not ds.alternativeTitle
-        assert not ds.alternativeURL
-        assert isinstance(ds.otherId, list)
-        assert len(ds.otherId) == 0
-        assert isinstance(ds.author, list)
-        assert len(ds.author) == 0
-        assert isinstance(ds.datasetContact, list)
-        assert len(ds.datasetContact) == 0
-        assert isinstance(ds.dsDescription, list)
-        assert len(ds.dsDescription) == 0
-        assert isinstance(ds.subject, list)
-        assert len(ds.subject) == 0
-        assert isinstance(ds.subject, list)
-        assert len(ds.subject) == 0
-        assert isinstance(ds.topicClassification, list)
-        assert len(ds.topicClassification) == 0
-        assert isinstance(ds.publication, list)
-        assert len(ds.publication) == 0
-        assert not ds.notesText
-        assert isinstance(ds.producer, list)
-        assert len(ds.producer) == 0
-        assert not ds.productionDate
-        assert not ds.productionPlace
-        assert isinstance(ds.contributor, list)
-        assert len(ds.contributor) == 0
-        assert isinstance(ds.grantNumber, list)
-        assert len(ds.grantNumber) == 0
-        assert isinstance(ds.distributor, list)
-        assert len(ds.distributor) == 0
-        assert not ds.distributionDate
-        assert not ds.depositor
-        assert not ds.dateOfDeposit
-        assert isinstance(ds.timePeriodCovered, list)
-        assert len(ds.timePeriodCovered) == 0
-        assert isinstance(ds.dateOfCollection, list)
-        assert len(ds.dateOfCollection) == 0
-        assert isinstance(ds.kindOfData, list)
-        assert len(ds.kindOfData) == 0
-        assert not ds.seriesName
-        assert not ds.seriesInformation
-        assert isinstance(ds.software, list)
-        assert len(ds.software) == 0
-        assert isinstance(ds.relatedMaterial, list)
-        assert len(ds.relatedMaterial) == 0
-        assert isinstance(ds.relatedDatasets, list)
-        assert len(ds.relatedDatasets) == 0
-        assert isinstance(ds.otherReferences, list)
-        assert len(ds.otherReferences) == 0
-        assert isinstance(ds.dataSources, list)
-        assert len(ds.dataSources) == 0
-        assert not ds.originOfSources
-        assert not ds.characteristicOfSources
-        assert not ds.accessToSources
-
-        """Metadata: geospatial"""
-        assert not ds.geospatial_displayName
-        assert isinstance(ds.geographicCoverage, list)
-        assert len(ds.geographicCoverage) == 0
-        assert not ds.geographicUnit
-        assert isinstance(ds.geographicBoundingBox, list)
-        assert len(ds.geographicBoundingBox) == 0
-
-        """Metadata: socialscience"""
-        assert not ds.socialscience_displayName
-        assert isinstance(ds.unitOfAnalysis, list)
-        assert len(ds.unitOfAnalysis) == 0
-        assert isinstance(ds.universe, list)
-        assert len(ds.universe) == 0
-        assert not ds.timeMethod
-        assert not ds.dataCollector
-        assert not ds.collectorTraining
-        assert not ds.frequencyOfDataCollection
-        assert not ds.samplingProcedure
-        assert not ds.targetSampleActualSize
-        assert not ds.targetSampleSizeFormula
-        assert not ds.socialScienceNotesType
-        assert not ds.socialScienceNotesSubject
-        assert not ds.socialScienceNotesText
-        assert not ds.deviationsFromSampleDesign
-        assert not ds.collectionMode
-        assert not ds.researchInstrument
-        assert not ds.dataCollectionSituation
-        assert not ds.actionsToMinimizeLoss
-        assert not ds.controlOperations
-        assert not ds.weighting
-        assert not ds.cleaningOperations
-        assert not ds.datasetLevelErrorNotes
-        assert not ds.responseRate
-        assert not ds.samplingErrorEstimates
-        assert not ds.otherDataAppraisal
-
-        """Metadata: journal"""
-        assert not ds.journal_displayName
-        assert isinstance(ds.journalVolumeIssue, list)
-        assert len(ds.journalVolumeIssue) == 0
-        assert not ds.journalArticleType
+        assert len(ds.__dict__.keys()) == 0

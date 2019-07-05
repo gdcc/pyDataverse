@@ -136,7 +136,9 @@ def import_dataverse_min_dict():
     data = {
         'alias': 'test-pyDataverse',
         'name': 'Test pyDataverse',
-        'contactEmail': ['info@aussda.at']
+        'dataverseContacts': [
+            {'contactEmail': 'info@aussda.at'}
+        ]
     }
     return data
 
@@ -154,7 +156,10 @@ def import_dataverse_full_dict():
     data = {
         'name': 'Scientific Research',
         'alias': 'science',
-        'contactEmail': ['pi@example.edu', 'student@example.edu'],
+        'dataverseContacts': [
+            {'contactEmail': 'pi@example.edu'},
+            {'contactEmail': 'student@example.edu'}
+        ],
         'affiliation': 'Scientific Research University',
         'description': 'We do all the science.',
         'dataverseType': 'LABORATORY'

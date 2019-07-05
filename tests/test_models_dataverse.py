@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """Dataverse data model tests."""
 import os
-from pyDataverse.models import Dataset
 from pyDataverse.models import Dataverse
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -15,6 +14,7 @@ class TestDataverse(object):
         """Test Dataverse.__init__()."""
         dv = Dataverse()
 
+        assert isinstance(dv, Dataverse)
         assert len(dv.__dict__.keys()) == 0
 
     def test_dataverse_set_dv_up(self, import_dataverse_min_dict,
@@ -34,8 +34,9 @@ class TestDataverse(object):
 
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
-        assert len(dv.contactEmail) == 1
-        assert dv.contactEmail[0] == 'info@aussda.at'
+        assert isinstance(dv.dataverseContacts, list)
+        assert len(dv.dataverseContacts) == 1
+        assert dv.dataverseContacts[0]['contactEmail'] == 'info@aussda.at'
         assert len(dv.__dict__.keys()) == 3
 
         data = import_dataverse_full_dict
@@ -47,9 +48,10 @@ class TestDataverse(object):
         assert dv.affiliation == 'Scientific Research University'
         assert dv.description == 'We do all the science.'
         assert dv.dataverseType == 'LABORATORY'
-        assert len(dv.contactEmail) == 2
-        assert dv.contactEmail[0] == 'pi@example.edu'
-        assert dv.contactEmail[1] == 'student@example.edu'
+        assert isinstance(dv.dataverseContacts, list)
+        assert len(dv.dataverseContacts) == 2
+        assert dv.dataverseContacts[0]['contactEmail'] == 'pi@example.edu'
+        assert dv.dataverseContacts[1]['contactEmail'] == 'student@example.edu'
         assert len(dv.__dict__.keys()) == 6
 
     def test_dataverse_import_metadata_dv_up(self):
@@ -59,8 +61,8 @@ class TestDataverse(object):
 
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
-        assert dv.contactEmail[0] == 'info@aussda.at'
-        assert len(dv.contactEmail) == 1
+        assert len(dv.dataverseContacts) == 1
+        assert dv.dataverseContacts[0]['contactEmail'] == 'info@aussda.at'
         assert len(dv.__dict__.keys()) == 3
 
         dv = Dataverse()
@@ -71,9 +73,9 @@ class TestDataverse(object):
         assert dv.affiliation == 'Scientific Research University'
         assert dv.description == 'We do all the science.'
         assert dv.dataverseType == 'LABORATORY'
-        assert len(dv.contactEmail) == 2
-        assert dv.contactEmail[0] == 'pi@example.edu'
-        assert dv.contactEmail[1] == 'student@example.edu'
+        assert len(dv.dataverseContacts) == 2
+        assert dv.dataverseContacts[0]['contactEmail'] == 'pi@example.edu'
+        assert dv.dataverseContacts[1]['contactEmail'] == 'student@example.edu'
         assert len(dv.__dict__.keys()) == 6
 
     def test_dataverse_import_metadata_format_wrong(self):
@@ -116,7 +118,7 @@ class TestDataverse(object):
         """
         attr_required = [
             'alias',
-            'contactEmail',
+            'dataverseContacts',
             'name'
         ]
         for attr in attr_required:
@@ -183,8 +185,8 @@ class TestDataverse(object):
         assert data['pid'] == 'doi:10.11587/EVMUHP'
         assert data['alias'] == 'test-pyDataverse'
         assert data['name'] == 'Test pyDataverse'
-        assert len(data['contactEmail']) == 1
-        assert data['contactEmail'][0] == 'info@aussda.at'
+        assert len(data['dataverseContacts']) == 1
+        assert data['dataverseContacts'][0]['contactEmail'] == 'info@aussda.at'
         assert len(data.keys()) == 4
 
         data = import_dataverse_full_dict
@@ -209,9 +211,9 @@ class TestDataverse(object):
         assert data['affiliation'] == 'Scientific Research University'
         assert data['description'] == 'We do all the science.'
         assert data['dataverseType'] == 'LABORATORY'
-        assert len(data['contactEmail']) == 2
-        assert data['contactEmail'][0] == 'pi@example.edu'
-        assert data['contactEmail'][1] == 'student@example.edu'
+        assert len(data['dataverseContacts']) == 2
+        assert data['dataverseContacts'][0]['contactEmail'] == 'pi@example.edu'
+        assert data['dataverseContacts'][1]['contactEmail'] == 'student@example.edu'
         assert len(data.keys()) == len(dv.__dict__.keys())
 
     def test_dataverse_dict_format_wrong(self, import_dataverse_min_dict):
