@@ -72,7 +72,9 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'contactEmail': ['test@example.com'],
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -142,7 +144,9 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'contactEmail': ['test@example.com'],
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -190,7 +194,9 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'contactEmail': ['test@example.com'],
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -250,7 +256,9 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'contactEmail': ['test@example.com'],
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -295,7 +303,9 @@ class Dataverse(object):
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
             >>> data = {
-            >>>     'dataverseContacts': [{'contactEmail': 'test@example.com'}],
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
             >>>     'name': 'Test pyDataverse',
             >>>     'alias': 'test-pyDataverse'
             >>> }
@@ -493,7 +503,9 @@ class Dataset(object):
             >>> ds = Dataset()
             >>> data = {
             >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'dsDescription': [
+            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
+            >>>     ]
             >>> }
             >>> ds.set(data)
             >>> ds.title
@@ -692,7 +704,9 @@ class Dataset(object):
             >>> ds = Dataset()
             >>> data = {
             >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'dsDescription': [
+            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
+            >>>     ]
             >>> }
             >>> ds.set(data)
             >>> ds.is_valid()
@@ -818,7 +832,9 @@ class Dataset(object):
             >>> ds = Dataset()
             >>> data = {
             >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'dsDescription': [
+            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
+            >>>     ]
             >>> }
             >>> ds.set(data)
             >>> data = dv.dict()
@@ -1064,10 +1080,12 @@ class Dataset(object):
             >>> ds = Dataset()
             >>> data = {
             >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'dsDescription': [
+            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
+            >>>     ]
             >>>     'author': [{'authorName': 'LastAuthor1, FirstAuthor1'}],
             >>>     'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1'}],
-            >>>     'subject': ['Engineering'],
+            >>>     'subject': ['Engineering']
             >>> }
             >>> ds.set(data)
             >>> data = ds.json()
@@ -1104,11 +1122,14 @@ class Dataset(object):
             >>> ds = Dataset()
             >>> data = {
             >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': 'New study about pyDataverse usage in 2019'
+            >>>     'dsDescription': [
+            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
+            >>>     ]
             >>>     'author': [{'authorName': 'LastAuthor1, FirstAuthor1'}],
             >>>     'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1'}],
             >>>     'subject': ['Engineering'],
             >>> }
+            >>> ds.set(data)
             >>> ds.export_metadata('export_dataset.json')
 
         """
