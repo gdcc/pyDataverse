@@ -15,15 +15,7 @@ class TestDataverse(object):
         """Test Dataverse.__init__()."""
         dv = Dataverse()
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
-        assert not dv.name
-        assert not dv.alias
-        assert not dv.contactEmail
-        assert not dv.affiliation
-        assert not dv.description
-        assert not dv.dataverseType
+        assert len(dv.__dict__.keys()) == 0
 
     def test_dataverse_set_dv_up(self, import_dataverse_min_dict,
                                  import_dataverse_full_dict):
@@ -40,21 +32,16 @@ class TestDataverse(object):
         dv = Dataverse()
         dv.set(data)
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
         assert len(dv.contactEmail) == 1
         assert dv.contactEmail[0] == 'info@aussda.at'
+        assert len(dv.__dict__.keys()) == 3
 
         data = import_dataverse_full_dict
         dv = Dataverse()
         dv.set(data)
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
         assert dv.alias == 'science'
         assert dv.name == 'Scientific Research'
         assert dv.affiliation == 'Scientific Research University'
@@ -63,26 +50,22 @@ class TestDataverse(object):
         assert len(dv.contactEmail) == 2
         assert dv.contactEmail[0] == 'pi@example.edu'
         assert dv.contactEmail[1] == 'student@example.edu'
+        assert len(dv.__dict__.keys()) == 6
 
     def test_dataverse_import_metadata_dv_up(self):
         """Test Dataverse.import_metadata() with format=`dv_up`."""
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_min.json')
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
         assert dv.contactEmail[0] == 'info@aussda.at'
         assert len(dv.contactEmail) == 1
+        assert len(dv.__dict__.keys()) == 3
 
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_full.json')
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
         assert dv.alias == 'science'
         assert dv.name == 'Scientific Research'
         assert dv.affiliation == 'Scientific Research University'
@@ -91,21 +74,14 @@ class TestDataverse(object):
         assert len(dv.contactEmail) == 2
         assert dv.contactEmail[0] == 'pi@example.edu'
         assert dv.contactEmail[1] == 'student@example.edu'
+        assert len(dv.__dict__.keys()) == 6
 
     def test_dataverse_import_metadata_format_wrong(self):
         """Test Dataverse.import_metadata() with non-valid format."""
         dv = Dataverse()
         dv.import_metadata(TEST_DIR + '/data/dataverse_min.json', 'wrong')
 
-        assert not dv.datasets
-        assert not dv.dataverses
-        assert not dv.pid
-        assert not dv.name
-        assert not dv.alias
-        assert not dv.contactEmail
-        assert not dv.affiliation
-        assert not dv.description
-        assert not dv.dataverseType
+        assert len(dv.__dict__.keys()) == 0
 
     def test_dataverse_is_valid_valid(self, import_dataverse_min_dict,
                                       import_dataverse_full_dict):
@@ -167,6 +143,7 @@ class TestDataverse(object):
 
         assert dv.dict()
         assert isinstance(dv.dict(), dict)
+        assert len(dv.dict().keys()) == 3
 
         data = import_dataverse_full_dict
         dv = Dataverse()
@@ -174,6 +151,7 @@ class TestDataverse(object):
 
         assert dv.dict()
         assert isinstance(dv.dict(), dict)
+        assert len(dv.dict().keys()) == 6
 
     def test_dataverse_dict_all_valid(self, import_dataverse_min_dict,
                                       import_dataverse_full_dict):
@@ -186,13 +164,18 @@ class TestDataverse(object):
             `tests/data/dataverse_min.json`.
 
         """
-
         data = import_dataverse_min_dict
         dv = Dataverse()
         dv.set(data)
+
+        assert len(dv.__dict__.keys()) == 3
+
         dv.set({
             'pid': 'doi:10.11587/EVMUHP'
         })
+
+        assert len(dv.__dict__.keys()) == 4
+
         data = dv.dict('all')
 
         assert data
@@ -202,13 +185,20 @@ class TestDataverse(object):
         assert data['name'] == 'Test pyDataverse'
         assert len(data['contactEmail']) == 1
         assert data['contactEmail'][0] == 'info@aussda.at'
+        assert len(data.keys()) == 4
 
         data = import_dataverse_full_dict
         dv = Dataverse()
         dv.set(data)
+
+        assert len(dv.__dict__.keys()) == 6
+
         dv.set({
             'pid': 'doi:10.11587/EVMUHP'
         })
+
+        assert len(dv.__dict__.keys()) == 7
+
         data = dv.dict('all')
 
         assert data
@@ -222,6 +212,7 @@ class TestDataverse(object):
         assert len(data['contactEmail']) == 2
         assert data['contactEmail'][0] == 'pi@example.edu'
         assert data['contactEmail'][1] == 'student@example.edu'
+        assert len(data.keys()) == len(dv.__dict__.keys())
 
     def test_dataverse_dict_format_wrong(self, import_dataverse_min_dict):
         """Test Dataverse.dict() with non-valid format.
@@ -303,13 +294,11 @@ class TestDataverse(object):
         data = import_dataverse_min_dict
         dv = Dataverse()
         dv.set(data)
-        dv.datasets = [Dataset()]
-        dv.dataverses = [Dataverse()]
         dv.pid = 'doi:10.11587/EVMUHP'
         data = dv.json('all')
 
-        assert data
         assert isinstance(data, str)
+        assert len(dv.__dict__.keys()) == 4
 
     def test_dataverse_json_format_wrong_valid(self, import_dataverse_min_dict):
         """Test Dataverse.json() with non-valid format and valid data.
@@ -324,8 +313,6 @@ class TestDataverse(object):
         data = import_dataverse_min_dict
         dv = Dataverse()
         dv.set(data)
-        dv.datasets = [Dataset()]
-        dv.dataverses = [Dataverse()]
         dv.pid = 'doi:10.11587/EVMUHP'
         data = dv.json('wrong')
 

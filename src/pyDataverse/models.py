@@ -43,8 +43,6 @@ class Dataverse(object):
     """Valid attributes for `all` metadata dict creation."""
     __attr_dict_all_valid = [
         'pid'
-        # 'datasets',
-        # 'dataverses',
     ] + __attr_dict_dv_up_valid
 
     def __init__(self):
@@ -58,8 +56,6 @@ class Dataverse(object):
             >>> dv = Dataverse()
 
         """
-        for attr in self.__attr_dict_all_valid:
-            self.__setattr__(attr, None)
 
     def __str__(self):
         """Return name of Dataverse() class for users."""
@@ -170,9 +166,13 @@ class Dataverse(object):
         """
         is_valid = True
         for attr in self.__attr_dict_dv_up_required:
-            if not self.__getattribute__(attr):
+            if attr in list(self.__dict__.keys()):
+                if not self.__getattribute__(attr):
+                    is_valid = False
+                    print('Attribute \'{0}\' is `False`.'.format(attr))
+            else:
                 is_valid = False
-                print('attribute \'{0}\' missing.'.format(attr))
+                print('Attribute \'{0}\' missing.'.format(attr))
         return is_valid
 
     def dict(self, format='dv_up'):
@@ -217,13 +217,21 @@ class Dataverse(object):
         if format == 'dv_up':
             if self.is_valid():
                 for attr in self.__attr_dict_dv_up_valid:
-                    if self.__getattribute__(attr) is not None:
-                        if attr == 'contactEmail':
-                            data['dataverseContacts'] = []
-                            for email in self.__getattribute__(attr):
-                                data['dataverseContacts'].append({attr: email})
+                    # check if attribute exists
+                    if attr in list(self.__dict__.keys()):
+                        # check if attribute is not None
+                        if self.__getattribute__(attr) is not None:
+                            if attr == 'contactEmail':
+                                data['dataverseContacts'] = []
+                                for email in self.__getattribute__(attr):
+                                    data['dataverseContacts'].append({attr: email})
+                            else:
+                                data[attr] = self.__getattribute__(attr)
                         else:
-                            data[attr] = self.__getattribute__(attr)
+                            print('Attribute `{0}` is `None`.'.format(attr))
+                    else:
+                        print('Attribute `{0}` not in object.'.format(attr))
+
                 # TODO: prüfen, ob required attributes gesetzt sind = Exception
                 return data
             else:
@@ -231,8 +239,13 @@ class Dataverse(object):
                 return None
         elif format == 'all':
             for attr in self.__attr_dict_all_valid:
-                if self.__getattribute__(attr) is not None:
-                    data[attr] = self.__getattribute__(attr)
+                if attr in list(self.__dict__.keys()):
+                    if self.__getattribute__(attr) is not None:
+                        data[attr] = self.__getattribute__(attr)
+                    else:
+                        print('Attribute `{0}` is `None`.'.format(attr))
+                else:
+                    print('Attribute `{0}` not in object.'.format(attr))
             return data
         else:
             # TODO: Exception
