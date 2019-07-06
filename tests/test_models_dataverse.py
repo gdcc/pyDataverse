@@ -54,10 +54,10 @@ class TestDataverse(object):
         assert dv.dataverseContacts[1]['contactEmail'] == 'student@example.edu'
         assert len(dv.__dict__.keys()) == 6
 
-    def test_dataverse_import_metadata_dv_up(self):
-        """Test Dataverse.import_metadata() with format=`dv_up`."""
+    def test_dataverse_import_data_dv_up(self):
+        """Test Dataverse.import_data() with format=`dv_up`."""
         dv = Dataverse()
-        dv.import_metadata(TEST_DIR + '/data/dataverse_min.json')
+        dv.import_data(TEST_DIR + '/data/dataverse_min.json')
 
         assert dv.alias == 'test-pyDataverse'
         assert dv.name == 'Test pyDataverse'
@@ -66,7 +66,7 @@ class TestDataverse(object):
         assert len(dv.__dict__.keys()) == 3
 
         dv = Dataverse()
-        dv.import_metadata(TEST_DIR + '/data/dataverse_full.json')
+        dv.import_data(TEST_DIR + '/data/dataverse_full.json')
 
         assert dv.alias == 'science'
         assert dv.name == 'Scientific Research'
@@ -78,10 +78,10 @@ class TestDataverse(object):
         assert dv.dataverseContacts[1]['contactEmail'] == 'student@example.edu'
         assert len(dv.__dict__.keys()) == 6
 
-    def test_dataverse_import_metadata_format_wrong(self):
-        """Test Dataverse.import_metadata() with non-valid format."""
+    def test_dataverse_import_data_format_wrong(self):
+        """Test Dataverse.import_data() with non-valid format."""
         dv = Dataverse()
-        dv.import_metadata(TEST_DIR + '/data/dataverse_min.json', 'wrong')
+        dv.import_data(TEST_DIR + '/data/dataverse_min.json', 'wrong')
 
         assert len(dv.__dict__.keys()) == 0
 

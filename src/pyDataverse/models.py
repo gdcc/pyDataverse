@@ -86,7 +86,7 @@ class Dataverse(object):
         for key, val in data.items():
             self.__setattr__(key, val)
 
-    def import_metadata(self, filename, format='dv_up'):
+    def import_data(self, filename, format='dv_up'):
         """Import Dataverse API Upload JSON metadata from JSON file.
 
         Parses in data stored in the Dataverse API Dataverse JSON standard.
@@ -106,7 +106,7 @@ class Dataverse(object):
 
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
-            >>> dv.import_metadata('tests/data/dataverse_full.json')
+            >>> dv.import_data('tests/data/dataverse_full.json')
             >>> dv.name
             'Test pyDataverse'
 
@@ -284,7 +284,7 @@ class Dataverse(object):
             # TODO Exception
             print('data format not valid.')
 
-    def export_metadata(self, filename, format='dv_up'):
+    def export_data(self, filename, format='dv_up'):
         """Export Dataverse metadata to Dataverse API upload JSON.
 
         Parameters
@@ -310,7 +310,7 @@ class Dataverse(object):
             >>>     'alias': 'test-pyDataverse'
             >>> }
             >>> dv.set(data)
-            >>> dv.export_metadata('dataverse_export.json')
+            >>> dv.export_data('dataverse_export.json')
 
         """
         if format == 'dv_up' or format == 'all':
@@ -515,7 +515,7 @@ class Dataset(object):
         for key, val in data.items():
             self.__setattr__(key, val)
 
-    def import_metadata(self, filename, format='dv_up'):
+    def import_data(self, filename, format='dv_up'):
         """Import Dataset API Upload JSON metadata from JSON file.
 
         Parses in data stored in the Dataverse API Dataset JSON standard.
@@ -535,7 +535,7 @@ class Dataset(object):
 
             >>> from pyDataverse.models import Dataset
             >>> ds = Dataset()
-            >>> ds.import_metadata('tests/data/dataset_full.json')
+            >>> ds.import_data('tests/data/dataset_full.json')
             >>> ds.title
             'Replication Data for: Title'
 
@@ -1102,7 +1102,7 @@ class Dataset(object):
             # TODO Exception
             print('data format not valid.')
 
-    def export_metadata(self, filename, format='dv_up'):
+    def export_data(self, filename, format='dv_up'):
         """Export Dataset metadata to Dataverse API upload JSON.
 
         Parameters
@@ -1130,7 +1130,7 @@ class Dataset(object):
             >>>     'subject': ['Engineering'],
             >>> }
             >>> ds.set(data)
-            >>> ds.export_metadata('export_dataset.json')
+            >>> ds.export_data('export_dataset.json')
 
         """
         if format == 'dv_up' or format == 'all':

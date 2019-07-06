@@ -40,22 +40,22 @@ class TestDataset(object):
     def test_dataset_is_valid_valid(self):
         """Test Dataset.is_valid() with valid data."""
         ds = Dataset()
-        ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
+        ds.import_data(TEST_DIR + '/data/dataset_full.json')
 
         assert ds.is_valid()
 
     def test_dataset_is_valid_valid_not(self):
         """Test Dataset.is_valid() with non-valid data."""
         ds = Dataset()
-        ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
+        ds.import_data(TEST_DIR + '/data/dataset_full.json')
         ds.title = None
 
         assert not ds.is_valid()
 
-    def test_dataset_import_metadata_dv_up(self):
-        """Test Dataset.import_metadata() with format=`dv_up`."""
+    def test_dataset_import_data_dv_up(self):
+        """Test Dataset.import_data() with format=`dv_up`."""
         ds = Dataset()
-        ds.import_metadata(TEST_DIR + '/data/dataset_full.json')
+        ds.import_data(TEST_DIR + '/data/dataset_full.json')
 
         assert ds.license == 'CC0'
         assert ds.termsOfUse == 'CC0 Waiver'
@@ -244,9 +244,9 @@ class TestDataset(object):
         print(list(ds.__dict__.keys()))
         assert len(ds.__dict__.keys()) == 67
 
-    def test_dataset_import_metadata_format_wrong(self):
-        """Test Dataset.import_metadata() with non-valid format."""
+    def test_dataset_import_data_format_wrong(self):
+        """Test Dataset.import_data() with non-valid format."""
         ds = Dataset()
-        ds.import_metadata(TEST_DIR + '/data/dataset_full.json', 'wrong')
+        ds.import_data(TEST_DIR + '/data/dataset_full.json', 'wrong')
 
         assert len(ds.__dict__.keys()) == 0
