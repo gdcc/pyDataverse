@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataverse data model tests."""
+import json
 import os
 from pyDataverse.models import Dataverse
 
@@ -319,3 +320,17 @@ class TestDataverse(object):
         data = dv.json('wrong')
 
         assert not data
+
+    def test_dataverse_import_to_export(self):
+        """Test Dataverse pipeline from import to export with format=`dv_up`."""
+        if not os.environ.get('TRAVIS'):
+            dv = Dataverse()
+            dv.import_data(TEST_DIR + '/data/dataverse_min.json')
+            dv.export_data(TEST_DIR + '/data/export_dataverse_min.json')
+            export_data = json.loads(TEST_DIR + '/data/export_dataverse_min.json')
+            assert dv.dict() == export_data
+
+            dv = Dataverse()
+            dv.import_data(TEST_DIR + '/data/dataverse_full.json')
+            export_data = dv.export_data(TEST_DIR + '/data/export_dataverse_full.json')
+            assert dv.dict() == export_data

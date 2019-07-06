@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataset data model tests."""
+import json
 import os
 from pyDataverse.models import Dataset
 
@@ -250,3 +251,17 @@ class TestDataset(object):
         ds.import_data(TEST_DIR + '/data/dataset_full.json', 'wrong')
 
         assert len(ds.__dict__.keys()) == 0
+
+    def test_dataset_import_to_export(self):
+        """Test Dataset pipeline from import to export with format=`dv_up`."""
+        if not os.environ.get('TRAVIS'):
+            ds = Dataset()
+            ds.import_data(TEST_DIR + '/data/dataset_min.json')
+            ds.export_data(TEST_DIR + '/data/export_dataset_min.json')
+            export_data = json.loads(TEST_DIR + '/data/export_dataverse_min.json')
+            assert ds.dict() == export_data
+
+            ds = Dataset()
+            ds.import_data(TEST_DIR + '/data/dataset_full.json')
+            export_data = ds.export_data(TEST_DIR + '/data/export_dataset_full.json')
+            assert ds.dict() == export_data
