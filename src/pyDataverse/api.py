@@ -88,11 +88,11 @@ class Api(object):
         self.conn_started = datetime.now()
 
         # Test connection.
-        query_str = '/info/server'
+        path = '/info/server'
         if base_url and api_version:
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
-            url = '{0}{1}'.format(self.native_api_base_url, query_str)
+            url = '{0}{1}'.format(self.native_api_base_url, path)
             try:
                 resp = get(url)
                 if resp:
@@ -142,12 +142,12 @@ class Api(object):
         """
         return 'pyDataverse API class'
 
-    def get_request(self, query_str, params=None, auth=False):
+    def get_request(self, path, params=None, auth=False):
         """Make a GET request.
 
         Parameters
         ----------
-        query_str : string
+        path : string
             Query string for the request. Will be concatenated to
             `native_api_base_url`.
         params : dict
@@ -162,7 +162,7 @@ class Api(object):
             Response object of requests library.
 
         """
-        url = '{0}{1}'.format(self.native_api_base_url, query_str)
+        url = '{0}{1}'.format(self.native_api_base_url, path)
         if auth:
             if self.api_token:
                 if not params:
@@ -199,13 +199,13 @@ class Api(object):
                 ''.format(url)
             )
 
-    def post_request(self, query_str, metadata=None, auth=False,
+    def post_request(self, path, metadata=None, auth=False,
                      params=None):
         """Make a POST request.
 
         Parameters
         ----------
-        query_str : string
+        path : string
             Query string for the request. Will be concatenated to
             `native_api_base_url`.
         metadata : string
@@ -222,7 +222,7 @@ class Api(object):
             Response object of requests library.
 
         """
-        url = '{0}{1}'.format(self.native_api_base_url, query_str)
+        url = '{0}{1}'.format(self.native_api_base_url, path)
         if auth:
             if self.api_token:
                 if not params:
@@ -253,13 +253,13 @@ class Api(object):
                 ''.format(url)
             )
 
-    def put_request(self, query_str, metadata=None, auth=False,
+    def put_request(self, path, metadata=None, auth=False,
                     params=None):
         """Make a PUT request.
 
         Parameters
         ----------
-        query_str : string
+        path : string
             Query string for the request. Will be concatenated to
             `native_api_base_url`.
         metadata : string
@@ -276,7 +276,7 @@ class Api(object):
             Response object of requests library.
 
         """
-        url = '{0}{1}'.format(self.native_api_base_url, query_str)
+        url = '{0}{1}'.format(self.native_api_base_url, path)
         if auth:
             if self.api_token:
                 if not params:
@@ -307,12 +307,12 @@ class Api(object):
                 ''.format(url)
             )
 
-    def delete_request(self, query_str, auth=False, params=None):
+    def delete_request(self, path, auth=False, params=None):
         """Make a DELETE request.
 
         Parameters
         ----------
-        query_str : string
+        path : string
             Query string for the request. Will be concatenated to
             `native_api_base_url`.
         auth : bool
@@ -327,7 +327,7 @@ class Api(object):
             Response object of requests library.
 
         """
-        url = '{0}{1}'.format(self.native_api_base_url, query_str)
+        url = '{0}{1}'.format(self.native_api_base_url, path)
         if auth:
             if self.api_token:
                 if not params:
@@ -372,8 +372,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.get_request(query_str, auth=auth)
+        path = '/dataverses/{0}'.format(identifier)
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def create_dataverse(self, identifier, metadata, auth=True,
@@ -423,8 +423,8 @@ class Api(object):
                 '`create_dataverse()`.'.format(identifier)
             )
 
-        query_str = '/dataverses/{0}'.format(parent)
-        resp = self.post_request(query_str, metadata, auth)
+        path = '/dataverses/{0}'.format(parent)
+        resp = self.post_request(path, metadata, auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -470,8 +470,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/dataverses/{0}/actions/:publish'.format(identifier)
-        resp = self.post_request(query_str, auth=auth)
+        path = '/dataverses/{0}/actions/:publish'.format(identifier)
+        resp = self.post_request(path, auth=auth)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -520,8 +520,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/dataverses/{0}'.format(identifier)
-        resp = self.delete_request(query_str, auth)
+        path = '/dataverses/{0}'.format(identifier)
+        resp = self.delete_request(path, auth)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -583,11 +583,11 @@ class Api(object):
 
         """
         if is_pid:
-            query_str = '/datasets/:persistentId/?persistentId={0}'.format(
+            path = '/datasets/:persistentId/?persistentId={0}'.format(
                 identifier)
         else:
-            query_str = '/datasets/{0}'.format(identifier)
-        resp = self.get_request(query_str, auth=auth)
+            path = '/datasets/{0}'.format(identifier)
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def get_dataset_export(self, pid, export_format):
@@ -614,9 +614,9 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/datasets/export?exporter={0}&persistentId={1}'.format(
+        path = '/datasets/export?exporter={0}&persistentId={1}'.format(
             export_format, pid)
-        resp = self.get_request(query_str)
+        resp = self.get_request(path)
         return resp
 
     def create_dataset(self, dataverse, metadata, auth=True):
@@ -673,8 +673,8 @@ class Api(object):
         Link Dataset finch1.json
 
         """
-        query_str = '/dataverses/{0}/datasets'.format(dataverse)
-        resp = self.post_request(query_str, metadata, auth)
+        path = '/dataverses/{0}/datasets'.format(dataverse)
+        resp = self.post_request(path, metadata, auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -742,9 +742,9 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/datasets/:persistentId/actions/:publish'
-        query_str += '?persistentId={0}&type={1}'.format(identifier, type)
-        resp = self.post_request(query_str, auth=auth)
+        path = '/datasets/:persistentId/actions/:publish'
+        path += '?persistentId={0}&type={1}'.format(identifier, type)
+        resp = self.post_request(path, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -789,11 +789,11 @@ class Api(object):
 
         """
         if is_pid:
-            query_str = '/datasets/:persistentId/?persistentId={0}'.format(
+            path = '/datasets/:persistentId/?persistentId={0}'.format(
                 identifier)
         else:
-            query_str = '/datasets/{0}'.format(identifier)
-        resp = self.delete_request(query_str, auth=auth)
+            path = '/datasets/{0}'.format(identifier)
+        resp = self.delete_request(path, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
@@ -876,13 +876,13 @@ class Api(object):
 
         """
         if is_pid:
-            query_str = '/datasets/:persistentId/editMetadata/?persistentId={0}'
+            path = '/datasets/:persistentId/editMetadata/?persistentId={0}'
             ''.format(identifier)
         else:
-            query_str = '/datasets/editMetadata/{0}'.format(identifier)
+            path = '/datasets/editMetadata/{0}'.format(identifier)
         params = {'replace': True} if is_replace else {}
 
-        resp = self.put_request(query_str, metadata, auth, params)
+        resp = self.put_request(path, metadata, auth, params)
 
         if resp.status_code == 401:
             error_msg = resp.json()['message']
@@ -926,9 +926,9 @@ class Api(object):
 
         """
         base_str = '/datasets/:persistentId/versions/'
-        query_str = base_str + '{0}/files?persistentId={1}'.format(
+        path = base_str + '{0}/files?persistentId={1}'.format(
             version, pid)
-        resp = self.get_request(query_str)
+        resp = self.get_request(path)
         return resp
 
     def get_datafile(self, identifier, is_pid=True):
@@ -961,11 +961,11 @@ class Api(object):
 
         """
         if is_pid:
-            query_str = '/access/datafile/{0}'.format(identifier)
+            path = '/access/datafile/{0}'.format(identifier)
         else:
-            query_str = '/access/datafile/:persistentId/?persistentId={0}'
+            path = '/access/datafile/:persistentId/?persistentId={0}'
             ''.format(identifier)
-        resp = self.get_request(query_str)
+        resp = self.get_request(path)
         return resp
 
     def get_datafile_bundle(self, identifier):
@@ -1004,8 +1004,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/access/datafile/bundle/{0}'.format(identifier)
-        data = self.get_request(query_str)
+        path = '/access/datafile/bundle/{0}'.format(identifier)
+        data = self.get_request(path)
         return data
 
     def upload_file(self, identifier, filename, is_pid=True):
@@ -1039,16 +1039,16 @@ class Api(object):
             dict().
 
         """
-        query_str = self.native_api_base_url
+        path = self.native_api_base_url
         if is_pid:
-            query_str += '/datasets/:persistentId/add?persistentId={0}'.format(
+            path += '/datasets/:persistentId/add?persistentId={0}'.format(
                 identifier)
         else:
-            query_str += '/datasets/{0}/add'.format(identifier)
+            path += '/datasets/{0}/add'.format(identifier)
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
-            query_str, filename)
+            path, filename)
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
@@ -1072,8 +1072,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/info/version'
-        resp = self.get_request(query_str)
+        path = '/info/version'
+        resp = self.get_request(path)
         return resp
 
     def get_info_server(self):
@@ -1094,8 +1094,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/info/server'
-        resp = self.get_request(query_str)
+        path = '/info/server'
+        resp = self.get_request(path)
         return resp
 
     def get_info_apiTermsOfUse(self):
@@ -1116,8 +1116,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/info/apiTermsOfUse'
-        resp = self.get_request(query_str)
+        path = '/info/apiTermsOfUse'
+        resp = self.get_request(path)
         return resp
 
     def get_metadatablocks(self):
@@ -1137,8 +1137,8 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/metadatablocks'
-        resp = self.get_request(query_str)
+        path = '/metadatablocks'
+        resp = self.get_request(path)
         return resp
 
     def get_metadatablock(self, identifier):
@@ -1164,6 +1164,6 @@ class Api(object):
             Response object of requests library.
 
         """
-        query_str = '/metadatablocks/{0}'.format(identifier)
-        resp = self.get_request(query_str)
+        path = '/metadatablocks/{0}'.format(identifier)
+        resp = self.get_request(path)
         return resp
