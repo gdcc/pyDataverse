@@ -65,6 +65,7 @@ class Dataverse(object):
             Flat :class:`dict` with data. All keys will be mapped to a similar
             called attribute with it's value.
 
+
         Examples
         -------
         Set Dataverse attributes via flat :class:`dict`::
@@ -462,6 +463,69 @@ class Dataset(object):
         'title'
     ]
 
+    """typeClass primitive."""
+    __attr_dict_dv_up_typeClass_primitive = [
+        'accessToSources',
+        'alternativeTitle',
+        'alternativeURL',
+        'characteristicOfSources',
+        'dateOfDeposit',
+        'dataSources',
+        'depositor',
+        'distributionDate',
+        'kindOfData',
+        'language',
+        'notesText',
+        'originOfSources',
+        'otherReferences',
+        'productionDate',
+        'productionPlace',
+        'relatedDatasets',
+        'relatedMaterial',
+        'seriesInformation',
+        'seriesName',
+        'subtitle',
+        'title'
+    ] + ['authorName', 'authorAffiliation', 'authorIdentifier'] \
+    + ['contributorName'] \
+    + __attr_import_dv_up_citation_fields_arrays['dateOfCollection'] \
+    + __attr_import_dv_up_citation_fields_arrays['datasetContact'] \
+    + __attr_import_dv_up_citation_fields_arrays['distributor'] \
+    + __attr_import_dv_up_citation_fields_arrays['dsDescription'] \
+    + __attr_import_dv_up_citation_fields_arrays['grantNumber'] \
+    + __attr_import_dv_up_citation_fields_arrays['keyword'] \
+    + __attr_import_dv_up_citation_fields_arrays['producer'] \
+    + __attr_import_dv_up_citation_fields_arrays['otherId'] \
+    + ['publicationCitation', 'publicationIDNumber', 'publicationURL'] \
+    + __attr_import_dv_up_citation_fields_arrays['software'] \
+    + __attr_import_dv_up_citation_fields_arrays['timePeriodCovered'] \
+    + __attr_import_dv_up_citation_fields_arrays['topicClassification'] \
+    + __attr_import_dv_up_geospatial_fields_values \
+    + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
+    + ['state', 'city', 'otherGeographicCoverage'] \
+    + __attr_import_dv_up_socialscience_fields_values \
+    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
+
+    """typeClass compound."""
+    __attr_dict_dv_up_typeClass_compound = [
+    ] + list(__attr_import_dv_up_citation_fields_arrays.keys()) \
+    + list(__attr_import_dv_up_geospatial_fields_arrays.keys()) \
+    + list(__attr_import_dv_up_journal_fields_arrays.keys()) \
+
+    """typeClass controlledVocabulary."""
+    __attr_dict_dv_up_typeClass_controlledVocabulary = [
+        'authorIdentifierScheme',
+        'contributorType',
+        'country',
+        'journalArticleType',
+        'publicationIDType',
+        'subject'
+    ]
+
+    __attr_dict_dv_up_multiple = [
+        # 'subject'
+    ]
+
     """Attributes of displayName."""
     __attr_displayNames = [
         'citation_displayName',
@@ -853,12 +917,6 @@ class Dataset(object):
                 data['datasetVersion']['metadataBlocks'] = {}
                 citation = {}
                 citation['fields'] = []
-                geospatial = {}
-                geospatial['fields'] = []
-                socialscience = {}
-                socialscience['fields'] = []
-                journal = {}
-                journal['fields'] = []
 
                 """dataset"""
                 # Generate first level attributes
@@ -868,24 +926,40 @@ class Dataset(object):
                             data['datasetVersion'][attr] = self.__getattribute__(attr)
 
                 """citation"""
-                if self.citation_displayName:
+                if 'citation_displayName' in list(self.__dict__.keys()):
                     citation['displayName'] = self.citation_displayName
 
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_citation_fields_values:
                     if attr in list(self.__dict__.keys()):
                         if self.__getattribute__(attr) is not None:
+                            v = self.__getattribute__(attr)
+                            if isinstance(v, list):
+                                multiple = True
+                            else:
+                                multiple = False
+                            if attr in self.__attr_dict_dv_up_typeClass_primitive:
+                                typeClass = 'primitive'
+                            elif attr in self.__attr_dict_dv_up_typeClass_compound:
+                                typeClass = 'compound'
+                            elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
+                                typeClass = 'controlledVocabulary'
                             citation['fields'].append({
                                 'typeName': attr,
-                                'value': self.__getattribute__(attr)
+                                'multiple': multiple,
+                                'typeClass': typeClass,
+                                'value': v
                             })
 
                 # Generate fields attributes
                 for key, val in self.__attr_import_dv_up_citation_fields_arrays.items():
                     if key in list(self.__dict__.keys()):
                         if self.__getattribute__(key) is not None:
+                            v = self.__getattribute__(key)
                             citation['fields'].append({
                                 'typeName': key,
+                                'multiple': True,
+                                'typeClass': 'compound',
                                 'value': self.__generate_field_arrays(key, val)
                             })
 
@@ -898,44 +972,100 @@ class Dataset(object):
                             if self.__getattribute__('seriesName') is not None:
                                 tmp_dict['value']['seriesName'] = {}
                                 tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
+                                tmp_dict['value']['seriesName']['multiple'] = False
+                                tmp_dict['value']['seriesName']['typeClass'] = 'primitive'
                                 tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
                         if 'seriesInformation' in list(self.__dict__.keys()):
                             if self.__getattribute__('seriesInformation') is not None:
                                 tmp_dict['value']['seriesInformation'] = {}
                                 tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
+                                tmp_dict['value']['seriesInformation']['multiple'] = False
+                                tmp_dict['value']['seriesInformation']['typeClass'] = 'primitive'
                                 tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
                         citation['fields'].append({
                             'typeName': 'series',
+                            'multiple': False,
+                            'typeClass': 'compound',
                             'value': tmp_dict
                         })
 
                 """geospatial"""
+                for attr in self.__attr_import_dv_up_geospatial_fields_values + list(self.__attr_import_dv_up_geospatial_fields_arrays.keys()) + ['geospatial_displayName']:
+                    if attr in list(self.__dict__.keys()):
+                        geospatial = {}
+                        if not attr == 'geospatial_displayName':
+                            geospatial['fields'] = []
+
+                if 'geospatial_displayName' in list(self.__dict__.keys()):
+                    if 'geospatial' not in locals():
+                        geospatial = {}
+                    geospatial['displayName'] = self.geospatial_displayName
+
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_geospatial_fields_values:
                     if attr in list(self.__dict__.keys()):
                         if self.__getattribute__(attr) is not None:
+                            v = self.__getattribute__(attr)
+                            if isinstance(v, list):
+                                multiple = True
+                            else:
+                                multiple = False
+                            if attr in self.__attr_dict_dv_up_typeClass_primitive:
+                                typeClass = 'primitive'
+                            elif attr in self.__attr_dict_dv_up_typeClass_compound:
+                                typeClass = 'compound'
+                            elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
+                                typeClass = 'controlledVocabulary'
                             geospatial['fields'].append({
                                 'typeName': attr,
-                                'value': self.__getattribute__(attr)
+                                'multiple': multiple,
+                                'typeClass': typeClass,
+                                'value': v
                             })
 
                 # Generate fields attributes
-                for key, val in self.__attr_valid_metadata_geospatial_arrays.items():
+                for key, val in self.__attr_import_dv_up_geospatial_fields_arrays.items():
                     if key in list(self.__dict__.keys()):
                         if self.__getattribute__(key) is not None:
                             geospatial['fields'].append({
                                 'typeName': key,
+                                'multiple': True,
+                                'typeClass': 'compound',
                                 'value': self.__generate_field_arrays(key, val)
                             })
 
                 """socialscience"""
+                for attr in self.__attr_import_dv_up_socialscience_fields_values + ['socialscience_displayName']:
+                    if attr in list(self.__dict__.keys()):
+                        socialscience = {}
+                        if not attr == 'socialscience_displayName':
+                            socialscience['fields'] = []
+
+                if 'socialscience_displayName' in list(self.__dict__.keys()):
+                    if 'socialscience' not in locals():
+                        socialscience = {}
+                    socialscience['displayName'] = self.socialscience_displayName
+
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_socialscience_fields_values:
                     if attr in list(self.__dict__.keys()):
                         if self.__getattribute__(attr) is not None:
+                            v = self.__getattribute__(attr)
+                            if isinstance(v, list):
+                                multiple = True
+                            else:
+                                multiple = False
+                            if attr in self.__attr_dict_dv_up_typeClass_primitive:
+                                typeClass = 'primitive'
+                            elif attr in self.__attr_dict_dv_up_typeClass_compound:
+                                typeClass = 'compound'
+                            elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
+                                typeClass = 'controlledVocabulary'
                             socialscience['fields'].append({
                                 'typeName': attr,
-                                'value': self.__getattribute__(attr)
+                                'multiple': multiple,
+                                'typeClass': typeClass,
+                                'value': v
                             })
 
                 # Generate targetSampleSize attributes
@@ -948,15 +1078,21 @@ class Dataset(object):
                                 if self.__getattribute__('targetSampleActualSize') is not None:
                                     tmp_dict['value']['targetSampleActualSize'] = {}
                                     tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
+                                    tmp_dict['value']['targetSampleActualSize']['multiple'] = False
+                                    tmp_dict['value']['targetSampleActualSize']['typeClass'] = 'primitive'
                                     tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
                         if 'targetSampleSizeFormula' in list(self.__dict__.keys()):
                             if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
                                 if self.__getattribute__('targetSampleSizeFormula') is not None:
                                     tmp_dict['value']['targetSampleSizeFormula'] = {}
                                     tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
+                                    tmp_dict['value']['targetSampleSizeFormula']['multiple'] = False
+                                    tmp_dict['value']['targetSampleSizeFormula']['typeClass'] = 'primitive'
                                     tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
                         socialscience['fields'].append({
                             'typeName': 'targetSampleSize',
+                            'multiple': False,
+                            'typeClass': 'compound',
                             'value': tmp_dict
                         })
 
@@ -969,30 +1105,60 @@ class Dataset(object):
                             if self.__getattribute__('socialScienceNotesType') is not None:
                                 tmp_dict['value']['socialScienceNotesType'] = {}
                                 tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                                tmp_dict['value']['socialScienceNotesType']['multiple'] = False
+                                tmp_dict['value']['socialScienceNotesType']['typeClass'] = 'primitive'
                                 tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
                         if 'socialScienceNotesSubject' in list(self.__dict__.keys()):
                             if self.__getattribute__('socialScienceNotesSubject') is not None:
                                 tmp_dict['value']['socialScienceNotesSubject'] = {}
                                 tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                                tmp_dict['value']['socialScienceNotesSubject']['multiple'] = False
+                                tmp_dict['value']['socialScienceNotesSubject']['typeClass'] = 'primitive'
                                 tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
                         if 'socialScienceNotesText' in list(self.__dict__.keys()):
                             if self.__getattribute__('socialScienceNotesText') is not None:
                                 tmp_dict['value']['socialScienceNotesText'] = {}
                                 tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                                tmp_dict['value']['socialScienceNotesText']['multiple'] = False
+                                tmp_dict['value']['socialScienceNotesText']['typeClass'] = 'primitive'
                                 tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
                         socialscience['fields'].append({
                             'typeName': 'socialScienceNotes',
+                            'multiple': False,
+                            'typeClass': 'compound',
                             'value': tmp_dict
                         })
 
                 """journal"""
+                for attr in self.__attr_import_dv_up_journal_fields_values + list(self.__attr_import_dv_up_journal_fields_arrays.keys()) + ['journal_displayName']:
+                    if attr in list(self.__dict__.keys()):
+                        journal = {}
+                        if not attr == 'journal_displayName':
+                            journal['fields'] = []
+
+                if 'journal_displayName' in list(self.__dict__.keys()):
+                    journal['displayName'] = self.journal_displayName
+
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_journal_fields_values:
                     if attr in list(self.__dict__.keys()):
                         if self.__getattribute__(attr) is not None:
+                            v = self.__getattribute__(attr)
+                            if isinstance(v, list):
+                                multiple = True
+                            else:
+                                multiple = False
+                            if attr in self.__attr_dict_dv_up_typeClass_primitive:
+                                typeClass = 'primitive'
+                            elif attr in self.__attr_dict_dv_up_typeClass_compound:
+                                typeClass = 'compound'
+                            elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
+                                typeClass = 'controlledVocabulary'
                             journal['fields'].append({
                                 'typeName': attr,
-                                'value': self.__getattribute__(attr)
+                                'multiple': multiple,
+                                'typeClass': typeClass,
+                                'value': v
                             })
 
                 # Generate fields attributes
@@ -1001,14 +1167,19 @@ class Dataset(object):
                         if self.__getattribute__(key) is not None:
                             journal['fields'].append({
                                 'typeName': key,
+                                'multiple': True,
+                                'typeClass': 'compound',
                                 'value': self.__generate_field_arrays(key, val)
                             })
 
                 # TODO: prüfen, ob required attributes gesetzt sind. wenn nicht = Exception!
                 data['datasetVersion']['metadataBlocks']['citation'] = citation
-                data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
-                data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
-                data['datasetVersion']['metadataBlocks']['journal'] = journal
+                if 'socialscience' in locals():
+                    data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
+                if 'geospatial' in locals():
+                    data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
+                if 'journal' in locals():
+                    data['datasetVersion']['metadataBlocks']['journal'] = journal
 
                 return data
             else:
@@ -1024,7 +1195,7 @@ class Dataset(object):
             print('dict can not be created. Format is not valid')
             return None
 
-    def __generate_dicts(self, key, sub_keys):
+    def __generate_field_arrays(self, key, sub_keys):
         """Generate dicts for array attributes of Dataverse API metadata upload.
 
         Parameters
@@ -1043,15 +1214,30 @@ class Dataset(object):
         # check if attribute exists
         tmp_list = []
         if self.__getattribute__(key):
+            attr = self.__getattribute__(key)
             # loop over list of attribute dict
-            for d in self.__getattribute__(key):
+            for d in attr:
                 tmp_dict = {}
                 # iterate over key-value pairs
                 for k, v in d.items():
                     # check if key is in attribute list
                     if k in sub_keys:
+                        multiple = None
+                        typeClass = None
+                        if isinstance(v, list):
+                            multiple = True
+                        else:
+                            multiple = False
+                        if k in self.__attr_dict_dv_up_typeClass_primitive:
+                            typeClass = 'primitive'
+                        elif k in self.__attr_dict_dv_up_typeClass_compound:
+                            typeClass = 'compound'
+                        elif k in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
+                            typeClass = 'controlledVocabulary'
                         tmp_dict[k] = {}
                         tmp_dict[k]['typeName'] = k
+                        tmp_dict[k]['typeClass'] = typeClass
+                        tmp_dict[k]['multiple'] = multiple
                         tmp_dict[k]['value'] = v
                 tmp_list.append(tmp_dict)
 
