@@ -1137,7 +1137,7 @@ class Api(object):
         Parameters
         ----------
         identifier : string
-            Can be block's id, or it's name.
+            Can be block's id, or its name.
 
         Returns
         -------
@@ -1148,3 +1148,31 @@ class Api(object):
         query_str = '/metadatablocks/{0}'.format(identifier)
         resp = self.get_request(query_str)
         return resp
+    
+    def walk_contents(self, identifier=':root'):
+        """Get contents of dataverse
+        
+        Returns dictionary describing the dataverses and datasets in the 
+        current dataverse 
+        
+        HTTP Request:
+        
+        .. code-block:: bash
+        
+            GET http://$SERVER/api/dataverses/$id/contents
+        
+        Parameters
+        ----------
+        idientifier : string
+            Can be dataverse's id, or its name. Defaults to root dataverse.
+        
+        
+        Returns
+        -------
+         requests.Response
+            Response object of requests library.
+        """
+        query_str = f'/dataverses/{subdataverse}/contents'
+        resp = self.get_request(query_str)
+        return resp
+        
