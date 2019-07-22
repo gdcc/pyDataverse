@@ -199,7 +199,8 @@ def read_csv_to_dict(filename, delimiter=';', quotechar='"', encoding='utf-8'):
 
     """
     with open(filename, 'r', newline='', encoding=encoding) as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        reader = csv.DictReader(csvfile, delimiter=delimiter,
+                                quotechar=quotechar)
         data = []
         for row in reader:
             data.append(dict(row))

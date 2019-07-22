@@ -356,8 +356,6 @@ class Dataset(object):
         'productionPlace',
         'relatedDatasets',
         'relatedMaterial',
-        'seriesInformation',
-        'seriesName',
         'subject',
         'subtitle',
         'title'
@@ -474,7 +472,6 @@ class Dataset(object):
         'depositor',
         'distributionDate',
         'kindOfData',
-        'language',
         'notesText',
         'originOfSources',
         'otherReferences',
@@ -518,8 +515,9 @@ class Dataset(object):
         'contributorType',
         'country',
         'journalArticleType',
+        'language',
         'publicationIDType',
-        'subject'
+        'subject',
     ]
 
     __attr_dict_dv_up_multiple = [
@@ -910,9 +908,9 @@ class Dataset(object):
         Validate standard
 
         """
+        data = {}
         if format == 'dv_up':
             if self.is_valid():
-                data = {}
                 data['datasetVersion'] = {}
                 data['datasetVersion']['metadataBlocks'] = {}
                 citation = {}
@@ -964,24 +962,24 @@ class Dataset(object):
                             })
 
                 # Generate series attributes
-                if 'seriesName' in list(self.__dict__.keys()) or 'seriesInformation' in list(self.__dict__.keys()):
-                    if self.__getattribute__('seriesName') is not None or self.__getattribute__('seriesInformation') is not None:
+                if 'series' in list(self.__dict__.keys()):
+                    series = self.__getattribute__('series')
+                    if series is not None:
                         tmp_dict = {}
-                        tmp_dict['value'] = {}
-                        if 'seriesName' in list(self.__dict__.keys()):
-                            if self.__getattribute__('seriesName') is not None:
-                                tmp_dict['value']['seriesName'] = {}
-                                tmp_dict['value']['seriesName']['typeName'] = 'seriesName'
-                                tmp_dict['value']['seriesName']['multiple'] = False
-                                tmp_dict['value']['seriesName']['typeClass'] = 'primitive'
-                                tmp_dict['value']['seriesName']['value'] = self.__getattribute__('seriesName')
-                        if 'seriesInformation' in list(self.__dict__.keys()):
-                            if self.__getattribute__('seriesInformation') is not None:
-                                tmp_dict['value']['seriesInformation'] = {}
-                                tmp_dict['value']['seriesInformation']['typeName'] = 'seriesInformation'
-                                tmp_dict['value']['seriesInformation']['multiple'] = False
-                                tmp_dict['value']['seriesInformation']['typeClass'] = 'primitive'
-                                tmp_dict['value']['seriesInformation']['value'] = self.__getattribute__('seriesInformation')
+                        if 'seriesName' in series.keys():
+                            if series['seriesName'] is not None:
+                                tmp_dict['seriesName'] = {}
+                                tmp_dict['seriesName']['typeName'] = 'seriesName'
+                                tmp_dict['seriesName']['multiple'] = False
+                                tmp_dict['seriesName']['typeClass'] = 'primitive'
+                                tmp_dict['seriesName']['value'] = series['seriesName']
+                        if 'seriesInformation' in series.keys():
+                            if series['seriesInformation'] is not None:
+                                tmp_dict['seriesInformation'] = {}
+                                tmp_dict['seriesInformation']['typeName'] = 'seriesInformation'
+                                tmp_dict['seriesInformation']['multiple'] = False
+                                tmp_dict['seriesInformation']['typeClass'] = 'primitive'
+                                tmp_dict['seriesInformation']['value'] = series['seriesInformation']
                         citation['fields'].append({
                             'typeName': 'series',
                             'multiple': False,
@@ -1186,10 +1184,9 @@ class Dataset(object):
                 print('dict can not be created. Data is not valid for format')
                 return None
         elif format == 'all':
-            for attr in self.__attr_valid_class:
-                if attr in list(self.__dict__.keys()):
-                    if self.__getattribute__(attr) is not None:
-                        data[attr] = self.__getattribute__(attr)
+            for attr in list(self.__dict__.keys()):
+                if self.__getattribute__(attr) is not None:
+                    data[attr] = self.__getattribute__(attr)
             return data
         else:
             print('dict can not be created. Format is not valid')
@@ -1319,11 +1316,7 @@ class Dataset(object):
             >>> ds.export_data('export_dataset.json')
 
         """
-        if format == 'dv_up' or format == 'all':
-            return write_file_json(filename, self.dict(format=format))
-        else:
-            # TODO: Exception
-            print('Data-format not right.')
+        return write_file_json(filename, self.dict(format=format))
 
 
 class Datafile(object):
