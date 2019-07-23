@@ -178,10 +178,10 @@ def import_dataset_min_dict():
 
     """
     data = {
-        'license': 'CC0',
-        'termsOfUse': 'CC0 Waiver',
-        'termsOfAccess': 'Terms of Access',
-        'citation_displayName': 'Citation Metadata',
+        'author': [{'authorName': 'Peter Muller'}],
+        'datasetContact': [{'datasetContactEmail': 'peter.muller@example.com'}],
+        'dsDescription': 'Description of Dataset.',
+        'subject': 'Medicine, Health and Life Sciences',
         'title': 'Replication Data for: Title'
     }
     return data

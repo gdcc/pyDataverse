@@ -31,11 +31,17 @@ class TestDataset(object):
         data = import_dataset_min_dict
         ds.set(data)
 
-        assert ds.license == 'CC0'
-        assert ds.termsOfUse == 'CC0 Waiver'
-        assert ds.termsOfAccess == 'Terms of Access'
-        assert ds.citation_displayName == 'Citation Metadata'
         assert ds.title == 'Replication Data for: Title'
+        assert isinstance(ds.author, list)
+        assert isinstance(ds.author[0], dict)
+        assert len(ds.author[0].keys()) == 1
+        assert ds.author[0]['authorName'] == 'Peter Muller'
+        assert isinstance(ds.datasetContact, list)
+        assert isinstance(ds.datasetContact[0], dict)
+        assert len(ds.datasetContact[0].keys()) == 1
+        assert ds.datasetContact[0]['datasetContactEmail'] == 'peter.muller@example.com'
+        assert ds.dsDescription == 'Description of Dataset.'
+        assert ds.subject == 'Medicine, Health and Life Sciences'
         assert len(ds.__dict__.keys()) == 5
 
     def test_dataset_is_valid_valid(self):
