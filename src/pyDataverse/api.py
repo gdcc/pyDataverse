@@ -815,7 +815,7 @@ class Api(object):
                 'ERROR: HTTP 401 - User not allowed to delete dataset {0}. '
                 'MSG: {1}'.format(identifier, error_msg))
         elif resp.status_code == 200:
-            print('Dataset {} deleted'.format(identifier))
+            print('Dataset {} deleted.'.format(identifier))
         return resp
 
     def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
@@ -1022,6 +1022,9 @@ class Api(object):
         The upload endpoint checks the content of the file, compares it with
         existing files and tells if already in the database (most likely via
         hashing).
+
+        `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
 
         Parameters
         ----------
