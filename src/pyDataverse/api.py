@@ -18,6 +18,7 @@ from requests import put
 import subprocess as sp
 
 
+
 class Api(object):
     """Api class.
 
@@ -743,21 +744,21 @@ class Api(object):
 
         """
         path = '/datasets/:persistentId/actions/:publish'
-        path += '?persistentId={0}&type={1}'.format(identifier, type)
+        path += '?persistentId={0}&type={1}'.format(pid, type)
         resp = self.post_request(path, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
             raise DatasetNotFoundError(
                 'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
-                ''.format(identifier, error_msg))
+                ''.format(pid, error_msg))
         elif resp.status_code == 401:
             error_msg = resp.json()['message']
             raise ApiAuthorizationError(
                 'ERROR: HTTP 401 - User not allowed to publish dataset {0}. '
-                'MSG: {1}'.format(identifier, error_msg))
+                'MSG: {1}'.format(pid, error_msg))
         elif resp.status_code == 200:
-            print('Dataset {} published'.format(identifier))
+            print('Dataset {} published'.format(pid))
         return resp
 
     def delete_dataset(self, identifier, is_pid=True, auth=True):
@@ -1008,7 +1009,7 @@ class Api(object):
         data = self.get_request(path)
         return data
 
-    def upload_file(self, identifier, filename, is_pid=True):
+    def upload_file(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1032,6 +1033,8 @@ class Api(object):
             Identifier of the dataset.
         filename : string
             Full filename with path.
+        json_str : string
+            Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
 
@@ -1052,6 +1055,8 @@ class Api(object):
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
             path, filename)
+        if json_str:
+            shell_command += " -F 'jsonData={0}'".format(json_str)
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
