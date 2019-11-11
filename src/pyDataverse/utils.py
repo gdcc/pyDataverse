@@ -3,52 +3,7 @@
 """Dataverse utility functions."""
 import csv
 import json
-
-
-def json_to_dict(data):
-    """Convert JSON to a dict().
-
-    See more about the json module at
-    https://docs.python.org/3.5/library/json.html
-
-    Parameters
-    ----------
-    data : string
-        Data as a json-formatted string.
-
-    Returns
-    -------
-    dict
-        Data as Python Dictionary.
-
-    """
-    try:
-        return json.loads(data)
-    except Exception as e:
-        raise e
-
-
-def dict_to_json(data):
-    """Convert dict() to JSON-formatted string.
-
-    See more about the json module at
-    https://docs.python.org/3.5/library/json.html
-
-    Parameters
-    ----------
-    data : dict
-        Data as Python Dictionary.
-
-    Returns
-    -------
-    string
-        Data as a json-formatted string.
-
-    """
-    try:
-        return json.dumps(data, ensure_ascii=True, indent=2)
-    except Exception as e:
-        raise e
+import pickle
 
 
 def read_file(filename, mode='r'):
@@ -101,7 +56,7 @@ def write_file(filename, data, mode='w'):
         raise e
 
 
-def read_file_json(filename):
+def read_json(filename):
     """Read in a json file.
 
     See more about the json module at
@@ -124,7 +79,7 @@ def read_file_json(filename):
         raise e
 
 
-def write_file_json(filename, data, mode='w'):
+def write_json(filename, data, mode='w'):
     """Write data to a json file.
 
     Parameters
@@ -139,6 +94,96 @@ def write_file_json(filename, data, mode='w'):
 
     """
     write_file(filename, dict_to_json(data), mode)
+
+
+def read_pickle(filename):
+    """Read in pickle file.
+
+    See more at `pickle <https://docs.python.org/3/library/pickle.html>`_.
+
+    Parameters
+    ----------
+    filename : string
+        Full filename with path of file.
+
+    Returns
+    -------
+    data
+        Data object.
+
+    """
+    try:
+        with open(filename, 'rb') as f:
+            data = pickle.load(f)
+            return data
+    except Exception as e:
+        raise e
+
+
+def write_pickle(filename, data):
+    """Write data in pickle file.
+
+    See more at `pickle <https://docs.python.org/3/library/pickle.html>`_.
+
+    Parameters
+    ----------
+    filename : string
+        Full filename with path of file.
+    data : object
+        Data to write in pickle file.
+
+    """
+    try:
+        with open(filename, 'wb') as f:
+            pickle.dump(data, f)
+    except Exception as e:
+        raise e
+
+
+def json_to_dict(data):
+    """Convert JSON to a dict().
+
+    See more about the json module at
+    https://docs.python.org/3.5/library/json.html
+
+    Parameters
+    ----------
+    data : string
+        Data as a json-formatted string.
+
+    Returns
+    -------
+    dict
+        Data as Python Dictionary.
+
+    """
+    try:
+        return json.loads(data)
+    except Exception as e:
+        raise e
+
+
+def dict_to_json(data):
+    """Convert dict() to JSON-formatted string.
+
+    See more about the json module at
+    https://docs.python.org/3.5/library/json.html
+
+    Parameters
+    ----------
+    data : dict
+        Data as Python Dictionary.
+
+    Returns
+    -------
+    string
+        Data as a json-formatted string.
+
+    """
+    try:
+        return json.dumps(data, ensure_ascii=True, indent=2)
+    except Exception as e:
+        raise e
 
 
 def read_file_csv(filename):
