@@ -222,7 +222,7 @@ class Dataverse(object):
                             data[attr] = self.__getattribute__(attr)
                 return data
             else:
-                print('Dict can not be created. Data is not valid for format')
+                print('Dict can not be created. Data is not valid for format.')
                 return None
         elif format == 'all':
             for attr in self.__attr_dict_all_valid:
@@ -283,10 +283,10 @@ class Dataverse(object):
                 print('JSON data can not be read in.')
         else:
             # TODO Exception
-            print('data format not valid.')
+            print('Data format not valid.')
 
     def export_data(self, filename, format='dv_up'):
-        """Export Dataverse metadata to Dataverse API upload JSON.
+        """Export Dataverse metadata to different formats.
 
         Parameters
         ----------
@@ -1286,7 +1286,7 @@ class Dataset(object):
             print('data format not valid.')
 
     def export_data(self, filename, format='dv_up'):
-        """Export Dataset metadata to Dataverse API upload JSON.
+        """Export Dataset metadata to different formats.
 
         Parameters
         ----------
@@ -1346,22 +1346,27 @@ class Datafile(object):
 
     """
 
-    """Class attributes required for Datafile metadata JSON."""
-    __attr_required_metadata = [
-        'filename',
-        'pid'
+    """Attributes to be imported from `dv_up` file."""
+    __attr_import_dv_up_values = [
+        'description',
+        'categories',
+        'restrict',
+        'title',
+        'directoryLabel'
     ]
 
-    """Attributes on first level of Datafile metadata JSON."""
-    __attr_valid_metadata = [
-        'description',
+    """Required attributes for valid `dv_up` metadata dict creation."""
+    __attr_dict_dv_up_required = [
         'pid',
-        'restrict'
-    ]
-    """Attributes on first level of Datafile metadata JSON."""
-    __attr_valid_class = [
         'filename'
-    ] + __attr_valid_metadata
+    ]
+
+    """Valid attributes for `dv_up` metadata dict creation."""
+    __attr_dict_dv_up_valid = __attr_import_dv_up_values + __attr_dict_dv_up_required
+
+    """Valid attributes for `all` metadata dict creation."""
+    __attr_dict_all_valid = __attr_dict_dv_up_valid
+
 
     def __init__(self, filename=None, pid=None):
         """Init a Datafile() class.
@@ -1413,6 +1418,7 @@ class Datafile(object):
             >>> data = {
             >>>     'pid': 'doi:10.11587/EVMUHP',
             >>>     'description': 'Test file',
+            >>>     'categories': ['Data', 'Code'],
             >>>     'filename': 'tests/data/datafile.txt'
             >>> }
             >>> df.set(data)
@@ -1421,11 +1427,7 @@ class Datafile(object):
 
         """
         for key, val in data.items():
-            if key in self.__attr_valid_class:
-                self.__setattr__(key, val)
-            else:
-                # TODO: Raise Exception
-                print('Key {0} not valid.'.format(key))
+            self.__setattr__(key, val)
 
     def is_valid(self):
         """Check if set attributes are valid for Dataverse API metadata creation.
@@ -1444,6 +1446,7 @@ class Datafile(object):
             >>> data = {
             >>>     'pid': 'doi:10.11587/EVMUHP',
             >>>     'description': 'Test file',
+            >>>     'categories': ['Data', 'Code'],
             >>>     'filename': 'tests/data/datafile.txt'
             >>> }
             >>> df.set(data)
@@ -1455,12 +1458,14 @@ class Datafile(object):
 
         """
         is_valid = True
-
-        for attr in self.__attr_required_metadata:
-            if self.__getattribute__(attr) is None:
+        for attr in self.__attr_dict_dv_up_required:
+            if attr in list(self.__dict__.keys()):
+                if not self.__getattribute__(attr):
+                    is_valid = False
+                    print('Attribute \'{0}\' is `False`.'.format(attr))
+            else:
                 is_valid = False
-                print('attribute \'{0}\' missing.'.format(attr))
-
+                print('Attribute \'{0}\' missing.'.format(attr))
         return is_valid
 
     def dict(self, format='dv_up'):
@@ -1487,7 +1492,7 @@ class Datafile(object):
             >>> data = {
             >>>     'pid': 'doi:10.11587/EVMUHP',
             >>>     'description': 'Test file',
-            >>>     'filename': 'tests/data/datafile.txt'
+            >>>     'categories': ['Data', 'Code']
             >>> }
             >>> df.set(data)
             >>> data = df.dict()
@@ -1502,18 +1507,21 @@ class Datafile(object):
         data = {}
         if format == 'dv_up':
             if self.is_valid():
-                for attr in self.__attr_valid_metadata:
-                    if self.__getattribute__(attr) is not None:
-                        data[attr] = self.__getattribute__(attr)
-
+                for attr in self.__attr_dict_dv_up_valid:
+                    # check if attribute exists
+                    if attr in list(self.__dict__.keys()):
+                        # check if attribute is not None
+                        if self.__getattribute__(attr) is not None:
+                            data[attr] = self.__getattribute__(attr)
                 return data
             else:
-                print('dict can not be created. Data is not valid')
+                print('Dict can not be created. Data is not valid for format.')
                 return None
         elif format == 'all':
-            for attr in self.__attr_valid_class:
-                if self.__getattribute__(attr) is not None:
-                    data[attr] = self.__getattribute__(attr)
+            for attr in self.__attr_dict_all_valid:
+                if attr in list(self.__dict__.keys()):
+                    if self.__getattribute__(attr) is not None:
+                        data[attr] = self.__getattribute__(attr)
             return data
         else:
             # TODO: Exception
@@ -1527,8 +1535,8 @@ class Datafile(object):
         ----------
         format : string
             Data format of input. Available formats are: `dv_up` for Dataverse
-            API upload compatible format and `all` with all attributes named in
-            `__attr_valid_class`.
+            API upload compatible format (default) and `all` with all attributes
+            named in `__attr_valid_class`.
 
         Returns
         -------
@@ -1544,7 +1552,7 @@ class Datafile(object):
             >>> data = {
             >>>     'pid': 'doi:10.11587/EVMUHP',
             >>>     'description': 'Test file',
-            >>>     'filename': 'tests/data/datafile.txt'
+            >>>     'categories': ['Data', 'Code']
             >>> }
             >>> df.set(data)
             >>> df.dict()
@@ -1558,21 +1566,47 @@ class Datafile(object):
         Link to default JSON file
 
         """
-        if format == 'dv_up':
-            data = self.dict('dv_up')
+        if format == 'dv_up' or format == 'all':
+            data = self.dict(format=format)
             if data:
                 return dict_to_json(data)
             else:
-                print('Dict can not be created')
-                return None
-        elif format == 'all':
-            data = self.dict('all')
-            if data:
-                return dict_to_json(data)
-            else:
-                print('Dict can not be created')
                 return None
         else:
             # TODO Exception
-            print('data format not valid.')
+            print('Data format not valid.')
             return None
+
+    def export_data(self, filename, format='dv_up'):
+        """Export Datafile metadata to different formats.
+
+        Parameters
+        ----------
+        filename : string
+            Filename with full path.
+        format : string
+            Data format for export. Available format so far are:
+            ``dv_up``: Dataverse API Upload Dataverse JSON metadata standard.
+            ``all``: All attributes.
+
+        Examples
+        -------
+        Export Datafile metadata::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'categories': ['Data', 'Code']
+            >>> }
+            >>> df.set(data)
+            >>> dv.export_data('dataverse_export.json')
+
+
+        """
+        if format == 'dv_up' or format == 'all':
+            return write_file_json(filename, self.dict(format=format))
+        else:
+            # TODO: Exception
+            print('Data-format not right.')
