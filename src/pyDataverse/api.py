@@ -799,7 +799,7 @@ class Api(object):
         if resp.status_code == 404:
             error_msg = resp.json()['message']
             raise DatasetNotFoundError(
-                'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
+                'ERROR: HTTP 404 - Dataset \'{0}\' was not found. MSG: {1}'
                 ''.format(identifier, error_msg))
         elif resp.status_code == 405:
             error_msg = resp.json()['message']
@@ -813,10 +813,10 @@ class Api(object):
         elif resp.status_code == 401:
             error_msg = resp.json()['message']
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - User not allowed to delete dataset {0}. '
+                'ERROR: HTTP 401 - User not allowed to delete dataset \'{0}\'. '
                 'MSG: {1}'.format(identifier, error_msg))
         elif resp.status_code == 200:
-            print('Dataset {} deleted.'.format(identifier))
+            print('Dataset \'{}\' deleted.'.format(identifier))
         return resp
 
     def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
@@ -1057,6 +1057,34 @@ class Api(object):
             path, filename)
         if json_str:
             shell_command += " -F 'jsonData={0}'".format(json_str)
+        # TODO(Shell): is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        resp = json.loads(result.stdout)
+        return resp
+
+    def update_datafile_metadata(self, datafile_id, json_str, auth=True):
+        """Update Datafile metadata.
+
+        Updates the file metadata for an existing file where id is the database
+        id of the file to replace or pid is the persistent id (DOI or Handle)
+        of the file. Requires a jsonString expressing the new metadata. No
+        metadata from the previous version of this file will be persisted, so
+        if you want to update a specific field first get the json with the
+        above command and alter the fields you want:
+
+        POST -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+
+        Also note that dataFileTags are not versioned and changes to these
+        will update the published version of the file.
+
+        """
+        path = '/files/{}/metadata'.format(datafile_id)
+
+        resp = self.post_request(path, auth=auth)
+
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
+            self.api_token)
+        shell_command += " -X POST {0} -F 'jsonData={0}'".format(json_str)
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
