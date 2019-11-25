@@ -693,6 +693,65 @@ class Api(object):
             print('Dataset {} created.'.format(identifier))
         return resp
 
+def create_private_url(self, identifier, is_pid=True, auth=True):
+    """Create private Dataset URL.
+
+    POST http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
+
+
+    http://guides.dataverse.org/en/4.16/api/native-api.html#create-a-private-url-for-a-dataset
+            'MSG: {1}'.format(pid, error_msg))
+
+    """
+    if is_pid:
+        path = '/datasets/:persistentId/privateUrl/?persistentId={0}'.format(identifier)
+    else:
+        path = '/datasets/{0}/privateUrl'.format(identifier)
+
+    resp = self.post_request(path, auth=auth)
+
+    if resp.status_code == 200:
+        print('Dataset private URL created: {0}'.format(resp.json()['data']['link']))
+    return resp
+
+    def get_private_url(self, identifier, is_pid=True, auth=True):
+        """Get private Dataset URL.
+
+        GET http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
+
+        http://guides.dataverse.org/en/4.16/api/native-api.html#get-the-private-url-for-a-dataset
+
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/privateUrl/?persistentId={0}'.format(identifier)
+        else:
+            path = '/datasets/{0}/privateUrl'.format(identifier)
+
+        resp = self.get_request(path, auth=auth)
+
+        if resp.status_code == 200:
+            print('Got Dataset private URL: {0}'.format(resp.json()['data']['link']))
+        return resp
+
+    def delete_private_url(self, identifier, is_pid=True, auth=True):
+        """Get private Dataset URL.
+
+        DELETE http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
+
+        http://guides.dataverse.org/en/4.16/api/native-api.html#delete-the-private-url-from-a-dataset
+
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/privateUrl/?persistentId={0}'.format(identifier)
+        else:
+            path = '/datasets/{0}/privateUrl'.format(identifier)
+
+        resp = self.delete_request(path, auth=auth)
+
+        if resp.status_code == 200:
+            print('Got Dataset private URL: {0}'.format(resp.json()['data']['link']))
+        return resp
+
     def publish_dataset(self, pid, type='minor', auth=True):
         """Publish dataset.
 
