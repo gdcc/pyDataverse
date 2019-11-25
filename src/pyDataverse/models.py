@@ -3,8 +3,8 @@
 """Dataverse data-types data model."""
 from __future__ import absolute_import
 from pyDataverse.utils import dict_to_json
-from pyDataverse.utils import read_file_json
-from pyDataverse.utils import write_file_json
+from pyDataverse.utils import read_json
+from pyDataverse.utils import write_json
 
 """
 Data-structure to work with data and metadata of Dataverses, Datasets and
@@ -114,7 +114,7 @@ class Dataverse(object):
         """
         data = {}
         if format == 'dv_up':
-            metadata = read_file_json(filename)
+            metadata = read_json(filename)
             # get first level metadata and parse it automatically
             for key, val in metadata.items():
                 if key in self.__attr_import_dv_up_values:
@@ -315,7 +315,7 @@ class Dataverse(object):
 
         """
         if format == 'dv_up' or format == 'all':
-            return write_file_json(filename, self.dict(format=format))
+            return write_json(filename, self.dict(format=format))
         else:
             # TODO: Exception
             print('Data-format not right.')
@@ -604,7 +604,7 @@ class Dataset(object):
         """
         data = {}
         if format == 'dv_up':
-            metadata = read_file_json(filename)
+            metadata = read_json(filename)
             """dataset"""
             # get first level metadata and parse it automatically
             for key, val in metadata['datasetVersion'].items():
@@ -1316,7 +1316,7 @@ class Dataset(object):
             >>> ds.export_data('export_dataset.json')
 
         """
-        return write_file_json(filename, self.dict(format=format))
+        return write_json(filename, self.dict(format=format))
 
 
 class Datafile(object):
@@ -1603,10 +1603,9 @@ class Datafile(object):
             >>> df.set(data)
             >>> dv.export_data('dataverse_export.json')
 
-
         """
         if format == 'dv_up' or format == 'all':
-            return write_file_json(filename, self.dict(format=format))
+            return write_json(filename, self.dict(format=format))
         else:
             # TODO: Exception
             print('Data-format not right.')
