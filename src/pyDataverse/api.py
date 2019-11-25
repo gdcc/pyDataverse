@@ -497,7 +497,7 @@ class Api(object):
             print('Dataverse {} published.'.format(identifier))
         return resp
 
-    def delete_dataverse(self, identifier, auth=True):
+    def sverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
 
         HTTP Request:
@@ -876,6 +876,35 @@ def create_private_url(self, identifier, is_pid=True, auth=True):
                 'MSG: {1}'.format(identifier, error_msg))
         elif resp.status_code == 200:
             print('Dataset \'{}\' deleted.'.format(identifier))
+        return resp
+
+    def destroy_dataset(self, identifier, is_pid=True, auth=True):
+        """Destroy Dataset.
+
+        http://guides.dataverse.org/en/4.16/api/native-api.html#delete-published-dataset
+
+        Normally published datasets should not be deleted, but there exists a
+        “destroy” API endpoint for superusers which will act on a dataset given
+        a persistent ID or dataset database ID:
+
+        curl -H "X-Dataverse-key:$API_TOKEN" -X DELETE http://$SERVER/api/datasets/:persistentId/destroy/?persistentId=doi:10.5072/FK2/AAA000
+
+        curl -H "X-Dataverse-key:$API_TOKEN" -X DELETE http://$SERVER/api/datasets/999/destroy
+
+        Calling the destroy endpoint is permanent and irreversible. It will
+        remove the dataset and its datafiles, then re-index the parent
+        dataverse in Solr. This endpoint requires the API token of a
+        superuser.
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/destroy/?persistentId={0}'.format(identifier)
+        else:
+            path = '/datasets/{0}/destroy'.format(identifier)
+
+        resp = self.delete_request(path, auth=auth)
+
+        if resp.status_code == 200:
+            print('Dataset {0} destroyed'.format(resp.json()))
         return resp
 
     def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
