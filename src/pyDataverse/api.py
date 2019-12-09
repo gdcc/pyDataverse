@@ -973,6 +973,27 @@ class Api(object):
             print('Dataset {} published'.format(pid))
         return resp
 
+    def get_dataset_lock(self, pid):
+        """Get if dataset is locked.
+
+        The lock API endpoint was introduced in Dataverse 4.9.3.
+
+        Parameters
+        ----------
+        pid : string
+            Persistent identifier of the dataset (e.g.
+            ``doi:10.11587/8H3N93``).
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/datasets/:persistentId/locks/?persistentId={0}'.format(pid)
+        resp = self.get_request(path, auth=True)
+        return resp
+
     def delete_dataset(self, identifier, is_pid=True, auth=True):
         """Delete a dataset.
 
