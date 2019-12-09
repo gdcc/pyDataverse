@@ -846,7 +846,7 @@ class Api(object):
             print('Dataset {} created.'.format(identifier))
         return resp
 
-    def create_private_url(self, identifier, is_pid=True, auth=True):
+    def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
         """Create private Dataset URL.
 
         POST http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
@@ -867,7 +867,7 @@ class Api(object):
             print('Dataset private URL created: {0}'.format(resp.json()['data']['link']))
         return resp
 
-    def get_private_url(self, identifier, is_pid=True, auth=True):
+    def get_dataset_private_url(self, identifier, is_pid=True, auth=True):
         """Get private Dataset URL.
 
         GET http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
@@ -886,7 +886,7 @@ class Api(object):
             print('Got Dataset private URL: {0}'.format(resp.json()['data']['link']))
         return resp
 
-    def delete_private_url(self, identifier, is_pid=True, auth=True):
+    def delete_dataset_private_url(self, identifier, is_pid=True, auth=True):
         """Get private Dataset URL.
 
         DELETE http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
@@ -992,6 +992,21 @@ class Api(object):
         """
         path = '/datasets/:persistentId/locks/?persistentId={0}'.format(pid)
         resp = self.get_request(path, auth=True)
+        return resp
+
+    def get_dataset_assignments(self, identifier, is_pid=True, auth=True):
+        """Get Dataset assignments.
+
+        GET http://$SERVER/api/datasets/$id/assignments?key=$apiKey
+
+
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/assignments/?persistentId={0}'.format(identifier)
+        else:
+            path = '/datasets/{0}/assignments'.format(identifier)
+
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def delete_dataset(self, identifier, is_pid=True, auth=True):
