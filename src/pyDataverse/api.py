@@ -1520,7 +1520,7 @@ class Api(object):
         return resp
 
     def delete_user_apitoken(self):
-        """Recreate an Users API token.
+        """Delete an Users API token.
 
         HTTP Request:
 
@@ -1535,5 +1535,77 @@ class Api(object):
 
         """
         path = '/users/token'
+        resp = self.delete_request(path)
+        return resp
+
+    def create_dataverse_role(self, dataverse_id):
+        """Create a new role in a Dataverse.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST http://$SERVER/api/roles?dvo=$dataverseIdtf&key=$apiKey
+
+        Parameters
+        ----------
+        dataverse_id : string
+            Can be alias or id of a Dataverse.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/roles?dvo={0}'.format(dataverse_id)
+        resp = self.post_request(path)
+        return resp
+
+    def get_dataverse_role(self, role_id):
+        """Get role of a Dataverse.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/roles/$id
+
+        Parameters
+        ----------
+        identifier : string
+            Can be alias or id of a Dataverse.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/roles/{0}'.format(role_id)
+        resp = self.get_request(path)
+        return resp
+
+    def delete_dataverse_role(self, role_id):
+        """Delete role of a Dataverse.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            DELETE http://$SERVER/api/roles/$id
+
+        Parameters
+        ----------
+        identifier : string
+            Can be alias or id of a Dataverse.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/roles/{0}'.format(role_id)
         resp = self.delete_request(path)
         return resp
