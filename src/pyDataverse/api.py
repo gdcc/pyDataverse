@@ -1480,3 +1480,60 @@ class Api(object):
         path = '/metadatablocks/{0}'.format(identifier)
         resp = self.get_request(path)
         return resp
+
+    def get_user_apitoken_expirationdate(self):
+        """Get the expiration date of an Users's API token.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            curl -H X-Dataverse-key:$API_TOKEN -X GET $SERVER_URL/api/users/token
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/users/token'
+        resp = self.get_request(path)
+        return resp
+
+    def recreate_user_apitoken(self):
+        """Recreate an Users API token.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            curl -H X-Dataverse-key:$API_TOKEN -X POST $SERVER_URL/api/users/token/recreate
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/users/token/recreate'
+        resp = self.post_request(path)
+        return resp
+
+    def delete_user_apitoken(self):
+        """Recreate an Users API token.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            curl -H X-Dataverse-key:$API_TOKEN -X POST $SERVER_URL/api/users/token/recreate
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/users/token'
+        resp = self.delete_request(path)
+        return resp
