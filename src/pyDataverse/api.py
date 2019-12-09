@@ -16,6 +16,7 @@ from requests import get
 from requests import post
 from requests import put
 import subprocess as sp
+import time
 
 
 
@@ -86,6 +87,7 @@ class Api(object):
                 raise ApiAuthorizationError(
                     'Api token passed is not a string.')
         self.api_token = api_token
+        self.timeout = 500
         self.conn_started = datetime.now()
 
         # Test connection.
@@ -497,7 +499,7 @@ class Api(object):
             print('Dataverse {} published.'.format(identifier))
         return resp
 
-    def sverse(self, identifier, auth=True):
+    def delete_dataverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
 
         HTTP Request:
@@ -552,6 +554,81 @@ class Api(object):
             print('Dataverse {} deleted.'.format(identifier))
         return resp
 
+    def get_dataverse_roles(self, identifier, auth=False):
+        """Get dataverse roles by alias or id.
+
+        View roles of a dataverse.
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/dataverses/$id/roles
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long), a dataverse alias (more
+            robust), or the special value ``:root``.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/dataverses/{0}/roles'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
+    def get_dataverse_assignments(self, identifier, auth=False):
+        """Get dataverse assignments by alias or id.
+
+        View assignments of a dataverse.
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/dataverses/$id/assignments
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long), a dataverse alias (more
+            robust), or the special value ``:root``.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/dataverses/{0}/assignments'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
+    def get_dataverse_facets(self, identifier, auth=False):
+        """Get dataverse facets by alias or id.
+
+        View facets of a dataverse.
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/dataverses/$id/facets
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long), a dataverse alias (more
+            robust), or the special value ``:root``.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/dataverses/{0}/facets'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
     def get_dataset(self, identifier, auth=True, is_pid=True):
         """Get metadata of a Dataset.
 
@@ -588,6 +665,82 @@ class Api(object):
                 identifier)
         else:
             path = '/datasets/{0}'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
+    def get_dataset_versions(self, identifier, auth=True, is_pid=True):
+        """Get versions of a Dataset.
+
+        With Dataverse identifier:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/$identifier/versions
+
+        With persistent identifier:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/:persistentId/versions?persistentId=$id
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
+        is_pid : bool
+            True, if identifier is a persistent identifier.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/versions?persistentId={0}'.format(
+                identifier)
+        else:
+            path = '/datasets/{0}/versions'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
+    def get_dataset_version(self, identifier, version, auth=True, is_pid=True):
+        """Get version of a Dataset.
+
+        With Dataverse identifier:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/$identifier/versions/$versionNumber
+
+        With persistent identifier:
+
+        .. code-block:: bash
+
+            GET http://$SERVER/api/datasets/:persistentId/versions/$versionNumber?persistentId=$id
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
+        version : string
+            Version string of the Dataset.
+        is_pid : bool
+            True, if identifier is a persistent identifier.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/versions/{0}?persistentId={1}'.format(
+                version, identifier)
+        else:
+            path = '/datasets/{0}/versions/{1}'.format(identifier, version)
         resp = self.get_request(path, auth=auth)
         return resp
 
@@ -693,26 +846,26 @@ class Api(object):
             print('Dataset {} created.'.format(identifier))
         return resp
 
-def create_private_url(self, identifier, is_pid=True, auth=True):
-    """Create private Dataset URL.
+    def create_private_url(self, identifier, is_pid=True, auth=True):
+        """Create private Dataset URL.
 
-    POST http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
+        POST http://$SERVER/api/datasets/$id/privateUrl?key=$apiKey
 
 
-    http://guides.dataverse.org/en/4.16/api/native-api.html#create-a-private-url-for-a-dataset
-            'MSG: {1}'.format(pid, error_msg))
+        http://guides.dataverse.org/en/4.16/api/native-api.html#create-a-private-url-for-a-dataset
+                'MSG: {1}'.format(pid, error_msg))
 
-    """
-    if is_pid:
-        path = '/datasets/:persistentId/privateUrl/?persistentId={0}'.format(identifier)
-    else:
-        path = '/datasets/{0}/privateUrl'.format(identifier)
+        """
+        if is_pid:
+            path = '/datasets/:persistentId/privateUrl/?persistentId={0}'.format(identifier)
+        else:
+            path = '/datasets/{0}/privateUrl'.format(identifier)
 
-    resp = self.post_request(path, auth=auth)
+        resp = self.post_request(path, auth=auth)
 
-    if resp.status_code == 200:
-        print('Dataset private URL created: {0}'.format(resp.json()['data']['link']))
-    return resp
+        if resp.status_code == 200:
+            print('Dataset private URL created: {0}'.format(resp.json()['data']['link']))
+        return resp
 
     def get_private_url(self, identifier, is_pid=True, auth=True):
         """Get private Dataset URL.
@@ -990,6 +1143,59 @@ def create_private_url(self, identifier, is_pid=True, auth=True):
             print('Dataset {0} updated'.format(identifier))
         return resp
 
+    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
+        """Add file to a dataset.
+
+        Add a file to an existing Dataset. Description and tags are optional:
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST http://$SERVER/api/datasets/$id/add
+
+        The upload endpoint checks the content of the file, compares it with
+        existing files and tells if already in the database (most likely via
+        hashing).
+
+        `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset.
+        filename : string
+            Full filename with path.
+        json_str : string
+            Metadata as JSON string.
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
+
+        Returns
+        -------
+        dict
+            The json string responded by the CURL request, converted to a
+            dict().
+
+        """
+        path = self.native_api_base_url
+        if is_pid:
+            path += '/datasets/:persistentId/add?persistentId={0}'.format(
+                identifier)
+        else:
+            path += '/datasets/{0}/add'.format(identifier)
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
+            self.api_token)
+        shell_command += ' -X POST {0} -F file=@{1}'.format(
+            path, filename)
+        if json_str:
+            shell_command += " -F 'jsonData={0}'".format(json_str)
+        # TODO(Shell): is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        resp = json.loads(result.stdout)
+        return resp
+
     def get_datafiles(self, pid, version='1'):
         """List metadata of all datafiles of a dataset.
 
@@ -1096,59 +1302,6 @@ def create_private_url(self, identifier, is_pid=True, auth=True):
         path = '/access/datafile/bundle/{0}'.format(identifier)
         data = self.get_request(path)
         return data
-
-    def upload_file(self, identifier, filename, json_str=None, is_pid=True):
-        """Add file to a dataset.
-
-        Add a file to an existing Dataset. Description and tags are optional:
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            POST http://$SERVER/api/datasets/$id/add
-
-        The upload endpoint checks the content of the file, compares it with
-        existing files and tells if already in the database (most likely via
-        hashing).
-
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
-
-        Parameters
-        ----------
-        identifier : string
-            Identifier of the dataset.
-        filename : string
-            Full filename with path.
-        json_str : string
-            Metadata as JSON string.
-        is_pid : bool
-            ``True`` to use persistent identifier. ``False``, if not.
-
-        Returns
-        -------
-        dict
-            The json string responded by the CURL request, converted to a
-            dict().
-
-        """
-        path = self.native_api_base_url
-        if is_pid:
-            path += '/datasets/:persistentId/add?persistentId={0}'.format(
-                identifier)
-        else:
-            path += '/datasets/{0}/add'.format(identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += ' -X POST {0} -F file=@{1}'.format(
-            path, filename)
-        if json_str:
-            shell_command += " -F 'jsonData={0}'".format(json_str)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
-        return resp
 
     def update_datafile_metadata(self, datafile_id, json_str, auth=True):
         """Update Datafile metadata.
