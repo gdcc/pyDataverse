@@ -842,8 +842,15 @@ class Api(object):
                 ''.format(error_msg)
             )
         elif resp.status_code == 201:
-            identifier = resp.json()['data']['persistentId']
-            print('Dataset {} created.'.format(identifier))
+            if 'data' in resp.json():
+                if 'persistentId' in resp.json()['data']:
+                    identifier = resp.json()['data']['persistentId']
+                    print('Dataset with pid \'{}\' created.'.format(identifier))
+                elif 'id' in resp.json()['data']:
+                    identifier = resp.json()['data']['id']
+                    print('Dataset with id \'{}\' created.'.format(identifier))
+                else:
+                    print('ERROR: No identifier returned for created Dataset.')
         return resp
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
