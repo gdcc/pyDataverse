@@ -744,7 +744,7 @@ class Api(object):
         resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_dataset_export(self, pid, export_format):
+    def get_dataset_export(self, pid, export_format, auth=False):
         """Get metadata of dataset exported in different formats.
 
         Export the metadata of the current published version of a dataset
@@ -770,7 +770,7 @@ class Api(object):
         """
         path = '/datasets/export?exporter={0}&persistentId={1}'.format(
             export_format, pid)
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def create_dataset(self, dataverse, metadata, auth=True):
@@ -1239,7 +1239,7 @@ class Api(object):
         resp = json.loads(result.stdout)
         return resp
 
-    def get_datafiles(self, pid, version='1'):
+    def get_datafiles(self, pid, version='1', auth=False):
         """List metadata of all datafiles of a dataset.
 
         `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
@@ -1266,10 +1266,10 @@ class Api(object):
         base_str = '/datasets/:persistentId/versions/'
         path = base_str + '{0}/files?persistentId={1}'.format(
             version, pid)
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_datafile(self, identifier, is_pid=True):
+    def get_datafile(self, identifier, is_pid=True, auth=False):
         """Download a datafile via the Dataverse Data Access API.
 
         Get by file id (HTTP Request).
@@ -1303,10 +1303,10 @@ class Api(object):
         else:
             path = '/access/datafile/:persistentId/?persistentId={0}'
             ''.format(identifier)
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_datafile_bundle(self, identifier):
+    def get_datafile_bundle(self, identifier, auth=False):
         """Download a datafile in all its formats.
 
         HTTP Request:
@@ -1343,7 +1343,7 @@ class Api(object):
 
         """
         path = '/access/datafile/bundle/{0}'.format(identifier)
-        data = self.get_request(path)
+        data = self.get_request(path, auth=auth)
         return data
 
     def update_datafile_metadata(self, datafile_id, json_str, auth=True):
@@ -1374,7 +1374,7 @@ class Api(object):
         resp = json.loads(result.stdout)
         return resp
 
-    def get_info_version(self):
+    def get_info_version(self, auth=False):
         """Get the Dataverse version and build number.
 
         The response contains the version and build numbers. Requires no api
@@ -1393,10 +1393,10 @@ class Api(object):
 
         """
         path = '/info/version'
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_info_server(self):
+    def get_info_server(self,auth=False):
         """Get dataverse server name.
 
         This is useful when a Dataverse system is composed of multiple Java EE
@@ -1415,10 +1415,10 @@ class Api(object):
 
         """
         path = '/info/server'
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_info_apiTermsOfUse(self):
+    def get_info_apiTermsOfUse(self, auth=False):
         """Get API Terms of Use url.
 
         The response contains the text value inserted as API Terms of use which
@@ -1437,10 +1437,10 @@ class Api(object):
 
         """
         path = '/info/apiTermsOfUse'
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_metadatablocks(self):
+    def get_metadatablocks(self, auth=False):
         """Get info about all metadata blocks.
 
         Lists brief info about all metadata blocks registered in the system.
@@ -1458,10 +1458,10 @@ class Api(object):
 
         """
         path = '/metadatablocks'
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_metadatablock(self, identifier):
+    def get_metadatablock(self, identifier, auth=False):
         """Get info about single metadata block.
 
         Returns data about the block whose identifier is passed. identifier can
@@ -1485,10 +1485,10 @@ class Api(object):
 
         """
         path = '/metadatablocks/{0}'.format(identifier)
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_user_apitoken_expirationdate(self):
+    def get_user_apitoken_expirationdate(self, auth=False):
         """Get the expiration date of an Users's API token.
 
         HTTP Request:
@@ -1504,7 +1504,7 @@ class Api(object):
 
         """
         path = '/users/token'
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def recreate_user_apitoken(self):
@@ -1569,7 +1569,7 @@ class Api(object):
         resp = self.post_request(path)
         return resp
 
-    def get_dataverse_role(self, role_id):
+    def get_dataverse_role(self, role_id, auth=False):
         """Get role of a Dataverse.
 
         HTTP Request:
@@ -1590,7 +1590,7 @@ class Api(object):
 
         """
         path = '/roles/{0}'.format(role_id)
-        resp = self.get_request(path)
+        resp = self.get_request(path, auth=auth)
         return resp
 
     def delete_dataverse_role(self, role_id):
