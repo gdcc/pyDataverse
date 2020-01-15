@@ -18,10 +18,15 @@ and Datafiles.
 * Python 2 and 3 (>=2.7)
 * Open Source ([MIT](https://opensource.org/licenses/MIT))
 
+**pyDataverse pipeline**
+
+![pyDataverse pipeline](assets/pipeline.png)
+
 **Copyright**
 
 * Sourcecode:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
 * Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
+
 
 ## QUICKSTART
 
