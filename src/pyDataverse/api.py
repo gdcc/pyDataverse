@@ -88,51 +88,51 @@ class Api(object):
                     'Api token passed is not a string.')
         self.api_token = api_token
         self.timeout = 500
-        self.conn_started = datetime.now()
+        self.conn_started = datetime.now() # TODO: Maybe set var later?
 
         # Test connection.
-        path = '/info/server'
+        # path = '/info/server'
         if base_url and api_version:
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
-            url = '{0}{1}'.format(self.native_api_base_url, path)
-            try:
-                resp = get(url)
-                if resp:
-                    self.status = resp.json()['status']
-                else:
-                    self.status = 'ERROR'
-                    raise ApiResponseError(
-                        'No response from api request {0}.'.format(url)
-                    )
-            except KeyError as e:
-                print('ERROR: Key not in response {0} {1}.'.format(e, url))
-            except ConnectionError as e:
-                self.status = 'ERROR'
-                print(
-                    'ERROR: Could not establish connection to url {0} {1}.'
-                    ''.format(url, e))
+            # url = '{0}{1}'.format(self.native_api_base_url, path)
+            # try:
+            #     resp = get(url)
+            #     if resp:
+            #         self.status = resp.json()['status']
+            #     else:
+            #         self.status = 'ERROR'
+            #         raise ApiResponseError(
+            #             'No response from api request {0}.'.format(url)
+            #         )
+            # except KeyError as e:
+            #     print('ERROR: Key not in response {0} {1}.'.format(e, url))
+            # except ConnectionError as e:
+            #     self.status = 'ERROR'
+            #     print(
+            #         'ERROR: Could not establish connection to url {0} {1}.'
+            #         ''.format(url, e))
         else:
             self.status = 'ERROR'
             self.native_api_base_url = None
 
-        try:
-            resp = self.get_info_version()
-            if 'data' in resp.json().keys():
-                if 'version' in resp.json()['data'].keys():
-                    self.dataverse_version = resp.json()['data']['version']
-                else:
-                    # TODO: raise exception
-                    self.dataverse_version = None
-                    print('Key not in response.')
-            else:
-                self.dataverse_version = None
-                # TODO: raise exception
-                print('Key not in response.')
-        except:
-            self.dataverse_version = 'ERROR'
-            # TODO: raise exception
-            print('Dataverse build version can not be retrieved.')
+        # try:
+        #     resp = self.get_info_version()
+        #     if 'data' in resp.json().keys():
+        #         if 'version' in resp.json()['data'].keys():
+        #             self.dataverse_version = resp.json()['data']['version']
+        #         else:
+        #             # TODO: raise exception
+        #             self.dataverse_version = None
+        #             print('Key not in response.')
+        #     else:
+        #         self.dataverse_version = None
+        #         # TODO: raise exception
+        #         print('Key not in response.')
+        # except:
+        #     self.dataverse_version = 'ERROR'
+        #     # TODO: raise exception
+        #     print('Dataverse build version can not be retrieved.')
 
     def __str__(self):
         """Return name of Api() class for users.
@@ -1396,7 +1396,7 @@ class Api(object):
         resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_info_server(self,auth=False):
+    def get_info_server(self, auth=False):
         """Get dataverse server name.
 
         This is useful when a Dataverse system is composed of multiple Java EE
