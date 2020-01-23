@@ -252,7 +252,7 @@ class Api(object):
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'ERROR: POST - Could not establish connection to api {}.'
+                'ERROR: POST - Could not establish connection to API: {}'
                 ''.format(url)
             )
 
@@ -838,7 +838,7 @@ class Api(object):
         elif resp.status_code == 401:
             error_msg = resp.json()['message']
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Delete Dataset unauthorized. MSG: '
+                'ERROR: HTTP 401 - Create Dataset unauthorized. MSG: '
                 ''.format(error_msg)
             )
         elif resp.status_code == 201:

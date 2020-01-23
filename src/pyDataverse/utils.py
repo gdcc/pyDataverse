@@ -211,7 +211,7 @@ def read_file_csv(filename):
         csvfile.close()
 
 
-def read_csv_to_dict(filename, delimiter=';', quotechar='"', encoding='utf-8'):
+def read_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
     """Read in csv file and convert it into a list of dicts.
 
     This offers an easy import functionality of csv files with dataset metadata.
