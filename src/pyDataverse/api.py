@@ -94,45 +94,45 @@ class Api(object):
         if base_url and api_version:
             self.native_api_base_url = '{0}/api/{1}'.format(self.base_url,
                                                             self.api_version)
-            # path = '/info/server'
-            # url = '{0}{1}'.format(self.native_api_base_url, path)
-            # try:
-            #     resp = get(url)
-            #     if resp:
-            #         self.status = resp.json()['status']
-            #     else:
-            #         self.status = 'ERROR'
-            #         raise ApiResponseError(
-            #             'No response from api request {0}.'.format(url)
-            #         )
-            # except KeyError as e:
-            #     print('ERROR: Key not in response {0} {1}.'.format(e, url))
-            # except ConnectionError as e:
-            #     self.status = 'ERROR'
-            #     print(
-            #         'ERROR: Could not establish connection to url {0} {1}.'
-            #         ''.format(url, e))
+            path = '/info/server'
+            url = '{0}{1}'.format(self.native_api_base_url, path)
+            try:
+                resp = get(url)
+                if resp:
+                    self.status = resp.json()['status']
+                else:
+                    self.status = 'ERROR'
+                    raise ApiResponseError(
+                        'No response from api request {0}.'.format(url)
+                    )
+            except KeyError as e:
+                print('ERROR: Key not in response {0} {1}.'.format(e, url))
+            except ConnectionError as e:
+                self.status = 'ERROR'
+                print(
+                    'ERROR: Could not establish connection to url {0} {1}.'
+                    ''.format(url, e))
         else:
             self.status = 'ERROR'
             self.native_api_base_url = None
 
-        # try:
-        #     resp = self.get_info_version()
-        #     if 'data' in resp.json().keys():
-        #         if 'version' in resp.json()['data'].keys():
-        #             self.dataverse_version = resp.json()['data']['version']
-        #         else:
-        #             # TODO: raise exception
-        #             self.dataverse_version = None
-        #             print('Key not in response.')
-        #     else:
-        #         self.dataverse_version = None
-        #         # TODO: raise exception
-        #         print('Key not in response.')
-        # except:
-        #     self.dataverse_version = 'ERROR'
-        #     # TODO: raise exception
-        #     print('Dataverse build version can not be retrieved.')
+        try:
+            resp = self.get_info_version()
+            if 'data' in resp.json().keys():
+                if 'version' in resp.json()['data'].keys():
+                    self.dataverse_version = resp.json()['data']['version']
+                else:
+                    # TODO: raise exception
+                    self.dataverse_version = None
+                    print('Key not in response.')
+            else:
+                self.dataverse_version = None
+                # TODO: raise exception
+                print('Key not in response.')
+        except:
+            self.dataverse_version = 'ERROR'
+            # TODO: raise exception
+            print('Dataverse build version can not be retrieved.')
 
     def __str__(self):
         """Return name of Api() class for users.
