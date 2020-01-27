@@ -77,6 +77,7 @@ pyDataverse officially supports Python 2.7 & 3.4–3.7.
 External packages:
 
 - curl
+- tox
 
 
 Features

@@ -29,28 +29,127 @@ Utils Interface
 
 
 Exceptions
------------------------------
+------------
 
 .. automodule:: pyDataverse.exceptions
   :members:
 
 
 Install
------------------------------
+---------
 
-Install from the local git repository, with all it's dependencies:
+In order to install pyDataverse (and all of its dependencies) follow the steps below:
+
+Clone `pyDataverse <https://github.com/AUSSDA/pyDataverse.git>`_ repository into local machine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code-block:: shell
+
+    $ git clone git@github.com:AUSSDA/pyDataverse.git
+    $ cd pyDataverse
+
+Create and enable a virtual environment **(Optional)**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The more Python projects you have, the more likely it is that you need to
+work with different versions of
+Python libraries, or even Python itself. Newer versions of libraries for one
+project can break compatibility in another project.
+
+Virtual environments are independent groups of Python libraries, one for each
+project. Packages installed for one project will not affect other projects or
+the operating system's packages.
+
+Python 3 comes bundled with the :mod:`venv` module to create virtual
+environments. If you're using a modern version of Python, you can continue on
+to the next section.
+
+If you are using Python 2, the :mod:`venv` module is not available. Instead,
+install `virtualenv`_:
+
+    On Linux, virtualenv is provided by your package manager:
+
+    .. code-block:: sh
+
+        # Debian, Ubuntu
+        $ sudo apt-get install python-virtualenv
+
+        # CentOS, Fedora
+        $ sudo yum install python-virtualenv
+
+        # Arch
+        $ sudo pacman -S python-virtualenv
+
+    If you are on Mac OS X or Windows, download `get-pip.py`_, then:
+
+    .. code-block:: sh
+
+        $ sudo python2 Downloads/get-pip.py
+        $ sudo python2 -m pip install virtualenv
+
+    On Windows, as an administrator:
+
+    .. code-block:: bat
+
+        > \Python27\python.exe Downloads\get-pip.py
+        > \Python27\python.exe -m pip install virtualenv
+
+Create an environment
+"""""""""""""""""""""""
+
+Create a project folder and a :file:`venv` folder within:
+
+.. code-block:: sh
+
+    $ mkdir myproject
+    $ cd myproject
+    $ python3 -m venv venv
+
+On Windows:
+
+.. code-block:: bat
+
+    $ py -3 -m venv venv
+
+If you needed to install virtualenv because you are using Python 2, use
+the following command instead:
+
+.. code-block:: sh
+
+    $ python2 -m virtualenv venv
+
+On Windows:
+
+.. code-block:: bat
+
+    > \Python27\Scripts\virtualenv.exe venv
+
+Activate the environment
+""""""""""""""""""""""""""
+
+Before you work on your project, activate the corresponding environment:
+
+.. code-block:: sh
+
+    $ source venv/bin/activate
+
+On Windows:
+
+.. code-block:: bat
+
+    > venv\Scripts\activate
+
+Your shell prompt will change to show the name of the activated environment.
+
+Install necessary requirements:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
-    git clone git@github.com:AUSSDA/pyDataverse.git
-    cd pyDataverse
-    virtualenv venv
-    source venv/bin/activate
-    pip install -r tools/tests-requirements.txt
-    pip install -r tools/lint-requirements.txt
-    pip install -r tools/docs-requirements.txt
-    pip install -r tools/packaging-requirements.txt
-    pip install -e .
+    $ pip install -r deps/tests-requirements.txt
+    $ pip install -r deps/lint-requirements.txt
+    $ pip install -r deps/docs-requirements.txt
+    $ pip install -r deps/packaging-requirements.txt
+    $ pip install -e .
 
 
 Testing
@@ -122,3 +221,6 @@ Use Sphinx to create class and function documentation out of the doc-strings. Yo
 .. code-block:: shell
 
     tox -e docs
+
+.. _virtualenv: https://virtualenv.pypa.io/
+.. _get-pip.py: https://bootstrap.pypa.io/get-pip.py
