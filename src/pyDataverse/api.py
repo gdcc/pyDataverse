@@ -16,8 +16,6 @@ from requests import get
 from requests import post
 from requests import put
 import subprocess as sp
-import time
-
 
 
 class Api(object):
@@ -578,6 +576,29 @@ class Api(object):
         path = '/dataverses/{0}/roles'.format(identifier)
         resp = self.get_request(path, auth=auth)
         return resp
+
+
+    def get_contents(self, identifier, auth=False):
+        """Gets contents of Dataverse.
+
+        Parameters
+        ----------
+        identifier : string
+            Can either be a dataverse id (long), a dataverse alias (more
+            robust), or the special value ``:root``.
+        auth : bool
+            Description of parameter `auth` (the default is False).
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        """
+        path = '/dataverses/{0}/contents'.format(identifier)
+        resp = self.get_request(path, auth=auth)
+        return resp
+
 
     def get_dataverse_assignments(self, identifier, auth=False):
         """Get dataverse assignments by alias or id.
