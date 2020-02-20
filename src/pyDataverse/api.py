@@ -578,7 +578,7 @@ class Api(object):
         return resp
 
 
-    def get_contents(self, identifier, auth=False):
+    def get_dataverse_contents(self, identifier, auth=False):
         """Gets contents of Dataverse.
 
         Parameters
