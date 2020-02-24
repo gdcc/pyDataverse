@@ -689,8 +689,9 @@ class Api(object):
 
         """
         if is_pid:
-            path = '/datasets/:persistentId/{0}?persistentId={1}'.format(
-                version, identifier)
+            # TODO: Add version to query http://guides.dataverse.org/en/4.18.1/api/native-api.html#get-json-representation-of-a-dataset
+            path = '/datasets/:persistentId/?persistentId={0}'.format(
+                identifier)
         else:
             path = '/datasets/{0}'.format(identifier)
             # CHECK: Its not really clear, if the version query can also be done via ID.
