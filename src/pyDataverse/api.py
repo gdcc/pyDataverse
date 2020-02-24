@@ -1645,3 +1645,45 @@ class Api(object):
         path = '/roles/{0}'.format(role_id)
         resp = self.delete_request(path)
         return resp
+
+    def walker(dv_lst=None, ds_lst=None, dataverse=':root'):
+        """Short summary.
+
+        CORS Lists all the dataverses and datasets directly under
+        a dataverse (direct children only). You must specify the
+        “alias” of a dataverse or its database id. If you specify
+        your API token and have access, unpublished dataverses
+        and datasets will be included in the listing.
+
+        curl -H X-Dataverse-key:$API_TOKEN $SERVER_URL/api/dataverses/$ALIAS/contents
+
+        Parameters
+        ----------
+        dv_lst : type
+            Description of parameter `dv_lst`.
+        ds_lst : type
+            Description of parameter `ds_lst`.
+        dataverse : type
+            Description of parameter `dataverse` (the default is ':root').
+
+        Returns
+        -------
+        type
+            Description of returned object.
+        """
+        if dv_lst is None:
+            dv_lst = []
+        if ds_lst is None:
+            ds_lst = []
+        resp = self.get_dataverse_contents(dataverse)
+        if 'data' in resp.json():
+            content = resp.json()['data']
+            for c in content:
+                if c['type'] == 'dataset':
+                    ds_lst.append(c['identifier'])
+                elif c['type'] == 'dataverse':
+                    dv_lst.append(c['id'])
+                    dv_lst, ds_lst = self.walker(api, dv_lst, ds_lst, c['id'])
+        else:
+            print('Walker: API request not working.')
+        return dv_lst, ds_lst
