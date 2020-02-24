@@ -650,7 +650,7 @@ class Api(object):
         resp = self.get_request(path, auth=auth)
         return resp
 
-    def get_dataset(self, identifier, auth=True, is_pid=True):
+    def get_dataset(self, identifier, version=':latest', auth=True, is_pid=True):
         """Get metadata of a Dataset.
 
         With Dataverse identifier:
@@ -674,6 +674,13 @@ class Api(object):
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
             True, if identifier is a persistent identifier.
+        version : string
+            Version to be retrieved:
+            ``:latest-published``: the latest published version
+            ``:latest``: either a draft (if exists) or the latest published version.
+            ``:draft``: the draft version, if any
+            ``x.y``: x.y a specific version, where x is the major version number and y is the minor version number.
+            ``x``: same as x.0
 
         Returns
         -------
@@ -682,10 +689,11 @@ class Api(object):
 
         """
         if is_pid:
-            path = '/datasets/:persistentId/?persistentId={0}'.format(
-                identifier)
+            path = '/datasets/:persistentId/{0}?persistentId={1}'.format(
+                version, identifier)
         else:
             path = '/datasets/{0}'.format(identifier)
+            # CHECK: Its not really clear, if the version query can also be done via ID.
         resp = self.get_request(path, auth=auth)
         return resp
 
