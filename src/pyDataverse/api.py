@@ -1646,8 +1646,9 @@ class Api(object):
         resp = self.delete_request(path)
         return resp
 
-    def walker(dv_lst=None, ds_lst=None, dataverse=':root'):
-        """Short summary.
+    def walker(self, dv_lst=None, ds_lst=None, dataverse=':root'):
+        """Walks through all child dataverses and collects the dataverses
+        and datasets.
 
         CORS Lists all the dataverses and datasets directly under
         a dataverse (direct children only). You must specify the
@@ -1683,7 +1684,7 @@ class Api(object):
                     ds_lst.append(c['identifier'])
                 elif c['type'] == 'dataverse':
                     dv_lst.append(c['id'])
-                    dv_lst, ds_lst = self.walker(api, dv_lst, ds_lst, c['id'])
+                    dv_lst, ds_lst = self.walker(dv_lst, ds_lst, c['id'])
         else:
             print('Walker: API request not working.')
         return dv_lst, ds_lst
