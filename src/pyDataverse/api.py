@@ -1688,7 +1688,7 @@ class Api(object):
                     if 'data' in resp.json():
                         alias = resp.json()['data']['alias']
                         dv_alias_lst.append(alias)
-                        dv_alias_lst, ds_pid_lst = self.walker(api, dv_alias_lst, ds_pid_lst, alias)
+                        dv_alias_lst, ds_pid_lst = self.walker(dv_alias_lst, ds_pid_lst, alias)
                     else:
                         print('ERROR: Can not resolve Dataverse ID to alias.')
         else:
