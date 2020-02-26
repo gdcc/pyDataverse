@@ -1647,7 +1647,7 @@ class Api(object):
         resp = self.delete_request(path)
         return resp
 
-    def walker(self, dv_lst=None, ds_lst=None, dataverse=':root'):
+    def walker(self, dv_alias_lst=None, ds_pid_lst=None, dataverse=':root'):
         """Walks through all child dataverses and collects the dataverses
         and datasets.
 
@@ -1661,31 +1661,36 @@ class Api(object):
 
         Parameters
         ----------
-        dv_lst : type
-            Description of parameter `dv_lst`.
-        ds_lst : type
-            Description of parameter `ds_lst`.
+        dv_id_lst : list
+            List with Dataverse ID's.
+        ds_pid_lst : list
+            List of Dataset PID's.
         dataverse : type
-            Description of parameter `dataverse` (the default is ':root').
+            Parent dataverse to start from.
 
         Returns
         -------
         type
             Description of returned object.
         """
-        if dv_lst is None:
-            dv_lst = []
-        if ds_lst is None:
-            ds_lst = []
+        if dv_alias_lst is None:
+            dv_alias_lst = []
+        if ds_pid_lst is None:
+            ds_pid_lst = []
         resp = self.get_dataverse_contents(dataverse)
         if 'data' in resp.json():
             content = resp.json()['data']
             for c in content:
                 if c['type'] == 'dataset':
-                    ds_lst.append(c['identifier'])
+                    ds_pid_lst.append(c['identifier'])
                 elif c['type'] == 'dataverse':
-                    dv_lst.append(c['id'])
-                    dv_lst, ds_lst = self.walker(dv_lst, ds_lst, c['id'])
+                    resp = self.get_dataverse(c['id'])
+                    if 'data' in resp.json():
+                        alias = resp.json()['data']['alias']
+                        dv_alias_lst.append(alias)
+                        dv_alias_lst, ds_pid_lst = self.walker(api, dv_alias_lst, ds_pid_lst, alias)
+                    else:
+                        print('ERROR: Can not resolve Dataverse ID to alias.')
         else:
             print('Walker: API request not working.')
-        return dv_lst, ds_lst
+        return dv_alias_lst, ds_pid_lst
