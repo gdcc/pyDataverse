@@ -629,7 +629,7 @@ class Api(object):
         <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_.
         Then, you must decide which dataverse to create the dataset in and
         target that datavese with either the "alias" of the dataverse (e.g.
-        "root" or the database id of the dataverse (e.g. "1"). The initial
+        "root") or the database id of the dataverse (e.g. "1"). The initial
         version state will be set to DRAFT:
 
         Status Code:
