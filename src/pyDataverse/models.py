@@ -325,8 +325,8 @@ class Dataset(object):
     """Base class for the Dataset data model."""
 
     """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'].
+    Dataverse API Upload Dataset JSON attributes inside
+    ds[\'datasetVersion\'].
     """
     __attr_import_dv_up_datasetVersion_values = [
         'license',
@@ -335,8 +335,8 @@ class Dataset(object):
     ]
 
     """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
+    Dataverse API Upload Dataset JSON attributes inside
+    ds[\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
     """
     __attr_import_dv_up_citation_fields_values = [
         'accessToSources',
@@ -362,7 +362,7 @@ class Dataset(object):
     ]
 
     """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+    Dataverse API Upload Dataset JSON attributes inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
     """
     __attr_import_dv_up_citation_fields_arrays = {
@@ -466,7 +466,12 @@ class Dataset(object):
         'accessToSources',
         'alternativeTitle',
         'alternativeURL',
+        'authorAffiliation',
+        'authorIdentifier',
+        'authorName',
         'characteristicOfSources',
+        'city',
+        'contributorName',
         'dateOfDeposit',
         'dataSources',
         'depositor',
@@ -474,18 +479,21 @@ class Dataset(object):
         'kindOfData',
         'notesText',
         'originOfSources',
+        'otherGeographicCoverage',
         'otherReferences',
         'productionDate',
         'productionPlace',
+        'publicationCitation',
+        'publicationIDNumber',
+        'publicationURL',
         'relatedDatasets',
         'relatedMaterial',
         'seriesInformation',
         'seriesName',
+        'state',
         'subtitle',
         'title'
-    ] + ['authorName', 'authorAffiliation', 'authorIdentifier'] \
-    + ['contributorName'] \
-    + __attr_import_dv_up_citation_fields_arrays['dateOfCollection'] \
+    ] + __attr_import_dv_up_citation_fields_arrays['dateOfCollection'] \
     + __attr_import_dv_up_citation_fields_arrays['datasetContact'] \
     + __attr_import_dv_up_citation_fields_arrays['distributor'] \
     + __attr_import_dv_up_citation_fields_arrays['dsDescription'] \
@@ -493,21 +501,22 @@ class Dataset(object):
     + __attr_import_dv_up_citation_fields_arrays['keyword'] \
     + __attr_import_dv_up_citation_fields_arrays['producer'] \
     + __attr_import_dv_up_citation_fields_arrays['otherId'] \
-    + ['publicationCitation', 'publicationIDNumber', 'publicationURL'] \
     + __attr_import_dv_up_citation_fields_arrays['software'] \
     + __attr_import_dv_up_citation_fields_arrays['timePeriodCovered'] \
     + __attr_import_dv_up_citation_fields_arrays['topicClassification'] \
     + __attr_import_dv_up_geospatial_fields_values \
     + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
-    + ['state', 'city', 'otherGeographicCoverage'] \
     + __attr_import_dv_up_socialscience_fields_values \
-    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
+    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue']
+    + ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText'] \
+    + ['targetSampleActualSize', 'targetSampleSizeFormula'] \
 
     """typeClass compound."""
     __attr_dict_dv_up_typeClass_compound = [
     ] + list(__attr_import_dv_up_citation_fields_arrays.keys()) \
     + list(__attr_import_dv_up_geospatial_fields_arrays.keys()) \
     + list(__attr_import_dv_up_journal_fields_arrays.keys()) \
+    + ['series', 'socialScienceNotes', 'targetSampleSize']
 
     """typeClass controlledVocabulary."""
     __attr_dict_dv_up_typeClass_controlledVocabulary = [
@@ -521,7 +530,15 @@ class Dataset(object):
     ]
 
     __attr_dict_dv_up_multiple = [
-        # 'subject'
+    ]
+
+    """
+    This attributes are excluded from automatic parsing in ds.dict() creation.
+    """
+    __attr_dict_dv_up_single_dict = [
+        'series',
+        'socialScienceNotes',
+        'targetSampleSize'
     ]
 
     """Attributes of displayName."""
@@ -529,8 +546,7 @@ class Dataset(object):
         'citation_displayName',
         'geospatial_displayName',
         'socialscience_displayName',
-        'journal_displayName',
-        'targetSampleActualSize'
+        'journal_displayName'
     ]
 
     def __init__(self):
@@ -966,14 +982,14 @@ class Dataset(object):
                     series = self.__getattribute__('series')
                     if series is not None:
                         tmp_dict = {}
-                        if 'seriesName' in series.keys():
+                        if 'seriesName' in series:
                             if series['seriesName'] is not None:
                                 tmp_dict['seriesName'] = {}
                                 tmp_dict['seriesName']['typeName'] = 'seriesName'
                                 tmp_dict['seriesName']['multiple'] = False
                                 tmp_dict['seriesName']['typeClass'] = 'primitive'
                                 tmp_dict['seriesName']['value'] = series['seriesName']
-                        if 'seriesInformation' in series.keys():
+                        if 'seriesInformation' in series:
                             if series['seriesInformation'] is not None:
                                 tmp_dict['seriesInformation'] = {}
                                 tmp_dict['seriesInformation']['typeName'] = 'seriesInformation'
@@ -1067,26 +1083,24 @@ class Dataset(object):
                             })
 
                 # Generate targetSampleSize attributes
-                if 'targetSampleActualSize' in list(self.__dict__.keys()) or 'targetSampleSizeFormula' in list(self.__dict__.keys()):
-                    if self.__getattribute__('targetSampleActualSize') is not None or self.__getattribute__('targetSampleSizeFormula') is not None:
+                if 'targetSampleSize' in list(self.__dict__.keys()):
+                    if self.__getattribute__('targetSampleSize') is not None:
+                        target_sample_size = self.__getattribute__('targetSampleSize')
                         tmp_dict = {}
-                        tmp_dict['value'] = {}
-                        if 'targetSampleActualSize' in list(self.__dict__.keys()):
-                            if 'targetSampleActualSize' in self.__getattribute__('targetSampleSize'):
-                                if self.__getattribute__('targetSampleActualSize') is not None:
-                                    tmp_dict['value']['targetSampleActualSize'] = {}
-                                    tmp_dict['value']['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
-                                    tmp_dict['value']['targetSampleActualSize']['multiple'] = False
-                                    tmp_dict['value']['targetSampleActualSize']['typeClass'] = 'primitive'
-                                    tmp_dict['value']['targetSampleActualSize']['value'] = self.__getattribute__('targetSampleActualSize')
-                        if 'targetSampleSizeFormula' in list(self.__dict__.keys()):
-                            if 'targetSampleSizeFormula' in self.__getattribute__('targetSampleSize'):
-                                if self.__getattribute__('targetSampleSizeFormula') is not None:
-                                    tmp_dict['value']['targetSampleSizeFormula'] = {}
-                                    tmp_dict['value']['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
-                                    tmp_dict['value']['targetSampleSizeFormula']['multiple'] = False
-                                    tmp_dict['value']['targetSampleSizeFormula']['typeClass'] = 'primitive'
-                                    tmp_dict['value']['targetSampleSizeFormula']['value'] = self.__getattribute__('targetSampleSizeFormula')
+                        if 'targetSampleActualSize' in target_sample_size:
+                            if target_sample_size['targetSampleActualSize'] is not None:
+                                tmp_dict['targetSampleActualSize'] = {}
+                                tmp_dict['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
+                                tmp_dict['targetSampleActualSize']['multiple'] = False
+                                tmp_dict['targetSampleActualSize']['typeClass'] = 'primitive'
+                                tmp_dict['targetSampleActualSize']['value'] = target_sample_size['targetSampleActualSize']
+                        if 'targetSampleSizeFormula' in target_sample_size:
+                            if target_sample_size['targetSampleSizeFormula'] is not None:
+                                tmp_dict['targetSampleSizeFormula'] = {}
+                                tmp_dict['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
+                                tmp_dict['targetSampleSizeFormula']['multiple'] = False
+                                tmp_dict['targetSampleSizeFormula']['typeClass'] = 'primitive'
+                                tmp_dict['targetSampleSizeFormula']['value'] = target_sample_size['targetSampleSizeFormula']
                         socialscience['fields'].append({
                             'typeName': 'targetSampleSize',
                             'multiple': False,
@@ -1095,31 +1109,31 @@ class Dataset(object):
                         })
 
                 # Generate socialScienceNotes attributes
-                if 'socialScienceNotesType' in list(self.__dict__.keys()) or 'socialScienceNotesSubject' in list(self.__dict__.keys()) or 'targetSampleActualSize' in list(self.__dict__.keys()):
-                    if self.__getattribute__('socialScienceNotesType') is not None or self.__getattribute__('socialScienceNotesSubject') is not None or self.__getattribute__('socialScienceNotesText') is not None:
+                if 'socialScienceNotes' in list(self.__dict__.keys()):
+                    if self.__getattribute__('socialScienceNotes') is not None:
+                        social_science_notes = self.__getattribute__('socialScienceNotes')
                         tmp_dict = {}
-                        tmp_dict['value'] = {}
-                        if 'socialScienceNotesType' in list(self.__dict__.keys()):
-                            if self.__getattribute__('socialScienceNotesType') is not None:
-                                tmp_dict['value']['socialScienceNotesType'] = {}
-                                tmp_dict['value']['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                                tmp_dict['value']['socialScienceNotesType']['multiple'] = False
-                                tmp_dict['value']['socialScienceNotesType']['typeClass'] = 'primitive'
-                                tmp_dict['value']['socialScienceNotesType']['value'] = self.__getattribute__('socialScienceNotesType')
-                        if 'socialScienceNotesSubject' in list(self.__dict__.keys()):
-                            if self.__getattribute__('socialScienceNotesSubject') is not None:
-                                tmp_dict['value']['socialScienceNotesSubject'] = {}
-                                tmp_dict['value']['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                                tmp_dict['value']['socialScienceNotesSubject']['multiple'] = False
-                                tmp_dict['value']['socialScienceNotesSubject']['typeClass'] = 'primitive'
-                                tmp_dict['value']['socialScienceNotesSubject']['value'] = self.__getattribute__('socialScienceNotesSubject')
-                        if 'socialScienceNotesText' in list(self.__dict__.keys()):
-                            if self.__getattribute__('socialScienceNotesText') is not None:
-                                tmp_dict['value']['socialScienceNotesText'] = {}
-                                tmp_dict['value']['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                                tmp_dict['value']['socialScienceNotesText']['multiple'] = False
-                                tmp_dict['value']['socialScienceNotesText']['typeClass'] = 'primitive'
-                                tmp_dict['value']['socialScienceNotesText']['value'] = self.__getattribute__('socialScienceNotesText')
+                        if 'socialScienceNotesType' in social_science_notes:
+                            if social_science_notes['socialScienceNotesType'] is not None:
+                                tmp_dict['socialScienceNotesType'] = {}
+                                tmp_dict['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
+                                tmp_dict['socialScienceNotesType']['multiple'] = False
+                                tmp_dict['socialScienceNotesType']['typeClass'] = 'primitive'
+                                tmp_dict['socialScienceNotesType']['value'] = social_science_notes['socialScienceNotesType']
+                        if 'socialScienceNotesSubject' in social_science_notes:
+                            if social_science_notes['socialScienceNotesSubject'] is not None:
+                                tmp_dict['socialScienceNotesSubject'] = {}
+                                tmp_dict['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
+                                tmp_dict['socialScienceNotesSubject']['multiple'] = False
+                                tmp_dict['socialScienceNotesSubject']['typeClass'] = 'primitive'
+                                tmp_dict['socialScienceNotesSubject']['value'] = social_science_notes['socialScienceNotesSubject']
+                        if 'socialScienceNotesText' in social_science_notes:
+                            if social_science_notes['socialScienceNotesText'] is not None:
+                                tmp_dict['socialScienceNotesText'] = {}
+                                tmp_dict['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
+                                tmp_dict['socialScienceNotesText']['multiple'] = False
+                                tmp_dict['socialScienceNotesText']['typeClass'] = 'primitive'
+                                tmp_dict['socialScienceNotesText']['value'] = social_science_notes['socialScienceNotesText']
                         socialscience['fields'].append({
                             'typeName': 'socialScienceNotes',
                             'multiple': False,
