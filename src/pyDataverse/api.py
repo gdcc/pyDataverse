@@ -2059,9 +2059,9 @@ class SearchApi(Api):
         """
         return 'pyDataverse Search-API class'
 
-    def get(self, q, type=None, subtree=None, sort=None, order=None,
+    def search(self, q, type=None, subtree=None, sort=None, order=None,
             per_page=None, start=None, show_relevance=None, show_facets=None,
-            fq=None, show_entity_ids=None, query_entities=None):
+            fq=None, show_entity_ids=None, query_entities=None, auth=False):
         """
 
         http://guides.dataverse.org/en/4.18.1/api/search.html
