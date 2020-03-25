@@ -527,14 +527,14 @@ class MetricsApi(Api):
 
     """
 
-    def __init__(self, base_url, api_version='latest', api_token=None):
+    def __init__(self, base_url, api_token=None, api_version='latest'):
         """Init an MetricsApi() class.
         """
+        super().__init__(base_url, api_token, api_version)
         if base_url:
             self.base_url_api_metrics = '{0}/api/info/metrics'.format(self.base_url)
         else:
             self.base_url_api_metrics = None
-
 
     def __str__(self):
         """Return name of MetricsApi() class for users.
@@ -546,6 +546,76 @@ class MetricsApi(Api):
 
         """
         return 'pyDataverse Metrics-API class'
+
+    def total(self, type, date_str=None, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/$type
+        GET https://$SERVER/api/info/metrics/$type/toMonth/$YYYY-DD
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        url = '{0}/{1}'.format(self.base_url_api_metrics, type)
+        if date_str:
+            url += '/toMonth/{0}'.format(date_str)
+        resp = self.get_request(url, auth=auth)
+        return resp
+
+    def past_days(self, type, days_str, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/$type/pastDays/$days
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        # TODO: check if date-string has proper format
+        url = '{0}/{1}/pastDays/{2}'.format(self.base_url_api_metrics, type, days_str)
+        resp = self.get_request(url, auth=auth)
+        return resp
+
+    def get_dataverses_by_subject(self, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/dataverses/bySubject
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        # TODO: check if date-string has proper format
+        url = '{0}/dataverses/bySubject'.format(self.base_url_api_metrics)
+        resp = self.get_request(url, auth=auth)
+        return resp
+
+    def get_dataverses_by_category(self, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/dataverses/byCategory
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        # TODO: check if date-string has proper format
+        url = '{0}/dataverses/byCategory'.format(self.base_url_api_metrics)
+        resp = self.get_request(url, auth=auth)
+        return resp
+
+    def get_datasets_by_subject(self, date_str=None, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/datasets/bySubject
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        # TODO: check if date-string has proper format
+        url = '{0}/datasets/bySubject'.format(self.base_url_api_metrics)
+        if date_str:
+            url += '/toMonth/{0}'.format(date_str)
+        resp = self.get_request(url, auth=auth)
+        return resp
+
+    def get_datasets_by_data_location(self, data_location, auth=False):
+        """
+        GET https://$SERVER/api/info/metrics/datasets/bySubject
+
+        $type can be set to dataverses, datasets, files or downloads.
+        """
+        # TODO: check if date-string has proper format
+        url = '{0}/datasets/?dataLocation={1}'.format(self.base_url_api_metrics, data_location)
+        resp = self.get_request(url, auth=auth)
+        return resp
 
 
 class NativeApi(Api):
@@ -1479,7 +1549,7 @@ class NativeApi(Api):
         identifier : string
             Identifier of the dataset.
         filename : string
-            Full filename with url.
+            Full filename with path.
         json_str : string
             Metadata as JSON string.
         is_pid : bool
@@ -1509,15 +1579,13 @@ class NativeApi(Api):
         return resp
 
     def replace_datafile(self, identifier, filename, json_str=None, is_filepid=True):
-        """Add file to a dataset.
-
-        metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+        """Replace datafile.
 
         HTTP Request:
 
         .. code-block:: bash
 
-            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/replace?key={apiKey}
 
         `Offical documentation
         <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
@@ -1527,7 +1595,7 @@ class NativeApi(Api):
         identifier : string
             Identifier of the dataset.
         filename : string
-            Full filename with url.
+            Full filename with path.
         json_str : string
             Metadata as JSON string.
         is_filepid : bool
@@ -1552,6 +1620,51 @@ class NativeApi(Api):
             url, filename)
         if json_str:
             shell_command += " -F 'jsonData={0}'".format(json_str)
+        # TODO(Shell): is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        resp = json.loads(result.stdout)
+        return resp
+
+    def update_datafile_metadata(self, identifier, json_str, is_filepid=True):
+        """Update datafile metadata.
+
+        metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+
+        `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset.
+        json_str : string
+            Metadata as JSON string.
+        is_filepid : bool
+            ``True`` to use persistent identifier for datafile. ``False``, if
+            not.
+
+        Returns
+        -------
+        dict
+            The json string responded by the CURL request, converted to a
+            dict().
+
+        """
+        url = self.base_url_api_native
+        if is_filepid:
+            url += '/files/:persistentId/metadata?persistentId={0}'.format(identifier)
+        else:
+            url += '/files/{0}/metadata'.format(identifier)
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
+            self.api_token)
+        shell_command += ' -X POST {0}'.format(url)
+        shell_command += " -F 'jsonData={0}'".format(json_str)
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
