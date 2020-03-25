@@ -139,7 +139,7 @@ class Api(object):
             if self.api_token:
                 if not params:
                     params = {}
-                params['key'] = self.api_token
+                params['key'] = str(self.api_token)
             else:
                 ApiAuthorizationError(
                     'ERROR: GET - Api token not passed to '
@@ -151,19 +151,18 @@ class Api(object):
                 url,
                 params=params
             )
-            if resp:
-                if resp.status_code == 401:
-                    error_msg = resp.json()['message']
-                    raise ApiAuthorizationError(
-                        'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
-                        ''.format(url, error_msg)
-                    )
-                elif resp.status_code >= 300:
-                    error_msg = resp.json()['message']
-                    raise OperationFailedError(
-                        'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
-                            resp.status_code, url, error_msg)
-                    )
+            if resp.status_code == 401:
+                error_msg = resp.json()['message']
+                raise ApiAuthorizationError(
+                    'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
+                    ''.format(url, error_msg)
+                )
+            elif resp.status_code >= 300:
+                error_msg = resp.json()['message']
+                raise OperationFailedError(
+                    'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
+                        resp.status_code, url, error_msg)
+                )
             return resp
         except ConnectionError:
             raise ConnectionError(
@@ -1441,6 +1440,22 @@ class NativeApi(Api):
             print('Dataset {0} updated'.format(identifier))
         return resp
 
+    def get_datafile_metadata(self, identifier, is_filepid=False, auth=True):
+        """
+        GET http://$SERVER/api/files/{id}/metadata
+
+        http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files
+
+        """
+        if is_filepid:
+            url = '{0}/files/:persistentId/metadata?persistentId={1}'.format(
+                self.base_url_api_native, identifier)
+        else:
+            url = '{0}/files/{1}/metadata'.format(self.base_url_api_native, identifier)
+            # CHECK: Its not really clear, if the version query can also be done via ID.
+        resp = self.get_request(url, auth=auth)
+        return resp
+
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
 
@@ -1482,6 +1497,55 @@ class NativeApi(Api):
             url += '/datasets/:persistentId/add?persistentId={0}'.format(identifier)
         else:
             url += '/datasets/{0}/add'.format(identifier)
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
+            self.api_token)
+        shell_command += ' -X POST {0} -F file=@{1}'.format(
+            url, filename)
+        if json_str:
+            shell_command += " -F 'jsonData={0}'".format(json_str)
+        # TODO(Shell): is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        resp = json.loads(result.stdout)
+        return resp
+
+    def replace_datafile(self, identifier, filename, json_str=None, is_filepid=True):
+        """Add file to a dataset.
+
+        metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+
+        `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset.
+        filename : string
+            Full filename with url.
+        json_str : string
+            Metadata as JSON string.
+        is_filepid : bool
+            ``True`` to use persistent identifier for datafile. ``False``, if
+            not.
+
+        Returns
+        -------
+        dict
+            The json string responded by the CURL request, converted to a
+            dict().
+
+        """
+        url = self.base_url_api_native
+        if is_filepid:
+            url += '/files/:persistentId/replace?persistentId={0}'.format(identifier)
+        else:
+            url += '/files/{0}/replace'.format(identifier)
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
