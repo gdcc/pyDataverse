@@ -74,9 +74,9 @@ Requirements
 
 pyDataverse officially supports Python 2.7 & 3.4–3.7.
 
-External packages:
+Python packages:
 
-- curl
+- requests>=2.12.0
 
 
 Features

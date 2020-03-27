@@ -15,7 +15,6 @@ from requests import delete
 from requests import get
 from requests import post
 from requests import put
-import subprocess as sp
 
 
 class Api(object):
@@ -170,18 +169,22 @@ class Api(object):
                 ''.format(url)
             )
 
-    def post_request(self, url, metadata=None, auth=False,
-                     params=None):
+    def post_request(self, url, data=None, auth=False,
+                     params=None, files=None):
         """Make a POST request.
+
+        params will be added as key-value pairs to the URL.
 
         Parameters
         ----------
         url : string
             Full URL.
-        metadata : string
+        data : string
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
+        files: dict
+            e. g. files = {'file': open('sample_file.txt','rb')}
         params : dict
             Dictionary of parameters to be passed with the request.
             Defaults to `None`.
@@ -198,16 +201,14 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                ApiAuthorizationError(
-                    'ERROR: POST - Api token not passed to '
-                    '`post_request` {}.'.format(url)
-                )
+                ApiAuthorizationError('ERROR: POST - Api token not available.')
 
         try:
             resp = post(
                 url,
-                data=metadata,
-                params=params
+                data=data,
+                params=params,
+                files=files
             )
             if resp.status_code == 401:
                 error_msg = resp.json()['message']
@@ -1526,6 +1527,50 @@ class NativeApi(Api):
         resp = self.get_request(url, auth=auth)
         return resp
 
+    def update_datafile_metadata(self, identifier, json_str, is_filepid=True):
+        """Update datafile metadata.
+
+        metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+
+        `Offical documentation
+        <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset.
+        json_str : string
+            Metadata as JSON string.
+        is_filepid : bool
+            ``True`` to use persistent identifier for datafile. ``False``, if
+            not.
+
+        Returns
+        -------
+        dict
+            The json string responded by the CURL request, converted to a
+            dict().
+
+        """
+        url = self.base_url_api_native
+        if is_filepid:
+            url += '/files/:persistentId/metadata?persistentId={0}'.format(identifier)
+        else:
+            url += '/files/{0}/metadata'.format(identifier)
+
+        resp = self.post_request(
+            url,
+            data=data,
+            auth=True
+            )
+        return resp
+
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
 
@@ -1567,18 +1612,18 @@ class NativeApi(Api):
             url += '/datasets/:persistentId/add?persistentId={0}'.format(identifier)
         else:
             url += '/datasets/{0}/add'.format(identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += ' -X POST {0} -F file=@{1}'.format(
-            url, filename)
-        if json_str:
-            shell_command += " -F 'jsonData={0}'".format(json_str)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
+
+        files = {'file': open(filename,'rb')}
+
+        resp = self.post_request(
+            url,
+            data={'jsonData': json_str},
+            files=files,
+            auth=True
+            )
         return resp
 
-    def replace_datafile(self, identifier, filename, json_str=None, is_filepid=True):
+    def replace_datafile(self, identifier, filename, json_str, is_filepid=True):
         """Replace datafile.
 
         HTTP Request:
@@ -1610,64 +1655,20 @@ class NativeApi(Api):
 
         """
         url = self.base_url_api_native
+        files = {'file': open(filename,'rb')}
+        data = {'jsonData': json_str}
+
         if is_filepid:
             url += '/files/:persistentId/replace?persistentId={0}'.format(identifier)
         else:
             url += '/files/{0}/replace'.format(identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += ' -X POST {0} -F file=@{1}'.format(
-            url, filename)
-        if json_str:
-            shell_command += " -F 'jsonData={0}'".format(json_str)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
-        return resp
 
-    def update_datafile_metadata(self, identifier, json_str, is_filepid=True):
-        """Update datafile metadata.
-
-        metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
-
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
-
-        Parameters
-        ----------
-        identifier : string
-            Identifier of the dataset.
-        json_str : string
-            Metadata as JSON string.
-        is_filepid : bool
-            ``True`` to use persistent identifier for datafile. ``False``, if
-            not.
-
-        Returns
-        -------
-        dict
-            The json string responded by the CURL request, converted to a
-            dict().
-
-        """
-        url = self.base_url_api_native
-        if is_filepid:
-            url += '/files/:persistentId/metadata?persistentId={0}'.format(identifier)
-        else:
-            url += '/files/{0}/metadata'.format(identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += ' -X POST {0}'.format(url)
-        shell_command += " -F 'jsonData={0}'".format(json_str)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
+        resp = self.post_request(
+            url,
+            data=data,
+            files=files,
+            auth=True
+            )
         return resp
 
     def get_datafiles(self, pid, version='1', auth=False):
@@ -1698,34 +1699,6 @@ class NativeApi(Api):
         url = base_str + '{0}/files?persistentId={1}'.format(
             version, pid)
         resp = self.get_request(url, auth=auth)
-        return resp
-
-    def update_datafile_metadata(self, datafile_id, json_str, auth=True):
-        """Update Datafile metadata.
-
-        Updates the file metadata for an existing file where id is the database
-        id of the file to replace or pid is the persistent id (DOI or Handle)
-        of the file. Requires a jsonString expressing the new metadata. No
-        metadata from the previous version of this file will be persisted, so
-        if you want to update a specific field first get the json with the
-        above command and alter the fields you want:
-
-        POST -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
-
-        Also note that dataFileTags are not versioned and changes to these
-        will update the published version of the file.
-
-        """
-        url = '{0}/files/{}/metadata'.format(self.base_url_api_native, datafile_id)
-
-        resp = self.post_request(url, auth=auth)
-
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += " -X POST {0} -F 'jsonData={0}'".format(json_str)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
         return resp
 
     def get_info_version(self, auth=False):
@@ -2121,7 +2094,7 @@ class SwordApi(Api):
 
     """
 
-    def __init__(self, base_url, api_version='latest', api_token=None, sword_api_version='v1.1'):
+    def __init__(self, base_url, api_version='v1.1', api_token=None, sword_api_version='v1.1'):
         """Init an SwordApi() class.
 
         Parameters
@@ -2130,17 +2103,18 @@ class SwordApi(Api):
             Api version of Dataverse SWORD API.
 
         """
+        super().__init__(base_url, api_token, api_version)
         if not isinstance(sword_api_version, ("".__class__, u"".__class__)):
             raise ApiUrlError('sword_api_version {0} is not a string.'.format(
                 sword_api_version))
         self.sword_api_version = sword_api_version
 
         # Test connection.
-        if base_url and sword_api_version:
-            self.base_url_api_sword = '{0}/dvn/api/data-deposit/v1.1{1}'.format(self.base_url,
-                                                            self.native_api_version)
+        if self.base_url and sword_api_version:
+            self.base_url_api_sword = '{0}/dvn/api/data-deposit/{1}'.format(self.base_url,
+                                                            self.sword_api_version)
         else:
-            self.base_url_api_sword = None
+            self.base_url_api_sword = base_url_api
 
     def __str__(self):
         """Return name of Api() class for users.
@@ -2152,3 +2126,8 @@ class SwordApi(Api):
 
         """
         return 'pyDataverse SWORD-API class'
+
+    def get_service_document(self, auth=True):
+        url = '{0}/swordv2/service-document'.format(self.base_url_api_sword)
+        resp = self.get_request(url, auth=True)
+        return resp
