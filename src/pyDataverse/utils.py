@@ -211,7 +211,44 @@ def read_file_csv(filename):
         csvfile.close()
 
 
-def read_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
+def write_file_csv(data, filename, delimiter=',', quotechar='"'):
+    """Short summary.
+
+    Parameters
+    ----------
+    data : type
+        Description of parameter `data`.
+    filename : type
+        Description of parameter `filename`.
+    delimiter : type
+        Description of parameter `delimiter` (the default is ';').
+    quotechar : type
+        Description of parameter `quotechar` (the default is '"').
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    Raises
+    -------
+    ExceptionName
+        Why the exception is raised.
+
+    Examples
+    -------
+    Examples should be written in doctest format, and
+    should illustrate how to use the function/class.
+    >>>
+
+    """
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar)
+        for row in data:
+            writer.writerow(row)
+
+
+def read_file_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
     """Read in csv file and convert it into a list of dicts.
 
     This offers an easy import functionality of csv files with dataset metadata.
@@ -250,3 +287,49 @@ def read_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
         for row in reader:
             data.append(dict(row))
     return data
+
+
+
+def write_dict_to_file_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
+    """Short summary.
+
+    Parameters
+    ----------
+    data : type
+        Description of parameter `data`.
+    fieldnames : type
+        Description of parameter `fieldnames`.
+    filename : type
+        Description of parameter `filename`.
+    delimiter : type
+        Description of parameter `delimiter` (the default is ';').
+    quotechar : type
+        Description of parameter `quotechar` (the default is '"').
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    Raises
+    -------
+    ExceptionName
+        Why the exception is raised.
+
+    Examples
+    -------
+    Examples should be written in doctest format, and
+    should illustrate how to use the function/class.
+    >>>
+
+    """
+    with open(filename, 'w', newline='') as csvfile:
+        fieldnames = fieldnames
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for d in data:
+            for key, val in d.items():
+                if isinstance(val, dict) or isinstance(val, list):
+                    d[key] = json.dumps(val)
+            writer.writerow(d)
