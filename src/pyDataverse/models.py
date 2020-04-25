@@ -507,7 +507,7 @@ class Dataset(object):
     + __attr_import_dv_up_geospatial_fields_values \
     + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
     + __attr_import_dv_up_socialscience_fields_values \
-    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue']
+    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
     + ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText'] \
     + ['targetSampleActualSize', 'targetSampleSizeFormula'] \
 
