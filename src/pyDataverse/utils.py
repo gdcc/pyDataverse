@@ -289,7 +289,6 @@ def read_file_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-
     return data
 
 
-
 def write_dict_to_file_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
     """Short summary.
 
@@ -333,3 +332,35 @@ def write_dict_to_file_csv(data, fieldnames, filename, delimiter=',', quotechar=
                 if isinstance(val, dict) or isinstance(val, list):
                     d[key] = json.dumps(val)
             writer.writerow(d)
+
+
+def tree_walker_count_types(children, num_dataverses=0, num_datasets=0, num_datafiles=0):
+    """Count data types from Dataverse tree.
+
+    Parameters
+    ----------
+    children : list
+        List of child elements.
+    num_dataverses : int
+        Number of Dataverses in tree.
+    num_datasets : int
+        Number of Datasets in tree.
+    num_datafiles : int
+        Number of Datafiles in tree.
+
+    Returns
+    -------
+    list
+        [num_dataverses, num_datasets, num_datafiles]
+
+    """
+    for child in children:
+        if child['type'] == 'dataverse':
+            num_dataverses += 1
+            num_dataverses, num_datasets, num_datafiles = count_tree_types(child['children'], num_dataverses, num_datasets, num_datafiles)
+        elif child['type'] == 'dataset':
+            num_datasets += 1
+            num_dataverses, num_datasets, num_datafiles = count_tree_types(child['children'], num_dataverses, num_datasets, num_datafiles)
+        elif child['type'] == 'datafile':
+            num_datafiles += 1
+    return num_dataverses, num_datasets, num_datafiles

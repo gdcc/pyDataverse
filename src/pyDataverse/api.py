@@ -1429,7 +1429,7 @@ class NativeApi(Api):
         return resp
 
     def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
-                              is_replace=False, auth=True):
+                              replace=False, auth=True):
         """Edit metadata of a given dataset.
 
         `Offical documentation
@@ -1465,7 +1465,7 @@ class NativeApi(Api):
             Metadata of the Dataset as a json-formatted string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
-        is_replace : bool
+        replace : bool
             ``True`` to replace already existing metadata. ``False``, if not.
         auth : bool
             ``True``, if an api token should be sent. Defaults to ``False``.
@@ -1486,12 +1486,10 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/editMetadata/?persistentId={1}'
-            ''.format(self.base_url_api_native, identifier)
+            url = '{0}/datasets/:persistentId/editMetadata/?persistentId={1}'.format(self.base_url_api_native, identifier)
         else:
             url = '{0}/datasets/editMetadata/{0}'.format(self.base_url_api_native, identifier)
-        params = {'replace': True} if is_replace else {}
-
+        params = {'replace': True} if replace else {}
         resp = self.put_request(url, metadata, auth, params)
 
         if resp.status_code == 401:
@@ -1614,7 +1612,6 @@ class NativeApi(Api):
             url += '/datasets/{0}/add'.format(identifier)
 
         files = {'file': open(filename,'rb')}
-
         resp = self.post_request(
             url,
             data={'jsonData': json_str},
@@ -1944,54 +1941,140 @@ class NativeApi(Api):
         resp = self.delete_request(url)
         return resp
 
-    def walker(self, dv_alias_lst=None, ds_pid_lst=None, dataverse=':root'):
-        """Walks through all child dataverses and collects the dataverses
-        and datasets.
+    def get_children(self, parent=':root', parent_type='dataverse', children_types=[]):
+        """Walk through children of parent element in Dataverse tree.
 
-        CORS Lists all the dataverses and datasets directly under
-        a dataverse (direct children only). You must specify the
-        “alias” of a dataverse or its database id. If you specify
-        your API token and have access, unpublished dataverses
-        and datasets will be included in the listing.
+        Default: gets all child dataverses if parent = dataverse or all
 
-        curl -H X-Dataverse-key:$API_TOKEN $SERVER_URL/api/dataverses/$ALIAS/contents
+        Example Dataverse Tree:
+        data =
+        {
+            'type': 'dataverse',
+            'dataverse_id': 1,
+            'dataverse_alias': ':root',
+            'children': [
+                {
+                    'type': 'datasets',
+                    'dataset_id': 231,
+                    'pid': 'doi:10.11587/LYFDYC',
+                    'children': [
+                        {
+                            'type': 'datafile'
+                            'datafile_id': 532,
+                            'pid': 'doi:10.11587/LYFDYC/C2WTRN',
+                            'filename': '10082_curation.pdf '
+                        }
+                    ]
+                }
+            ]
+        }
 
         Parameters
         ----------
-        dv_id_lst : list
-            List with Dataverse ID's.
-        ds_pid_lst : list
-            List of Dataset PID's.
-        dataverse : type
-            Parent dataverse to start from.
+        parent : string
+            Description of parameter `parent`.
+        parent_type : string
+            Description of parameter `parent_type`.
+        children_types : list
+            Types of children to be collected. 'dataverses', 'datasets' and 'datafiles' are valid list items.
 
         Returns
         -------
-        type
-            Description of returned object.
-        """
-        if dv_alias_lst is None:
-            dv_alias_lst = []
-        if ds_pid_lst is None:
-            ds_pid_lst = []
-        resp = self.get_dataverse_contents(dataverse)
-        if 'data' in resp.json():
-            content = resp.json()['data']
-            for c in content:
-                if c['type'] == 'dataset':
-                    ds_pid_lst.append(c['identifier'])
-                elif c['type'] == 'dataverse':
-                    resp = self.get_dataverse(c['id'])
-                    if 'data' in resp.json():
-                        alias = resp.json()['data']['alias']
-                        dv_alias_lst.append(alias)
-                        dv_alias_lst, ds_pid_lst = self.walker(dv_alias_lst, ds_pid_lst, alias)
-                    else:
-                        print('ERROR: Can not resolve Dataverse ID to alias.')
-        else:
-            print('Walker: API request not working.')
-        return dv_alias_lst, ds_pid_lst
+        list
+            List of Dataverse data type dictionaries. Different ones for
+            Dataverses, Datasets and Datafiles.
 
+        # TODO
+        - differentiate between published and unpublished data types
+        - util function to read out all dataverses into a list
+        - util function to read out all datasets into a list
+        - util function to read out all datafiles into a list
+        - Unify tree and models
+
+        """
+
+        children = []
+
+        if len(children_types) == 0:
+            if parent_type == 'dataverse':
+                children_types = ['dataverses']
+            elif parent_type == 'dataset':
+                children_types = ['datafiles']
+
+        if 'dataverses' in children_types and 'datafiles' in children_types and 'datasets' not in children_types:
+            print('ERROR: Wrong children_types passed: \'dataverses\' and \'datafiles\' passed, \'datasets\' missing.')
+            return False
+
+        if parent_type == 'dataverse':
+            # check for dataverses and datasets as children and get their ID
+            parent_alias = parent
+            resp = self.get_dataverse_contents(parent_alias)
+            if 'data' in resp.json():
+                content = resp.json()['data']
+                for c in content:
+                    if c['type'] == 'dataverse' and 'dataverses' in children_types:
+                        dataverse_id = c['id']
+                        title = c['title']
+                        child_alias = self.dataverse_id2alias(dataverse_id)
+                        children.append(
+                            {
+                                'dataverse_id': dataverse_id,
+                                'title': dataverse_id,
+                                'dataverse_alias': child_alias,
+                                'type': 'dataverse',
+                                'children': self.get_children(
+                                    parent=child_alias,
+                                    parent_type='dataverse',
+                                    children_types=children_types
+                                )
+                            }
+                        )
+                    elif c['type'] == 'dataset' and 'datasets' in children_types:
+                        dataset_id = c['identifier']
+                        pid = c['protocol'] + ':' + c['authority'] + '/' + c['identifier']
+                        children.append(
+                            {
+                                'dataset_id': dataset_id,
+                                'pid': pid,
+                                'type': 'dataset',
+                                'children': self.get_children(
+                                    parent=pid,
+                                    parent_type='dataset',
+                                    children_types=children_types
+                                )
+                            }
+                        )
+            else:
+                print('ERROR: \'get_dataverse_contents()\' API request not working.')
+        elif parent_type == 'dataset' and 'datafiles' in children_types:
+            # check for datafiles as children and get their ID
+            pid = parent
+            resp = self.get_datafiles(parent, version=':latest')
+            if 'data' in resp.json():
+                for file in resp.json()['data']:
+                    datafile_id = file['dataFile']['id']
+                    filename = file['dataFile']['filename']
+                    children.append(
+                        {
+                            'datafile_id': datafile_id,
+                            'filename': filename,
+                            'pid': pid,
+                            'type': 'datafile'
+                        }
+                    )
+            else:
+                print('ERROR: \'get_datafiles()\' API request not working.')
+        return children
+
+    def dataverse_id2alias(self, dataverse_id):
+        resp = self.get_dataverse(dataverse_id)
+        if 'data' in resp.json():
+            if 'alias' in resp.json()['data']:
+                alias = resp.json()['data']['alias']
+                return alias
+        else:
+            print('ERROR: Can not resolve Dataverse ID to alias.')
+            return False
 
 class SearchApi(Api):
     """Short summary.
