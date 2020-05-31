@@ -56,7 +56,7 @@ def write_file(filename, data, mode='w'):
         raise e
 
 
-def read_json(filename):
+def read_json(filename, mode='r'):
     """Read in a json file.
 
     See more about the json module at
@@ -74,7 +74,9 @@ def read_json(filename):
 
     """
     try:
-        return json_to_dict(read_file(filename, 'r'))
+        with open(filename, mode) as f:
+            data = json.load(f)
+        return data
     except Exception as e:
         raise e
 
@@ -93,7 +95,13 @@ def write_json(filename, data, mode='w'):
         https://docs.python.org/3/library/functions.html#open
 
     """
-    write_file(filename, dict_to_json(data), mode)
+    try:
+        with open(filename, mode) as f:
+            json.dump(data, f, indent=2)
+    except IOError:
+        print('An error occured trying to write the file {}.'.format(filename))
+    except Exception as e:
+        raise e
 
 
 def read_pickle(filename):
@@ -140,53 +148,7 @@ def write_pickle(filename, data):
         raise e
 
 
-def json_to_dict(data):
-    """Convert JSON to a dict().
-
-    See more about the json module at
-    https://docs.python.org/3.5/library/json.html
-
-    Parameters
-    ----------
-    data : string
-        Data as a json-formatted string.
-
-    Returns
-    -------
-    dict
-        Data as Python Dictionary.
-
-    """
-    try:
-        return json.loads(data)
-    except Exception as e:
-        raise e
-
-
-def dict_to_json(data):
-    """Convert dict() to JSON-formatted string.
-
-    See more about the json module at
-    https://docs.python.org/3.5/library/json.html
-
-    Parameters
-    ----------
-    data : dict
-        Data as Python Dictionary.
-
-    Returns
-    -------
-    string
-        Data as a json-formatted string.
-
-    """
-    try:
-        return json.dumps(data, ensure_ascii=True, indent=2)
-    except Exception as e:
-        raise e
-
-
-def read_file_csv(filename):
+def read_csv(filename):
     """Read in CSV file.
 
     See more at `csv.reader() <https://docs.python.org/3.5/library/csv.html>`_.
@@ -211,7 +173,7 @@ def read_file_csv(filename):
         csvfile.close()
 
 
-def write_file_csv(data, filename, delimiter=',', quotechar='"'):
+def write_csv(data, filename, delimiter=',', quotechar='"'):
     """Short summary.
 
     Parameters
@@ -248,7 +210,7 @@ def write_file_csv(data, filename, delimiter=',', quotechar='"'):
             writer.writerow(row)
 
 
-def read_file_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
+def read_csv_as_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
     """Read in csv file and convert it into a list of dicts.
 
     This offers an easy import functionality of csv files with dataset metadata.
@@ -289,7 +251,7 @@ def read_file_csv_to_dict(filename, delimiter=',', quotechar='"', encoding='utf-
     return data
 
 
-def write_dict_to_file_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
+def write_dict_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
     """Short summary.
 
     Parameters
@@ -330,7 +292,7 @@ def write_dict_to_file_csv(data, fieldnames, filename, delimiter=',', quotechar=
         for d in data:
             for key, val in d.items():
                 if isinstance(val, dict) or isinstance(val, list):
-                    d[key] = json.dumps(val)
+                    d[key] = json.dump(val)
             writer.writerow(d)
 
 
@@ -364,3 +326,9 @@ def tree_walker_count_types(children, num_dataverses=0, num_datasets=0, num_data
         elif child['type'] == 'datafile':
             num_datafiles += 1
     return num_dataverses, num_datasets, num_datafiles
+
+
+def clean_string(str):
+    clean_str = str.strip()
+    clean_str = clean_str.replace('  ', ' ')
+    return clean_str
