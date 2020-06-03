@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "https://github.com/AUSSDA/pyDataverse/schemas/json/dataverse_full_upload_schema.json",
+  "type": "object",
+  "title": "Full upload Dataverse schema",
+  "description": "Describes the full Dataverse metadata structure for an API upload.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "alias": {
+      "type": "string"
+    },
+    "dataverseContacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "uniqueItems": true,
+        "properties": {
+          "contactEmail": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "contactEmail"
+        ]
+      }
+    },
+    "affiliation": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "dataverseType": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "alias",
+    "dataverseContacts",
+    "name"
+  ]
+}

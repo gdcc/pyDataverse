@@ -3,6 +3,7 @@
 """Dataverse utility functions."""
 import csv
 import json
+from jsonschema import validate
 import pickle
 
 
@@ -332,3 +333,25 @@ def clean_string(str):
     clean_str = str.strip()
     clean_str = clean_str.replace('  ', ' ')
     return clean_str
+
+
+def validate_data(data, filename_schema, format='json'):
+    """Short summary.
+
+    Parameters
+    ----------
+    format : type
+        Description of parameter `format`.
+    filename_schema : type
+        Description of parameter `filename_schema`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    if format == 'json':
+        validate(instance=data, schema=read_json(filename_schema))
+    else:
+        print('ERROR: No valid format passed.')

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "https://github.com/AUSSDA/pyDataverse/schemas/json/dataverse_full_upload_schema.json",
+  "type": "object",
+  "title": "Full upload Datafile schema",
+  "description": "Describes the full Datafile metadata structure for an API upload.",
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "restrict": {
+      "type": "boolean"
+    },
+    "pid": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "directoryLabel": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "filename",
+    "pid"
+  ]
+}

@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 import json
 from pyDataverse.utils import read_json
+from pyDataverse.utils import validate_data
 from pyDataverse.utils import write_json
 
 """
@@ -12,7 +13,98 @@ Datafiles - coming from different sources.
 """
 
 
-class Dataverse(object):
+class DVObject(object):
+    def __init__(self):
+        self.default_validate_format = 'dataverse_upload'
+
+    def set(self, data):
+        """Set class attributes with a flat :class:`dict`.
+
+        Parameters
+        ----------
+        data : dict
+            Flat :class:`dict` with data. All keys will be mapped to a similar
+            called attribute with it's value.
+
+
+        Examples
+        -------
+        Set Dataverse attributes via flat :class:`dict`::
+
+            >>> from pyDataverse.models import Dataverse
+            >>> dv = Dataverse()
+            >>> data = {
+            >>>     'dataverseContacts': [
+            >>>         {'contactEmail': 'test@example.com'}
+            >>>     ],
+            >>>     'name': 'Test pyDataverse',
+            >>>     'alias': 'test-pyDataverse'
+            >>> }
+            >>> dv.set(data)
+            >>> dv.contactEmail
+            ['test@example.com']
+
+        """
+        for key, val in data.items():
+            self.__setattr__(key, val)
+
+    def validate_json(self, format=None, filename_schema=None):
+        if not format:
+            format = self.default_validate_format
+        if not filename_schema:
+            filename_schema = self.default_validate_schema_filename
+        data = self.dict(format=format, validate=False)
+        validate_data(data, filename_schema)
+
+    def to_json(self, format=None, validate=True, filename_schema=None):
+        r"""Create JSON from attributes.
+
+        Parameters
+        ----------
+        format : string
+            Data format of input. Available formats are: `dv_up` for Dataverse
+            API upload compatible format (default) and `all` with all attributes
+            named in `__attr_valid_class`.
+
+        Returns
+        -------
+        string
+            JSON formatted string of Dataverse metadata for API upload.
+
+        Examples
+        -------
+        Get dict of Dataverse metadata::
+
+            >>> from pyDataverse.models import Datafile
+            >>> df = Datafile()
+            >>> data = {
+            >>>     'pid': 'doi:10.11587/EVMUHP',
+            >>>     'description': 'Test file',
+            >>>     'categories': ['Data', 'Code']
+            >>> }
+            >>> df.set(data)
+            >>> df.dict()
+            {'description': 'Test file',
+             'directoryLabel': None,
+             'restrict': None}
+
+        Todo
+        -------
+        Validate standards.
+        Link to default JSON file
+
+        """
+        if not format:
+            format = self.default_validate_format
+        if not filename_schema:
+            filename_schema = self.default_validate_schema_filename
+        data = self.dict(format=format, validate=validate, filename_schema=filename_schema)
+        if data:
+            return json.dumps(data)
+        else:
+            return None
+
+class Dataverse(DVObject):
     """Base class for Dataverse data model."""
 
     """Attributes to be imported from `dv_up` file."""
@@ -51,41 +143,13 @@ class Dataverse(object):
             >>> dv = Dataverse()
 
         """
+        super().__init__(self)
+        self.default_validate_schema_filename = 'schemas/json/dataverse_upload_full_schema.json'
 
     def __str__(self):
         """Return name of class :class:`Dataverse()` for users."""
         return 'pyDataverse Dataverse() model class.'
 
-    def set(self, data):
-        """Set class attributes with a flat :class:`dict`.
-
-        Parameters
-        ----------
-        data : dict
-            Flat :class:`dict` with data. All keys will be mapped to a similar
-            called attribute with it's value.
-
-
-        Examples
-        -------
-        Set Dataverse attributes via flat :class:`dict`::
-
-            >>> from pyDataverse.models import Dataverse
-            >>> dv = Dataverse()
-            >>> data = {
-            >>>     'dataverseContacts': [
-            >>>         {'contactEmail': 'test@example.com'}
-            >>>     ],
-            >>>     'name': 'Test pyDataverse',
-            >>>     'alias': 'test-pyDataverse'
-            >>> }
-            >>> dv.set(data)
-            >>> dv.contactEmail
-            ['test@example.com']
-
-        """
-        for key, val in data.items():
-            self.__setattr__(key, val)
 
     def from_json(self, filename, format='dataverse_upload', filename_mapping=None,
                   validate=True,
@@ -128,51 +192,9 @@ class Dataverse(object):
             # TODO: Exception
             print('Data-format not right.')
 
-    def validate_json(self, format='dataverse_upload', filename_schema='dataverse_release_4.18.1.json'):
-        """Check if all attributes required for Dataverse metadata are set.
 
-        Check if all attributes are set necessary for the Dataverse API Upload
-        JSON metadata standard of a Dataverse.
-
-        Returns
-        -------
-        bool
-            ``True``, if creation of Dataverse API Upload JSON metadata is
-            possible. ``False``, if not.
-
-        Examples
-        -------
-        Check if metadata is valid for Dataverse API Upload JSON metadata creation::
-
-            >>> from pyDataverse.models import Dataverse
-            >>> dv = Dataverse()
-            >>> data = {
-            >>>     'dataverseContacts': [
-            >>>         {'contactEmail': 'test@example.com'}
-            >>>     ],
-            >>>     'name': 'Test pyDataverse',
-            >>>     'alias': 'test-pyDataverse'
-            >>> }
-            >>> dv.set(data)
-            >>> dv.validate_json()
-            True
-            >>> dv.name = None
-            >>> dv.validate_json()
-            False
-
-        """
-        is_valid = True
-        for attr in self.__attr_dict_dv_up_required:
-            if attr in list(self.__dict__.keys()):
-                if not self.__getattribute__(attr):
-                    is_valid = False
-                    print('Attribute \'{0}\' is `False`.'.format(attr))
-            else:
-                is_valid = False
-                print('Attribute \'{0}\' missing.'.format(attr))
-        return is_valid
-
-    def dict(self, format='dataverse_upload'):
+    def dict(self, format='dataverse_upload', validate=False,
+             filename_schema='schemas/json/dataverse_upload_full_schema.json'):
         """Create different data outputs as :class:`dict`.
 
         Creates different data outputs - different in structure and content -
@@ -214,82 +236,34 @@ class Dataverse(object):
 
         """
         data = {}
-        if format == 'dataverse_upload':
-            if self.validate_json():
+        allowed_formats = [
+            'dataverse_upload',
+            'all'
+        ]
+
+        if format in allowed_formats:
+            if format == 'dataverse_upload':
                 for attr in self.__attr_dict_dv_up_valid:
                     # check if attribute exists
                     if attr in list(self.__dict__.keys()):
                         # check if attribute is not None
                         if self.__getattribute__(attr) is not None:
                             data[attr] = self.__getattribute__(attr)
+                if validate:
+                    validate_data(data, filename_schema)
                 return data
-            else:
-                print('Dict can not be created. Data is not valid for format.')
-                return None
-        elif format == 'all':
-            for attr in self.__attr_dict_all_valid:
-                if attr in list(self.__dict__.keys()):
-                    if self.__getattribute__(attr) is not None:
-                        data[attr] = self.__getattribute__(attr)
-            return data
+            elif format == 'all':
+                for attr in self.__attr_dict_all_valid:
+                    if attr in list(self.__dict__.keys()):
+                        if self.__getattribute__(attr) is not None:
+                            data[attr] = self.__getattribute__(attr)
+                return data
         else:
             # TODO: Exception
-            print('Format not right for dict.')
+            print('Format not right for dict().')
             return None
 
-    def to_json(self, format='dataverse_upload', validate=True,
-                filename_schema='dataverse_release_4.18.1.json'):
-        r"""Create JSON output of different data formats.
-
-        Parameters
-        ----------
-        format : string
-            Data format for JSON creation. Available format so far are:
-            ``dv_up``: Dataverse API Upload Dataverse JSON metadata standard.
-            ``all``: All attributes.
-
-        Returns
-        -------
-        string
-            JSON formatted :class:`str` of Dataverse metadata for API upload.
-
-        Examples
-        -------
-        Get :class:`dict` of Dataverse metadata::
-
-            >>> from pyDataverse.models import Dataverse
-            >>> dv = Dataverse()
-            >>> data = {
-            >>>     'dataverseContacts': [
-            >>>         {'contactEmail': 'test@example.com'}
-            >>>     ],
-            >>>     'name': 'Test pyDataverse',
-            >>>     'alias': 'test-pyDataverse'
-            >>> }
-            >>> dv.set(data)
-            >>> data = dv.json()
-            >>> data
-            '{\n  "name": "Test pyDataverse",\n  "dataverseContacts": [\n    {\n      "contactEmail": "test@example.com"\n    }\n  ],\n  "alias": "test-pyDataverse"\n}'
-
-        Todo
-        -------
-        Validate standards.
-
-        """
-        if format == 'dataverse_upload' or format == 'all':
-            data = self.dict(format=format)
-            if data:
-                return json.dumps(data)
-            else:
-                return None
-                # TODO Exception
-                print('JSON data can not be read in.')
-        else:
-            # TODO Exception
-            print('Data format not valid.')
-
-
-class Dataset(object):
+class Dataset(DVObject):
     """Base class for the Dataset data model."""
 
     """
@@ -528,38 +502,12 @@ class Dataset(object):
             >>> ds = Dataset()
 
         """
+        super().__init__(self)
+        self.default_validate_schema_filename = 'schemas/json/dataset_upload_full_schema.json'
 
     def __str__(self):
         """Return name of Dataset() class for users."""
         return 'pyDataverse Dataset() model class.'
-
-    def set(self, data):
-        """Set class attributes with a flat :class:`dict`.
-
-        Parameters
-        ----------
-            Flat :class:`dict` with data. All keys will be mapped to a similar
-            called attribute with it's value.
-
-        Examples
-        -------
-        Set Dataset attributes via flat :class:`dict`::
-
-            >>> from pyDataverse.models import Dataset
-            >>> ds = Dataset()
-            >>> data = {
-            >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': [
-            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
-            >>>     ]
-            >>> }
-            >>> ds.set(data)
-            >>> ds.title
-            'pyDataverse study 2019'
-
-        """
-        for key, val in data.items():
-            self.__setattr__(key, val)
 
     def from_json(self, filename, format='dataverse_upload', filename_mapping=None,
                   validate=True,
@@ -1224,54 +1172,8 @@ class Dataset(object):
 
         return tmp_list
 
-    def to_json(self, format='dataverse_upload', validate=True,
-                filename_schema='dataverse_release_4.18.1.json'):
-        """Create JSON output of different data formats.
 
-        Parameters
-        ----------
-        format : string
-            Data format for :class:`dict` creation. Available format so far are:
-            ``dv_up``: Dataverse API Upload Dataset JSON metadata standard.
-            ``all``: All attributes.
-
-        Returns
-        -------
-        string
-            JSON formatted string of Dataverse metadata for API upload.
-
-        Examples
-        -------
-        Get JSON of Dataverse API upload::
-
-            >>> from pyDataverse.models import Dataset
-            >>> ds = Dataset()
-            >>> data = {
-            >>>     'title': 'pyDataverse study 2019',
-            >>>     'dsDescription': [
-            >>>         {'dsDescriptionValue': 'New study about pyDataverse usage in 2019'}
-            >>>     ]
-            >>>     'author': [{'authorName': 'LastAuthor1, FirstAuthor1'}],
-            >>>     'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1'}],
-            >>>     'subject': ['Engineering']
-            >>> }
-            >>> ds.set(data)
-            >>> data = ds.json()
-
-        Todo
-        -------
-        TODO: Validate standard
-        TODO: Link to default JSON file
-
-        """
-        if format == 'dataverse_upload' or format == 'all':
-            return json.dumps(self.dict(format=format))
-        else:
-            # TODO Exception
-            print('data format not valid.')
-
-
-class Datafile(object):
+class Datafile(DVObject):
     """Base class for the Datafile model.
 
     Parameters
@@ -1340,6 +1242,10 @@ class Datafile(object):
             <pyDataverse.models.Datafile at 0x7f4dfc0466a0>
 
         """
+
+        super().__init__(self)
+        self.default_validate_schema_filename = 'schemas/json/datafile_upload_full_schema.json'
+
         """Misc"""
         self.pid = pid
         self.filename = filename
@@ -1348,79 +1254,13 @@ class Datafile(object):
         self.description = None
         self.restrict = None
 
+
     def __str__(self):
         """Return name of Datafile() class for users."""
         return 'pyDataverse Datafile() model class.'
 
-    def set(self, data):
-        """Set class attributes with a flat dict.
-
-        Parameters
-        ----------
-        data : dict
-            Flat dict with data. Key's must be name the same as the class
-            attribute, the data should be mapped to.
-
-        Examples
-        -------
-        Set Datafile attributes via flat dict::
-
-            >>> from pyDataverse.models import Datafile
-            >>> df = Datafile()
-            >>> data = {
-            >>>     'pid': 'doi:10.11587/EVMUHP',
-            >>>     'description': 'Test file',
-            >>>     'categories': ['Data', 'Code'],
-            >>>     'filename': 'tests/data/datafile.txt'
-            >>> }
-            >>> df.set(data)
-            >>> df.pid
-            'doi:10.11587/EVMUHP',
-
-        """
-        for key, val in data.items():
-            self.__setattr__(key, val)
-
-    def validate_json(self):
-        """Check if set attributes are valid for Dataverse API metadata creation.
-
-        Returns
-        -------
-        bool
-            True, if creation of metadata JSON is possible. False, if not.
-
-        Examples
-        -------
-        Check if metadata is valid for Dataverse API upload::
-
-            >>> from pyDataverse.models import Datafile
-            >>> df = Datafile()
-            >>> data = {
-            >>>     'pid': 'doi:10.11587/EVMUHP',
-            >>>     'description': 'Test file',
-            >>>     'categories': ['Data', 'Code'],
-            >>>     'filename': 'tests/data/datafile.txt'
-            >>> }
-            >>> df.set(data)
-            >>> df.is_valid
-            True
-            >>> df.filename = None
-            >>> df.is_valid
-            False
-
-        """
-        is_valid = True
-        for attr in self.__attr_dict_dv_up_required:
-            if attr in list(self.__dict__.keys()):
-                if not self.__getattribute__(attr):
-                    is_valid = False
-                    print('Attribute \'{0}\' is `False`.'.format(attr))
-            else:
-                is_valid = False
-                print('Attribute \'{0}\' missing.'.format(attr))
-        return is_valid
-
-    def dict(self, format='dataverse_upload'):
+    def dict(self, format='dataverse_upload', validate=False,
+             filename_schema='schemas/json/datafile_upload_full_schema.json'):
         """Create dict in different data formats.
 
         Parameters
@@ -1457,75 +1297,30 @@ class Datafile(object):
 
         """
         data = {}
-        if format == 'dataverse_upload':
-            if self.validate_json():
+
+        allowed_formats = [
+            'dataverse_upload',
+            'all'
+        ]
+
+        if format in allowed_formats:
+            if format == 'dataverse_upload':
                 for attr in self.__attr_dict_dv_up_valid:
                     # check if attribute exists
                     if attr in list(self.__dict__.keys()):
                         # check if attribute is not None
                         if self.__getattribute__(attr) is not None:
                             data[attr] = self.__getattribute__(attr)
+                if validate:
+                    validate_data(data, filename_schema)
                 return data
-            else:
-                print('Dict can not be created. Data is not valid for format.')
-                return None
-        elif format == 'all':
-            for attr in self.__attr_dict_all_valid:
-                if attr in list(self.__dict__.keys()):
-                    if self.__getattribute__(attr) is not None:
-                        data[attr] = self.__getattribute__(attr)
-            return data
+            elif format == 'all':
+                for attr in self.__attr_dict_all_valid:
+                    if attr in list(self.__dict__.keys()):
+                        if self.__getattribute__(attr) is not None:
+                            data[attr] = self.__getattribute__(attr)
+                return data
         else:
             # TODO: Exception
             print('Format not right for dict.')
-            return None
-
-    def to_json(self, format='dataverse_upload', validate=True,
-                filename_schema='dataverse_release_4.18.1.json'):
-        r"""Create JSON from attributes.
-
-        Parameters
-        ----------
-        format : string
-            Data format of input. Available formats are: `dv_up` for Dataverse
-            API upload compatible format (default) and `all` with all attributes
-            named in `__attr_valid_class`.
-
-        Returns
-        -------
-        string
-            JSON formatted string of Dataverse metadata for API upload.
-
-        Examples
-        -------
-        Get dict of Dataverse metadata::
-
-            >>> from pyDataverse.models import Datafile
-            >>> df = Datafile()
-            >>> data = {
-            >>>     'pid': 'doi:10.11587/EVMUHP',
-            >>>     'description': 'Test file',
-            >>>     'categories': ['Data', 'Code']
-            >>> }
-            >>> df.set(data)
-            >>> df.dict()
-            {'description': 'Test file',
-             'directoryLabel': None,
-             'restrict': None}
-
-        Todo
-        -------
-        Validate standards.
-        Link to default JSON file
-
-        """
-        if format == 'dataverse_upload' or format == 'all':
-            data = self.dict(format=format)
-            if data:
-                return json.dumps(data)
-            else:
-                return None
-        else:
-            # TODO Exception
-            print('Data format not valid.')
             return None
