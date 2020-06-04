@@ -57,7 +57,7 @@ def write_file(filename, data, mode='w'):
         raise e
 
 
-def read_json(filename, mode='r'):
+def read_json(filename, mode='r', encoding='utf-8'):
     """Read in a json file.
 
     See more about the json module at
@@ -75,14 +75,14 @@ def read_json(filename, mode='r'):
 
     """
     try:
-        with open(filename, mode) as f:
+        with open(filename, mode, encoding=encoding) as f:
             data = json.load(f)
         return data
     except Exception as e:
         raise e
 
 
-def write_json(filename, data, mode='w'):
+def write_json(filename, data, mode='w', encoding='utf-8'):
     """Write data to a json file.
 
     Parameters
@@ -97,7 +97,7 @@ def write_json(filename, data, mode='w'):
 
     """
     try:
-        with open(filename, mode) as f:
+        with open(filename, mode, encoding=encoding) as f:
             json.dump(data, f, indent=2)
     except IOError:
         print('An error occured trying to write the file {}.'.format(filename))
