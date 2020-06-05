@@ -16,6 +16,7 @@ stash*.*
 setup.sh
 .pypirc
 data/
+dev/
 
 # Distribution / packaging
 build/
