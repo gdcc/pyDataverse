@@ -380,19 +380,19 @@ class TestDataverse(object):
         assert isinstance(dv.to_json(), str)
         assert json.loads(dv.to_json()) == json.loads(json_upload_full())
 
-    # def test_dataverse_to_json_dv_up_invalid(self, object_min):
-    #     """Test Dataverse.json() with format=`dv_up` and non-valid data.
-    #
-    #     Parameters
-    #     ----------
-    #     object_min : dict
-    #         Fixture, which returns a flat dataset dict() coming from
-    #         `tests/data/dataverse_min.json`.
-    #
-    #     """
-    #     dv = object_min
-    #     dv.name = None
-    #     # TODO: check error
+    def test_dataverse_to_json_dv_up_invalid(self):
+        """Test Dataverse.json() with format=`dv_up` and non-valid data.
+
+        Parameters
+        ----------
+        object_min : dict
+            Fixture, which returns a flat dataset dict() coming from
+            `tests/data/dataverse_min.json`.
+
+        """
+        dv = object_min()
+        with pytest.raises(TypeError):
+            json_dict = json.loads(dv.to_json(format='wrong'))
 
     def test_dataverse_to_json_format_invalid(self):
         """Test Dataverse.json() with non-valid format and valid data.
