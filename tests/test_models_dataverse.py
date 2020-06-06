@@ -211,7 +211,7 @@ def assert_dict_min():
     return data
 
 
-def assert_dict_invalid():
+def assert_dict_init():
     data = {
         'default_validate_format': 'dataverse_upload',
         'default_validate_schema_filename': 'schemas/json/dataverse_upload_full_schema.json',
@@ -220,21 +220,33 @@ def assert_dict_invalid():
     return data
 
 
+def attr_dv_up_values():
+    data = [
+        'affiliation',
+        'alias',
+        'dataverseContacts',
+        'dataverseType',
+        'description',
+        'name'
+    ]
+    return data
+
+
 class TestDataverse(object):
     """Tests for Dataverse()."""
 
     def test_dataverse_init(self):
         """Test Dataverse.__init__()."""
-
-        data = assert_dict_invalid()
         dv = Dataverse()
+        data_assert = assert_dict_init()
 
         assert isinstance(dv, Dataverse)
         assert isinstance(dv, DVObject)
-        assert len(dv.__dict__.keys()) == len(data.keys())
-        for attr in list(data.keys()):
-            if data[attr] != 'LIST':
-                assert getattr(dv, attr) == data[attr]
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr]
+        assert len(dv.__dict__.keys()) == len(data_assert.keys())
 
     def test_dataverse_set_valid(self):
         """Test Dataverse.set() with format=`dv_up`.
@@ -246,66 +258,68 @@ class TestDataverse(object):
             `tests/data/dataverse_min.json`.
 
         """
-
-        data_min = assert_dict_min()
-
         data = dict_flat_min()
+        data_assert = assert_dict_min()
         dv = Dataverse()
         dv.set(data)
 
         assert dv.dataverseContacts == [{'contactEmail': 'info@aussda.at'}]
-        for attr in list(data_min.keys()):
-            if data_min[attr] != 'LIST':
-                assert getattr(dv, attr) == data_min[attr]
-        assert len(dv.__dict__.keys()) == len(data_min.keys())
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr]
+        assert len(dv.__dict__.keys()) == len(data_assert.keys())
 
         data = dict_flat_full()
+        data_assert = assert_dict_full()
         dv = Dataverse()
         dv.set(data)
 
-        data_full = assert_dict_full()
-
         assert dv.dataverseContacts == [{'contactEmail': 'pi@example.edu'},{'contactEmail': 'student@example.edu'}]
-        for attr in list(data_full.keys()):
-            if data_full[attr] != 'LIST':
-                assert getattr(dv, attr) == data_full[attr]
-        assert len(dv.__dict__.keys()) == len(data_full.keys())
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr]
+        assert len(dv.__dict__.keys()) == len(data_assert.keys())
 
     def test_dataverse_from_json_dv_up_valid(self):
         """Test Dataverse.import_data() with format=`dv_up`."""
-
-        data_min = assert_dict_min()
-
+        data_assert = assert_dict_min()
+        dv_assert = object_min()
         dv = Dataverse()
         dv.from_json('tests/data/dataverse_upload_min.json')
 
-        for attr in list(data_min.keys()):
-            if data_min[attr] != 'LIST':
-                assert getattr(dv, attr) == data_min[attr]
-        assert len(dv.__dict__.keys()) == len(data_min.keys())
+        assert dv_assert.__dict__ == dv.__dict__
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr] == getattr(dv_assert, attr)
+        assert len(dv.__dict__.keys()) == len(data_assert.keys()) == len(dv_assert.__dict__.keys())
 
-        data_full = assert_dict_full()
-
+        data_assert = assert_dict_full()
+        dv_assert = object_full()
         dv = Dataverse()
         dv.from_json('tests/data/dataverse_upload_full.json')
 
+        assert dv_assert.__dict__ == dv.__dict__
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
         assert dv.dataverseContacts == [{'contactEmail': 'pi@example.edu'},{'contactEmail': 'student@example.edu'}]
-        for attr in list(data_full.keys()):
-            if data_full[attr] != 'LIST':
-                assert getattr(dv, attr) == data_full[attr]
-        assert len(dv.__dict__.keys()) == len(data_full.keys())
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr] == getattr(dv_assert, attr)
+        assert len(dv.__dict__.keys()) == len(data_assert.keys()) == len(dv_assert.__dict__.keys())
 
     def test_dataverse_from_json_format_invalid(self):
         """Test Dataverse.import_data() with non-valid format."""
-        data = assert_dict_invalid()
-
+        data_assert = assert_dict_init()
         dv = Dataverse()
         dv.from_json('tests/data/dataverse_upload_min.json', format='wrong')
 
-        for attr in list(data.keys()):
-            if data[attr] != 'LIST':
-                assert getattr(dv, attr) == data[attr]
-        assert len(dv.__dict__.keys()) == len(data.keys())
+        assert getattr(dv, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert getattr(dv, attr) == data_assert[attr]
+        assert len(dv.__dict__.keys()) == len(data_assert.keys())
 
     def test_dataverse_dict_valid(self):
         """Test Dataverse.dict() with format=`all` and valid data.
@@ -317,36 +331,31 @@ class TestDataverse(object):
             `tests/data/dataverse_min.json`.
 
         """
-        data_min = assert_dict_min()
         dv = object_min()
-
-        for attr in list(data_min.keys()):
-            if data_min[attr] != 'LIST':
-                assert getattr(dv, attr) == data_min[attr]
-        assert len(dv.__dict__.keys()) == len(data_min.keys())
-
+        data_min = dict_flat_min()
+        data_assert = assert_dict_min()
         data = dv.dict()
 
         assert data
         assert isinstance(data, dict)
+        assert data['attr_dv_up_values'] == attr_dv_up_values()
         for attr in list(data.keys()):
             if data[attr] != 'LIST':
-                assert getattr(dv, attr) == data[attr]
-        assert len(data.keys()) == len(data_min.keys()) == len(dv.__dict__.keys())
+                assert getattr(dv, attr) == data[attr] == getattr(dv, attr)
+        assert len(data.keys()) == len(data_assert.keys()) == len(dv.__dict__.keys())
 
-        data_full = assert_dict_full()
         dv = object_full()
-
-        assert len(dv.__dict__.keys()) == len(data_full.keys())
-
+        data_assert = assert_dict_full()
         data = dv.dict()
+
         assert data
         assert isinstance(data, dict)
+        assert data['attr_dv_up_values'] == attr_dv_up_values()
         assert data['dataverseContacts'] == [{'contactEmail': 'pi@example.edu'},{'contactEmail': 'student@example.edu'}]
         for attr in list(data.keys()):
             if data[attr] != 'LIST':
-                assert getattr(dv, attr) == data[attr]
-        assert len(data.keys()) == len(data_full.keys()) == len(dv.__dict__.keys())
+                assert getattr(dv, attr) == data[attr] == getattr(dv, attr)
+        assert len(data.keys()) == len(data_assert.keys()) == len(dv.__dict__.keys())
 
     def test_dataverse_to_json_dv_up_valid(self):
         """Test Dataverse.json() with format=`dv_up` and valid data.
@@ -366,6 +375,7 @@ class TestDataverse(object):
         assert json.loads(dv.to_json()) == json.loads(json_upload_min())
 
         dv = object_full()
+
         assert dv.to_json()
         assert isinstance(dv.to_json(), str)
         assert json.loads(dv.to_json()) == json.loads(json_upload_full())
@@ -391,8 +401,8 @@ class TestDataverse(object):
         ----------
 
         """
-        data = assert_dict_invalid()
         dv = object_min()
+
         with pytest.raises(TypeError):
             json_dict = json.loads(dv.to_json(format='wrong'))
 
@@ -405,6 +415,6 @@ class TestDataverse(object):
             assert json.loads(json_upload_min()) == json.loads(dv.to_json())
 
             dv = Dataverse()
-            dv.from_json(TEST_DIR + '/data/dataverse_upload_full.json')
+            dv.from_json(os.path.join(TEST_DIR + '/data/dataverse_upload_full.json'))
             json_str = dv.to_json()
             assert json.loads(json_upload_full()) == json.loads(dv.to_json())

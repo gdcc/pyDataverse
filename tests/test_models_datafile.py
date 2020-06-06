@@ -5,6 +5,7 @@ import json
 import os
 from pyDataverse.models import Datafile
 from pyDataverse.models import DVObject
+import pytest
 
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -125,8 +126,8 @@ def dict_flat_min():
 
     """
     data = {
-        'pid': 'doi:10.11587/EVMUHP',
-        'filename': 'tests/data/datafile.txt'
+        'pid': 'doi:10.11587/RRKEA9',
+        'filename': '10109_qu_de_v1_0.pdf'
     }
     return data
 
@@ -166,6 +167,19 @@ def json_upload_min():
 
 
 def json_upload_full():
+    """Import minimum Dataverse dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataverse metadata.
+
+    """
+    data = read_file('tests/data/datafile_upload_full.json')
+    return data
+
+
+def json_upload_full():
     """Import full Dataverse dict.
 
     Returns
@@ -178,20 +192,70 @@ def json_upload_full():
     return data
 
 
+def assert_dict_full():
+    data = {
+        'default_validate_format': 'dataverse_upload',
+        'default_validate_schema_filename': 'schemas/json/datafile_upload_full_schema.json',
+        'attr_dv_up_values': 'LIST',
+        'pid': 'doi:10.11587/NVWE8Y',
+        'filename': '20001_ta_de_v1_0.pdf',
+        'description': 'Another data file.',
+        'restrict': True,
+        'categories': 'LIST',
+        'title': 'Questionnaire',
+        'directoryLabel': 'data/subdir1'
+    }
+    return data
+
+
+def assert_dict_min():
+    data = {
+        'default_validate_format': 'dataverse_upload',
+        'default_validate_schema_filename': 'schemas/json/datafile_upload_full_schema.json',
+        'attr_dv_up_values': 'LIST',
+        'pid': 'doi:10.11587/RRKEA9',
+        'filename': '10109_qu_de_v1_0.pdf'
+    }
+    return data
+
+
+def assert_dict_init():
+    data = {
+        'default_validate_format': 'dataverse_upload',
+        'default_validate_schema_filename': 'schemas/json/datafile_upload_full_schema.json',
+        'attr_dv_up_values': 'LIST'
+    }
+    return data
+
+
+def attr_dv_up_values():
+    data = [
+        'description',
+        'categories',
+        'restrict',
+        'title',
+        'directoryLabel',
+        'pid',
+        'filename'
+    ]
+    return data
+
+
 class TestDatafile(object):
     """Tests for Datafile()."""
 
     def test_datafile_init(self):
         """Test Datafile.__init__()."""
+        data = assert_dict_init()
         df = Datafile()
 
         assert isinstance(df, Datafile)
         assert isinstance(df, DVObject)
-        assert len(df.__dict__.keys()) == 3
-        assert df.default_validate_format == 'dataverse_upload'
-        assert df.default_validate_schema_filename == 'schemas/json/datafile_upload_full_schema.json'
-        assert hasattr(df, 'attr_dv_up_values')
-        # assert df.attr_dv_up_values == []
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
+        assert len(df.__dict__.keys()) == len(data.keys())
+        for attr in list(data.keys()):
+            if data[attr] != 'LIST':
+                assert getattr(df, attr) == data[attr]
 
     def test_datafile_set_valid(self):
         """Test Datafile.set() with format=`dv_up`.
@@ -202,39 +266,67 @@ class TestDatafile(object):
             Fixture, which returns a flat datafile dict().
 
         """
-        data = dict_flat_full()
+        data = dict_flat_min()
+        data_assert = assert_dict_min()
         df = Datafile()
         df.set(data)
 
-        assert df.pid == 'doi:10.11587/NVWE8Y'
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df, attr)
+        assert len(df.__dict__.keys()) == len(data_assert.keys())
+
+        data = dict_flat_full()
+        data_assert = assert_dict_full()
+        df = Datafile()
+        df.set(data)
+
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
         assert df.categories == ['Documentation']
-        assert df.description == 'Another data file.'
-        assert df.filename == '20001_ta_de_v1_0.pdf'
-        assert df.title == 'Questionnaire'
-        assert df.directoryLabel == 'data/subdir1'
-        assert df.restrict == True
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df, attr)
+        assert len(df.__dict__.keys()) == len(data_assert.keys())
 
     def test_datafile_from_json_dv_up_valid(self):
         """Test Dataverse.import_data() with format=`dv_up`."""
+        data_assert = dict_flat_min()
+        df_assert = object_min()
+        df = Datafile()
+        df.from_json('tests/data/datafile_upload_min.json')
+
+        assert df_assert.__dict__ == df.__dict__
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df_assert, attr)
+        assert len(df.__dict__.keys()) == len(df_assert.__dict__.keys())
+
+        data_assert = dict_flat_full()
+        df_assert = object_full()
         df = Datafile()
         df.from_json('tests/data/datafile_upload_full.json')
-        assert df.pid == 'doi:10.11587/NVWE8Y'
+
+        assert df_assert.__dict__ == df.__dict__
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
         assert df.categories == ['Documentation']
-        assert df.description == 'Another data file.'
-        assert df.filename == '20001_ta_de_v1_0.pdf'
-        assert df.title == 'Questionnaire'
-        assert df.directoryLabel == 'data/subdir1'
-        assert df.restrict == True
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df_assert, attr)
+        assert len(df.__dict__.keys()) == len(df_assert.__dict__.keys())
 
     def test_datafile_from_json_format_invalid(self):
         """Test Dataverse.import_data() with non-valid format."""
+        data_assert = assert_dict_init()
         df = Datafile()
-        df.default_validate_format = 'wrong'
-        df.from_json('tests/data/datafile_upload_min.json')
+        df.from_json('tests/data/datafile_upload_min.json', format='wrong')
 
-        assert df.default_validate_format == 'wrong'
-        assert df.default_validate_schema_filename == 'schemas/json/datafile_upload_full_schema.json'
-        assert len(df.__dict__.keys()) == 3
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df, attr)
+        assert len(df.__dict__.keys()) == len(data_assert.keys())
 
     def test_datafile_dict_valid(self):
         """Test Datafile.dict() with format=`dv_up` and valid data.
@@ -245,24 +337,32 @@ class TestDatafile(object):
             Fixture, which returns a flat dataset dict().
 
         """
-        df = object_full()
-
-        assert df.default_validate_format == 'dataverse_upload'
-        assert df.default_validate_schema_filename == 'schemas/json/datafile_upload_full_schema.json'
-        assert len(df.__dict__.keys()) == 10
-
+        df = object_min()
+        data_min = dict_flat_min()
+        data_assert = assert_dict_min()
         data = df.dict()
 
         assert data
         assert isinstance(data, dict)
-        assert data['pid'] == 'doi:10.11587/NVWE8Y'
-        assert data['description'] == 'Another data file.'
-        assert data['restrict']
-        assert data['title'] == 'Questionnaire'
-        assert data['directoryLabel'] == 'data/subdir1'
+        assert data['attr_dv_up_values'] == attr_dv_up_values()
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df, attr)
+        assert len(data_assert.keys()) == len(df.__dict__.keys())
+
+        df = object_full()
+        data_full = dict_flat_full()
+        data_assert = assert_dict_full()
+        data = df.dict()
+
+        assert data
+        assert isinstance(data, dict)
+        assert getattr(df, 'attr_dv_up_values') == attr_dv_up_values()
         assert data['categories'] == ['Documentation']
-        assert data['filename'] == '20001_ta_de_v1_0.pdf'
-        assert len(data.keys()) == len(df.__dict__.keys())
+        for attr in list(data_assert.keys()):
+            if data_assert[attr] != 'LIST':
+                assert data_assert[attr] == getattr(df, attr)
+        assert len(df.__dict__.keys()) == len(data_assert.keys())
 
     def test_datafile_to_json_dv_up_valid(self):
         """Test Dataverse.json() with format=`dv_up` and valid data.
@@ -275,6 +375,12 @@ class TestDatafile(object):
 
         TODO: Assert content
         """
+        df = object_min()
+
+        assert df.to_json()
+        assert isinstance(df.to_json(), str)
+        assert json.loads(df.to_json()) == json.loads(json_upload_min())
+
         df = object_full()
 
         assert df.to_json()
@@ -289,13 +395,17 @@ class TestDatafile(object):
 
         """
         df = object_min()
-        data = df.to_json('wrong')
-
-        assert not data
+        with pytest.raises(TypeError):
+            json_dict = json.loads(df.to_json(format='wrong'))
 
     def test_datafile_from_json_to_json(self):
         """Test Dataverse pipeline from import to export with format=`dv_up`."""
         if not os.environ.get('TRAVIS'):
+            df = Datafile()
+            df.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'))
+            json_str = df.to_json()
+            assert json.loads(df.to_json()) == json.loads(json_upload_min())
+
             df = Datafile()
             df.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_full.json'))
             json_str = df.to_json()
