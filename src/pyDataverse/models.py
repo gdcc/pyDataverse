@@ -102,7 +102,11 @@ class DVObject(object):
             filename_schema = self.default_validate_schema_filename
 
         data_json = self.to_json(format=format)
-        validate_data(json.loads(data_json), filename_schema)
+        is_valid = validate_data(json.loads(data_json), filename_schema)
+        if is_valid:
+            return True
+        else:
+            return False
 
     def from_json(self, filename, format=None, validate=True,
                   filename_schema=None):
@@ -155,8 +159,9 @@ class DVObject(object):
                     else:
                         print('INFO: Attribute {0} not valid for import (dv_up).'.format(key))
                 self.set(data)
+                return True
             elif format == 'dataverse_download':
-                pass
+                return True
             elif format == 'dspace':
                 pass
             elif format == 'custom':
@@ -164,6 +169,7 @@ class DVObject(object):
         else:
             # TODO: Exception
             print('WARNING: Data-format not right.')
+            return False
 
     def to_json(self, format=None, validate=True, filename_schema=None):
         r"""Create JSON from attributes.

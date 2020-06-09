@@ -353,5 +353,7 @@ def validate_data(data, filename_schema, format='json'):
     """
     if format == 'json':
         validate(instance=data, schema=read_json(filename_schema))
+        return True
     else:
         print('ERROR: No valid format passed.')
+        return False

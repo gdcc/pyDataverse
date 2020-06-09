@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Datafile data model tests."""
 import json
+import jsonschema
 import os
 from pyDataverse.models import Datafile
 from pyDataverse.models import DVObject
@@ -261,10 +262,10 @@ class TestDatafile(object):
 
     def test_datafile_init(self):
         """Test Datafile.__init__()."""
-        df_assert = object_init()
-        df = Datafile()
+        obj_assert = object_init()
+        obj = Datafile()
 
-        assert df.__dict__ == df_assert.__dict__
+        assert obj.__dict__ == obj_assert.__dict__
 
     def test_datafile_set_valid(self):
         """Test Datafile.set() with format=`dv_up`.
@@ -275,17 +276,17 @@ class TestDatafile(object):
             Fixture, which returns a flat datafile dict().
 
         """
-        df_assert = object_min()
-        df = Datafile()
-        df.set(dict_flat_set_min())
+        obj_assert = object_min()
+        obj = Datafile()
+        obj.set(dict_flat_set_min())
 
-        assert df.__dict__ == df_assert.__dict__
+        assert obj.__dict__ == obj_assert.__dict__
 
-        df_assert = object_full()
-        df = Datafile()
-        df.set(dict_flat_set_full())
+        obj_assert = object_full()
+        obj = Datafile()
+        obj.set(dict_flat_set_full())
 
-        assert df.__dict__ == df_assert.__dict__
+        assert obj.__dict__ == obj_assert.__dict__
 
     def test_datafile_dict_valid(self):
         """Test Datafile.dict() with format=`dv_up` and valid data.
@@ -297,41 +298,41 @@ class TestDatafile(object):
 
         """
         dict_assert = dict_flat_dict_min()
-        df = object_min()
-        dict_flat = df.dict()
+        obj = object_min()
+        dict_flat = obj.dict()
 
         assert dict_flat == dict_assert
 
         dict_assert = dict_flat_dict_full()
-        df = object_full()
-        dict_flat = df.dict()
+        obj = object_full()
+        dict_flat = obj.dict()
 
         assert dict_flat == dict_assert
 
     def test_datafile_from_json_dv_up_valid(self):
         """Test Dataverse.import_data() with format=`dv_up`."""
-        df_assert = object_min()
-        df = Datafile()
-        df.from_json('tests/data/datafile_upload_min.json', validate=False)
+        obj_assert = object_min()
+        obj = Datafile()
+        obj.from_json('tests/data/datafile_upload_min.json', validate=False)
 
-        assert df_assert.__dict__ == df.__dict__
+        assert obj_assert.__dict__ == obj.__dict__
 
-        df_assert = object_full()
-        df = Datafile()
-        df.from_json('tests/data/datafile_upload_full.json', validate=False)
+        obj_assert = object_full()
+        obj = Datafile()
+        obj.from_json('tests/data/datafile_upload_full.json', validate=False)
 
-        assert df_assert.__dict__ == df.__dict__
+        assert obj_assert.__dict__ == obj.__dict__
 
     def test_datafile_from_json_format_invalid(self):
         """Test Dataverse.import_data() with non-valid format."""
-        df_assert = object_init()
-        df = Datafile()
-        df.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), format='wrong', validate=False)
+        obj_assert = object_init()
+        obj = Datafile()
+        obj.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), format='wrong', validate=False)
 
-        assert df
-        assert df.__dict__
-        assert df_assert.__dict__ is not df.__dict__
-        assert len(df.__dict__.keys()) == len(df_assert.__dict__.keys())
+        assert obj
+        assert obj.__dict__
+        assert obj_assert.__dict__ is not obj.__dict__
+        assert len(obj.__dict__.keys()) == len(obj_assert.__dict__.keys())
 
     def test_datafile_to_json_dv_up_valid(self):
         """Test Dataverse.json() with format=`dv_up` and valid data.
@@ -345,16 +346,16 @@ class TestDatafile(object):
         TODO: Assert content
         """
         dict_assert = json.loads(json_upload_min())
-        df = object_min()
+        obj = object_min()
 
-        assert isinstance(df.to_json(validate=False), str)
-        assert json.loads(df.to_json(validate=False)) == dict_assert
+        assert isinstance(obj.to_json(validate=False), str)
+        assert json.loads(obj.to_json(validate=False)) == dict_assert
 
         dict_assert = json.loads(json_upload_full())
-        df = object_full()
+        obj = object_full()
 
-        assert isinstance(df.to_json(validate=False), str)
-        assert json.loads(df.to_json(validate=False)) == dict_assert
+        assert isinstance(obj.to_json(validate=False), str)
+        assert json.loads(obj.to_json(validate=False)) == dict_assert
 
     def test_datafile_to_json_format_invalid(self):
         """Test Dataverse.json() with non-valid format and valid data.
@@ -363,23 +364,50 @@ class TestDatafile(object):
         ----------
 
         """
-        df = object_min()
+        obj = object_min()
         with pytest.raises(TypeError):
-            json_dict = json.loads(df.to_json(format='wrong', validate=False))
+            json_dict = json.loads(obj.to_json(format='wrong', validate=False))
+
+    def test_validate(self):
+        obj = object_init()
+        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'))
+
+        obj = object_init()
+        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=True)
+
+        obj = object_init()
+        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=True, filename_schema='schemas/json/datafile_upload_schema.json')
+
+        obj = object_init()
+        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), filename_schema='schemas/json/datafile_upload_schema.json')
+
+        # wrong
+        with pytest.raises(jsonschema.exceptions.ValidationError):
+            obj = object_init()
+            obj.to_json()
+        assert not obj.to_json(format='wrong')
+        with pytest.raises(jsonschema.exceptions.ValidationError):
+            assert obj.to_json(filename_schema='schemas/json/dataverse_upload_schema.json')
+        with pytest.raises(jsonschema.exceptions.ValidationError):
+            assert obj.validate_json()
+        with pytest.raises(TypeError):
+            assert obj.validate_json(format='wrong')
+        with pytest.raises(jsonschema.exceptions.ValidationError):
+            assert obj.validate_json(filename_schema='schemas/json/dataverse_upload_schema.json')
 
     def test_datafile_from_json_to_json(self):
         """Test Dataverse pipeline from import to export with format=`dv_up`."""
         if not os.environ.get('TRAVIS'):
             dict_assert = json.loads(json_upload_min())
-            df = Datafile()
-            df.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=False)
-            json_str = df.to_json(validate=False)
+            obj = Datafile()
+            obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=False)
+            json_str = obj.to_json(validate=False)
 
             assert json.loads(json_str) == dict_assert
 
             dict_assert = json.loads(json_upload_full())
-            df = Datafile()
-            df.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_full.json'), validate=False)
-            json_str = df.to_json(validate=False)
+            obj = Datafile()
+            obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_full.json'), validate=False)
+            json_str = obj.to_json(validate=False)
 
             assert json.loads(json_str) == dict_assert

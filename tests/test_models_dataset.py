@@ -465,10 +465,10 @@ class TestDataset(object):
 
     def test_dataset_init(self):
         """Test Dataset.__init__()."""
-        ds_assert = object_init()
-        ds = Dataset()
+        obj_assert = object_init()
+        obj = Dataset()
 
-        assert ds.__dict__ == ds_assert.__dict__
+        assert obj.__dict__ == obj_assert.__dict__
 
     def test_dataset_set_valid(self):
         """Test Dataset.set() with format=`dv_up`.
@@ -479,11 +479,11 @@ class TestDataset(object):
             Fixture, which returns a flat dataset dict().
 
         """
-        ds_assert = object_min()
-        ds = Dataset()
-        ds.set(dict_flat_set_min())
+        obj_assert = object_min()
+        obj = Dataset()
+        obj.set(dict_flat_set_min())
 
-        assert ds.__dict__ == ds_assert.__dict__
+        assert obj.__dict__ == obj_assert.__dict__
 
         # ds_assert = object_full()
         # ds = Dataset()
@@ -514,11 +514,11 @@ class TestDataset(object):
 
     def test_dataset_from_json_dv_up_valid(self):
         """Test Dataset.import_data() with format=`dv_up`."""
-        ds_assert = object_min()
-        ds = Dataset()
-        ds.from_json('tests/data/dataset_upload_min_default.json', validate=False)
+        obj_assert = object_min()
+        obj = Dataset()
+        obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
 
-        assert ds_assert.__dict__ == ds.__dict__
+        assert obj_assert.__dict__ == obj.__dict__
 
         # ds_assert = object_full()
         # ds = Dataset()
@@ -528,14 +528,14 @@ class TestDataset(object):
 
     def test_dataset_from_json_format_invalid(self):
         """Test Dataverse.import_data() with non-valid format."""
-        ds_assert = object_init()
-        ds = Dataset()
-        ds.from_json('tests/data/dataset_upload_full_default.json', format='wrong', validate=False)
+        obj_assert = object_init()
+        obj = Dataset()
+        obj.from_json('tests/data/dataset_upload_full_default.json', format='wrong', validate=False)
 
-        assert ds
-        assert ds.__dict__
-        assert ds_assert.__dict__ is not ds.__dict__
-        assert len(ds.__dict__.keys()) == len(ds_assert.__dict__.keys())
+        assert obj
+        assert obj.__dict__
+        assert obj_assert.__dict__ is not obj.__dict__
+        assert len(obj.__dict__.keys()) == len(obj_assert.__dict__.keys())
 
     def test_dataset_to_json_dv_up_valid(self):
         """Test Dataverse.json() with format=`dv_up` and valid data.
@@ -549,9 +549,9 @@ class TestDataset(object):
         TODO: Assert content
         """
         dict_assert = json.loads(json_upload_min())
-        ds = object_min()
+        obj = object_min()
 
-        assert isinstance(ds.to_json(validate=False), str)
+        assert isinstance(obj.to_json(validate=False), str)
         # assert json.loads(ds.to_json(validate=False)) == dict_assert
 
         # dict_assert = json.loads(json_upload_full())
@@ -578,25 +578,52 @@ class TestDataset(object):
     #     for attr in dv_up_keys:
     #         delattr(ds, attr)
 
-    def test_dataset_to_json_format_invalid(self):
-        """Test Dataverse.json() with non-valid format and valid data.
-
-        Parameters
-        ----------
-
-        """
-        ds = object_min()
-        with pytest.raises(TypeError):
-            json_dict = json.loads(ds.to_json(format='wrong', validate=False))
+    # def test_dataset_to_json_format_invalid(self):
+    #     """Test Dataverse.json() with non-valid format and valid data.
+    #
+    #     Parameters
+    #     ----------
+    #
+    #     """
+    #     ds = object_min()
+    #     with pytest.raises(TypeError):
+    #         json_dict = json.loads(ds.to_json(format='wrong', validate=False))
+    #
+    # def test_validate(self):
+    #     ds = object_init()
+    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'))
+    #
+    #     ds = object_init()
+    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True)
+    #
+    #     ds = object_init()
+    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True, filename_schema='schemas/json/dataset_upload_default_schema.json')
+    #
+    #     ds = object_init()
+    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), filename_schema='schemas/json/dataset_upload_default_schema.json')
+    #
+    #     # wrong
+    #     with pytest.raises(jsonschema.exceptions.ValidationError):
+    #         ds = object_init()
+    #         ds.to_json()
+    #     assert not ds.to_json(format='wrong')
+    #     with pytest.raises(jsonschema.exceptions.ValidationError):
+    #         assert ds.to_json(filename_schema='schemas/json/dataverse_upload_schema.json')
+    #     with pytest.raises(jsonschema.exceptions.ValidationError):
+    #         assert ds.validate_json()
+    #     with pytest.raises(TypeError):
+    #         assert ds.validate_json(format='wrong')
+    #     with pytest.raises(jsonschema.exceptions.ValidationError):
+    #         assert ds.validate_json(filename_schema='schemas/json/dataverse_upload_schema.json')
 
     def test_dataset_json_dataset(self):
         """Test Dataverse pipeline from import to export with format=`dv_up`."""
         if not os.environ.get('TRAVIS'):
             dict_assert = json.loads(json_upload_min())
-            ds = object_init()
-            ds.from_json('tests/data/dataset_upload_min_default.json', validate=False)
-            json_out = ds.to_json(validate=False)
+            obj = object_init()
+            obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
+            json_out = obj.to_json(validate=False)
             write_json('tests/data/output/dataset_upload_min_default.json', json.loads(json_out))
-            ds_new = Dataset()
-            ds_new.from_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_min_default.json'), validate=False)
-            assert ds.__dict__ == ds_new.__dict__
+            obj_new = Dataset()
+            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_min_default.json'), validate=False)
+            assert obj.__dict__ == obj_new.__dict__
