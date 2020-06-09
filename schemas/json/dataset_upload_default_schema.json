@@ -1,0 +1,1062 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "datasetVersion": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        },
+        "termsOfUse": {
+          "type": "string"
+        },
+        "termsOfAccess": {
+          "type": "string"
+        },
+        "metadataBlocks": {
+          "type": "object",
+          "properties": {
+            "citation": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                },
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "typeName": {
+                        "type": "string"
+                      },
+                      "multiple": {
+                        "type": "boolean"
+                      },
+                      "typeClass": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "otherIdAgency": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "otherIdValue": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "authorName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "authorAffiliation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "authorIdentifierScheme": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "authorIdentifier": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "datasetContactName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "datasetContactAffiliation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "datasetContactEmail": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "dsDescriptionValue": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "dsDescriptionDate": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "keywordValue": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "keywordVocabulary": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "keywordVocabularyURI": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "topicClassValue": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "topicClassVocab": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "publicationCitation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "publicationIDType": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "publicationIDNumber": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "publicationURL": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "producerName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "producerAffiliation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "producerAbbreviation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "producerURL": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "producerLogoURL": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "contributorType": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "contributorName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "grantNumberAgency": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "grantNumberValue": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "distributorName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "distributorAffiliation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "distributorAbbreviation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "distributorURL": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "distributorLogoURL": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "timePeriodCoveredStart": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "timePeriodCoveredEnd": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "dateOfCollectionStart": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "dateOfCollectionEnd": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "softwareName": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    },
+                                    "softwareVersion": {
+                                      "type": "object",
+                                      "properties": {
+                                        "typeName": {
+                                          "type": "string"
+                                        },
+                                        "multiple": {
+                                          "type": "boolean"
+                                        },
+                                        "typeClass": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "multiple",
+                                        "typeClass",
+                                        "typeName",
+                                        "value"
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "seriesName": {
+                                "type": "object",
+                                "properties": {
+                                  "typeName": {
+                                    "type": "string"
+                                  },
+                                  "multiple": {
+                                    "type": "boolean"
+                                  },
+                                  "typeClass": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "multiple",
+                                  "typeClass",
+                                  "typeName",
+                                  "value"
+                                ]
+                              },
+                              "seriesInformation": {
+                                "type": "object",
+                                "properties": {
+                                  "typeName": {
+                                    "type": "string"
+                                  },
+                                  "multiple": {
+                                    "type": "boolean"
+                                  },
+                                  "typeClass": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "multiple",
+                                  "typeClass",
+                                  "typeName",
+                                  "value"
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "multiple",
+                      "typeClass",
+                      "typeName",
+                      "value"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "displayName",
+                "fields"
+              ]
+            },
+            "required": [
+              "citation"
+            ]
+          }
+        },
+        "required": [
+          "metadataBlocks"
+        ]
+      }
+    },
+    "required": [
+      "datasetVersion"
+    ]
+  }
+}
