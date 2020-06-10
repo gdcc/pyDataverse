@@ -4,24 +4,6 @@
     "type": "object",
     "title": "Dataverse JSON upload schema",
     "description": "Describes the full Dataverse metadata JSON file structure for a Dataverse API upload.",
-    "default": {},
-    "examples": [
-        {
-            "name": "Scientific Research",
-            "alias": "science",
-            "dataverseContacts": [
-                {
-                    "contactEmail": "pi@example.edu"
-                },
-                {
-                    "contactEmail": "student@example.edu"
-                }
-            ],
-            "affiliation": "Scientific Research University",
-            "description": "We do all the science.",
-            "dataverseType": "LABORATORY"
-        }
-    ],
     "required": [
         "name",
         "alias",
@@ -31,54 +13,21 @@
     "properties": {
         "name": {
             "$id": "#/properties/name",
-            "type": "string",
-            "title": "The name schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "Scientific Research"
-            ]
+            "type": "string"
         },
         "alias": {
             "$id": "#/properties/alias",
-            "type": "string",
-            "title": "The alias schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "science"
-            ]
+            "type": "string"
         },
         "dataverseContacts": {
             "$id": "#/properties/dataverseContacts",
             "type": "array",
-            "title": "The dataverseContacts schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                [
-                    {
-                        "contactEmail": "pi@example.edu"
-                    },
-                    {
-                        "contactEmail": "student@example.edu"
-                    }
-                ]
-            ],
-            "additionalItems": true,
+            "additionalItems": false,
             "items": {
                 "anyOf": [
                     {
                         "$id": "#/properties/dataverseContacts/items/anyOf/0",
                         "type": "object",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
-                        "default": {},
-                        "examples": [
-                            {
-                                "contactEmail": "pi@example.edu"
-                            }
-                        ],
                         "required": [
                             "contactEmail"
                         ],
@@ -86,13 +35,7 @@
                         "properties": {
                             "contactEmail": {
                                 "$id": "#/properties/dataverseContacts/items/anyOf/0/properties/contactEmail",
-                                "type": "string",
-                                "title": "The contactEmail schema",
-                                "description": "An explanation about the purpose of this instance.",
-                                "default": "",
-                                "examples": [
-                                    "pi@example.edu"
-                                ]
+                                "type": "string"
                             }
                         }
                     }
@@ -102,33 +45,15 @@
         },
         "affiliation": {
             "$id": "#/properties/affiliation",
-            "type": "string",
-            "title": "The affiliation schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "Scientific Research University"
-            ]
+            "type": "string"
         },
         "description": {
             "$id": "#/properties/description",
-            "type": "string",
-            "title": "The description schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "We do all the science."
-            ]
+            "type": "string"
         },
         "dataverseType": {
             "$id": "#/properties/dataverseType",
-            "type": "string",
-            "title": "The dataverseType schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "LABORATORY"
-            ]
+            "type": "string"
         }
     }
 }

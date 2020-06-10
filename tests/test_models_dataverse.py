@@ -89,12 +89,12 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
 
 
 def dict_flat_set_min():
-    """Import minimum Dataverse dict.
+    """Get flat dict for set() of minimum Dataverse.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Flat dict with minimum Dataverse data.
 
     """
     data = {
@@ -108,12 +108,12 @@ def dict_flat_set_min():
 
 
 def dict_flat_set_full():
-    """Import full Dataverse dict.
+    """Get flat dict for set() of full Dataverse.
 
     Returns
     -------
     dict
-        Full Dataverse metadata.
+        Flat dict with full Dataverse data.
 
     """
     data = {
@@ -131,12 +131,12 @@ def dict_flat_set_full():
 
 
 def object_init():
-    """Import minimum Dataverse dict.
+    """Get :class:Dataverse() with initial attributes.
 
     Returns
     -------
-    dict
-        Minimum Dataverse metadata.
+    pyDataverse.Dataverse()
+        :class:Dataverse() with init attributes set.
 
     """
     dv = Dataverse()
@@ -144,12 +144,12 @@ def object_init():
 
 
 def object_min():
-    """Import minimum Dataverse dict.
+    """Get :class:Dataverse() with attributes of minimum Dataverse.
 
     Returns
     -------
-    dict
-        Minimum Dataverse metadata.
+    pyDataverse.Dataverse()
+        :class:Dataverse() with minimum attributes set.
 
     """
     dv = object_init()
@@ -160,12 +160,12 @@ def object_min():
 
 
 def object_full():
-    """Import minimum Dataverse dict.
+    """Get :class:Dataverse() with attributes of full Dataverse.
 
     Returns
     -------
-    dict
-        Minimum Dataverse metadata.
+    pyDataverse.Dataverse()
+        :class:Dataverse() with full attributes set.
 
     """
     dv = object_init()
@@ -179,12 +179,12 @@ def object_full():
 
 
 def dict_flat_dict_min():
-    """Import minimum Dataverse dict.
+    """Get flat dict for dict() of minimum Dataverse.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Flat dict with minimum Dataverse data.
 
     """
     data = {
@@ -201,12 +201,12 @@ def dict_flat_dict_min():
 
 
 def dict_flat_dict_full():
-    """Import full Dataverse dict.
+    """Get flat dict for dict() of full Dataverse.
 
     Returns
     -------
     dict
-        Full Dataverse metadata.
+        Flat dict with full Dataverse data.
 
     """
     data = {
@@ -227,12 +227,12 @@ def dict_flat_dict_full():
 
 
 def json_upload_min():
-    """Import minimum Dataverse dict.
+    """Get JSON string of minimum Dataverse.
 
     Returns
     -------
-    dict
-        Minimum Dataverse metadata.
+    string
+        JSON string.
 
     """
     data = read_file('tests/data/dataverse_upload_min.json')
@@ -240,12 +240,12 @@ def json_upload_min():
 
 
 def json_upload_full():
-    """Import full Dataverse dict.
+    """Get JSON string of full Dataverse.
 
     Returns
     -------
-    dict
-        Full Dataverse metadata.
+    string
+        JSON string.
 
     """
     data = read_file('tests/data/dataverse_upload_full.json')
@@ -253,6 +253,14 @@ def json_upload_full():
 
 
 def attr_dv_up_values():
+    """List of attributes import or export in format `dataverse_upload`.
+
+    Returns
+    -------
+    list
+        List of attributes, which will be used for import and export.
+
+    """
     data = [
         'affiliation',
         'alias',

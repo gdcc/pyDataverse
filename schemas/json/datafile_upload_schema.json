@@ -5,19 +5,6 @@
     "title": "Datafile JSON upload schema",
     "description": "Describes the full Datafile metadata JSON file structure for a Dataverse API upload.",
     "default": {},
-    "examples": [
-        {
-            "description": "Another data file.",
-            "categories": [
-                "Documentation"
-            ],
-            "restrict": true,
-            "pid": "doi:10.11587/NVWE8Y",
-            "filename": "20001_ta_de_v1_0.pdf",
-            "title": "Questionnaire",
-            "directoryLabel": "data/subdir1"
-        }
-    ],
     "required": [
         "pid",
         "filename"
@@ -26,37 +13,17 @@
     "properties": {
         "description": {
             "$id": "#/properties/description",
-            "type": "string",
-            "title": "The description schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "Another data file."
-            ]
+            "type": "string"
         },
         "categories": {
             "$id": "#/properties/categories",
             "type": "array",
-            "title": "The categories schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                [
-                    "Documentation"
-                ]
-            ],
-            "additionalItems": true,
+            "additionalItems": false,
             "items": {
                 "anyOf": [
                     {
                         "$id": "#/properties/categories/items/anyOf/0",
-                        "type": "string",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
-                        "default": "",
-                        "examples": [
-                            "Documentation"
-                        ]
+                        "type": "string"
                     }
                 ],
                 "$id": "#/properties/categories/items"
@@ -64,53 +31,23 @@
         },
         "restrict": {
             "$id": "#/properties/restrict",
-            "type": "boolean",
-            "title": "The restrict schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": false,
-            "examples": [
-                true
-            ]
+            "type": "boolean"
         },
         "pid": {
             "$id": "#/properties/pid",
-            "type": "string",
-            "title": "The pid schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "doi:10.11587/NVWE8Y"
-            ]
+            "type": "string"
         },
         "filename": {
             "$id": "#/properties/filename",
-            "type": "string",
-            "title": "The filename schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "20001_ta_de_v1_0.pdf"
-            ]
+            "type": "string"
         },
         "title": {
             "$id": "#/properties/title",
-            "type": "string",
-            "title": "The title schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "Questionnaire"
-            ]
+            "type": "string"
         },
         "directoryLabel": {
             "$id": "#/properties/directoryLabel",
-            "type": "string",
-            "title": "The directoryLabel schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "data/subdir1"
-            ]
+            "type": "string"
         }
     }
 }
