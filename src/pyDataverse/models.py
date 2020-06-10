@@ -18,6 +18,10 @@ class DVObject(object):
         self.default_validate_format = 'dataverse_upload'
         self.attr_dv_up_values = None
 
+    def __str__(self):
+        """Return name of class :class:`DVObject()` for users."""
+        return 'pyDataverse DVObject() model class.'
+
     def set(self, data):
         """Set class attributes with a flat :class:`dict`.
 
@@ -28,30 +32,26 @@ class DVObject(object):
             called attribute with it's value.
 
         """
-        for key, val in data.items():
-            self.__setattr__(key, val)
+        if isinstance(data, dict):
+            for key, val in data.items():
+                self.__setattr__(key, val)
+            return True
+        else:
+            return False
 
     def dict(self):
-        """Create different data outputs as :class:`dict`.
+        """Create flat :class:`dict`.
 
-        Creates different data outputs - different in structure and content -
-        of the objects data.
-
-        Parameters
-        ----------
-        format : string
-            Data format for :class:`dict` creation. Available format so far are:
-            ``dataverse_upload``: Dataverse API Upload Dataverse JSON metadata standard.
-            ``all``: All attributes.
+        Creates :class:`dict` with all attributes in a flat structure.
 
         Returns
         -------
         dict
-            Data as :class:`dict` with expected structure and content.
+            Flat data.
 
         Examples
         -------
-        Get dict of Dataverse metadata::
+        Get dict of Dataverse::
 
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
@@ -67,17 +67,11 @@ class DVObject(object):
             >>> data['name']
             'Test pyDataverse'
 
-        Todo
-        -------
-        Validate standards.
-
         """
         data = {}
 
         for attr in list(self.__dict__.keys()):
-            if attr in list(self.__dict__.keys()):
-                if self.__getattribute__(attr) is not None:
-                    data[attr] = self.__getattribute__(attr)
+            data[attr] = self.__getattribute__(attr)
         return data
 
     def validate_json(self, format=None, filename_schema=None):
@@ -101,10 +95,13 @@ class DVObject(object):
         if not filename_schema:
             filename_schema = self.default_validate_schema_filename
 
-        data_json = self.to_json(format=format)
-        is_valid = validate_data(json.loads(data_json), filename_schema)
-        if is_valid:
-            return True
+        data_json = self.to_json(format=format, validate=False)
+        if data_json:
+            is_valid = validate_data(json.loads(data_json), filename_schema, format='json')
+            if is_valid:
+                return True
+            else:
+                return False
         else:
             return False
 
@@ -161,11 +158,14 @@ class DVObject(object):
                 self.set(data)
                 return True
             elif format == 'dataverse_download':
+                print('INFO: Not implemented yet.')
                 return True
             elif format == 'dspace':
-                pass
+                print('INFO: Not implemented yet.')
+                return True
             elif format == 'custom':
-                pass
+                print('INFO: Not implemented yet.')
+                return True
         else:
             # TODO: Exception
             print('WARNING: Data-format not right.')
@@ -210,9 +210,11 @@ class DVObject(object):
                     if attr in list(self.dict().keys()):
                         data[attr] = self.dict()[attr]
             elif format == 'dspace':
-                pass
+                data = None
+                print('INFO: Not implemented yet.')
             elif format == 'custom':
-                pass
+                data = None
+                print('INFO: Not implemented yet.')
             if validate:
                 validate_data(data, filename_schema)
             return json.dumps(data, indent=2)
@@ -540,23 +542,23 @@ class Dataset(DVObject):
 
         if format in allowed_formats:
             if format == 'dataverse_upload':
-                data_json = read_json(filename)
+                dict_json = read_json(filename)
                 if validate:
-                    validate_data(data_json, filename_schema)
+                    validate_data(dict_json, filename_schema, format='json')
                 """dataset"""
                 # get first level metadata and parse it automatically
-                for key, val in data_json['datasetVersion'].items():
+                for key, val in dict_json['datasetVersion'].items():
                     if not key == 'metadataBlocks':
                         if key in self.__attr_import_dv_up_datasetVersion_values:
                             data[key] = val
                         else:
                             print('Attribute {0} not valid for import (dv_up).'.format(key))
 
-                if 'metadataBlocks' in data_json['datasetVersion']:
+                if 'metadataBlocks' in dict_json['datasetVersion']:
 
                     """citation"""
-                    if 'citation' in data_json['datasetVersion']['metadataBlocks']:
-                        citation = data_json['datasetVersion']['metadataBlocks']['citation']
+                    if 'citation' in dict_json['datasetVersion']['metadataBlocks']:
+                        citation = dict_json['datasetVersion']['metadataBlocks']['citation']
                         if 'displayName' in citation:
                             data['citation_displayName'] = citation['displayName']
 
@@ -580,8 +582,8 @@ class Dataset(DVObject):
                         print('Citation not in JSON')
 
                     """geospatial"""
-                    if 'geospatial' in data_json['datasetVersion']['metadataBlocks']:
-                        geospatial = data_json['datasetVersion']['metadataBlocks']['geospatial']
+                    if 'geospatial' in dict_json['datasetVersion']['metadataBlocks']:
+                        geospatial = dict_json['datasetVersion']['metadataBlocks']['geospatial']
                         if 'displayName' in geospatial:
                             self.__setattr__('geospatial_displayName',
                                              geospatial['displayName'])
@@ -600,8 +602,8 @@ class Dataset(DVObject):
                         print('geospatial not in JSON')
 
                     """socialscience"""
-                    if 'socialscience' in data_json['datasetVersion']['metadataBlocks']:
-                        socialscience = data_json['datasetVersion']['metadataBlocks']['socialscience']
+                    if 'socialscience' in dict_json['datasetVersion']['metadataBlocks']:
+                        socialscience = dict_json['datasetVersion']['metadataBlocks']['socialscience']
 
                         if 'displayName' in socialscience:
                             self.__setattr__('socialscience_displayName',
@@ -631,8 +633,8 @@ class Dataset(DVObject):
                         print('socialscience not in JSON')
 
                     """journal"""
-                    if 'journal' in data_json['datasetVersion']['metadataBlocks']:
-                        journal = data_json['datasetVersion']['metadataBlocks']['journal']
+                    if 'journal' in dict_json['datasetVersion']['metadataBlocks']:
+                        journal = dict_json['datasetVersion']['metadataBlocks']['journal']
 
                         if 'displayName' in journal:
                             self.__setattr__('journal_displayName',
@@ -652,10 +654,19 @@ class Dataset(DVObject):
                         print('journal not in JSON')
                 self.set(data)
                 return True
-            else:
-                # TODO: Exception
-                print('Data-format not right')
-                return False
+            elif format == 'dataverse_download':
+                print('INFO: Not implemented yet.')
+                return True
+            elif format == 'dspace':
+                print('INFO: Not implemented yet.')
+                return True
+            elif format == 'custom':
+                print('INFO: Not implemented yet.')
+                return True
+        else:
+            # TODO: Exception
+            print('WARNING: Data-format not right.')
+            return False
 
     def __parse_field_array(self, data, attr_list):
         """Parse out Dataverse API Upload Dataset JSON arrays.
@@ -686,7 +697,7 @@ class Dataset(DVObject):
 
         return data_tmp
 
-    def validate_json(self):
+    def validate_json(self, format=None, filename_schema=None):
         """Check if all attributes required for Dataverse metadata are set.
 
         Check if all attributes are set necessary for the Dataverse API Upload
@@ -725,6 +736,18 @@ class Dataset(DVObject):
 
         """
         is_valid = True
+        if not format:
+            format = self.default_validate_format
+        if not filename_schema:
+            filename_schema = self.default_validate_schema_filename
+
+        data_json = self.to_json(format=format, validate=False)
+        if data_json:
+            is_valid = validate_data(json.loads(data_json), filename_schema, format='json')
+            if not is_valid:
+                return False
+        else:
+            return False
 
         # check if all required attributes are set
         for attr in self.__attr_dict_dv_up_required:
@@ -879,7 +902,6 @@ class Dataset(DVObject):
                 data['datasetVersion']['metadataBlocks'] = {}
                 citation = {}
                 citation['fields'] = []
-
                 data_dict = self.dict()
 
                 """dataset"""
@@ -955,11 +977,15 @@ class Dataset(DVObject):
                         geospatial = {}
                         if not attr == 'geospatial_displayName':
                             geospatial['fields'] = []
+                            break
 
                 if 'geospatial_displayName' in list(data_dict.keys()):
-                    if 'geospatial' not in locals():
-                        geospatial = {}
-                    geospatial['displayName'] = self.geospatial_displayName
+                    geospatial['displayName'] = data_dict['geospatial_displayName']
+
+                # if 'geospatial_displayName' in list(data_dict.keys()):
+                #     if 'geospatial' not in locals():
+                #         geospatial = {}
+                #     geospatial['displayName'] = self.geospatial_displayName
 
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_geospatial_fields_values:
@@ -998,11 +1024,15 @@ class Dataset(DVObject):
                         socialscience = {}
                         if not attr == 'socialscience_displayName':
                             socialscience['fields'] = []
+                            break
 
                 if 'socialscience_displayName' in list(data_dict.keys()):
-                    if 'socialscience' not in locals():
-                        socialscience = {}
-                    socialscience['displayName'] = self.socialscience_displayName
+                    socialscience['displayName'] = data_dict['socialscience_displayName']
+
+                # if 'socialscience_displayName' in list(data_dict.keys()):
+                #     if 'socialscience' not in locals():
+                #         socialscience = {}
+                #     socialscience['displayName'] = self.socialscience_displayName
 
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_socialscience_fields_values:
@@ -1088,9 +1118,10 @@ class Dataset(DVObject):
                         journal = {}
                         if not attr == 'journal_displayName':
                             journal['fields'] = []
+                            break
 
                 if 'journal_displayName' in list(data_dict.keys()):
-                    journal['displayName'] = self.journal_displayName
+                    journal['displayName'] = data_dict['journal_displayName']
 
                 # Generate first level attributes
                 for attr in self.__attr_import_dv_up_journal_fields_values:
@@ -1131,16 +1162,17 @@ class Dataset(DVObject):
                     data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
                 if 'journal' in locals():
                     data['datasetVersion']['metadataBlocks']['journal'] = journal
-
-                if validate:
-                    validate_data(data, filename_schema)
-
-                return json.dumps(data, indent=2)
             elif format == 'dspace':
-                pass
-            else:
-                print('WARNING: dict can not be created. Format is not valid.')
-                return None
+                data = None
+                print('INFO: Not implemented yet.')
+            elif format == 'custom':
+                data = None
+                print('INFO: Not implemented yet.')
+            if validate:
+                validate_data(data, filename_schema)
+            return json.dumps(data, indent=2)
+        else:
+            return None
 
 
 class Datafile(DVObject):

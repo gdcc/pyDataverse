@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Dataset data model tests."""
 import json
+import jsonschema
 import os
 from pyDataverse.models import Dataset
 from pyDataverse.models import DVObject
@@ -86,192 +87,13 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
         raise e
 
 
-def object_init():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
-    """
-    ds = Dataset()
-    ds.default_validate_format = 'dataverse_upload'
-    ds.default_validate_schema_filename = 'schemas/json/dataset_upload_default_schema.json'
-    return ds
-
-def object_min():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
-    """
-    ds = object_init()
-    ds.title = 'Darwin\'s Finches'
-    ds.author = [{'authorName': 'Finch, Fiona','authorAffiliation': 'Birds Inc.'}]
-    ds.datasetContact = [{'datasetContactEmail': 'finch@mailinator.com','datasetContactName': 'Finch, Fiona'}]
-    ds.dsDescription = [{'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'}]
-    ds.subject = ['Medicine, Health and Life Sciences']
-    ds.citation_displayName = 'Citation Metadata'
-    return ds
-
-
-# def object_full():
-#     """Import minimum Dataverse dict.
-#
-#     Returns
-#     -------
-#     dict
-#         Minimum Dataverse metadata.
-#
-#     """
-    # ds = object_init()
-    # assert ds.license == 'CC0'
-    # assert ds.termsOfUse == 'CC0 Waiver'
-    # assert ds.termsOfAccess == 'Terms of Access'
-    # assert ds.citation_displayName == 'Citation Metadata'
-    # assert ds.title == 'Replication Data for: Title'
-    # assert ds.subtitle == 'Subtitle'
-    # assert ds.alternativeTitle == 'Alternative Title'
-    # assert ds.alternativeURL == 'http://AlternativeURL.org'
-    # assert ds.otherId =
-    # ds.author
-    #     assert d['authorName'] in ['LastAuthor1, FirstAuthor1']
-    #     assert d['authorAffiliation'] in ['AuthorAffiliation1']
-    #     assert d['authorIdentifierScheme'] in ['ORCID']
-    #     assert d['authorIdentifier'] in ['AuthorIdentifier1']
-    # for d in ds.datasetContact:
-    #     assert d['datasetContactName'] in ['LastContact1, FirstContact1']
-    #     assert d['datasetContactAffiliation'] in ['ContactAffiliation1']
-    #     assert d['datasetContactEmail'] in ['ContactEmail1@mailinator.com']
-    # for d in ds.dsDescription:
-    #     assert d['dsDescriptionValue'] in ['DescriptionText2']
-    #     assert d['dsDescriptionDate'] in ['1000-02-02']
-    # assert ds.subject == ['Agricultural Sciences',
-    #                       'Business and Management', 'Engineering', 'Law']
-    # for d in ds.keyword:
-    #     assert d['keywordValue'] in ['KeywordTerm1']
-    #     assert d['keywordVocabulary'] in ['KeywordVocabulary1']
-    #     assert d['keywordVocabularyURI'] in ['http://KeywordVocabularyURL1.org']
-    # assert isinstance(ds.topicClassification, list)
-    # assert len(ds.topicClassification) == 1
-    # for d in ds.topicClassification:
-    #     assert d['topicClassValue'] in ['Topic Class Value1']
-    #     assert d['topicClassVocab'] in ['Topic Classification Vocabulary']
-    # assert isinstance(ds.publication, list)
-    # for d in ds.publication:
-    #     assert d['publicationCitation'] in ['RelatedPublicationCitation1']
-    #     assert d['publicationIDType'] in ['ark']
-    #     assert d['publicationIDNumber'] in ['RelatedPublicationIDNumber1']
-    #     assert d['publicationURL'] in ['http://RelatedPublicationURL1.org']
-    # assert ds.notesText == 'Notes1'
-    # assert isinstance(ds.producer, list)
-    # for d in ds.producer:
-    #     assert d['producerName'] in ['LastProducer1, FirstProducer1']
-    #     assert d['producerAffiliation'] in ['ProducerAffiliation1']
-    #     assert d['producerAbbreviation'] in ['ProducerAbbreviation1']
-    #     assert d['producerURL'] in ['http://ProducerURL1.org']
-    #     assert d['producerLogoURL'] in ['http://ProducerLogoURL1.org']
-    # assert ds.productionDate == '1003-01-01'
-    # assert ds.productionPlace == 'ProductionPlace'
-    # for d in ds.contributor:
-    #     assert d['contributorType'] in ['Data Collector']
-    #     assert d['contributorName'] in ['LastContributor1, FirstContributor1']
-    # for d in ds.grantNumber:
-    #     assert d['grantNumberAgency'] in ['GrantInformationGrantAgency1']
-    #     assert d['grantNumberValue'] in ['GrantInformationGrantNumber1']
-    #     assert len(d.keys()) == 2
-    # for d in ds.distributor:
-    #     assert d['distributorName'] in ['LastDistributor1, FirstDistributor1']
-    #     assert d['distributorAffiliation'] in ['DistributorAffiliation1']
-    #     assert d['distributorAbbreviation'] in ['DistributorAbbreviation1']
-    #     assert d['distributorURL'] in ['http://DistributorURL1.org']
-    #     assert d['distributorLogoURL'] in ['http://DistributorLogoURL1.org']
-    # assert ds.distributionDate == '1004-01-01'
-    # assert ds.depositor == 'LastDepositor, FirstDepositor'
-    # assert ds.dateOfDeposit == '1002-01-01'
-    # for d in ds.timePeriodCovered:
-    #     assert d['timePeriodCoveredStart'] in ['1005-01-01']
-    #     assert d['timePeriodCoveredEnd'] in ['1005-01-02']
-    # assert isinstance(ds.dateOfCollection, list)
-    # for d in ds.dateOfCollection:
-    #     assert d['dateOfCollectionStart'] in ['1006-01-01']
-    #     assert d['dateOfCollectionEnd'] in ['1006-01-01']
-    # assert ds.kindOfData == ['KindOfData1', 'KindOfData2']
-    # assert ds.series['seriesName'] == 'SeriesName'
-    # assert ds.series['seriesInformation'] == 'SeriesInformation'
-    # for d in ds.software:
-    #     assert d['softwareName'] in ['SoftwareName1']
-    #     assert d['softwareVersion'] in ['SoftwareVersion1']
-    # assert ds.relatedMaterial == ['RelatedMaterial1', 'RelatedMaterial2']
-    # assert ds.relatedDatasets == ['RelatedDatasets1', 'RelatedDatasets2']
-    # assert ds.otherReferences == ['OtherReferences1', 'OtherReferences2']
-    # assert ds.dataSources == ['DataSources1', 'DataSources2']
-    # assert ds.originOfSources == 'OriginOfSources'
-    # assert ds.characteristicOfSources == 'CharacteristicOfSourcesNoted'
-    # assert ds.accessToSources == 'DocumentationAndAccessToSources'
-    #
-    # """geospatial"""
-    # assert ds.geospatial_displayName == 'Geospatial Metadata'
-    # for d in ds.geographicCoverage:
-    #     assert d['country'] in ['Afghanistan']
-    #     assert d['state'] in ['GeographicCoverageStateProvince1']
-    #     assert d['city'] in ['GeographicCoverageCity1']
-    #     assert d['otherGeographicCoverage'] in ['GeographicCoverageOther1']
-    # assert ds.geographicUnit == ['GeographicUnit1', 'GeographicUnit2']
-    # for d in ds.geographicBoundingBox:
-    #     assert d['westLongitude'] in ['10']
-    #     assert d['eastLongitude'] in ['20']
-    #     assert d['northLongitude'] in ['30']
-    #     assert d['southLongitude'] in ['40']
-    #
-    # """socialscience"""
-    # assert ds.socialscience_displayName == 'Social Science and Humanities Metadata'
-    # assert ds.unitOfAnalysis == ['UnitOfAnalysis1', 'UnitOfAnalysis2']
-    # assert ds.universe == ['Universe1', 'Universe2']
-    # assert ds.timeMethod == 'TimeMethod'
-    # assert ds.dataCollector == 'LastDataCollector1, FirstDataCollector1'
-    # assert ds.collectorTraining == 'CollectorTraining'
-    # assert ds.frequencyOfDataCollection == 'Frequency'
-    # assert ds.samplingProcedure == 'SamplingProcedure'
-    # assert ds.targetSampleSize['targetSampleActualSize'] == '100'
-    # assert ds.targetSampleSize['targetSampleSizeFormula'] == 'TargetSampleSizeFormula'
-    # assert ds.deviationsFromSampleDesign == 'MajorDeviationsForSampleDesign'
-    # assert ds.collectionMode == 'CollectionMode'
-    # assert ds.researchInstrument == 'TypeOfResearchInstrument'
-    # assert ds.dataCollectionSituation == 'CharacteristicsOfDataCollectionSituation'
-    # assert ds.actionsToMinimizeLoss == 'ActionsToMinimizeLosses'
-    # assert ds.controlOperations == 'ControlOperations'
-    # assert ds.weighting == 'Weighting'
-    # assert ds.cleaningOperations == 'CleaningOperations'
-    # assert ds.datasetLevelErrorNotes == 'StudyLevelErrorNotes'
-    # assert ds.responseRate == 'ResponseRate'
-    # assert ds.samplingErrorEstimates == 'EstimatesOfSamplingError'
-    # assert ds.otherDataAppraisal == 'OtherFormsOfDataAppraisal'
-    # assert ds.socialScienceNotes['socialScienceNotesType'] == 'NotesType'
-    # assert ds.socialScienceNotes['socialScienceNotesSubject'] == 'NotesSubject'
-    # assert ds.socialScienceNotes['socialScienceNotesText'] == 'NotesText'
-    #
-    # """journal"""
-    # assert ds.journal_displayName == 'Journal Metadata'
-    # for d in ds.journalVolumeIssue:
-    #     assert d['journalVolume'] in ['JournalVolume1']
-    #     assert d['journalIssue'] in ['JournalIssue1']
-    #     assert d['journalPubDate'] in ['1008-01-01']
-    # assert ds.journalArticleType == 'abstract'
-#     return ds
-
-
 def dict_flat_set_min():
-    """Import minimum Dataverse dict.
+    """Import minimum Dataset dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Dataset metadata.
 
     """
     data = {
@@ -301,29 +123,217 @@ def dict_flat_set_min():
     return data
 
 
-# def dict_flat_set_full():
-#     """Import full Dataverse dict.
-#
-#     Returns
-#     -------
-#     dict
-#         Full Dataverse metadata.
-#
-#     """
-#     data = {
-#         '': '',
-#         'citation_displayName': 'Citation Metadata'
-#     }
-#     return data
-
-
-def dict_flat_dict_min():
-    """Import minimum Dataverse dict.
+def dict_flat_set_full():
+    """Import full Dataset dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Full Dataset metadata.
+
+    """
+    data = {
+        'license': 'CC0',
+        'termsOfUse': 'CC0 Waiver',
+        'termsOfAccess': 'Terms of Access',
+        'citation_displayName': 'Citation Metadata',
+        'title': 'Replication Data for: Title',
+        'subtitle': 'Subtitle',
+        'alternativeTitle': 'Alternative Title',
+        'alternativeURL': 'http://AlternativeURL.org',
+        'otherId': [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}],
+        'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
+        'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
+        'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
+        'subject': ['Agricultural Sciences','Business and Management','Engineering','Law'],
+        'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
+        'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
+        'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
+        'notesText': 'Notes1',
+        'producer': [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}],
+        'productionDate': '1003-01-01',
+        'productionPlace': 'ProductionPlace',
+        'contributor': [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}],
+        'grantNumber': [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}],
+        'distributor': [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}],
+        'distributionDate': '1004-01-01',
+        'depositor': 'LastDepositor, FirstDepositor',
+        'dateOfDeposit': '1002-01-01',
+        'timePeriodCovered': [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}],
+        'dateOfCollection': [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}],
+        'kindOfData': ['KindOfData1', 'KindOfData2'],
+        'language': ['German'],
+        'series': {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'},
+        'software': [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}],
+        'relatedMaterial': ['RelatedMaterial1', 'RelatedMaterial2'],
+        'relatedDatasets': ['RelatedDatasets1', 'RelatedDatasets2'],
+        'otherReferences': ['OtherReferences1', 'OtherReferences2'],
+        'dataSources': ['DataSources1', 'DataSources2'],
+        'originOfSources': 'OriginOfSources',
+        'characteristicOfSources': 'CharacteristicOfSourcesNoted',
+        'accessToSources': 'DocumentationAndAccessToSources',
+        'geospatial_displayName': 'Geospatial Metadata',
+        'geographicCoverage': [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}],
+        'geographicUnit': ['GeographicUnit1', 'GeographicUnit2'],
+        'geographicBoundingBox': [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}],
+        'socialscience_displayName': 'Social Science and Humanities Metadata',
+        'unitOfAnalysis': ['UnitOfAnalysis1', 'UnitOfAnalysis2'],
+        'universe': ['Universe1', 'Universe2'],
+        'timeMethod': 'TimeMethod',
+        'dataCollector': 'LastDataCollector1, FirstDataCollector1',
+        'collectorTraining': 'CollectorTraining',
+        'frequencyOfDataCollection': 'Frequency',
+        'samplingProcedure': 'SamplingProcedure',
+        'targetSampleSize': {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'},
+        'deviationsFromSampleDesign': 'MajorDeviationsForSampleDesign',
+        'collectionMode': 'CollectionMode',
+        'researchInstrument': 'TypeOfResearchInstrument',
+        'dataCollectionSituation': 'CharacteristicsOfDataCollectionSituation',
+        'actionsToMinimizeLoss': 'ActionsToMinimizeLosses',
+        'controlOperations': 'ControlOperations',
+        'weighting': 'Weighting',
+        'cleaningOperations': 'CleaningOperations',
+        'datasetLevelErrorNotes': 'StudyLevelErrorNotes',
+        'responseRate': 'ResponseRate',
+        'samplingErrorEstimates': 'EstimatesOfSamplingError',
+        'otherDataAppraisal': 'OtherFormsOfDataAppraisal',
+        'socialScienceNotes': {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'},
+        'journal_displayName': 'Journal Metadata',
+        'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
+        'journalArticleType': 'abstract'
+    }
+    return data
+
+
+def object_init():
+    """Import minimum Dataset dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataset metadata.
+
+    """
+    ds = Dataset()
+    return ds
+
+
+def object_min():
+    """Import minimum Dataset dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataset metadata.
+
+    """
+    ds = object_init()
+
+    ds.title = 'Darwin\'s Finches'
+    ds.author = [{'authorName': 'Finch, Fiona','authorAffiliation': 'Birds Inc.'}]
+    ds.datasetContact = [{'datasetContactEmail': 'finch@mailinator.com','datasetContactName': 'Finch, Fiona'}]
+    ds.dsDescription = [{'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'}]
+    ds.subject = ['Medicine, Health and Life Sciences']
+    ds.citation_displayName = 'Citation Metadata'
+    return ds
+
+
+def object_full():
+    """Import minimum Dataset dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataset metadata.
+
+    """
+    ds = object_init()
+
+    """citation"""
+    ds.license = 'CC0'
+    ds.termsOfUse = 'CC0 Waiver'
+    ds.termsOfAccess = 'Terms of Access'
+    ds.citation_displayName = 'Citation Metadata'
+    ds.title = 'Replication Data for: Title'
+    ds.subtitle = 'Subtitle'
+    ds.alternativeTitle = 'Alternative Title'
+    ds.alternativeURL = 'http://AlternativeURL.org'
+    ds.otherId = [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}]
+    ds.author = [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}]
+    ds.datasetContact = [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}]
+    ds.dsDescription = [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}]
+    ds.subject = ['Agricultural Sciences','Business and Management','Engineering','Law']
+    ds.keyword = [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}]
+    ds.topicClassification = [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}]
+    ds.publication = [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}]
+    ds.notesText = 'Notes1'
+    ds.producer = [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}]
+    ds.productionDate = '1003-01-01'
+    ds.productionPlace = 'ProductionPlace'
+    ds.contributor = [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}]
+    ds.grantNumber = [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}]
+    ds.distributor = [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}]
+    ds.distributionDate = '1004-01-01'
+    ds.depositor = 'LastDepositor, FirstDepositor'
+    ds.dateOfDeposit = '1002-01-01'
+    ds.timePeriodCovered = [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}]
+    ds.dateOfCollection = [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}]
+    ds.kindOfData = ['KindOfData1', 'KindOfData2']
+    ds.language = ['German']
+    ds.series = {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'}
+    ds.software = [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}]
+    ds.relatedMaterial = ['RelatedMaterial1', 'RelatedMaterial2']
+    ds.relatedDatasets = ['RelatedDatasets1', 'RelatedDatasets2']
+    ds.otherReferences = ['OtherReferences1', 'OtherReferences2']
+    ds.dataSources = ['DataSources1', 'DataSources2']
+    ds.originOfSources = 'OriginOfSources'
+    ds.characteristicOfSources = 'CharacteristicOfSourcesNoted'
+    ds.accessToSources = 'DocumentationAndAccessToSources'
+
+    """geospatial"""
+    ds.geospatial_displayName = 'Geospatial Metadata'
+    ds.geographicCoverage = [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}]
+    ds.geographicUnit = ['GeographicUnit1', 'GeographicUnit2']
+    ds.geographicBoundingBox = [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}]
+
+    """socialscience"""
+    ds.socialscience_displayName = 'Social Science and Humanities Metadata'
+    ds.unitOfAnalysis = ['UnitOfAnalysis1', 'UnitOfAnalysis2']
+    ds.universe = ['Universe1', 'Universe2']
+    ds.timeMethod = 'TimeMethod'
+    ds.dataCollector = 'LastDataCollector1, FirstDataCollector1'
+    ds.collectorTraining = 'CollectorTraining'
+    ds.frequencyOfDataCollection = 'Frequency'
+    ds.samplingProcedure = 'SamplingProcedure'
+    ds.targetSampleSize = {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'}
+    ds.deviationsFromSampleDesign = 'MajorDeviationsForSampleDesign'
+    ds.collectionMode = 'CollectionMode'
+    ds.researchInstrument = 'TypeOfResearchInstrument'
+    ds.dataCollectionSituation = 'CharacteristicsOfDataCollectionSituation'
+    ds.actionsToMinimizeLoss = 'ActionsToMinimizeLosses'
+    ds.controlOperations = 'ControlOperations'
+    ds.weighting = 'Weighting'
+    ds.cleaningOperations = 'CleaningOperations'
+    ds.datasetLevelErrorNotes = 'StudyLevelErrorNotes'
+    ds.responseRate = 'ResponseRate'
+    ds.samplingErrorEstimates = 'EstimatesOfSamplingError'
+    ds.otherDataAppraisal = 'OtherFormsOfDataAppraisal'
+    ds.socialScienceNotes = {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'}
+
+    """journal"""
+    ds.journal_displayName = 'Journal Metadata'
+    ds.journalVolumeIssue = [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}]
+    ds.journalArticleType = 'abstract'
+    return ds
+
+
+def dict_flat_dict_min():
+    """Import minimum Dataset dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataset metadata.
 
     """
     data = {
@@ -350,18 +360,105 @@ def dict_flat_dict_min():
         ],
         'citation_displayName': 'Citation Metadata',
         'default_validate_format': 'dataverse_upload',
-        'default_validate_schema_filename': 'schemas/json/dataset_upload_default_schema.json'
+        'default_validate_schema_filename': 'schemas/json/dataset_upload_default_schema.json',
+        'attr_dv_up_values': None
+    }
+    return data
+
+
+def dict_flat_dict_full():
+    """Import minimum Dataset dict.
+
+    Returns
+    -------
+    dict
+        Minimum Dataset metadata.
+
+    """
+    data = {
+        'license': 'CC0',
+        'termsOfUse': 'CC0 Waiver',
+        'termsOfAccess': 'Terms of Access',
+        'citation_displayName': 'Citation Metadat',
+        'title': 'Replication Data for: Title',
+        'subtitle': 'Subtitle',
+        'alternativeTitle': 'Alternative Title',
+        'alternativeURL': 'http://AlternativeURL.org',
+        'otherId': [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}],
+        'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
+        'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
+        'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
+        'subject': ['Agricultural Sciences','Business and Management','Engineering','Law'],
+        'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
+        'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
+        'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
+        'notesText': 'Notes1',
+        'producer': [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}],
+        'productionDate': '1003-01-01',
+        'productionPlace': 'ProductionPlace',
+        'contributor': [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}],
+        'grantNumber': [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}],
+        'distributor': [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}],
+        'distributionDate': '1004-01-01',
+        'depositor': 'LastDepositor, FirstDepositor',
+        'dateOfDeposit': '1002-01-01',
+        'timePeriodCovered': [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}],
+        'dateOfCollection': [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}],
+        'kindOfData': ['KindOfData1', 'KindOfData2'],
+        'language': ['German'],
+        'series': {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'},
+        'software': [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}],
+        'relatedMaterial': ['RelatedMaterial1', 'RelatedMaterial2'],
+        'relatedDatasets': ['RelatedDatasets1', 'RelatedDatasets2'],
+        'otherReferences': ['OtherReferences1', 'OtherReferences2'],
+        'dataSources': ['DataSources1', 'DataSources2'],
+        'originOfSources': 'OriginOfSources',
+        'characteristicOfSources': 'CharacteristicOfSourcesNoted',
+        'accessToSources': 'DocumentationAndAccessToSources',
+        'geospatial_displayName': 'Geospatial Metadata',
+        'geographicCoverage': [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}],
+        'geographicUnit': ['GeographicUnit1', 'GeographicUnit2'],
+        'geographicBoundingBox': [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}],
+        'socialscience_displayName': 'Social Science and Humanities Metadata',
+        'unitOfAnalysis': ['UnitOfAnalysis1', 'UnitOfAnalysis2'],
+        'universe': ['Universe1', 'Universe2'],
+        'timeMethod': 'TimeMethod',
+        'dataCollector': 'LastDataCollector1, FirstDataCollector1',
+        'collectorTraining': 'CollectorTraining',
+        'frequencyOfDataCollection': 'Frequency',
+        'samplingProcedure': 'SamplingProcedure',
+        'targetSampleSize': {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'},
+        'deviationsFromSampleDesign': 'MajorDeviationsForSampleDesign',
+        'collectionMode': 'CollectionMode',
+        'researchInstrument': 'TypeOfResearchInstrument',
+        'dataCollectionSituation': 'CharacteristicsOfDataCollectionSituation',
+        'actionsToMinimizeLoss': 'ActionsToMinimizeLosses',
+        'controlOperations': 'ControlOperations',
+        'weighting': 'Weighting',
+        'cleaningOperations': 'CleaningOperations',
+        'datasetLevelErrorNotes': 'StudyLevelErrorNotes',
+        'responseRate': 'ResponseRate',
+        'samplingErrorEstimates': 'EstimatesOfSamplingError',
+        'otherDataAppraisal': 'OtherFormsOfDataAppraisal',
+        'socialScienceNotes': {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'},
+        'journal_displayName': 'Journal Metadata',
+        'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
+        'journalArticleType': 'abstract',
+        'citation_displayName': 'Citation Metadata',
+        'default_validate_format': 'dataverse_upload',
+        'default_validate_schema_filename': 'schemas/json/dataset_upload_default_schema.json',
+        'attr_dv_up_values': None
     }
     return data
 
 
 def json_upload_min():
-    """Import minimum Dataverse dict.
+    """Import minimum Dataset dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Dataset metadata.
 
     """
     data = read_file('tests/data/dataset_upload_min_default.json')
@@ -369,12 +466,12 @@ def json_upload_min():
 
 
 def json_upload_full():
-    """Import full Dataverse dict.
+    """Import full Dataset dict.
 
     Returns
     -------
     dict
-        Full Dataverse metadata.
+        Full Dataset metadata.
 
     """
     data = read_file('tests/data/dataset_upload_full_default.json')
@@ -383,79 +480,74 @@ def json_upload_full():
 
 def attr_dv_up_values():
     data = [
-        'org.dataset_id',
-        'org.dataverse_id',
-        'org.doi',
-        'org.privateurl',
-        'org.to_upload',
-        'org.is_uploaded',
-        'org.to_publish',
-        'org.is_published',
-        'org.to_delete',
-        'org.is_deleted',
-        'org.to_update',
-        'org.is_updated',
-        'root'
         'license',
-        'termsOfAccess',
         'termsOfUse',
-        'otherId',
+        'termsOfAccess',
+        'citation_displayName',
         'title',
         'subtitle',
         'alternativeTitle',
-        'series',
-        'notesText',
+        'alternativeURL',
+        'otherId',
         'author',
+        'datasetContact',
         'dsDescription',
         'subject',
         'keyword',
         'topicClassification',
-        'language',
-        'grantNumber',
-        'dateOfCollection',
-        'kindOfData',
-        'dataSources',
-        'accessToSources',
-        'alternativeURL',
-        'characteristicOfSources',
-        'dateOfDeposit',
-        'depositor',
-        'distributionDate',
-        'otherReferences',
+        'publication',
+        'notesText',
+        'producer',
         'productionDate',
         'productionPlace',
         'contributor',
-        'relatedDatasets',
-        'relatedMaterial',
-        'datasetContact',
+        'grantNumber',
         'distributor',
-        'producer',
-        'publication',
-        'software',
+        'distributionDate',
+        'depositor',
+        'dateOfDeposit',
         'timePeriodCovered',
+        'dateOfCollection',
+        'kindOfData',
+        'language',
+        'series',
+        'software',
+        'relatedMaterial',
+        'relatedDatasets',
+        'otherReferences',
+        'dataSources',
+        'originOfSources',
+        'characteristicOfSources',
+        'accessToSources',
+        'geospatial_displayName',
+        'geographicCoverage',
         'geographicUnit',
         'geographicBoundingBox',
-        'geographicCoverage',
-        'actionsToMinimizeLoss',
-        'cleaningOperations',
-        'collectionMode',
-        'collectorTraining',
-        'controlOperations',
-        'dataCollectionSituation',
-        'dataCollector',
-        'datasetLevelErrorNotes',
-        'deviationsFromSampleDesign',
-        'frequencyOfDataCollection',
-        'otherDataAppraisal',
-        'socialScienceNotes',
-        'researchInstrument',
-        'responseRate',
-        'samplingErrorEstimates',
-        'samplingProcedure',
+        'socialscience_displayName',
         'unitOfAnalysis',
         'universe',
         'timeMethod',
-        'weighting'
+        'dataCollector',
+        'collectorTraining',
+        'frequencyOfDataCollection',
+        'samplingProcedure',
+        'targetSampleSize',
+        'deviationsFromSampleDesign',
+        'collectionMode',
+        'researchInstrument',
+        'dataCollectionSituation',
+        'actionsToMinimizeLoss',
+        'controlOperations',
+        'weighting',
+        'cleaningOperations',
+        'datasetLevelErrorNotes',
+        'responseRate',
+        'samplingErrorEstimates',
+        'otherDataAppraisal',
+        'socialScienceNotes',
+        'journal_displayName',
+        'journalVolumeIssue',
+        'journalArticleType'
     ]
     return data
 
@@ -465,100 +557,207 @@ class TestDataset(object):
 
     def test_dataset_init(self):
         """Test Dataset.__init__()."""
+        obj = Dataset()
         obj_assert = object_init()
-        obj = Dataset()
-
         assert obj.__dict__ == obj_assert.__dict__
+        assert str(obj) == 'pyDataverse Dataset() model class.'
 
-    def test_dataset_set_valid(self):
-        """Test Dataset.set() with format=`dv_up`.
-
-        Parameters
-        ----------
-        import_dataset_min_dict : dict
-            Fixture, which returns a flat dataset dict().
-
-        """
+    def test_dataset_set_min_valid(self):
+        """Test Dataset.set() with minimum data."""
+        obj = object_init()
+        result = obj.set(dict_flat_set_min())
         obj_assert = object_min()
-        obj = Dataset()
-        obj.set(dict_flat_set_min())
-
+        assert result
         assert obj.__dict__ == obj_assert.__dict__
 
-        # ds_assert = object_full()
-        # ds = Dataset()
-        # ds.set(dict_flat_set_full())
-        #
-        # assert ds.__dict__ == ds_assert.__dict__
+    def test_dataset_set_full_valid(self):
+        """Test Dataset.set() with full data."""
+        obj = object_init()
+        result = obj.set(dict_flat_set_full())
+        obj_assert = object_full()
+        assert result
+        assert obj.__dict__ == obj_assert.__dict__
 
-    def test_dataset_dict_valid(self):
-        """Test Datafile.dict() with format=`dv_up` and valid data.
+    def test_dataset_set_invalid(self):
+        """Test Dataset.set() with invalid data."""
+        obj = object_init()
+        obj_assert = obj
+        for dtype in [list(), str(), int(), set(), tuple()]:
+            result = obj.set(list())
+            assert not result
+            assert obj.__dict__ == obj_assert.__dict__
 
-        Parameters
-        ----------
-        import_datafile_min_dict : dict
-            Fixture, which returns a flat dataset dict().
-
-        """
-        dict_assert = dict_flat_dict_min()
+    def test_dataset_dict_min_valid(self):
+        """Test Dataset.dict() with min data."""
         obj = object_min()
         dict_flat = obj.dict()
-
+        dict_assert = dict_flat_dict_min()
         assert dict_flat == dict_assert
 
-        # dict_assert = dict_flat_dict_full()
-        # obj = object_full()
-        # dict_flat = obj.dict()
-        #
-        # assert dict_flat == dict_assert
+    def test_dataset_dict_full_valid(self):
+        """Test Dataset.dict() with full data."""
+        obj = object_full()
+        dict_flat = obj.dict()
+        dict_assert = dict_flat_dict_full()
+        assert dict_flat == dict_assert
 
-    def test_dataset_from_json_dv_up_valid(self):
-        """Test Dataset.import_data() with format=`dv_up`."""
+    def test_dataset_from_json_min_valid(self):
+        """Test Dataset.from_json() with min data."""
+        obj = object_init()
+        result = obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
         obj_assert = object_min()
-        obj = Dataset()
-        obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
-
+        assert result
         assert obj_assert.__dict__ == obj.__dict__
 
-        # ds_assert = object_full()
-        # ds = Dataset()
-        # ds.from_json('tests/data/dataset_upload_min_default.json', validate=False)
-        #
-        # assert ds_assert.__dict__ == ds.__dict__
+    def test_dataset_from_json_full_valid(self):
+        """Test Dataset.from_json() with full data."""
+        obj = object_init()
+        result = obj.from_json('tests/data/dataset_upload_full_default.json')
+        obj_assert = object_full()
+        assert result
+        assert obj_assert.__dict__ == obj.__dict__
 
-    def test_dataset_from_json_format_invalid(self):
-        """Test Dataverse.import_data() with non-valid format."""
+        obj = object_init()
+        result = obj.from_json('tests/data/dataset_upload_full_default.json', validate=False)
+        obj_assert = object_full()
+        assert result
+        assert obj_assert.__dict__ == obj.__dict__
+
+        obj = object_init()
+        result = obj.from_json('tests/data/dataset_upload_full_default.json', validate=False, filename_schema='wrong')
+        obj_assert = object_full()
+        assert result
+        assert obj_assert.__dict__ == obj.__dict__
+
+    def test_dataset_from_json_invalid(self):
+        """Test Dataset.from_json() with non-valid format."""
+        # filename_schema=wrong
+        with pytest.raises(FileNotFoundError):
+            obj = object_init()
+            obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), filename_schema='wrong')
+
+        # format=wrong
+        obj = object_init()
+        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong')
         obj_assert = object_init()
-        obj = Dataset()
-        obj.from_json('tests/data/dataset_upload_full_default.json', format='wrong', validate=False)
+        assert not result
+        assert obj_assert.__dict__ == obj.__dict__
 
-        assert obj
-        assert obj.__dict__
-        assert obj_assert.__dict__ is not obj.__dict__
-        assert len(obj.__dict__.keys()) == len(obj_assert.__dict__.keys())
+        # format=wrong, validate=False
+        obj = object_init()
+        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong', validate=False)
+        obj_assert = object_init()
+        assert not result
+        assert obj_assert.__dict__ == obj.__dict__
 
-    def test_dataset_to_json_dv_up_valid(self):
-        """Test Dataverse.json() with format=`dv_up` and valid data.
-
-        Parameters
-        ----------
-        object_min : dict
-            Fixture, which returns a flat dataset dict() coming from
-            `tests/data/dataverse_min.json`.
-
-        TODO: Assert content
-        """
-        dict_assert = json.loads(json_upload_min())
+    def test_dataset_to_json_min_valid(self):
+        """Test Dataset.to_json() with min data."""
         obj = object_min()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_min())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result)
 
-        assert isinstance(obj.to_json(validate=False), str)
-        # assert json.loads(ds.to_json(validate=False)) == dict_assert
+    def test_dataset_to_json_full_valid(self):
+        """Test Dataset.to_json() with full data."""
+        obj = object_full()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result)
 
-        # dict_assert = json.loads(json_upload_full())
-        # ds = object_full()
-        #
-        # assert isinstance(ds.to_json(validate=False), str)
-        # assert json.loads(ds.to_json(validate=False)) == dict_assert
+        obj = object_full()
+        result = obj.to_json(validate=False)
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result)
+
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result)
+
+        obj = object_full()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result)
+
+    def test_dataset_to_json_invalid(self):
+        """Test Dataset.to_json() with non-valid data."""
+        with pytest.raises(FileNotFoundError):
+            obj = object_full()
+            result = obj.to_json(filename_schema='wrong')
+
+        obj = object_full()
+        result = obj.to_json(format='wrong')
+        assert not result
+
+        obj = object_full()
+        result = obj.to_json(format='wrong', validate=False)
+        assert not result
+
+    def test_dataset_validate_json_valid(self):
+        """Test Dataset.validate_json() with valid data."""
+        obj = object_min()
+        result = obj.validate_json()
+        assert result
+
+        obj = object_full()
+        result = obj.validate_json()
+        assert result
+
+    def test_dataset_validate_json_invalid(self):
+        """Test Dataset.validate_json() with non-valid data."""
+        # with pytest.raises(jsonschema.exceptions.SchemaError):
+        #     obj = object_init()
+        #     obj.validate_json()
+
+        with pytest.raises(FileNotFoundError):
+            obj = object_min()
+            obj.validate_json(filename_schema='wrong')
+
+        obj = object_min()
+        result = obj.validate_json(format='wrong')
+        assert not result
+
+        obj = object_min()
+        result = obj.validate_json(format='wrong', filename_schema='wrong')
+        assert not result
+
+        with pytest.raises(FileNotFoundError):
+            obj = object_full()
+            obj.validate_json(filename_schema='wrong')
+
+        obj = object_full()
+        result = obj.validate_json(format='wrong')
+        assert not result
+
+        obj = object_full()
+        result = obj.validate_json(format='wrong', filename_schema='wrong')
+        assert not result
+
+    def test_dataset_from_json_to_json_min(self):
+        """Test Dataset from JSON to JSON with min data."""
+        if not os.environ.get('TRAVIS'):
+            obj = object_init()
+            obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=False)
+            json_str = obj.to_json(validate=False)
+            dict_assert = json.loads(json_upload_min())
+            # assert json.loads(json_str) == dict_assert
+
+    def test_dataset_from_json_to_json_full(self):
+        """Test Dataset from JSON to JSON with full data."""
+        if not os.environ.get('TRAVIS'):
+            obj = object_init()
+            obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_full_default.json'), validate=False)
+            json_str = obj.to_json(validate=False)
+            dict_assert = json.loads(json_upload_full())
+            # assert json.loads(json_str) == dict_assert
 
     # def test_dataset_to_json_dv_up_invalid(self):
     #     """Test Dataverse.json() with format=`dv_up` and valid data.
@@ -590,40 +789,28 @@ class TestDataset(object):
     #         json_dict = json.loads(ds.to_json(format='wrong', validate=False))
     #
     # def test_validate(self):
-    #     ds = object_init()
-    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'))
+    #     obj = object_init()
+    #     assert obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'))
     #
-    #     ds = object_init()
-    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True)
+    #     obj = object_init()
+    #     assert obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True)
     #
-    #     ds = object_init()
-    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True, filename_schema='schemas/json/dataset_upload_default_schema.json')
+    #     obj = object_init()
+    #     assert obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), validate=True, filename_schema='schemas/json/dataset_upload_default_schema.json')
     #
-    #     ds = object_init()
-    #     assert ds.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), filename_schema='schemas/json/dataset_upload_default_schema.json')
+    #     obj = object_init()
+    #     assert obj.from_json(os.path.join(TEST_DIR + '/data/dataset_upload_min_default.json'), filename_schema='schemas/json/dataset_upload_default_schema.json')
     #
     #     # wrong
     #     with pytest.raises(jsonschema.exceptions.ValidationError):
-    #         ds = object_init()
-    #         ds.to_json()
-    #     assert not ds.to_json(format='wrong')
+    #         obj = object_init()
+    #         obj.to_json()
+    #     assert not obj.to_json(format='wrong')
     #     with pytest.raises(jsonschema.exceptions.ValidationError):
-    #         assert ds.to_json(filename_schema='schemas/json/dataverse_upload_schema.json')
+    #         assert obj.to_json(filename_schema='schemas/json/dataverse_upload_schema.json')
     #     with pytest.raises(jsonschema.exceptions.ValidationError):
-    #         assert ds.validate_json()
+    #         assert obj.validate_json()
     #     with pytest.raises(TypeError):
-    #         assert ds.validate_json(format='wrong')
+    #         assert obj.validate_json(format='wrong')
     #     with pytest.raises(jsonschema.exceptions.ValidationError):
-    #         assert ds.validate_json(filename_schema='schemas/json/dataverse_upload_schema.json')
-
-    def test_dataset_json_dataset(self):
-        """Test Dataverse pipeline from import to export with format=`dv_up`."""
-        if not os.environ.get('TRAVIS'):
-            dict_assert = json.loads(json_upload_min())
-            obj = object_init()
-            obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
-            json_out = obj.to_json(validate=False)
-            write_json('tests/data/output/dataset_upload_min_default.json', json.loads(json_out))
-            obj_new = Dataset()
-            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_min_default.json'), validate=False)
-            assert obj.__dict__ == obj_new.__dict__
+    #         assert obj.validate_json(filename_schema='schemas/json/dataverse_upload_schema.json')

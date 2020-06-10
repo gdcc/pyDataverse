@@ -1,1062 +1,599 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "properties": {
-    "datasetVersion": {
-      "type": "object",
-      "properties": {
-        "license": {
-          "type": "string"
-        },
-        "termsOfUse": {
-          "type": "string"
-        },
-        "termsOfAccess": {
-          "type": "string"
-        },
-        "metadataBlocks": {
-          "type": "object",
-          "properties": {
-            "citation": {
-              "type": "object",
-              "properties": {
-                "displayName": {
-                  "type": "string"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "properties": {
+        "datasetVersion": {
+            "$id": "#/properties/datasetVersion",
+            "type": "object",
+            "description": "An explanation about the purpose of this instance.",
+            "properties": {
+                "license": {
+                    "$id": "#/properties/datasetVersion/properties/license",
+                    "type": "string"
                 },
-                "fields": {
-                  "type": "array",
-                  "items": {
+                "termsOfUse": {
+                    "$id": "#/properties/datasetVersion/properties/termsOfUse",
+                    "type": "string",
+                    "title": "The termsOfUse schema",
+                    "description": "An explanation about the purpose of this instance."
+                },
+                "termsOfAccess": {
+                    "$id": "#/properties/datasetVersion/properties/termsOfAccess",
+                    "type": "string",
+                    "title": "The termsOfAccess schema",
+                    "description": "An explanation about the purpose of this instance."
+                },
+                "metadataBlocks": {
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks",
                     "type": "object",
+                    "title": "The metadataBlocks schema",
+                    "description": "An explanation about the purpose of this instance.",
                     "properties": {
-                      "typeName": {
-                        "type": "string"
-                      },
-                      "multiple": {
-                        "type": "boolean"
-                      },
-                      "typeClass": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "anyOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "array",
-                            "items": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "otherIdAgency": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "otherIdValue": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "authorName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "authorAffiliation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "authorIdentifierScheme": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "authorIdentifier": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "datasetContactName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "datasetContactAffiliation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "datasetContactEmail": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "dsDescriptionValue": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "dsDescriptionDate": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "keywordValue": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "keywordVocabulary": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "keywordVocabularyURI": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "topicClassValue": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "topicClassVocab": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "publicationCitation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "publicationIDType": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "publicationIDNumber": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "publicationURL": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "producerName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "producerAffiliation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "producerAbbreviation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "producerURL": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "producerLogoURL": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "contributorType": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "contributorName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "grantNumberAgency": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "grantNumberValue": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "distributorName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "distributorAffiliation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "distributorAbbreviation": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "distributorURL": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "distributorLogoURL": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "timePeriodCoveredStart": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "timePeriodCoveredEnd": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "dateOfCollectionStart": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "dateOfCollectionEnd": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "softwareName": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    },
-                                    "softwareVersion": {
-                                      "type": "object",
-                                      "properties": {
-                                        "typeName": {
-                                          "type": "string"
-                                        },
-                                        "multiple": {
-                                          "type": "boolean"
-                                        },
-                                        "typeClass": {
-                                          "type": "string"
-                                        },
-                                        "value": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "multiple",
-                                        "typeClass",
-                                        "typeName",
-                                        "value"
-                                      ]
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          },
-                          {
+                        "citation": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation",
                             "type": "object",
+                            "title": "The citation schema",
+                            "description": "An explanation about the purpose of this instance.",
                             "properties": {
-                              "seriesName": {
-                                "type": "object",
-                                "properties": {
-                                  "typeName": {
-                                    "type": "string"
-                                  },
-                                  "multiple": {
-                                    "type": "boolean"
-                                  },
-                                  "typeClass": {
-                                    "type": "string"
-                                  },
-                                  "value": {
-                                    "type": "string"
-                                  }
+                                "displayName": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/displayName",
+                                    "type": "string",
+                                    "title": "The displayName schema",
+                                    "description": "An explanation about the purpose of this instance."
                                 },
-                                "required": [
-                                  "multiple",
-                                  "typeClass",
-                                  "typeName",
-                                  "value"
-                                ]
-                              },
-                              "seriesInformation": {
-                                "type": "object",
-                                "properties": {
-                                  "typeName": {
-                                    "type": "string"
-                                  },
-                                  "multiple": {
-                                    "type": "boolean"
-                                  },
-                                  "typeClass": {
-                                    "type": "string"
-                                  },
-                                  "value": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "multiple",
-                                  "typeClass",
-                                  "typeName",
-                                  "value"
-                                ]
-                              }
+                                "fields": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields",
+                                    "type": "array",
+                                    "title": "The fields schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0",
+                                                "type": "object",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "properties": {
+                                                    "typeName": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/typeName",
+                                                        "type": "string",
+                                                        "title": "The typeName schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "multiple": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/multiple",
+                                                        "type": "boolean",
+                                                        "title": "The multiple schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "typeClass": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/typeClass",
+                                                        "type": "string",
+                                                        "title": "The typeClass schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "value": {
+                                                      "anyOf": [
+                                                        {
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/0",
+                                                          "type": "array",
+                                                          "title": "The fields schema",
+                                                          "description": "An explanation about the purpose of this instance."
+                                                        },
+                                                        {
+                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/1",
+                                                            "type": "string",
+                                                            "title": "The value schema",
+                                                            "description": "An explanation about the purpose of this instance."
+                                                        },
+                                                        {
+                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/2",
+                                                            "type": "object",
+                                                            "title": "The value schema",
+                                                            "description": "An explanation about the purpose of this instance."
+                                                        }
+                                                      ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items"
+                                    }
+                                }
                             }
-                          }
-                        ]
-                      }
-                    },
-                    "required": [
-                      "multiple",
-                      "typeClass",
-                      "typeName",
-                      "value"
-                    ]
-                  }
+                        },
+                        "geospatial": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial",
+                            "type": "object",
+                            "title": "The geospatial schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "properties": {
+                                "displayName": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/displayName",
+                                    "type": "string",
+                                    "title": "The displayName schema",
+                                    "description": "An explanation about the purpose of this instance."
+                                },
+                                "fields": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields",
+                                    "type": "array",
+                                    "title": "The fields schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0",
+                                                "type": "object",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "properties": {
+                                                    "typeName": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/typeName",
+                                                        "type": "string",
+                                                        "title": "The typeName schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "multiple": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/multiple",
+                                                        "type": "boolean",
+                                                        "title": "The multiple schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "typeClass": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/typeClass",
+                                                        "type": "string",
+                                                        "title": "The typeClass schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "value": {
+                                                        "anyOf": [
+                                                          {
+                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                                            "type": "array",
+                                                            "title": "The value schema",
+                                                            "description": "An explanation about the purpose of this instance."
+                                                          },
+                                                          {
+                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/1",
+                                                            "type": "object",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "properties": {
+                                                                "country": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country",
+                                                                    "type": "object",
+                                                                    "title": "The country schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "properties": {
+                                                                        "typeName": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/typeName",
+                                                                            "type": "string",
+                                                                            "title": "The typeName schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "multiple": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/multiple",
+                                                                            "type": "boolean",
+                                                                            "title": "The multiple schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "typeClass": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/typeClass",
+                                                                            "type": "string",
+                                                                            "title": "The typeClass schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "value": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/value",
+                                                                            "type": "string",
+                                                                            "title": "The value schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "state": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state",
+                                                                    "type": "object",
+                                                                    "title": "The state schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "properties": {
+                                                                        "typeName": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/typeName",
+                                                                            "type": "string",
+                                                                            "title": "The typeName schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "multiple": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/multiple",
+                                                                            "type": "boolean",
+                                                                            "title": "The multiple schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "typeClass": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/typeClass",
+                                                                            "type": "string",
+                                                                            "title": "The typeClass schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "value": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/value",
+                                                                            "type": "string",
+                                                                            "title": "The value schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "city": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city",
+                                                                    "type": "object",
+                                                                    "title": "The city schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "properties": {
+                                                                        "typeName": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/typeName",
+                                                                            "type": "string",
+                                                                            "title": "The typeName schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "multiple": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/multiple",
+                                                                            "type": "boolean",
+                                                                            "title": "The multiple schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "typeClass": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/typeClass",
+                                                                            "type": "string",
+                                                                            "title": "The typeClass schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "value": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/value",
+                                                                            "type": "string",
+                                                                            "title": "The value schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "otherGeographicCoverage": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage",
+                                                                    "type": "object",
+                                                                    "title": "The otherGeographicCoverage schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "properties": {
+                                                                        "typeName": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/typeName",
+                                                                            "type": "string",
+                                                                            "title": "The typeName schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "multiple": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/multiple",
+                                                                            "type": "boolean",
+                                                                            "title": "The multiple schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "typeClass": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/typeClass",
+                                                                            "type": "string",
+                                                                            "title": "The typeClass schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        },
+                                                                        "value": {
+                                                                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/value",
+                                                                            "type": "string",
+                                                                            "title": "The value schema",
+                                                                            "description": "An explanation about the purpose of this instance."
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                          }
+                                                      ],
+                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items"
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items"
+                                    }
+                                }
+                            }
+                        },
+                        "socialscience": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience",
+                            "type": "object",
+                            "title": "The socialscience schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "properties": {
+                                "displayName": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/displayName",
+                                    "type": "string",
+                                    "title": "The displayName schema",
+                                    "description": "An explanation about the purpose of this instance."
+                                },
+                                "fields": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields",
+                                    "type": "array",
+                                    "title": "The fields schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0",
+                                                "type": "object",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "properties": {
+                                                    "typeName": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/typeName",
+                                                        "type": "string",
+                                                        "title": "The typeName schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "multiple": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/multiple",
+                                                        "type": "boolean",
+                                                        "title": "The multiple schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "typeClass": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/typeClass",
+                                                        "type": "string",
+                                                        "title": "The typeClass schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "value": {
+                                                      "anyOf": [
+                                                        {
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                                          "type": "array",
+                                                          "title": "The value schema",
+                                                          "description": "An explanation about the purpose of this instance.",
+                                                          "items": {
+                                                              "anyOf": [
+                                                                  {
+                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                                                      "type": "string",
+                                                                      "title": "The first anyOf schema",
+                                                                      "description": "An explanation about the purpose of this instance."
+                                                                  }
+                                                              ],
+                                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value/items"
+                                                          }
+                                                        },
+                                                        {
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                                          "type": "string",
+                                                          "title": "The value schema",
+                                                          "description": "An explanation about the purpose of this instance."
+                                                        },
+                                                        {
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                                          "type": "object",
+                                                          "title": "The value schema",
+                                                          "description": "An explanation about the purpose of this instance.",
+                                                          "properties": {
+                                                            "targetSampleActualSize": {
+                                                              "type": "object"
+                                                            },
+                                                            "targetSampleSizeFormula": {
+                                                              "type": "object",
+                                                              "properties": {
+                                                                "typeName": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeName",
+                                                                    "type": "string"
+                                                                },
+                                                                "multiple": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/multiple",
+                                                                    "type": "boolean"
+                                                                },
+                                                                "typeClass": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeClass",
+                                                                    "type": "string",
+                                                                    "title": "The typeClass schema",
+                                                                    "description": "An explanation about the purpose of this instance."
+                                                                },
+                                                                "value": {
+                                                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value",
+                                                                    "type": "string"
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items"
+                                    }
+                                }
+                            }
+                        },
+                        "journal": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal",
+                            "type": "object",
+                            "title": "The journal schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "properties": {
+                                "displayName": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/displayName",
+                                    "type": "string",
+                                    "title": "The displayName schema",
+                                    "description": "An explanation about the purpose of this instance."
+                                },
+                                "fields": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields",
+                                    "type": "array",
+                                    "title": "The fields schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0",
+                                                "type": "object",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "properties": {
+                                                    "typeName": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/typeName",
+                                                        "type": "string",
+                                                        "title": "The typeName schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "multiple": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/multiple",
+                                                        "type": "boolean",
+                                                        "title": "The multiple schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "typeClass": {
+                                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/typeClass",
+                                                        "type": "string",
+                                                        "title": "The typeClass schema",
+                                                        "description": "An explanation about the purpose of this instance."
+                                                    },
+                                                    "value": {
+                                                      "anyOf": [
+                                                        {
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value",
+                                                          "type": "array",
+                                                          "title": "The value schema",
+                                                          "description": "An explanation about the purpose of this instance.",
+                                                          "items": {
+                                                              "anyOf": [
+                                                                  {
+                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                                                      "type": "object",
+                                                                      "title": "The first anyOf schema",
+                                                                      "description": "An explanation about the purpose of this instance.",
+                                                                      "properties": {
+                                                                          "journalVolume": {
+                                                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume",
+                                                                              "type": "object",
+                                                                              "title": "The journalVolume schema",
+                                                                              "description": "An explanation about the purpose of this instance.",
+                                                                              "properties": {
+                                                                                  "typeName": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/typeName",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeName schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "multiple": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/multiple",
+                                                                                      "type": "boolean",
+                                                                                      "title": "The multiple schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "typeClass": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/typeClass",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeClass schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "value": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/value",
+                                                                                      "type": "string",
+                                                                                      "title": "The value schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  }
+                                                                              }
+                                                                          },
+                                                                          "journalIssue": {
+                                                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue",
+                                                                              "type": "object",
+                                                                              "title": "The journalIssue schema",
+                                                                              "description": "An explanation about the purpose of this instance.",
+                                                                              "properties": {
+                                                                                  "typeName": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/typeName",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeName schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "multiple": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/multiple",
+                                                                                      "type": "boolean",
+                                                                                      "title": "The multiple schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "typeClass": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/typeClass",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeClass schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "value": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/value",
+                                                                                      "type": "string",
+                                                                                      "title": "The value schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  }
+                                                                              }
+                                                                          },
+                                                                          "journalPubDate": {
+                                                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate",
+                                                                              "type": "object",
+                                                                              "title": "The journalPubDate schema",
+                                                                              "description": "An explanation about the purpose of this instance.",
+                                                                              "properties": {
+                                                                                  "typeName": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/typeName",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeName schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "multiple": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/multiple",
+                                                                                      "type": "boolean",
+                                                                                      "title": "The multiple schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "typeClass": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/typeClass",
+                                                                                      "type": "string",
+                                                                                      "title": "The typeClass schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  },
+                                                                                  "value": {
+                                                                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/value",
+                                                                                      "type": "string",
+                                                                                      "title": "The value schema",
+                                                                                      "description": "An explanation about the purpose of this instance."
+                                                                                  }
+                                                                              }
+                                                                          }
+                                                                      }
+                                                                  }
+                                                                ]
+                                                              }
+                                                            },
+                                                            {
+                                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value",
+                                                              "type": "string",
+                                                              "title": "The value schema",
+                                                              "description": "An explanation about the purpose of this instance."
+                                                            }
+                                                          ],
+                                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items"
+                                                        }
+                                                    }
+                                                }
+                                              ],
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items"
+                                            }
+                                }
+                            }
+                        }
+                    }
                 }
-              },
-              "required": [
-                "displayName",
-                "fields"
-              ]
-            },
-            "required": [
-              "citation"
-            ]
-          }
-        },
-        "required": [
-          "metadataBlocks"
-        ]
-      }
-    },
-    "required": [
-      "datasetVersion"
-    ]
-  }
+            }
+        }
+    }
 }

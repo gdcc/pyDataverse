@@ -87,64 +87,13 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
         raise e
 
 
-def object_init():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
-    """
-    df = Datafile()
-    df.default_validate_format = 'dataverse_upload'
-    df.default_validate_schema_filename = 'schemas/json/datafile_upload_schema.json'
-    df.attr_dv_up_values = attr_dv_up_values()
-    return df
-
-
-def object_min():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
-    """
-    df = object_init()
-    df.pid = 'doi:10.11587/RRKEA9'
-    df.filename = '10109_qu_de_v1_0.pdf'
-    return df
-
-
-def object_full():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
-    """
-    df = object_init()
-    df.pid = 'doi:10.11587/NVWE8Y'
-    df.filename = '20001_ta_de_v1_0.pdf'
-    df.description = 'Another data file.'
-    df.restrict = True
-    df.categories = ['Documentation']
-    df.title = 'Questionnaire'
-    df.directoryLabel = 'data/subdir1'
-    return df
-
-
 def dict_flat_set_min():
-    """Import minimum Dataverse dict.
+    """Import minimum Datafile dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Datafile metadata.
 
     """
     data = {
@@ -155,12 +104,12 @@ def dict_flat_set_min():
 
 
 def dict_flat_set_full():
-    """Import full Dataverse dict.
+    """Import full Datafile dict.
 
     Returns
     -------
     dict
-        Full Dataverse metadata.
+        Full Datafile metadata.
 
     """
     data = {
@@ -175,13 +124,61 @@ def dict_flat_set_full():
     return data
 
 
-def dict_flat_dict_min():
-    """Import minimum Dataverse dict.
+def object_init():
+    """Import minimum Datafile dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Datafile metadata.
+
+    """
+    df = Datafile()
+    return df
+
+
+def object_min():
+    """Import minimum Datafile dict.
+
+    Returns
+    -------
+    dict
+        Minimum Datafile metadata.
+
+    """
+    df = object_init()
+    df.pid = 'doi:10.11587/RRKEA9'
+    df.filename = '10109_qu_de_v1_0.pdf'
+    return df
+
+
+def object_full():
+    """Import minimum Datafile dict.
+
+    Returns
+    -------
+    dict
+        Minimum Datafile metadata.
+
+    """
+    df = object_init()
+    df.pid = 'doi:10.11587/NVWE8Y'
+    df.filename = '20001_ta_de_v1_0.pdf'
+    df.description = 'Another data file.'
+    df.restrict = True
+    df.categories = ['Documentation']
+    df.title = 'Questionnaire'
+    df.directoryLabel = 'data/subdir1'
+    return df
+
+
+def dict_flat_dict_min():
+    """Import minimum Datafile dict.
+
+    Returns
+    -------
+    dict
+        Minimum Datafile metadata.
 
     """
     data = {
@@ -195,12 +192,12 @@ def dict_flat_dict_min():
 
 
 def dict_flat_dict_full():
-    """Import full Dataverse dict.
+    """Import full Datafile dict.
 
     Returns
     -------
     dict
-        Full Dataverse metadata.
+        Full Datafile metadata.
 
     """
     data = {
@@ -219,12 +216,12 @@ def dict_flat_dict_full():
 
 
 def json_upload_min():
-    """Import minimum Dataverse dict.
+    """Import minimum Datafile dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Datafile metadata.
 
     """
     data = read_file('tests/data/datafile_upload_min.json')
@@ -232,12 +229,12 @@ def json_upload_min():
 
 
 def json_upload_full():
-    """Import minimum Dataverse dict.
+    """Import minimum Datafile dict.
 
     Returns
     -------
     dict
-        Minimum Dataverse metadata.
+        Minimum Datafile metadata.
 
     """
     data = read_file('tests/data/datafile_upload_full.json')
@@ -262,152 +259,204 @@ class TestDatafile(object):
 
     def test_datafile_init(self):
         """Test Datafile.__init__()."""
+        obj = Datafile()
         obj_assert = object_init()
-        obj = Datafile()
-
         assert obj.__dict__ == obj_assert.__dict__
+        assert str(obj) == 'pyDataverse Datafile() model class.'
 
-    def test_datafile_set_valid(self):
-        """Test Datafile.set() with format=`dv_up`.
-
-        Parameters
-        ----------
-        import_datafile_full_dict : dict
-            Fixture, which returns a flat datafile dict().
-
-        """
+    def test_datafile_set_min_valid(self):
+        """Test Datafile.set() with minimum data."""
+        obj = object_init()
+        result = obj.set(dict_flat_set_min())
         obj_assert = object_min()
-        obj = Datafile()
-        obj.set(dict_flat_set_min())
-
+        assert result
         assert obj.__dict__ == obj_assert.__dict__
 
+    def test_datafile_set_full_valid(self):
+        """Test Datafile.set() with full data."""
+        obj = object_init()
+        result = obj.set(dict_flat_set_full())
         obj_assert = object_full()
-        obj = Datafile()
-        obj.set(dict_flat_set_full())
-
+        assert result
         assert obj.__dict__ == obj_assert.__dict__
 
-    def test_datafile_dict_valid(self):
-        """Test Datafile.dict() with format=`dv_up` and valid data.
+    def test_datafile_set_invalid(self):
+        """Test Datafile.set() with invalid data."""
+        obj = object_init()
+        obj_assert = obj
+        for dtype in [list(), str(), int(), set(), tuple()]:
+            result = obj.set(list())
+            assert not result
+            assert obj.__dict__ == obj_assert.__dict__
 
-        Parameters
-        ----------
-        import_datafile_min_dict : dict
-            Fixture, which returns a flat dataset dict().
-
-        """
-        dict_assert = dict_flat_dict_min()
+    def test_datafile_dict_min_valid(self):
+        """Test Datafile.dict() with min data."""
         obj = object_min()
         dict_flat = obj.dict()
-
+        dict_assert = dict_flat_dict_min()
         assert dict_flat == dict_assert
 
-        dict_assert = dict_flat_dict_full()
+    def test_datafile_dict_full_valid(self):
+        """Test Datafile.dict() with full data."""
         obj = object_full()
         dict_flat = obj.dict()
-
+        dict_assert = dict_flat_dict_full()
         assert dict_flat == dict_assert
 
-    def test_datafile_from_json_dv_up_valid(self):
-        """Test Dataverse.import_data() with format=`dv_up`."""
+    def test_datafile_from_json_min_valid(self):
+        """Test Datafile.from_json() with min data."""
+        obj = object_init()
+        result = obj.from_json('tests/data/datafile_upload_min.json', validate=False)
         obj_assert = object_min()
-        obj = Datafile()
-        obj.from_json('tests/data/datafile_upload_min.json', validate=False)
-
+        assert result
         assert obj_assert.__dict__ == obj.__dict__
 
+    def test_datafile_from_json_full_valid(self):
+        """Test Datafile.from_json() with full data."""
+        obj = object_init()
+        result = obj.from_json('tests/data/datafile_upload_full.json')
         obj_assert = object_full()
-        obj = Datafile()
-        obj.from_json('tests/data/datafile_upload_full.json', validate=False)
-
+        assert result
         assert obj_assert.__dict__ == obj.__dict__
 
-    def test_datafile_from_json_format_invalid(self):
-        """Test Dataverse.import_data() with non-valid format."""
+        obj = object_init()
+        result = obj.from_json('tests/data/datafile_upload_full.json', validate=False)
+        obj_assert = object_full()
+        assert result
+        assert obj_assert.__dict__ == obj.__dict__
+
+        obj = object_init()
+        result = obj.from_json('tests/data/datafile_upload_full.json', validate=False, filename_schema='wrong')
+        obj_assert = object_full()
+        assert result
+        assert obj_assert.__dict__ == obj.__dict__
+
+    def test_datafile_from_json_invalid(self):
+        """Test Datafile.from_json() with non-valid format."""
+        # filename_schema=wrong
+        with pytest.raises(FileNotFoundError):
+            obj = object_init()
+            obj.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), filename_schema='wrong')
+
+        # format=wrong
+        obj = object_init()
+        result = obj.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), format='wrong')
         obj_assert = object_init()
-        obj = Datafile()
-        obj.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), format='wrong', validate=False)
+        assert not result
+        assert obj_assert.__dict__ == obj.__dict__
 
-        assert obj
-        assert obj.__dict__
-        assert obj_assert.__dict__ is not obj.__dict__
-        assert len(obj.__dict__.keys()) == len(obj_assert.__dict__.keys())
+        # format=wrong, validate=False
+        obj = object_init()
+        result = obj.from_json(os.path.join(TEST_DIR, '/data/datafile_upload_min.json'), format='wrong', validate=False)
+        obj_assert = object_init()
+        assert not result
+        assert obj_assert.__dict__ == obj.__dict__
 
-    def test_datafile_to_json_dv_up_valid(self):
-        """Test Dataverse.json() with format=`dv_up` and valid data.
-
-        Parameters
-        ----------
-        object_min : dict
-            Fixture, which returns a flat dataset dict() coming from
-            `tests/data/dataverse_min.json`.
-
-        TODO: Assert content
-        """
-        dict_assert = json.loads(json_upload_min())
+    def test_datafile_to_json_min_valid(self):
+        """Test Datafile.to_json() with min data."""
         obj = object_min()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_min())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result) == dict_assert
 
-        assert isinstance(obj.to_json(validate=False), str)
-        assert json.loads(obj.to_json(validate=False)) == dict_assert
+    def test_datafile_to_json_full_valid(self):
+        """Test Datafile.to_json() with full data."""
+        obj = object_full()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result) == dict_assert
+
+        obj = object_full()
+        result = obj.to_json(validate=False)
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result) == dict_assert
 
         dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result) == dict_assert
+
         obj = object_full()
+        result = obj.to_json()
+        dict_assert = json.loads(json_upload_full())
+        assert result
+        assert isinstance(result, str)
+        assert json.loads(result) == dict_assert
 
-        assert isinstance(obj.to_json(validate=False), str)
-        assert json.loads(obj.to_json(validate=False)) == dict_assert
+    def test_datafile_to_json_invalid(self):
+        """Test Datafile.to_json() with non-valid data."""
+        with pytest.raises(FileNotFoundError):
+            obj = object_full()
+            result = obj.to_json(filename_schema='wrong')
 
-    def test_datafile_to_json_format_invalid(self):
-        """Test Dataverse.json() with non-valid format and valid data.
+        obj = object_full()
+        result = obj.to_json(format='wrong')
+        assert not result
 
-        Parameters
-        ----------
+        obj = object_full()
+        result = obj.to_json(format='wrong', validate=False)
+        assert not result
 
-        """
+    def test_datafile_validate_json_valid(self):
+        """Test Datafile.validate_json() with valid data."""
         obj = object_min()
-        with pytest.raises(TypeError):
-            json_dict = json.loads(obj.to_json(format='wrong', validate=False))
+        result = obj.validate_json()
+        assert result
 
-    def test_validate(self):
-        obj = object_init()
-        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'))
+        obj = object_full()
+        result = obj.validate_json()
+        assert result
 
-        obj = object_init()
-        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=True)
-
-        obj = object_init()
-        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=True, filename_schema='schemas/json/datafile_upload_schema.json')
-
-        obj = object_init()
-        assert obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), filename_schema='schemas/json/datafile_upload_schema.json')
-
-        # wrong
+    def test_datafile_validate_json_invalid(self):
+        """Test Datafile.validate_json() with non-valid data."""
         with pytest.raises(jsonschema.exceptions.ValidationError):
             obj = object_init()
-            obj.to_json()
-        assert not obj.to_json(format='wrong')
-        with pytest.raises(jsonschema.exceptions.ValidationError):
-            assert obj.to_json(filename_schema='schemas/json/dataverse_upload_schema.json')
-        with pytest.raises(jsonschema.exceptions.ValidationError):
-            assert obj.validate_json()
-        with pytest.raises(TypeError):
-            assert obj.validate_json(format='wrong')
-        with pytest.raises(jsonschema.exceptions.ValidationError):
-            assert obj.validate_json(filename_schema='schemas/json/dataverse_upload_schema.json')
+            obj.validate_json()
 
-    def test_datafile_from_json_to_json(self):
-        """Test Dataverse pipeline from import to export with format=`dv_up`."""
+        with pytest.raises(FileNotFoundError):
+            obj = object_min()
+            obj.validate_json(filename_schema='wrong')
+
+        obj = object_min()
+        result = obj.validate_json(format='wrong')
+        assert not result
+
+        obj = object_min()
+        result = obj.validate_json(format='wrong', filename_schema='wrong')
+        assert not result
+
+        with pytest.raises(FileNotFoundError):
+            obj = object_full()
+            obj.validate_json(filename_schema='wrong')
+
+        obj = object_full()
+        result = obj.validate_json(format='wrong')
+        assert not result
+
+        obj = object_full()
+        result = obj.validate_json(format='wrong', filename_schema='wrong')
+        assert not result
+
+    def test_datafile_from_json_to_json_min(self):
+        """Test Datafile from JSON to JSON with min data."""
         if not os.environ.get('TRAVIS'):
-            dict_assert = json.loads(json_upload_min())
-            obj = Datafile()
+            obj = object_init()
             obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=False)
             json_str = obj.to_json(validate=False)
-
+            dict_assert = json.loads(json_upload_min())
             assert json.loads(json_str) == dict_assert
 
-            dict_assert = json.loads(json_upload_full())
-            obj = Datafile()
+    def test_datafile_from_json_to_json_full(self):
+        """Test Datafile from JSON to JSON with full data."""
+        if not os.environ.get('TRAVIS'):
+            obj = object_init()
             obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_full.json'), validate=False)
             json_str = obj.to_json(validate=False)
-
+            dict_assert = json.loads(json_upload_full())
             assert json.loads(json_str) == dict_assert
