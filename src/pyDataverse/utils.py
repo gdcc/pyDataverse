@@ -7,7 +7,7 @@ from jsonschema import validate
 import pickle
 
 
-def read_file(filename, mode='r'):
+def read_file(filename, mode='r', encoding='utf-8'):
     """Read in a file.
 
     Parameters
@@ -24,17 +24,12 @@ def read_file(filename, mode='r'):
         Returns data as string.
 
     """
-    try:
-        with open(filename, mode) as f:
-            data = f.read()
-        return data
-    except IOError:
-        print('An error occured trying to read the file {}.'.format(filename))
-    except Exception as e:
-        raise e
+    with open(filename, mode, encoding=encoding) as f:
+        data = f.read()
+    return data
 
 
-def write_file(filename, data, mode='w'):
+def write_file(filename, data, mode='w', encoding='utf-8'):
     """Write data in a file.
 
     Parameters
@@ -46,15 +41,12 @@ def write_file(filename, data, mode='w'):
     mode : string
         Read mode of file. Defaults to `w`. See more at
         https://docs.python.org/3.5/library/functions.html#open
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     """
-    try:
-        with open(filename, mode) as f:
-            f.write(data)
-    except IOError:
-        print('An error occured trying to write the file {}.'.format(filename))
-    except Exception as e:
-        raise e
+    with open(filename, mode, encoding=encoding) as f:
+        f.write(data)
 
 
 def read_json(filename, mode='r', encoding='utf-8'):
@@ -67,6 +59,11 @@ def read_json(filename, mode='r', encoding='utf-8'):
     ----------
     filename : string
         Filename with full path.
+    mode : string
+        Read mode of file. Defaults to `w`. See more at
+        https://docs.python.org/3.5/library/functions.html#open
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     Returns
     -------
@@ -74,12 +71,9 @@ def read_json(filename, mode='r', encoding='utf-8'):
         Data as a json-formatted string.
 
     """
-    try:
-        with open(filename, mode, encoding=encoding) as f:
-            data = json.load(f)
-        return data
-    except Exception as e:
-        raise e
+    with open(filename, mode, encoding=encoding) as f:
+        data = json.load(f)
+    return data
 
 
 def write_json(filename, data, mode='w', encoding='utf-8'):
@@ -90,19 +84,16 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
     filename : string
         Filename with full path.
     data : dict
-        Data to be written in the json file.
+        Data to be written in the JSON file.
     mode : string
         Write mode of file. Defaults to `w`. See more at
         https://docs.python.org/3/library/functions.html#open
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     """
-    try:
-        with open(filename, mode, encoding=encoding) as f:
-            json.dump(data, f, indent=2)
-    except IOError:
-        print('An error occured trying to write the file {}.'.format(filename))
-    except Exception as e:
-        raise e
+    with open(filename, mode, encoding=encoding) as f:
+        json.dump(data, f, indent=2)
 
 
 def read_pickle(filename):
@@ -121,12 +112,9 @@ def read_pickle(filename):
         Data object.
 
     """
-    try:
-        with open(filename, 'rb') as f:
-            data = pickle.load(f)
-            return data
-    except Exception as e:
-        raise e
+    with open(filename, 'rb') as f:
+        data = pickle.load(f)
+        return data
 
 
 def write_pickle(filename, data):
@@ -142,22 +130,28 @@ def write_pickle(filename, data):
         Data to write in pickle file.
 
     """
-    try:
-        with open(filename, 'wb') as f:
-            pickle.dump(data, f)
-    except Exception as e:
-        raise e
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f)
 
 
-def read_csv(filename):
-    """Read in CSV file.
+def read_csv(filename, newline='', delimiter=',', quotechar='"',
+             encoding='utf-8'):
+    """Read in a CSV file.
 
-    See more at `csv.reader() <https://docs.python.org/3.5/library/csv.html>`_.
+    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
     filename : string
         Full filename with path of file.
+    newline : string
+        Newline character.
+    delimiter : string
+        Cell delimiter of CSV file. Defaults to ';'.
+    quotechar : string
+        Quote-character of CSV file. Defaults to '"'.
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     Returns
     -------
@@ -165,69 +159,62 @@ def read_csv(filename):
         Reader object, which can be iterated over.
 
     """
-    try:
-        with open(filename, newline='') as csvfile:
-            return csv.reader(csvfile, delimiter=',', quotechar='"')
-    except Exception as e:
-        raise e
-    finally:
-        csvfile.close()
+    with open(filename, newline=newline, encoding=encoding) as csvfile:
+        return csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
 
 
-def write_csv(data, filename, delimiter=',', quotechar='"'):
+def write_csv(data, filename, newline='', delimiter=',', quotechar='"',
+              encoding='utf-8'):
     """Short summary.
+
+    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
-    data : type
-        Description of parameter `data`.
-    filename : type
-        Description of parameter `filename`.
-    delimiter : type
-        Description of parameter `delimiter` (the default is ';').
-    quotechar : type
-        Description of parameter `quotechar` (the default is '"').
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    Raises
-    -------
-    ExceptionName
-        Why the exception is raised.
-
-    Examples
-    -------
-    Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
-    >>>
+    data : list
+        List of :class:`dict`s. Key is column, value is cell content.
+    filename : string
+        Full filename with path of file.
+    newline : string
+        Newline character.
+    delimiter : string
+        Cell delimiter of CSV file. Defaults to ';'.
+    quotechar : string
+        Quote-character of CSV file. Defaults to '"'.
+    encoding : string
+        Character encoding of file. Defaults to 'utf-8'.
 
     """
-    with open(filename, 'w', newline='') as csvfile:
+    with open(filename, 'w', newline=newline, encoding=encoding) as csvfile:
         writer = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar)
         for row in data:
             writer.writerow(row)
 
 
-def read_csv_as_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
-    """Read in csv file and convert it into a list of dicts.
+def read_csv_as_dict(filename, newline='', delimiter=',', quotechar='"',
+                     encoding='utf-8'):
+    """Read in CSV file into a list of :class:`dict`s.
 
-    This offers an easy import functionality of csv files with dataset metadata.
+    This offers an easy import functionality of your data from CSV files.
+    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
 
-    Assumptions:
-    1) The header rows contains the column names, named after Dataverse's
-    dataset attribute standard naming convention.
-    2) One row contains one dataset
+    CSV file structure:
+    1) The header row contains the column names.
+    2) A row contains one dataset
+    3) A column contains one specific attribute.
 
-    After the import, the created dict then can directly be used to set
-    Dataset() attributes via ``Dataset.set(data)``.
+    Recommendation: Name the column name the way you want the attribute to be
+    named later in your Dataverse object. See the
+    `pyDataverse templates https://github.com/AUSSDA/pyDataverse_templates>`_
+    for this. The created :class:`dict` can later be used for the `set()`
+    function to create Dataverse objects.
 
     Parameters
     ----------
     filename : string
         Filename with full path.
+    newline : string
+        Newline character.
     delimiter : string
         Cell delimiter of CSV file. Defaults to ';'.
     quotechar : string
@@ -238,12 +225,11 @@ def read_csv_as_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
     Returns
     -------
     list
-        List with one dict per row (=dataset). The keys of the dicts are named
-        after the columen names, which must be named after the Dataverse
-        dataset metadata naming convention.
+        List with one :class:`dict` each row. The keys of a :class:`dict` are
+        named after the columen names.
 
     """
-    with open(filename, 'r', newline='', encoding=encoding) as csvfile:
+    with open(filename, 'r', newline=newline, encoding=encoding) as csvfile:
         reader = csv.DictReader(csvfile, delimiter=delimiter,
                                 quotechar=quotechar)
         data = []
@@ -253,40 +239,26 @@ def read_csv_as_dict(filename, delimiter=',', quotechar='"', encoding='utf-8'):
 
 
 def write_dict_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
-    """Short summary.
+    """Write :class:`dict` to a CSV file
+
+    This offers an easy export functionality of your data to a CSV files.
+    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
     data : type
         Description of parameter `data`.
-    fieldnames : type
-        Description of parameter `fieldnames`.
-    filename : type
-        Description of parameter `filename`.
-    delimiter : type
-        Description of parameter `delimiter` (the default is ';').
-    quotechar : type
-        Description of parameter `quotechar` (the default is '"').
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    Raises
-    -------
-    ExceptionName
-        Why the exception is raised.
-
-    Examples
-    -------
-    Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
-    >>>
+    fieldnames : list
+        Sequence of keys that identify the order of the columns.
+    filename : string
+        Filename with full path.
+    delimiter : string
+        Cell delimiter of CSV file. Defaults to ';'.
+    quotechar : string
+        Quote-character of CSV file. Defaults to '"'.
 
     """
     with open(filename, 'w', newline='') as csvfile:
-        fieldnames = fieldnames
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -297,66 +269,50 @@ def write_dict_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
             writer.writerow(d)
 
 
-def tree_walker_count_types(children, num_dataverses=0, num_datasets=0, num_datafiles=0):
-    """Count data types from Dataverse tree.
+def clean_string(str):
+    """Clean a string.
+
+    Trims whitespace.
 
     Parameters
     ----------
-    children : list
-        List of child elements.
-    num_dataverses : int
-        Number of Dataverses in tree.
-    num_datasets : int
-        Number of Datasets in tree.
-    num_datafiles : int
-        Number of Datafiles in tree.
+    str : string
+        String to be cleaned.
 
     Returns
     -------
-    list
-        [num_dataverses, num_datasets, num_datafiles]
+    string
+        Cleaned string.
 
     """
-    for child in children:
-        if child['type'] == 'dataverse':
-            num_dataverses += 1
-            num_dataverses, num_datasets, num_datafiles = count_tree_types(child['children'], num_dataverses, num_datasets, num_datafiles)
-        elif child['type'] == 'dataset':
-            num_datasets += 1
-            num_dataverses, num_datasets, num_datafiles = count_tree_types(child['children'], num_dataverses, num_datasets, num_datafiles)
-        elif child['type'] == 'datafile':
-            num_datafiles += 1
-    return num_dataverses, num_datasets, num_datafiles
-
-
-def clean_string(str):
     clean_str = str.strip()
     clean_str = clean_str.replace('  ', ' ')
     return clean_str
 
 
 def validate_data(data, filename_schema, format='json'):
-    """Short summary.
+    """Validate data against a schema.
 
     Parameters
     ----------
-    format : type
-        Description of parameter `format`.
-    filename_schema : type
-        Description of parameter `filename_schema`.
+    data : dict
+        Data to be validated.
+    filename_schema : string
+        Filename with full path of the schema file.
+    format : string
+        Data format of file to be validated.
 
     Returns
     -------
-    type
-        Description of returned object.
+    bool
+        `True` if data was validated, `False` if not.
 
     """
     if format == 'json':
-        validate(instance=data, schema=read_json(filename_schema))
-        return True
+        return validate(instance=data, schema=read_json(filename_schema))
     elif format == 'xml':
         print('INFO: Not implemented yet.')
-        return True
+        return False
     else:
-        print('ERROR: No valid format passed.')
+        print('WARNING: No valid format passed.')
         return False
