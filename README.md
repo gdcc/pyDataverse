@@ -15,7 +15,7 @@ and Datafiles.
 * Custom exceptions
 * Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
 * [Documentation](https://pydataverse.readthedocs.io/en/latest/) (Sphinx, ReadTheDocs)
-* Python 2 and 3 (>=2.7)
+* Python 3
 * Open Source ([MIT](https://opensource.org/licenses/MIT))
 
 **pyDataverse pipeline**
