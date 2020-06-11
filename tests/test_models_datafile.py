@@ -406,7 +406,9 @@ class TestDatafile(object):
     def test_datafile_validate_json_valid(self):
         """Test Datafile.validate_json() with valid data."""
         obj = object_min()
+        print(obj.__dict__)
         result = obj.validate_json()
+        print(result)
         assert result
 
         obj = object_full()

@@ -309,7 +309,8 @@ def validate_data(data, filename_schema, format='json'):
 
     """
     if format == 'json':
-        return validate(instance=data, schema=read_json(filename_schema))
+        validate(instance=data, schema=read_json(filename_schema))
+        return True
     elif format == 'xml':
         print('INFO: Not implemented yet.')
         return False
