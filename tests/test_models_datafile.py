@@ -254,6 +254,22 @@ def attr_dv_up_values():
     return data
 
 
+def attr_dv_up_required():
+    """List of attributes required for `dataverse_upload` JSON.
+
+    Returns
+    -------
+    list
+        List of attributes, which will be used for import and export.
+
+    """
+    data = [
+        'pid',
+        'filename'
+    ]
+    return data
+
+
 class TestDatafile(object):
     """Tests for Datafile()."""
 
@@ -406,9 +422,7 @@ class TestDatafile(object):
     def test_datafile_validate_json_valid(self):
         """Test Datafile.validate_json() with valid data."""
         obj = object_min()
-        print(obj.__dict__)
         result = obj.validate_json()
-        print(result)
         assert result
 
         obj = object_full()
@@ -417,48 +431,58 @@ class TestDatafile(object):
 
     def test_datafile_validate_json_invalid(self):
         """Test Datafile.validate_json() with non-valid data."""
+        # init data
         with pytest.raises(jsonschema.exceptions.ValidationError):
             obj = object_init()
             obj.validate_json()
 
+        # remove required attributes
+        required_attributes = attr_dv_up_required()
+        for attr in required_attributes:
+            with pytest.raises(jsonschema.exceptions.ValidationError):
+                obj = object_min()
+                delattr(obj, attr)
+                obj.validate_json()
+
+        # file not found
         with pytest.raises(FileNotFoundError):
             obj = object_min()
             obj.validate_json(filename_schema='wrong')
 
+        # format=wrong
         obj = object_min()
         result = obj.validate_json(format='wrong')
         assert not result
 
+        obj = object_full()
+        result = obj.validate_json(format='wrong')
+        assert not result
+
+        # format=wrong, filename_schema=wrong
         obj = object_min()
         result = obj.validate_json(format='wrong', filename_schema='wrong')
         assert not result
 
-        with pytest.raises(FileNotFoundError):
+        obj = object_full()
+        result = obj.validate_json(format='wrong', filename_schema='wrong')
+        assert not result
+
+    def test_datafile_to_json_from_json_min(self):
+        """Test Datafile to JSON from JSON with min data."""
+        if not os.environ.get('TRAVIS'):
+            obj = object_min()
+            data = obj.to_json(validate=False, as_dict=True)
+            write_json(os.path.join(TEST_DIR + '/data/output/datafile_upload_min.json'), data)
+            obj_new = Datafile()
+            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/datafile_upload_min.json'), validate=False)
+            assert obj_new.__dict__ == obj.__dict__
+
+    def test_datafile_to_json_from_json_full(self):
+        """Test Datafile to JSON from JSON with full data."""
+        if not os.environ.get('TRAVIS'):
             obj = object_full()
-            obj.validate_json(filename_schema='wrong')
-
-        obj = object_full()
-        result = obj.validate_json(format='wrong')
-        assert not result
-
-        obj = object_full()
-        result = obj.validate_json(format='wrong', filename_schema='wrong')
-        assert not result
-
-    def test_datafile_from_json_to_json_min(self):
-        """Test Datafile from JSON to JSON with min data."""
-        if not os.environ.get('TRAVIS'):
-            obj = object_init()
-            obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_min.json'), validate=False)
-            json_str = obj.to_json(validate=False)
-            dict_assert = json.loads(json_upload_min())
-            assert json.loads(json_str) == dict_assert
-
-    def test_datafile_from_json_to_json_full(self):
-        """Test Datafile from JSON to JSON with full data."""
-        if not os.environ.get('TRAVIS'):
-            obj = object_init()
-            obj.from_json(os.path.join(TEST_DIR + '/data/datafile_upload_full.json'), validate=False)
-            json_str = obj.to_json(validate=False)
-            dict_assert = json.loads(json_upload_full())
-            assert json.loads(json_str) == dict_assert
+            data = obj.to_json(validate=False, as_dict=True)
+            write_json(os.path.join(TEST_DIR + '/data/output/datafile_upload_full.json'), data)
+            obj_new = Datafile()
+            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/datafile_upload_full.json'), validate=False)
+            assert obj_new.__dict__ == obj.__dict__
