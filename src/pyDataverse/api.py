@@ -15,6 +15,7 @@ from requests import delete
 from requests import get
 from requests import post
 from requests import put
+import subprocess as sp
 
 
 class Api(object):
@@ -157,11 +158,12 @@ class Api(object):
                     ''.format(url, error_msg)
                 )
             elif resp.status_code >= 300:
-                error_msg = resp.json()['message']
-                raise OperationFailedError(
-                    'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
-                        resp.status_code, url, error_msg)
-                )
+                if resp.text:
+                    error_msg = resp.text
+                    raise OperationFailedError(
+                        'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
+                            resp.status_code, url, error_msg)
+                    )
             return resp
         except ConnectionError:
             raise ConnectionError(
@@ -223,7 +225,7 @@ class Api(object):
                 ''.format(url)
             )
 
-    def put_request(self, url, metadata=None, auth=False,
+    def put_request(self, url, data=None, auth=False,
                     params=None):
         """Make a PUT request.
 
@@ -231,7 +233,7 @@ class Api(object):
         ----------
         url : string
             Full URL.
-        metadata : string
+        data : string
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -259,7 +261,7 @@ class Api(object):
         try:
             resp = put(
                 url,
-                data=metadata,
+                data=data,
                 params=params
             )
             if resp.status_code == 401:
@@ -339,7 +341,7 @@ class DataAccessApi(Api):
     def __init__(self, base_url, api_token=None):
         """Init an DataAccessApi() class.
         """
-        super().__init__(base_url, api_token, api_version)
+        super().__init__(base_url, api_token)
         if base_url:
             self.base_url_api_data_access = '{0}/access'.format(self.base_url_api)
         else:
@@ -481,22 +483,50 @@ class DataAccessApi(Api):
         return resp
 
 
-    def request_access(self, identifier):
+    def request_access(self, identifier, auth=True, is_filepid=False):
         """
+        This method requests access to the datafile whose id is passed on the behalf of an authenticated user whose key is passed. Note that not all datasets allow access requests to restricted files.
+
+        /api/access/datafile/$id/requestAccess
+
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/{id}/requestAccess
         """
-        url = '{0}/datafile/{1}/requestAccess'.format(self.base_url_api_data_access, identifier)
-        resp = self.get_request(url, auth=auth)
+        if is_filepid:
+            url = '{0}/datafile/:persistentId/requestAccess?persistentId={1}'.format(self.base_url_api_data_access, identifier)
+        else:
+            url = '{0}/datafile/{1}/requestAccess'.format(self.base_url_api_data_access, identifier)
+        resp = self.put_request(url, auth=auth)
         return resp
 
 
-    def grant_file_access(self, identifier, user):
+    def allow_access_request(self, identifier, do_allow=True, auth=True, is_pid=True):
+        """
+        curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/{id}/allowAccessRequest
+        curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/:persistentId/allowAccessRequest?persistentId={pid}
+        """
+        if is_pid:
+            url = '{0}/:persistentId/allowAccessRequest?persistentId={1}'.format(self.base_url_api_data_access, identifier)
+        else:
+            url = '{0}/{1}/allowAccessRequest'.format(self.base_url_api_data_access, identifier)
+
+        if do_allow == True:
+            data = 'true'
+        elif do_allow == False:
+            data = 'false'
+        else:
+            print('ERROR: `do_allow` value not valid.')
+            return None
+        resp = self.put_request(url, data=data, auth=auth)
+        return resp
+
+
+    def grant_file_access(self, identifier, user, auth=False):
         """
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/{id}/grantAccess/{@userIdentifier}
         """
         url = '{0}/datafile/{1}/grantAccess/{2}'.format(
             self.base_url_api_data_access, identifier, user)
-        resp = self.get_request(url, auth=auth)
+        resp = self.put_request(url, auth=auth)
         return resp
 
 
@@ -1509,32 +1539,49 @@ class NativeApi(Api):
             print('Dataset {0} updated'.format(identifier))
         return resp
 
-    def get_datafile_metadata(self, identifier, is_filepid=False, auth=True):
+    def get_datafile_metadata(self, identifier, is_filepid=False, is_draft=False, auth=True):
         """
         GET http://$SERVER/api/files/{id}/metadata
 
-        http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files
+        curl $SERVER_URL/api/files/$ID/metadata
+        curl "$SERVER_URL/api/files/:persistentId/metadata?persistentId=$PERSISTENT_ID"
+        curl "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
+        curl -H "X-Dataverse-key:$API_TOKEN" $SERVER_URL/api/files/$ID/metadata/draft
 
         """
         if is_filepid:
-            url = '{0}/files/:persistentId/metadata?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = '{0}/files/:persistentId/metadata'.format(self.base_url_api_native)
+            if is_draft:
+                url += '/draft'
+            url += '?persistentId={0}'.format(identifier)
         else:
             url = '{0}/files/{1}/metadata'.format(self.base_url_api_native, identifier)
+            if is_draft:
+                url += '/draft'
             # CHECK: Its not really clear, if the version query can also be done via ID.
         resp = self.get_request(url, auth=auth)
         return resp
 
-    def update_datafile_metadata(self, identifier, json_str, is_filepid=True):
+    def update_datafile_metadata(self, identifier, json_str=None, is_filepid=False):
         """Update datafile metadata.
 
         metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+        Updates the file metadata for an existing file where ID is the
+        database id of the file to update or PERSISTENT_ID is the persistent id
+        (DOI or Handle) of the file. Requires a jsonString expressing the new
+        metadata. No metadata from the previous version of this file will be
+        persisted, so if you want to update a specific field first get the
+        json with the above command and alter the fields you want.
+
+        Also note that dataFileTags are not versioned and changes to these will update the published version of the file.
 
         HTTP Request:
 
         .. code-block:: bash
 
             POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/metadata?key={apiKey}
+            curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' $SERVER_URL/api/files/$ID/metadata
+            curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
 
         `Offical documentation
         <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
@@ -1556,18 +1603,28 @@ class NativeApi(Api):
             dict().
 
         """
-        url = self.base_url_api_native
+        # if is_filepid:
+        #     url = '{0}/files/:persistentId/metadata?persistentId={1}'.format(
+        #         self.base_url_api_native, identifier)
+        # else:
+        #     url = '{0}/files/{1}/metadata'.format(self.base_url_api_native, identifier)
+        #
+        # data = {'jsonData': json_str}
+        # resp = self.post_request(
+        #     url,
+        #     data=data,
+        #     auth=True
+        #     )
+        query_str = self.base_url_api_native
         if is_filepid:
-            url += '/files/:persistentId/metadata?persistentId={0}'.format(identifier)
+            query_str = '{0}/files/:persistentId/metadata?persistentId={1}'.format(self.base_url_api_native, identifier)
         else:
-            url += '/files/{0}/metadata'.format(identifier)
-
-        resp = self.post_request(
-            url,
-            data=data,
-            auth=True
-            )
-        return resp
+            query_str = '{0}/files/{1}/metadata'.format(self.base_url_api_native, identifier)
+        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(self.api_token)
+        shell_command += ' -X POST -F \'jsonData={0}\' {1}'.format(json_str, query_str)
+        # TODO(Shell): is shell=True necessary?
+        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
+        return result
 
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
@@ -1668,7 +1725,7 @@ class NativeApi(Api):
             )
         return resp
 
-    def get_datafiles(self, pid, version='1', auth=False):
+    def get_datafiles(self, pid, version=':latest', auth=True):
         """List metadata of all datafiles of a dataset.
 
         `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
