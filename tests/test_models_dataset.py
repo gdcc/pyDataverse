@@ -136,6 +136,7 @@ def dict_flat_set_full():
         'license': 'CC0',
         'termsOfUse': 'CC0 Waiver',
         'termsOfAccess': 'Terms of Access',
+        'fileAccessRequest': True,
         'citation_displayName': 'Citation Metadata',
         'title': 'Replication Data for: Title',
         'subtitle': 'Subtitle',
@@ -253,6 +254,7 @@ def object_full():
     ds.license = 'CC0'
     ds.termsOfUse = 'CC0 Waiver'
     ds.termsOfAccess = 'Terms of Access'
+    ds.fileAccessRequest = True
     ds.citation_displayName = 'Citation Metadata'
     ds.title = 'Replication Data for: Title'
     ds.subtitle = 'Subtitle'
@@ -380,6 +382,7 @@ def dict_flat_dict_full():
         'license': 'CC0',
         'termsOfUse': 'CC0 Waiver',
         'termsOfAccess': 'Terms of Access',
+        'fileAccessRequest': True,
         'citation_displayName': 'Citation Metadat',
         'title': 'Replication Data for: Title',
         'subtitle': 'Subtitle',
@@ -484,6 +487,7 @@ def attr_dv_up_values():
         'license',
         'termsOfUse',
         'termsOfAccess',
+        'fileAccessRequest',
         'citation_displayName',
         'title',
         'subtitle',

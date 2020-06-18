@@ -3,6 +3,7 @@
     "license": "CC0",
     "termsOfUse": "CC0 Waiver",
     "termsOfAccess": "Terms of Access",
+    "fileAccessRequest": true,
     "metadataBlocks": {
       "citation": {
         "displayName": "Citation Metadata",
