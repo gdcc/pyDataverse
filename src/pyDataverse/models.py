@@ -293,6 +293,7 @@ class Dataset(DVObject):
     __attr_import_dv_up_datasetVersion_values = [
         'license',
         'termsOfAccess',
+        'fileAccessRequest',
         'termsOfUse'
     ]
 
@@ -587,7 +588,7 @@ class Dataset(DVObject):
                         if key in self.__attr_import_dv_up_datasetVersion_values:
                             data[key] = val
                         else:
-                            print('Attribute {0} not valid for import (dv_up).'.format(key))
+                            print('Attribute {0} not valid for import (format={1}).'.format(key, format))
 
                 if 'metadataBlocks' in dict_json['datasetVersion']:
 
