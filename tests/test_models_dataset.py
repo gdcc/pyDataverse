@@ -137,6 +137,9 @@ def dict_flat_set_full():
         'termsOfUse': 'CC0 Waiver',
         'termsOfAccess': 'Terms of Access',
         'fileAccessRequest': True,
+        'protocol': 'doi',
+        'authority': '10.11587',
+        'identifier': '6AQBYW',
         'citation_displayName': 'Citation Metadata',
         'title': 'Replication Data for: Title',
         'subtitle': 'Subtitle',
@@ -255,6 +258,9 @@ def object_full():
     ds.termsOfUse = 'CC0 Waiver'
     ds.termsOfAccess = 'Terms of Access'
     ds.fileAccessRequest = True
+    ds.protocol = 'doi'
+    ds.authority = '10.11587'
+    ds.identifier = '6AQBYW'
     ds.citation_displayName = 'Citation Metadata'
     ds.title = 'Replication Data for: Title'
     ds.subtitle = 'Subtitle'
@@ -383,6 +389,9 @@ def dict_flat_dict_full():
         'termsOfUse': 'CC0 Waiver',
         'termsOfAccess': 'Terms of Access',
         'fileAccessRequest': True,
+        'protocol': 'doi',
+        'authority': '10.11587',
+        'identifier': '6AQBYW',
         'citation_displayName': 'Citation Metadat',
         'title': 'Replication Data for: Title',
         'subtitle': 'Subtitle',
@@ -488,6 +497,9 @@ def attr_dv_up_values():
         'termsOfUse',
         'termsOfAccess',
         'fileAccessRequest',
+        'protocol',
+        'authority',
+        'identifier',
         'citation_displayName',
         'title',
         'subtitle',

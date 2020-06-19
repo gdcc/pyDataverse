@@ -7,34 +7,29 @@ from pyDataverse.utils import read_json
 from pyDataverse.utils import validate_data
 from pyDataverse.utils import write_json
 
-"""
-Classes to work with data and metadata of Dataverses, Datasets and Datafiles.
-"""
-
 
 class DVObject(object):
-    """Base class for the Dataverse data types `Dataverse`, `Dataset` and
-    `Datafile`.
+    """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`.
 
     Attributes
     ----------
     default_validate_format : string
-        Default format to be validated against in :func:`from_json()` and
-        :func:`to_json()`.
+        Default format to be validated against in :func:`from_json` and
+        :func:`to_json`.
 
     """
 
     def __init__(self):
-        """Init :class:`DVObject()`."""
+        """Init :class:`DVObject`."""
         self.default_validate_format = 'dataverse_upload'
         self.attr_dv_up_values = None
 
     def __str__(self):
-        """Return name of class :class:`DVObject()` for users."""
+        """Return name of class :class:`DVObject` for users."""
         return 'pyDataverse DVObject() model class.'
 
     def set(self, data):
-        """Set class attributes by a flat :class:`dict`.
+        """Set class attributes by a flat dictionary.
 
         The flat dict is the main way to set the class attributes.
         It is the main interface between the object and the outside world.
@@ -42,7 +37,7 @@ class DVObject(object):
         Parameters
         ----------
         data : dict
-            Flat :class:`dict`. All keys will be mapped to a similar
+            Flat dictionary. All keys will be mapped to a similar
             named attribute and it's value.
 
         Returns
@@ -60,7 +55,7 @@ class DVObject(object):
             return False
 
     def dict(self):
-        """Create flat :class:`dict` of all attributes.
+        """Create flat `dict` of all attributes.
 
         Creates :class:`dict` with all attributes in a flat structure.
         The flat :class:`dict` can then be used for further processing.
@@ -294,6 +289,9 @@ class Dataset(DVObject):
         'license',
         'termsOfAccess',
         'fileAccessRequest',
+        'protocol',
+        'authority',
+        'identifier',
         'termsOfUse'
     ]
 
@@ -615,7 +613,7 @@ class Dataset(DVObject):
                                 print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
                     else:
                         # TODO: Exception
-                        print('Citation not in JSON')
+                        pass
 
                     """geospatial"""
                     if 'geospatial' in dict_json['datasetVersion']['metadataBlocks']:
@@ -635,7 +633,7 @@ class Dataset(DVObject):
                                 print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
                     else:
                         # TODO: Exception
-                        print('geospatial not in JSON')
+                        pass
 
                     """socialscience"""
                     if 'socialscience' in dict_json['datasetVersion']['metadataBlocks']:
@@ -666,7 +664,7 @@ class Dataset(DVObject):
                                 print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
                     else:
                         # TODO: Exception
-                        print('socialscience not in JSON')
+                        pass
 
                     """journal"""
                     if 'journal' in dict_json['datasetVersion']['metadataBlocks']:
@@ -687,7 +685,7 @@ class Dataset(DVObject):
                                 print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
                     else:
                         # TODO: Exception
-                        print('journal not in JSON')
+                        pass
                 self.set(data)
                 return True
             elif format == 'dataverse_download':
