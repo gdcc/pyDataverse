@@ -18,4 +18,3 @@ class TestDVObject(object):
         obj = DVObject()
         assert obj.default_validate_format == 'dataverse_upload'
         assert obj.attr_dv_up_values == None
-        assert str(obj) == 'pyDataverse DVObject() model class.'
