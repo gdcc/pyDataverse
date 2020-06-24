@@ -297,7 +297,6 @@ class TestDataverse(object):
         obj = Dataverse()
         obj_assert = object_init()
         assert obj.__dict__ == obj_assert.__dict__
-        assert str(obj) == 'pyDataverse Dataverse() model class.'
 
     def test_dataverse_set_min_valid(self):
         """Test Dataverse.set() with minimum data."""
@@ -324,17 +323,17 @@ class TestDataverse(object):
             assert not result
             assert obj.__dict__ == obj_assert.__dict__
 
-    def test_dataverse_dict_min_valid(self):
-        """Test Dataverse.dict() with min data."""
+    def test_dataverse_get_min_valid(self):
+        """Test Dataverse.get() with min data."""
         obj = object_min()
-        dict_flat = obj.dict()
+        dict_flat = obj.get()
         dict_assert = dict_flat_dict_min()
         assert dict_flat == dict_assert
 
-    def test_dataverse_dict_full_valid(self):
-        """Test Dataverse.dict() with full data."""
+    def test_dataverse_get_full_valid(self):
+        """Test Dataverse.get() with full data."""
         obj = object_full()
-        dict_flat = obj.dict()
+        dict_flat = obj.get()
         dict_assert = dict_flat_dict_full()
         assert dict_flat == dict_assert
 

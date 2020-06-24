@@ -278,7 +278,6 @@ class TestDatafile(object):
         obj = Datafile()
         obj_assert = object_init()
         assert obj.__dict__ == obj_assert.__dict__
-        assert str(obj) == 'pyDataverse Datafile() model class.'
 
     def test_datafile_set_min_valid(self):
         """Test Datafile.set() with minimum data."""
@@ -305,17 +304,17 @@ class TestDatafile(object):
             assert not result
             assert obj.__dict__ == obj_assert.__dict__
 
-    def test_datafile_dict_min_valid(self):
-        """Test Datafile.dict() with min data."""
+    def test_datafile_get_min_valid(self):
+        """Test Datafile.get() with min data."""
         obj = object_min()
-        dict_flat = obj.dict()
+        dict_flat = obj.get()
         dict_assert = dict_flat_dict_min()
         assert dict_flat == dict_assert
 
-    def test_datafile_dict_full_valid(self):
-        """Test Datafile.dict() with full data."""
+    def test_datafile_get_full_valid(self):
+        """Test Datafile.get() with full data."""
         obj = object_full()
-        dict_flat = obj.dict()
+        dict_flat = obj.get()
         dict_assert = dict_flat_dict_full()
         assert dict_flat == dict_assert
 

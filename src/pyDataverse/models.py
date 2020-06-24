@@ -24,10 +24,6 @@ class DVObject(object):
         self.default_validate_format = 'dataverse_upload'
         self.attr_dv_up_values = None
 
-    def __str__(self):
-        """Return name of class :class:`DVObject` for users."""
-        return 'pyDataverse DVObject() model class.'
-
     def set(self, data):
         """Set class attributes by a flat dictionary.
 
@@ -54,7 +50,7 @@ class DVObject(object):
         else:
             return False
 
-    def dict(self):
+    def get(self):
         """Create flat `dict` of all attributes.
 
         Creates :class:`dict` with all attributes in a flat structure.
@@ -223,8 +219,8 @@ class DVObject(object):
             if format == 'dataverse_upload':
                 for attr in self.attr_dv_up_values:
                     # check if attribute exists
-                    if attr in list(self.dict().keys()):
-                        data[attr] = self.dict()[attr]
+                    if attr in list(self.get().keys()):
+                        data[attr] = self.get()[attr]
             elif format == 'dspace':
                 data = None
                 print('INFO: Not implemented yet.')
@@ -272,10 +268,6 @@ class Dataverse(DVObject):
             'description',
             'name'
         ]
-
-    def __str__(self):
-        """Return name of class :class:`Dataverse()` for users."""
-        return 'pyDataverse Dataverse() model class.'
 
 
 class Dataset(DVObject):
@@ -494,7 +486,7 @@ class Dataset(DVObject):
     ]
 
     """
-    This attributes are excluded from automatic parsing in ds.dict() creation.
+    This attributes are excluded from automatic parsing in ds.get() creation.
     """
     __attr_dict_dv_up_single_dict = [
         'series',
@@ -525,10 +517,6 @@ class Dataset(DVObject):
         """
         super().__init__()
         self.default_validate_schema_filename = 'schemas/json/dataset_upload_default_schema.json'
-
-    def __str__(self):
-        """Return name of Dataset() class for users."""
-        return 'pyDataverse Dataset() model class.'
 
     def from_json(self, filename, format=None, validate=True,
                   filename_schema=None):
@@ -962,7 +950,7 @@ class Dataset(DVObject):
                 data['datasetVersion']['metadataBlocks'] = {}
                 citation = {}
                 citation['fields'] = []
-                data_dict = self.dict()
+                data_dict = self.get()
 
                 """dataset"""
                 # Generate first level attributes
@@ -1260,7 +1248,3 @@ class Datafile(DVObject):
             'pid',
             'filename'
         ]
-
-    def __str__(self):
-        """Return name of Datafile() class for users."""
-        return 'pyDataverse Datafile() model class.'
