@@ -1,0 +1,3 @@
+# Requirements for development.
+tox
+wheel
