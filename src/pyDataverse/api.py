@@ -1,10 +1,9 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Dataverse API connector."""
+"""Dataverse API wrapper for all it's API's."""
 from datetime import datetime
 import json
 from pyDataverse.exceptions import ApiAuthorizationError
-from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.exceptions import DatasetNotFoundError
 from pyDataverse.exceptions import DataverseNotEmptyError
@@ -19,7 +18,7 @@ import subprocess as sp
 
 
 class Api(object):
-    """Api class.
+    """Base class.
 
     Parameters
     ----------
@@ -114,7 +113,7 @@ class Api(object):
             Naming of the API class.
 
         """
-        return 'pyDataverse API class'
+        return 'API: {0}'.format(self.base_url_api)
 
     def get_request(self, url, params=None, auth=False):
         """Make a GET request.
@@ -131,7 +130,7 @@ class Api(object):
 
         Returns
         -------
-        requests.Response
+        class:`requests.Response`
             Response object of requests library.
 
         """
@@ -141,7 +140,7 @@ class Api(object):
                     params = {}
                 params['key'] = str(self.api_token)
             else:
-                ApiAuthorizationError(
+                raise ApiAuthorizationError(
                     'ERROR: GET - Api token not passed to '
                     '`get_request` {}.'.format(url)
                 )
@@ -203,7 +202,7 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                ApiAuthorizationError('ERROR: POST - Api token not available.')
+                raise ApiAuthorizationError('ERROR: POST - Api token not available.')
 
         try:
             resp = post(
@@ -253,7 +252,7 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                ApiAuthorizationError(
+                raise ApiAuthorizationError(
                     'ERROR: PUT - Api token not passed to '
                     '`put_request` {}.'.format(url)
                 )
@@ -302,7 +301,7 @@ class Api(object):
                     params = {}
                 params['key'] = self.api_token
             else:
-                ApiAuthorizationError(
+                raise ApiAuthorizationError(
                     'ERROR: DELETE - Api token not passed to '
                     '`delete_request` {}.'.format(url)
                 )
@@ -321,7 +320,7 @@ class Api(object):
 
 
 class DataAccessApi(Api):
-    """Short summary.
+    """Class to access Dataverse's Data Access API.
 
     Examples
     -------
@@ -356,7 +355,7 @@ class DataAccessApi(Api):
             Naming of the DataAccess API class.
 
         """
-        return 'pyDataverse Data-Access-API class'
+        return 'Data Access API: {0}'.format(self.base_url_api_data_access)
 
     def get_datafile(self, identifier, format=None, noVarHeader=None,
                      imageThumb=None, is_pid=True, auth=False):
@@ -376,8 +375,8 @@ class DataAccessApi(Api):
 
         Parameters
         ----------
-        identifier : string
-            Identifier of the dataset. Can be datafile id or persistent
+        identifier : str
+            Identifier of the datafile. Can be datafile id or persistent
             identifier of the datafile (e. g. doi).
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
@@ -541,13 +540,7 @@ class DataAccessApi(Api):
 
 
 class MetricsApi(Api):
-    """Short summary.
-
-    Examples
-    -------
-    Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
-    >>>
+    """Class to access Dataverse's Metrics API.
 
     Attributes
     ----------
@@ -576,7 +569,7 @@ class MetricsApi(Api):
             Naming of the MetricsApi() class.
 
         """
-        return 'pyDataverse Metrics-API class'
+        return 'Metrics API: {0}'.format(self.base_url_api_metrics)
 
     def total(self, type, date_str=None, auth=False):
         """
@@ -650,6 +643,25 @@ class MetricsApi(Api):
 
 
 class NativeApi(Api):
+    """Class to access Dataverse's Native API.
+
+    Parameters
+    ----------
+    base_url : type
+        Description of parameter `base_url`.
+    api_token : type
+        Description of parameter `api_token`.
+    api_version : type
+        Description of parameter `api_version`.
+
+    Attributes
+    ----------
+    base_url_api_native : type
+        Description of attribute `base_url_api_native`.
+    base_url_api : type
+        Description of attribute `base_url_api`.
+
+    """
 
     def __init__(self, base_url, api_token=None, api_version='v1'):
         """Init an Api() class.
@@ -675,7 +687,7 @@ class NativeApi(Api):
             Naming of the NativeApi() class.
 
         """
-        return 'pyDataverse Native-API class'
+        return 'Native API: {0}'.format(self.base_url_api_native)
 
     def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
@@ -975,6 +987,29 @@ class NativeApi(Api):
         resp = self.get_request(url, auth=auth)
         return resp
 
+    def dataverse_id2alias(self, dataverse_id):
+        """Converts a Dataverse ID to an alias.
+
+        Parameters
+        ----------
+        dataverse_id : str
+            Dataverse ID.
+
+        Returns
+        -------
+        str
+            Dataverse alias
+
+        """
+        resp = self.get_dataverse(dataverse_id)
+        if 'data' in resp.json():
+            if 'alias' in resp.json()['data']:
+                alias = resp.json()['data']['alias']
+                return alias
+        else:
+            print('ERROR: Can not resolve Dataverse ID to alias.')
+            return False
+
     def get_dataset(self, identifier, version=':latest', auth=True, is_pid=True):
         """Get metadata of a Dataset.
 
@@ -1157,8 +1192,8 @@ class NativeApi(Api):
         <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_.
         Then, you must decide which dataverse to create the dataset in and
         target that datavese with either the "alias" of the dataverse (e.g.
-        "root" or the database id of the dataverse (e.g. "1"). The initial
-        version state will be set to DRAFT:
+        "root") or the database id of the dataverse (e.g. "1"). The initial
+        version state will be set to "DRAFT":
 
         Status Code:
             201: dataset created
@@ -1206,6 +1241,85 @@ class NativeApi(Api):
                     print('Dataset with id \'{}\' created.'.format(identifier))
                 else:
                     print('ERROR: No identifier returned for created Dataset.')
+        return resp
+
+    def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
+                              replace=False, auth=True):
+        """Edit metadata of a given dataset.
+
+        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            PUT http://$SERVER/api/datasets/editMetadata/$id --upload-file FILENAME
+
+        Add data to dataset fields that are blank or accept multiple values with
+        the following
+
+        CURL Request:
+
+        .. code-block:: bash
+
+            curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$pid --upload-file dataset-add-metadata.json
+
+        For these edits your JSON file need only include those dataset fields
+        which you would like to edit. A sample JSON file may be downloaded
+        here: `dataset-edit-metadata-sample.json
+        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset. Can be a Dataverse identifier or a
+            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
+        metadata : string
+            Metadata of the Dataset as a json-formatted string.
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
+        replace : bool
+            ``True`` to replace already existing metadata. ``False``, if not.
+        auth : bool
+            ``True``, if an api token should be sent. Defaults to ``False``.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+
+        Examples
+        -------
+        Get dataset metadata::
+
+            >>> data = api.get_dataset_metadata(doi, auth=True)
+            >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
+            >>> resp.status_code
+            200: metadata updated
+
+        """
+        if is_pid:
+            url = '{0}/datasets/:persistentId/editMetadata/?persistentId={1}'.format(self.base_url_api_native, identifier)
+        else:
+            url = '{0}/datasets/editMetadata/{0}'.format(self.base_url_api_native, identifier)
+        params = {'replace': True} if replace else {}
+        resp = self.put_request(url, metadata, auth, params)
+
+        if resp.status_code == 401:
+            error_msg = resp.json()['message']
+            raise ApiAuthorizationError(
+                'ERROR: HTTP 401 - Updating metadata unauthorized. MSG: '
+                ''.format(error_msg)
+            )
+        elif resp.status_code == 400:
+            if 'Error parsing' in resp.json()['message']:
+                print('Wrong passed data format.')
+            else:
+                print('You may not add data to a field that already has data ' +
+                      'and does not allow multiples. ' +
+                      'Use is_replace=true to replace existing data.')
+        elif resp.status_code == 200:
+            print('Dataset {0} updated'.format(identifier))
         return resp
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
@@ -1458,85 +1572,34 @@ class NativeApi(Api):
             print('Dataset {0} destroyed'.format(resp.json()))
         return resp
 
-    def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
-                              replace=False, auth=True):
-        """Edit metadata of a given dataset.
+    def get_datafiles(self, pid, version=':latest', auth=True):
+        """List metadata of all datafiles of a dataset.
 
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#
-        edit-dataset-metadata>`_.
+        `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
 
         HTTP Request:
 
         .. code-block:: bash
 
-            PUT http://$SERVER/api/datasets/editMetadata/$id --upload-file FILENAME
-
-        Add data to dataset fields that are blank or accept multiple values with
-        the following
-
-        CURL Request:
-
-        .. code-block:: bash
-
-            curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$pid --upload-file dataset-add-metadata.json
-
-        For these edits your JSON file need only include those dataset fields
-        which you would like to edit. A sample JSON file may be downloaded
-        here: `dataset-edit-metadata-sample.json
-        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
+            GET http://$SERVER/api/datasets/$id/versions/$versionId/files
 
         Parameters
         ----------
-        identifier : string
-            Identifier of the dataset. Can be a Dataverse identifier or a
-            persistent identifier (e.g. ``doi:10.11587/8H3N93``).
-        metadata : string
-            Metadata of the Dataset as a json-formatted string.
-        is_pid : bool
-            ``True`` to use persistent identifier. ``False``, if not.
-        replace : bool
-            ``True`` to replace already existing metadata. ``False``, if not.
-        auth : bool
-            ``True``, if an api token should be sent. Defaults to ``False``.
+        pid : string
+            Persistent identifier of the dataset. e.g. ``doi:10.11587/8H3N93``.
+        version : string
+            Version of dataset. Defaults to `1`.
 
         Returns
         -------
         requests.Response
             Response object of requests library.
 
-        Examples
-        -------
-        Get dataset metadata::
-
-            >>> data = api.get_dataset_metadata(doi, auth=True)
-            >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
-            >>> resp.status_code
-            200: metadata updated
-
         """
-        if is_pid:
-            url = '{0}/datasets/:persistentId/editMetadata/?persistentId={1}'.format(self.base_url_api_native, identifier)
-        else:
-            url = '{0}/datasets/editMetadata/{0}'.format(self.base_url_api_native, identifier)
-        params = {'replace': True} if replace else {}
-        resp = self.put_request(url, metadata, auth, params)
-
-        if resp.status_code == 401:
-            error_msg = resp.json()['message']
-            raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Updating metadata unauthorized. MSG: '
-                ''.format(error_msg)
-            )
-        elif resp.status_code == 400:
-            if 'Error parsing' in resp.json()['message']:
-                print('Wrong passed data format.')
-            else:
-                print('You may not add data to a field that already has data ' +
-                      'and does not allow multiples. ' +
-                      'Use is_replace=true to replace existing data.')
-        elif resp.status_code == 200:
-            print('Dataset {0} updated'.format(identifier))
+        base_str = '{0}/datasets/:persistentId/versions/'.format(self.base_url_api_native)
+        url = base_str + '{0}/files?persistentId={1}'.format(
+            version, pid)
+        resp = self.get_request(url, auth=auth)
         return resp
 
     def get_datafile_metadata(self, identifier, is_filepid=False, is_draft=False, auth=True):
@@ -1562,6 +1625,56 @@ class NativeApi(Api):
         resp = self.get_request(url, auth=auth)
         return resp
 
+    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
+        """Add file to a dataset.
+
+        Add a file to an existing Dataset. Description and tags are optional:
+
+        HTTP Request:
+
+        .. code-block:: bash
+
+            POST http://$SERVER/api/datasets/$id/add
+
+        The upload endpoint checks the content of the file, compares it with
+        existing files and tells if already in the database (most likely via
+        hashing).
+
+        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
+
+        Parameters
+        ----------
+        identifier : string
+            Identifier of the dataset.
+        filename : string
+            Full filename with path.
+        json_str : string
+            Metadata as JSON string.
+        is_pid : bool
+            ``True`` to use persistent identifier. ``False``, if not.
+
+        Returns
+        -------
+        dict
+            The json string responded by the CURL request, converted to a
+            dict().
+
+        """
+        url = self.base_url_api_native
+        if is_pid:
+            url += '/datasets/:persistentId/add?persistentId={0}'.format(identifier)
+        else:
+            url += '/datasets/{0}/add'.format(identifier)
+
+        files = {'file': open(filename,'rb')}
+        resp = self.post_request(
+            url,
+            data={'jsonData': json_str},
+            files=files,
+            auth=True
+            )
+        return resp
+
     def update_datafile_metadata(self, identifier, json_str=None, is_filepid=False):
         """Update datafile metadata.
 
@@ -1583,8 +1696,7 @@ class NativeApi(Api):
             curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' $SERVER_URL/api/files/$ID/metadata
             curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
 
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
 
         Parameters
         ----------
@@ -1626,57 +1738,6 @@ class NativeApi(Api):
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         return result
 
-    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
-        """Add file to a dataset.
-
-        Add a file to an existing Dataset. Description and tags are optional:
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            POST http://$SERVER/api/datasets/$id/add
-
-        The upload endpoint checks the content of the file, compares it with
-        existing files and tells if already in the database (most likely via
-        hashing).
-
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
-
-        Parameters
-        ----------
-        identifier : string
-            Identifier of the dataset.
-        filename : string
-            Full filename with path.
-        json_str : string
-            Metadata as JSON string.
-        is_pid : bool
-            ``True`` to use persistent identifier. ``False``, if not.
-
-        Returns
-        -------
-        dict
-            The json string responded by the CURL request, converted to a
-            dict().
-
-        """
-        url = self.base_url_api_native
-        if is_pid:
-            url += '/datasets/:persistentId/add?persistentId={0}'.format(identifier)
-        else:
-            url += '/datasets/{0}/add'.format(identifier)
-
-        files = {'file': open(filename,'rb')}
-        resp = self.post_request(
-            url,
-            data={'jsonData': json_str},
-            files=files,
-            auth=True
-            )
-        return resp
-
     def replace_datafile(self, identifier, filename, json_str, is_filepid=True):
         """Replace datafile.
 
@@ -1686,8 +1747,7 @@ class NativeApi(Api):
 
             POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/replace?key={apiKey}
 
-        `Offical documentation
-        <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
+        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
 
         Parameters
         ----------
@@ -1723,36 +1783,6 @@ class NativeApi(Api):
             files=files,
             auth=True
             )
-        return resp
-
-    def get_datafiles(self, pid, version=':latest', auth=True):
-        """List metadata of all datafiles of a dataset.
-
-        `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            GET http://$SERVER/api/datasets/$id/versions/$versionId/files
-
-        Parameters
-        ----------
-        pid : string
-            Persistent identifier of the dataset. e.g. ``doi:10.11587/8H3N93``.
-        version : string
-            Version of dataset. Defaults to `1`.
-
-        Returns
-        -------
-        requests.Response
-            Response object of requests library.
-
-        """
-        base_str = '{0}/datasets/:persistentId/versions/'.format(self.base_url_api_native)
-        url = base_str + '{0}/files?persistentId={1}'.format(
-            version, pid)
-        resp = self.get_request(url, auth=auth)
         return resp
 
     def get_info_version(self, auth=False):
@@ -2004,27 +2034,29 @@ class NativeApi(Api):
         Default: gets all child dataverses if parent = dataverse or all
 
         Example Dataverse Tree:
-        data =
-        {
-            'type': 'dataverse',
-            'dataverse_id': 1,
-            'dataverse_alias': ':root',
-            'children': [
-                {
-                    'type': 'datasets',
-                    'dataset_id': 231,
-                    'pid': 'doi:10.11587/LYFDYC',
-                    'children': [
-                        {
-                            'type': 'datafile'
-                            'datafile_id': 532,
-                            'pid': 'doi:10.11587/LYFDYC/C2WTRN',
-                            'filename': '10082_curation.pdf '
-                        }
-                    ]
-                }
-            ]
-        }
+
+        .. code-block:: bash
+
+            data = {
+                'type': 'dataverse',
+                'dataverse_id': 1,
+                'dataverse_alias': ':root',
+                'children': [
+                    {
+                        'type': 'datasets',
+                        'dataset_id': 231,
+                        'pid': 'doi:10.11587/LYFDYC',
+                        'children': [
+                            {
+                                'type': 'datafile'
+                                'datafile_id': 532,
+                                'pid': 'doi:10.11587/LYFDYC/C2WTRN',
+                                'filename': '10082_curation.pdf '
+                            }
+                        ]
+                    }
+                ]
+            }
 
         Parameters
         ----------
@@ -2123,18 +2155,9 @@ class NativeApi(Api):
                 print('ERROR: \'get_datafiles()\' API request not working.')
         return children
 
-    def dataverse_id2alias(self, dataverse_id):
-        resp = self.get_dataverse(dataverse_id)
-        if 'data' in resp.json():
-            if 'alias' in resp.json()['data']:
-                alias = resp.json()['data']['alias']
-                return alias
-        else:
-            print('ERROR: Can not resolve Dataverse ID to alias.')
-            return False
 
 class SearchApi(Api):
-    """Short summary.
+    """Class to access Dataverse's Search API.
 
     Examples
     -------
@@ -2170,7 +2193,7 @@ class SearchApi(Api):
             Naming of the Search API class.
 
         """
-        return 'pyDataverse Search-API class'
+        return 'Search API: {0}'.format(self.base_url_api_search)
 
     def search(self, q, type=None, subtree=None, sort=None, order=None,
             per_page=None, start=None, show_relevance=None, show_facets=None,
@@ -2209,18 +2232,12 @@ class SearchApi(Api):
 
 
 class SwordApi(Api):
-    """Short summary.
+    """Class to access Dataverse's SWORD API.
 
     Parameters
     ----------
     sword_api_version : type
         Description of parameter `sword_api_version` (the default is 'v1.1').
-
-    Examples
-    -------
-    Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
-    >>>
 
     Attributes
     ----------
@@ -2265,7 +2282,7 @@ class SwordApi(Api):
             Naming of the SWORD API class.
 
         """
-        return 'pyDataverse SWORD-API class'
+        return 'SWORD API: {0}'.format(self.base_url_api_sword)
 
     def get_service_document(self, auth=True):
         url = '{0}/swordv2/service-document'.format(self.base_url_api_sword)
