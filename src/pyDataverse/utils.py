@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Dataverse utility functions."""
+"""Helper functions."""
 import csv
 import json
 from jsonschema import validate
@@ -205,7 +205,7 @@ def read_csv_as_dict(filename, newline='', delimiter=',', quotechar='"',
 
     Recommendation: Name the column name the way you want the attribute to be
     named later in your Dataverse object. See the
-    `pyDataverse templates https://github.com/AUSSDA/pyDataverse_templates>`_
+    `pyDataverse templates <https://github.com/AUSSDA/pyDataverse_templates>`_
     for this. The created :class:`dict` can later be used for the `set()`
     function to create Dataverse objects.
 
@@ -317,3 +317,85 @@ def validate_data(data, filename_schema, format='json'):
     else:
         print('WARNING: No valid format passed.')
         return False
+
+
+def create_dataverse_url(base_url, identifier):
+    """Creates URL of Dataverse.
+
+    Example: https://data.aussda.at/dataverse/autnes
+
+    Parameters
+    ----------
+    base_url : str
+        Base URL of Dataverse instance
+    identifier : string
+        Can either be a dataverse id (long), a dataverse alias (more
+        robust), or the special value ``:root``.
+
+    Returns
+    -------
+    str
+        URL of the dataverse
+
+    """
+    base_url = base_url.rstrip('/')
+    return '{0}/dataverse/{1}'.format(base_url, identifier)
+
+
+def create_dataset_url(base_url, identifier, is_pid):
+    """Creates URL of Dataset.
+
+    Example: https://data.aussda.at/dataset.xhtml?persistentId=doi:10.11587/CCESLK
+
+    Parameters
+    ----------
+    base_url : str
+        Base URL of Dataverse instance
+    identifier : str
+        Identifier of the dataset. Can be dataset id or persistent
+        identifier of the dataset (e. g. doi).
+    is_pid : bool
+        ``True`` to use persistent identifier. ``False``, if not.
+
+    Returns
+    -------
+    str
+        URL of the dataset
+
+    """
+    base_url = base_url.rstrip('/')
+    if is_pid:
+        url = '{0}/dataset.xhtml?persistentId={1}'.format(base_url, identifier)
+    else:
+        url = '{0}/NOT-YET-IMPLEMENTED/{1}'.format(base_url, identifier)
+    return url
+
+
+def create_datafile_url(base_url, identifier, is_filepid):
+    """Creates URL of Datafile.
+
+    Example
+    - File ID: https://data.aussda.at/file.xhtml?persistentId=doi:10.11587/CCESLK/5RH5GK
+
+    Parameters
+    ----------
+    base_url : str
+        Base URL of Dataverse instance
+    identifier : str
+        Identifier of the datafile. Can be datafile id or persistent
+        identifier of the datafile (e. g. doi).
+    is_filepid : bool
+        ``True`` to use persistent identifier. ``False``, if not.
+
+    Returns
+    -------
+    str
+        URL of the datafile
+
+    """
+    base_url = base_url.rstrip('/')
+    if is_filepid:
+        url = '{0}/file.xhtml?persistentId={1}'.format(base_url, identifier)
+    else:
+        url = '{0}/file.xhtml?fileId={1}'.format(base_url, identifier)
+    return url
