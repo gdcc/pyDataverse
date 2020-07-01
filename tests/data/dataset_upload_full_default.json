@@ -4,9 +4,9 @@
     "termsOfUse": "CC0 Waiver",
     "termsOfAccess": "Terms of Access",
     "fileAccessRequest": true,
-    "protocol":"doi",
-    "authority":"10.11587",
-    "identifier":"6AQBYW",
+    "protocol": "doi",
+    "authority": "10.11587",
+    "identifier": "6AQBYW",
     "metadataBlocks": {
       "citation": {
         "displayName": "Citation Metadata",

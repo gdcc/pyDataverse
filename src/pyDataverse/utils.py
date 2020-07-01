@@ -3,8 +3,9 @@
 """Helper functions."""
 import csv
 import json
-from jsonschema import validate
 import pickle
+
+from jsonschema import validate
 
 
 def read_file(filename, mode='r', encoding='utf-8'):
@@ -191,8 +192,8 @@ def write_csv(data, filename, newline='', delimiter=',', quotechar='"',
             writer.writerow(row)
 
 
-def read_csv_as_dict(filename, newline='', delimiter=',', quotechar='"',
-                     encoding='utf-8'):
+def read_csv_as_dicts(filename, newline='', delimiter=',', quotechar='"',
+                      encoding='utf-8'):
     """Read in CSV file into a list of :class:`dict`s.
 
     This offers an easy import functionality of your data from CSV files.
@@ -238,7 +239,7 @@ def read_csv_as_dict(filename, newline='', delimiter=',', quotechar='"',
     return data
 
 
-def write_dict_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
+def write_dicts_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"'):
     """Write :class:`dict` to a CSV file
 
     This offers an easy export functionality of your data to a CSV files.

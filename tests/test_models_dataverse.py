@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 """Dataverse data model tests."""
 import json
-import jsonschema
 import os
-from pyDataverse.models import Dataverse
-from pyDataverse.models import DVObject
-import pytest
 
+import jsonschema
+
+import pytest
+from pyDataverse.models import Dataverse, DVObject
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -85,7 +85,6 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
         print('An error occured trying to write the file {}.'.format(filename))
     except Exception as e:
         raise e
-
 
 
 def dict_flat_set_min():
@@ -171,7 +170,8 @@ def object_full():
     dv = object_init()
     dv.alias = 'science'
     dv.name = 'Scientific Research'
-    dv.dataverseContacts = [{'contactEmail': 'pi@example.edu'},{'contactEmail': 'student@example.edu'}]
+    dv.dataverseContacts = [{'contactEmail': 'pi@example.edu'}, {
+        'contactEmail': 'student@example.edu'}]
     dv.affiliation = 'Scientific Research University'
     dv.description = 'We do all the science.'
     dv.dataverseType = 'LABORATORY'
@@ -340,7 +340,8 @@ class TestDataverse(object):
     def test_dataverse_from_json_min_valid(self):
         """Test Dataverse.from_json() with min data."""
         obj = object_init()
-        result = obj.from_json('tests/data/dataverse_upload_min.json', validate=False)
+        result = obj.from_json(
+            'tests/data/dataverse_upload_min.json', validate=False)
         obj_assert = object_min()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
@@ -354,13 +355,15 @@ class TestDataverse(object):
         assert obj_assert.__dict__ == obj.__dict__
 
         obj = object_init()
-        result = obj.from_json('tests/data/dataverse_upload_full.json', validate=False)
+        result = obj.from_json(
+            'tests/data/dataverse_upload_full.json', validate=False)
         obj_assert = object_full()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
 
         obj = object_init()
-        result = obj.from_json('tests/data/dataverse_upload_full.json', validate=False, filename_schema='wrong')
+        result = obj.from_json(
+            'tests/data/dataverse_upload_full.json', validate=False, filename_schema='wrong')
         obj_assert = object_full()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
@@ -370,18 +373,21 @@ class TestDataverse(object):
         # filename_schema=wrong
         with pytest.raises(FileNotFoundError):
             obj = object_init()
-            obj.from_json(os.path.join(TEST_DIR, '/data/dataverse_upload_min.json'), filename_schema='wrong')
+            obj.from_json(os.path.join(
+                TEST_DIR, '/data/dataverse_upload_min.json'), filename_schema='wrong')
 
         # format=wrong
         obj = object_init()
-        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataverse_upload_min.json'), format='wrong')
+        result = obj.from_json(os.path.join(
+            TEST_DIR, '/data/dataverse_upload_min.json'), format='wrong')
         obj_assert = object_init()
         assert not result
         assert obj_assert.__dict__ == obj.__dict__
 
         # format=wrong, validate=False
         obj = object_init()
-        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataverse_upload_min.json'), format='wrong', validate=False)
+        result = obj.from_json(os.path.join(
+            TEST_DIR, '/data/dataverse_upload_min.json'), format='wrong', validate=False)
         obj_assert = object_init()
         assert not result
         assert obj_assert.__dict__ == obj.__dict__
@@ -490,9 +496,11 @@ class TestDataverse(object):
         if not os.environ.get('TRAVIS'):
             obj = object_min()
             data = obj.to_json(validate=False, as_dict=True)
-            write_json(os.path.join(TEST_DIR + '/data/output/dataverse_upload_min.json'), data)
+            write_json(os.path.join(
+                TEST_DIR + '/data/output/dataverse_upload_min.json'), data)
             obj_new = Dataverse()
-            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataverse_upload_min.json'), validate=False)
+            obj_new.from_json(os.path.join(
+                TEST_DIR + '/data/output/dataverse_upload_min.json'), validate=False)
             assert obj_new.__dict__ == obj.__dict__
 
     def test_dataverse_to_json_from_json_full(self):
@@ -500,7 +508,9 @@ class TestDataverse(object):
         if not os.environ.get('TRAVIS'):
             obj = object_full()
             data = obj.to_json(validate=False, as_dict=True)
-            write_json(os.path.join(TEST_DIR + '/data/output/dataverse_upload_full.json'), data)
+            write_json(os.path.join(
+                TEST_DIR + '/data/output/dataverse_upload_full.json'), data)
             obj_new = Dataverse()
-            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataverse_upload_full.json'), validate=False)
+            obj_new.from_json(os.path.join(
+                TEST_DIR + '/data/output/dataverse_upload_full.json'), validate=False)
             assert obj_new.__dict__ == obj.__dict__

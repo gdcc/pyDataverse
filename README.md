@@ -9,14 +9,14 @@ and Datafiles.
 
 **Features**
 
-* Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles of your Dataverse instance via Api.
-* Dataverse metadata model for easy manipulation and data conversion from and to other formats (e. g. Dataverse Api metadata JSON).
-* Utils to support core functionalities.
-* Custom exceptions
-* Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
-* [Documentation](https://pydataverse.readthedocs.io/en/latest/) (Sphinx, ReadTheDocs)
-* Python 3
-* Open Source ([MIT](https://opensource.org/licenses/MIT))
+-   Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles of your Dataverse instance via Api.
+-   Dataverse metadata model for easy manipulation and data conversion from and to other formats (e. g. Dataverse Api metadata JSON).
+-   Utils to support core functionalities.
+-   Custom exceptions
+-   Tests on [Travis CI](https://travis-ci.com/AUSSDA/pyDataverse) ([pytest](https://docs.pytest.org/en/latest/) + [tox](http://tox.readthedocs.io/)).
+-   [Documentation](https://pydataverse.readthedocs.io/en/latest/) (Sphinx, ReadTheDocs)
+-   Python 3
+-   Open Source ([MIT](https://opensource.org/licenses/MIT))
 
 **pyDataverse pipeline**
 
@@ -24,9 +24,8 @@ and Datafiles.
 
 **Copyright**
 
-* Sourcecode:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
-* Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
-
+-   Sourcecode:  [![GitHub](https://img.shields.io/github/license/aussda/pydataverse.svg)](https://opensource.org/licenses/MIT)
+-   Documentation:  [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
 ## QUICKSTART
 

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """Dataverse data-types data model."""
 from __future__ import absolute_import
+
 import json
-from pyDataverse.utils import read_json
-from pyDataverse.utils import validate_data
-from pyDataverse.utils import write_json
+
+from pyDataverse.utils import read_json, validate_data, write_json
 
 
 class DVObject(object):
@@ -86,7 +86,6 @@ class DVObject(object):
             `True` if JSON validate correctly, `False` if not.
 
         """
-
         """List of allowed JSON formats to be validated."""
         allowed_formats = [
             'dataverse_upload',
@@ -101,7 +100,8 @@ class DVObject(object):
 
         data_json = self.to_json(format=format, validate=False)
         if data_json:
-            is_valid = validate_data(json.loads(data_json), filename_schema, format='json')
+            is_valid = validate_data(json.loads(
+                data_json), filename_schema, format='json')
             if is_valid:
                 return True
             else:
@@ -159,7 +159,8 @@ class DVObject(object):
                     if key in self.attr_dv_up_values:
                         data[key] = data_json[key]
                     else:
-                        print('INFO: Attribute {0} not valid for import (format=`{1}`).'.format(key, format))
+                        print('INFO: Attribute {0} not valid for import (format=`{1}`).'.format(
+                            key, format))
                 self.set(data)
                 return True
             elif format == 'dataverse_download':
@@ -447,29 +448,29 @@ class Dataset(DVObject):
         'subtitle',
         'title'
     ] + __attr_import_dv_up_citation_fields_arrays['dateOfCollection'] \
-    + __attr_import_dv_up_citation_fields_arrays['datasetContact'] \
-    + __attr_import_dv_up_citation_fields_arrays['distributor'] \
-    + __attr_import_dv_up_citation_fields_arrays['dsDescription'] \
-    + __attr_import_dv_up_citation_fields_arrays['grantNumber'] \
-    + __attr_import_dv_up_citation_fields_arrays['keyword'] \
-    + __attr_import_dv_up_citation_fields_arrays['producer'] \
-    + __attr_import_dv_up_citation_fields_arrays['otherId'] \
-    + __attr_import_dv_up_citation_fields_arrays['software'] \
-    + __attr_import_dv_up_citation_fields_arrays['timePeriodCovered'] \
-    + __attr_import_dv_up_citation_fields_arrays['topicClassification'] \
-    + __attr_import_dv_up_geospatial_fields_values \
-    + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
-    + __attr_import_dv_up_socialscience_fields_values \
-    + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
-    + ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText'] \
-    + ['targetSampleActualSize', 'targetSampleSizeFormula'] \
+        + __attr_import_dv_up_citation_fields_arrays['datasetContact'] \
+        + __attr_import_dv_up_citation_fields_arrays['distributor'] \
+        + __attr_import_dv_up_citation_fields_arrays['dsDescription'] \
+        + __attr_import_dv_up_citation_fields_arrays['grantNumber'] \
+        + __attr_import_dv_up_citation_fields_arrays['keyword'] \
+        + __attr_import_dv_up_citation_fields_arrays['producer'] \
+        + __attr_import_dv_up_citation_fields_arrays['otherId'] \
+        + __attr_import_dv_up_citation_fields_arrays['software'] \
+        + __attr_import_dv_up_citation_fields_arrays['timePeriodCovered'] \
+        + __attr_import_dv_up_citation_fields_arrays['topicClassification'] \
+        + __attr_import_dv_up_geospatial_fields_values \
+        + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
+        + __attr_import_dv_up_socialscience_fields_values \
+        + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
+        + ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText'] \
+        + ['targetSampleActualSize', 'targetSampleSizeFormula'] \
 
     """typeClass compound."""
     __attr_dict_dv_up_typeClass_compound = [
     ] + list(__attr_import_dv_up_citation_fields_arrays.keys()) \
-    + list(__attr_import_dv_up_geospatial_fields_arrays.keys()) \
-    + list(__attr_import_dv_up_journal_fields_arrays.keys()) \
-    + ['series', 'socialScienceNotes', 'targetSampleSize']
+        + list(__attr_import_dv_up_geospatial_fields_arrays.keys()) \
+        + list(__attr_import_dv_up_journal_fields_arrays.keys()) \
+        + ['series', 'socialScienceNotes', 'targetSampleSize']
 
     """typeClass controlledVocabulary."""
     __attr_dict_dv_up_typeClass_controlledVocabulary = [
@@ -574,7 +575,8 @@ class Dataset(DVObject):
                         if key in self.__attr_import_dv_up_datasetVersion_values:
                             data[key] = val
                         else:
-                            print('Attribute {0} not valid for import (format={1}).'.format(key, format))
+                            print('Attribute {0} not valid for import (format={1}).'.format(
+                                key, format))
 
                 if 'metadataBlocks' in dict_json['datasetVersion']:
 
@@ -598,7 +600,8 @@ class Dataset(DVObject):
                                 if 'seriesInformation' in field['value']:
                                     data['series']['seriesInformation'] = field['value']['seriesInformation']['value']
                             else:
-                                print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
+                                print('Attribute {0} not valid for import (dv_up).'.format(
+                                    field['typeName']))
                     else:
                         # TODO: Exception
                         pass
@@ -618,7 +621,8 @@ class Dataset(DVObject):
                                     field['value'],
                                     self.__attr_import_dv_up_geospatial_fields_arrays[field['typeName']])
                             else:
-                                print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
+                                print('Attribute {0} not valid for import (dv_up).'.format(
+                                    field['typeName']))
                     else:
                         # TODO: Exception
                         pass
@@ -649,7 +653,8 @@ class Dataset(DVObject):
                                 if 'socialScienceNotesText' in field['value']:
                                     data['socialScienceNotes']['socialScienceNotesText'] = field['value']['socialScienceNotesText']['value']
                             else:
-                                print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
+                                print('Attribute {0} not valid for import (dv_up).'.format(
+                                    field['typeName']))
                     else:
                         # TODO: Exception
                         pass
@@ -670,7 +675,8 @@ class Dataset(DVObject):
                                     field['value'],
                                     self.__attr_import_dv_up_journal_fields_arrays[field['typeName']])
                             else:
-                                print('Attribute {0} not valid for import (dv_up).'.format(field['typeName']))
+                                print('Attribute {0} not valid for import (dv_up).'.format(
+                                    field['typeName']))
                     else:
                         # TODO: Exception
                         pass
@@ -766,7 +772,8 @@ class Dataset(DVObject):
 
         data_json = self.to_json(format=format, validate=False)
         if data_json:
-            is_valid = validate_data(json.loads(data_json), filename_schema, format='json')
+            is_valid = validate_data(json.loads(
+                data_json), filename_schema, format='json')
             if not is_valid:
                 return False
         else:
@@ -1233,7 +1240,6 @@ class Datafile(DVObject):
             'schemas/json/datafile_upload_schema.json'
 
         """
-
         super().__init__()
         self.default_validate_schema_filename = 'schemas/json/datafile_upload_schema.json'
 

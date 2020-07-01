@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 """Dataset data model tests."""
 import json
-import jsonschema
 import os
-from pyDataverse.models import Dataset
-from pyDataverse.models import DVObject
-import pytest
 
+import jsonschema
+
+import pytest
+from pyDataverse.models import Dataset, DVObject
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -149,7 +149,7 @@ def dict_flat_set_full():
         'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
         'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
         'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
-        'subject': ['Agricultural Sciences','Business and Management','Engineering','Law'],
+        'subject': ['Agricultural Sciences', 'Business and Management', 'Engineering', 'Law'],
         'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
         'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
         'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
@@ -234,9 +234,12 @@ def object_min():
     ds = object_init()
 
     ds.title = 'Darwin\'s Finches'
-    ds.author = [{'authorName': 'Finch, Fiona','authorAffiliation': 'Birds Inc.'}]
-    ds.datasetContact = [{'datasetContactEmail': 'finch@mailinator.com','datasetContactName': 'Finch, Fiona'}]
-    ds.dsDescription = [{'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'}]
+    ds.author = [{'authorName': 'Finch, Fiona',
+                  'authorAffiliation': 'Birds Inc.'}]
+    ds.datasetContact = [
+        {'datasetContactEmail': 'finch@mailinator.com', 'datasetContactName': 'Finch, Fiona'}]
+    ds.dsDescription = [
+        {'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'}]
     ds.subject = ['Medicine, Health and Life Sciences']
     ds.citation_displayName = 'Citation Metadata'
     return ds
@@ -266,30 +269,46 @@ def object_full():
     ds.subtitle = 'Subtitle'
     ds.alternativeTitle = 'Alternative Title'
     ds.alternativeURL = 'http://AlternativeURL.org'
-    ds.otherId = [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}]
-    ds.author = [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}]
-    ds.datasetContact = [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}]
-    ds.dsDescription = [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}]
-    ds.subject = ['Agricultural Sciences','Business and Management','Engineering','Law']
-    ds.keyword = [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}]
-    ds.topicClassification = [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}]
-    ds.publication = [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}]
+    ds.otherId = [{'otherIdAgency': 'OtherIDAgency1',
+                   'otherIdValue': 'OtherIDIdentifier1'}]
+    ds.author = [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1',
+                  'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}]
+    ds.datasetContact = [{'datasetContactName': 'LastContact1, FirstContact1',
+                          'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}]
+    ds.dsDescription = [
+        {'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}]
+    ds.subject = ['Agricultural Sciences',
+                  'Business and Management', 'Engineering', 'Law']
+    ds.keyword = [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1',
+                   'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}]
+    ds.topicClassification = [{'topicClassValue': 'Topic Class Value1',
+                               'topicClassVocab': 'Topic Classification Vocabulary'}]
+    ds.publication = [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark',
+                       'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}]
     ds.notesText = 'Notes1'
-    ds.producer = [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}]
+    ds.producer = [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1',
+                    'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}]
     ds.productionDate = '1003-01-01'
     ds.productionPlace = 'ProductionPlace'
-    ds.contributor = [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}]
-    ds.grantNumber = [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}]
-    ds.distributor = [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}]
+    ds.contributor = [{'contributorType': 'Data Collector',
+                       'contributorName': 'LastContributor1, FirstContributor1'}]
+    ds.grantNumber = [{'grantNumberAgency': 'GrantInformationGrantAgency1',
+                       'grantNumberValue': 'GrantInformationGrantNumber1'}]
+    ds.distributor = [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1',
+                       'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}]
     ds.distributionDate = '1004-01-01'
     ds.depositor = 'LastDepositor, FirstDepositor'
     ds.dateOfDeposit = '1002-01-01'
-    ds.timePeriodCovered = [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}]
-    ds.dateOfCollection = [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}]
+    ds.timePeriodCovered = [
+        {'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}]
+    ds.dateOfCollection = [
+        {'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}]
     ds.kindOfData = ['KindOfData1', 'KindOfData2']
     ds.language = ['German']
-    ds.series = {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'}
-    ds.software = [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}]
+    ds.series = {'seriesName': 'SeriesName',
+                 'seriesInformation': 'SeriesInformation'}
+    ds.software = [{'softwareName': 'SoftwareName1',
+                    'softwareVersion': 'SoftwareVersion1'}]
     ds.relatedMaterial = ['RelatedMaterial1', 'RelatedMaterial2']
     ds.relatedDatasets = ['RelatedDatasets1', 'RelatedDatasets2']
     ds.otherReferences = ['OtherReferences1', 'OtherReferences2']
@@ -300,9 +319,11 @@ def object_full():
 
     """geospatial"""
     ds.geospatial_displayName = 'Geospatial Metadata'
-    ds.geographicCoverage = [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}]
+    ds.geographicCoverage = [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1',
+                              'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}]
     ds.geographicUnit = ['GeographicUnit1', 'GeographicUnit2']
-    ds.geographicBoundingBox = [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}]
+    ds.geographicBoundingBox = [
+        {'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}]
 
     """socialscience"""
     ds.socialscience_displayName = 'Social Science and Humanities Metadata'
@@ -313,7 +334,8 @@ def object_full():
     ds.collectorTraining = 'CollectorTraining'
     ds.frequencyOfDataCollection = 'Frequency'
     ds.samplingProcedure = 'SamplingProcedure'
-    ds.targetSampleSize = {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'}
+    ds.targetSampleSize = {'targetSampleActualSize': '100',
+                           'targetSampleSizeFormula': 'TargetSampleSizeFormula'}
     ds.deviationsFromSampleDesign = 'MajorDeviationsForSampleDesign'
     ds.collectionMode = 'CollectionMode'
     ds.researchInstrument = 'TypeOfResearchInstrument'
@@ -326,11 +348,13 @@ def object_full():
     ds.responseRate = 'ResponseRate'
     ds.samplingErrorEstimates = 'EstimatesOfSamplingError'
     ds.otherDataAppraisal = 'OtherFormsOfDataAppraisal'
-    ds.socialScienceNotes = {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'}
+    ds.socialScienceNotes = {'socialScienceNotesType': 'NotesType',
+                             'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'}
 
     """journal"""
     ds.journal_displayName = 'Journal Metadata'
-    ds.journalVolumeIssue = [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}]
+    ds.journalVolumeIssue = [{'journalVolume': 'JournalVolume1',
+                              'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}]
     ds.journalArticleType = 'abstract'
 
     return ds
@@ -401,7 +425,7 @@ def dict_flat_dict_full():
         'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
         'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
         'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
-        'subject': ['Agricultural Sciences','Business and Management','Engineering','Law'],
+        'subject': ['Agricultural Sciences', 'Business and Management', 'Engineering', 'Law'],
         'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
         'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
         'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
@@ -639,7 +663,8 @@ class TestDataset(object):
     def test_dataset_from_json_min_valid(self):
         """Test Dataset.from_json() with min data."""
         obj = object_init()
-        result = obj.from_json('tests/data/dataset_upload_min_default.json', validate=False)
+        result = obj.from_json(
+            'tests/data/dataset_upload_min_default.json', validate=False)
         obj_assert = object_min()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
@@ -653,13 +678,15 @@ class TestDataset(object):
         assert obj_assert.__dict__ == obj.__dict__
 
         obj = object_init()
-        result = obj.from_json('tests/data/dataset_upload_full_default.json', validate=False)
+        result = obj.from_json(
+            'tests/data/dataset_upload_full_default.json', validate=False)
         obj_assert = object_full()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
 
         obj = object_init()
-        result = obj.from_json('tests/data/dataset_upload_full_default.json', validate=False, filename_schema='wrong')
+        result = obj.from_json(
+            'tests/data/dataset_upload_full_default.json', validate=False, filename_schema='wrong')
         obj_assert = object_full()
         assert result
         assert obj_assert.__dict__ == obj.__dict__
@@ -669,18 +696,21 @@ class TestDataset(object):
         # filename_schema=wrong
         with pytest.raises(FileNotFoundError):
             obj = object_init()
-            obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), filename_schema='wrong')
+            obj.from_json(os.path.join(
+                TEST_DIR, '/data/dataset_upload_min_default.json'), filename_schema='wrong')
 
         # format=wrong
         obj = object_init()
-        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong')
+        result = obj.from_json(os.path.join(
+            TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong')
         obj_assert = object_init()
         assert not result
         assert obj_assert.__dict__ == obj.__dict__
 
         # format=wrong, validate=False
         obj = object_init()
-        result = obj.from_json(os.path.join(TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong', validate=False)
+        result = obj.from_json(os.path.join(
+            TEST_DIR, '/data/dataset_upload_min_default.json'), format='wrong', validate=False)
         obj_assert = object_init()
         assert not result
         assert obj_assert.__dict__ == obj.__dict__
@@ -790,9 +820,11 @@ class TestDataset(object):
         if not os.environ.get('TRAVIS'):
             obj = object_min()
             data = obj.to_json(validate=False, as_dict=True)
-            write_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_min_default.json'), data)
+            write_json(os.path.join(
+                TEST_DIR + '/data/output/dataset_upload_min_default.json'), data)
             obj_new = Dataset()
-            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_min_default.json'), validate=False)
+            obj_new.from_json(os.path.join(
+                TEST_DIR + '/data/output/dataset_upload_min_default.json'), validate=False)
             assert obj_new.__dict__ == obj.__dict__
 
     def test_dataset_to_json_from_json_full(self):
@@ -800,7 +832,9 @@ class TestDataset(object):
         if not os.environ.get('TRAVIS'):
             obj = object_full()
             data = obj.to_json(validate=False, as_dict=True)
-            write_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_full_default.json'), data)
+            write_json(os.path.join(
+                TEST_DIR + '/data/output/dataset_upload_full_default.json'), data)
             obj_new = Dataset()
-            obj_new.from_json(os.path.join(TEST_DIR + '/data/output/dataset_upload_full_default.json'), validate=False)
+            obj_new.from_json(os.path.join(
+                TEST_DIR + '/data/output/dataset_upload_full_default.json'), validate=False)
             assert obj_new.__dict__ == obj.__dict__
