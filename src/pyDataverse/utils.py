@@ -25,8 +25,14 @@ def read_file(filename, mode='r', encoding='utf-8'):
         Returns data as string.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(mode, str)
+    assert isinstance(encoding, str)
+
     with open(filename, mode, encoding=encoding) as f:
         data = f.read()
+
+    assert isinstance(data, str)
     return data
 
 
@@ -46,6 +52,11 @@ def write_file(filename, data, mode='w', encoding='utf-8'):
         Character encoding of file. Defaults to 'utf-8'.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(data, str)
+    assert isinstance(mode, str)
+    assert isinstance(encoding, str)
+
     with open(filename, mode, encoding=encoding) as f:
         f.write(data)
 
@@ -72,8 +83,14 @@ def read_json(filename, mode='r', encoding='utf-8'):
         Data as a json-formatted string.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(mode, str)
+    assert isinstance(encoding, str)
+
     with open(filename, mode, encoding=encoding) as f:
         data = json.load(f)
+
+    assert isinstance(data, dict)
     return data
 
 
@@ -93,6 +110,11 @@ def write_json(filename, data, mode='w', encoding='utf-8'):
         Character encoding of file. Defaults to 'utf-8'.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(data, str)
+    assert isinstance(mode, str)
+    assert isinstance(encoding, str)
+
     with open(filename, mode, encoding=encoding) as f:
         json.dump(data, f, indent=2)
 
@@ -109,12 +131,16 @@ def read_pickle(filename):
 
     Returns
     -------
-    data
+    dict
         Data object.
 
     """
+    assert isinstance(filename, str)
+
     with open(filename, 'rb') as f:
         data = pickle.load(f)
+
+        assert isinstance(data, dict)
         return data
 
 
@@ -127,10 +153,13 @@ def write_pickle(filename, data):
     ----------
     filename : string
         Full filename with path of file.
-    data : object
+    data : dict
         Data to write in pickle file.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(data, dict)
+
     with open(filename, 'wb') as f:
         pickle.dump(data, f)
 
@@ -160,8 +189,16 @@ def read_csv(filename, newline='', delimiter=',', quotechar='"',
         Reader object, which can be iterated over.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(newline, str)
+    assert isinstance(delimiter, str)
+    assert isinstance(quotechar, str)
+    assert isinstance(encoding, str)
+
     with open(filename, newline=newline, encoding=encoding) as csvfile:
-        return csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        csv_reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        assert isinstance(csv_reader, csv.reader)
+        return csv_reader
 
 
 def write_csv(data, filename, newline='', delimiter=',', quotechar='"',
@@ -186,6 +223,13 @@ def write_csv(data, filename, newline='', delimiter=',', quotechar='"',
         Character encoding of file. Defaults to 'utf-8'.
 
     """
+    assert isinstance(data, list)
+    assert isinstance(filename, str)
+    assert isinstance(newline, str)
+    assert isinstance(delimiter, str)
+    assert isinstance(quotechar, str)
+    assert isinstance(encoding, str)
+
     with open(filename, 'w', newline=newline, encoding=encoding) as csvfile:
         writer = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar)
         for row in data:
@@ -230,12 +274,19 @@ def read_csv_as_dicts(filename, newline='', delimiter=',', quotechar='"',
         named after the columen names.
 
     """
+    assert isinstance(filename, str)
+    assert isinstance(newline, str)
+    assert isinstance(delimiter, str)
+    assert isinstance(quotechar, str)
+    assert isinstance(encoding, str)
+
     with open(filename, 'r', newline=newline, encoding=encoding) as csvfile:
         reader = csv.DictReader(csvfile, delimiter=delimiter,
                                 quotechar=quotechar)
         data = []
         for row in reader:
             data.append(dict(row))
+    assert isinstance(data, list)
     return data
 
 
@@ -247,8 +298,8 @@ def write_dicts_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"')
 
     Parameters
     ----------
-    data : type
-        Description of parameter `data`.
+    data : dict
+        Dictionary with columns as keys, to be written in the CSV file.
     fieldnames : list
         Sequence of keys that identify the order of the columns.
     filename : string
@@ -259,6 +310,12 @@ def write_dicts_as_csv(data, fieldnames, filename, delimiter=',', quotechar='"')
         Quote-character of CSV file. Defaults to '"'.
 
     """
+    assert isinstance(data, str)
+    assert isinstance(fieldnames, list)
+    assert isinstance(filename, str)
+    assert isinstance(delimiter, str)
+    assert isinstance(quotechar, str)
+
     with open(filename, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -286,12 +343,16 @@ def clean_string(str):
         Cleaned string.
 
     """
+    assert isinstance(str, str)
+
     clean_str = str.strip()
     clean_str = clean_str.replace('  ', ' ')
+
+    assert isinstance(clean_str, str)
     return clean_str
 
 
-def validate_data(data, filename_schema, format='json'):
+def validate_data(data, filename_schema, file_format='json'):
     """Validate data against a schema.
 
     Parameters
@@ -300,8 +361,8 @@ def validate_data(data, filename_schema, format='json'):
         Data to be validated.
     filename_schema : string
         Filename with full path of the schema file.
-    format : string
-        Data format of file to be validated.
+    file_format : string
+        File format to be validated.
 
     Returns
     -------
@@ -309,10 +370,14 @@ def validate_data(data, filename_schema, format='json'):
         `True` if data was validated, `False` if not.
 
     """
-    if format == 'json':
+    assert isinstance(data, dict)
+    assert isinstance(filename_schema, str)
+    assert isinstance(file_format, str)
+
+    if file_format == 'json':
         validate(instance=data, schema=read_json(filename_schema))
         return True
-    elif format == 'xml':
+    elif file_format == 'xml':
         print('INFO: Not implemented yet.')
         return False
     else:
@@ -339,8 +404,13 @@ def create_dataverse_url(base_url, identifier):
         URL of the dataverse
 
     """
+    assert isinstance(base_url, str)
+    assert isinstance(identifier, str)
+
     base_url = base_url.rstrip('/')
-    return '{0}/dataverse/{1}'.format(base_url, identifier)
+    url = '{0}/dataverse/{1}'.format(base_url, identifier)
+    assert isinstance(url, str)
+    return url
 
 
 def create_dataset_url(base_url, identifier, is_pid):
@@ -364,11 +434,16 @@ def create_dataset_url(base_url, identifier, is_pid):
         URL of the dataset
 
     """
+    assert isinstance(base_url, str)
+    assert isinstance(identifier, str)
+    assert isinstance(is_pid, bool)
+
     base_url = base_url.rstrip('/')
     if is_pid:
         url = '{0}/dataset.xhtml?persistentId={1}'.format(base_url, identifier)
     else:
         url = '{0}/NOT-YET-IMPLEMENTED/{1}'.format(base_url, identifier)
+        assert isinstance(url, str)
     return url
 
 
@@ -394,9 +469,13 @@ def create_datafile_url(base_url, identifier, is_filepid):
         URL of the datafile
 
     """
+    assert isinstance(base_url, str)
+    assert isinstance(identifier, str)
+
     base_url = base_url.rstrip('/')
     if is_filepid:
         url = '{0}/file.xhtml?persistentId={1}'.format(base_url, identifier)
     else:
         url = '{0}/file.xhtml?fileId={1}'.format(base_url, identifier)
+    assert isinstance(url, str)
     return url
