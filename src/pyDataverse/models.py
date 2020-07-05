@@ -79,8 +79,6 @@ class DVObject(object):
 
         Parameters
         ----------
-        data_format : string
-            Data formats to be validated. See `allowed_json_formats`.
         filename_schema : string
             Filename of JSON schema with full path.
 
@@ -248,9 +246,6 @@ class Dataverse(DVObject):
         'dataverse_upload',
         'dataverse_download'
         ]
-
-        """List of attributes to be imported or exported for `dataverse_upload`
-        JSON format."""
         self.json_dataverse_upload_attr = [
             'affiliation',
             'alias',
@@ -531,16 +526,88 @@ class Dataset(DVObject):
             'dspace',
             'custom'
         ]
+        self.json_dataverse_upload_attr = [
+            'license',
+            'termsOfUse',
+            'termsOfAccess',
+            'fileAccessRequest',
+            'protocol',
+            'authority',
+            'identifier',
+            'citation_displayName',
+            'title',
+            'subtitle',
+            'alternativeTitle',
+            'alternativeURL',
+            'otherId',
+            'author',
+            'datasetContact',
+            'dsDescription',
+            'subject',
+            'keyword',
+            'topicClassification',
+            'publication',
+            'notesText',
+            'producer',
+            'productionDate',
+            'productionPlace',
+            'contributor',
+            'grantNumber',
+            'distributor',
+            'distributionDate',
+            'depositor',
+            'dateOfDeposit',
+            'timePeriodCovered',
+            'dateOfCollection',
+            'kindOfData',
+            'language',
+            'series',
+            'software',
+            'relatedMaterial',
+            'relatedDatasets',
+            'otherReferences',
+            'dataSources',
+            'originOfSources',
+            'characteristicOfSources',
+            'accessToSources',
+            'geospatial_displayName',
+            'geographicCoverage',
+            'geographicUnit',
+            'geographicBoundingBox',
+            'socialscience_displayName',
+            'unitOfAnalysis',
+            'universe',
+            'timeMethod',
+            'dataCollector',
+            'collectorTraining',
+            'frequencyOfDataCollection',
+            'samplingProcedure',
+            'targetSampleSize',
+            'deviationsFromSampleDesign',
+            'collectionMode',
+            'researchInstrument',
+            'dataCollectionSituation',
+            'actionsToMinimizeLoss',
+            'controlOperations',
+            'weighting',
+            'cleaningOperations',
+            'datasetLevelErrorNotes',
+            'responseRate',
+            'samplingErrorEstimates',
+            'otherDataAppraisal',
+            'socialScienceNotes',
+            'journal_displayName',
+            'journalVolumeIssue',
+            'journalArticleType'
+        ]
 
-    def validate_json(self, data_format=None, filename_schema=None):
+    def validate_json(self, filename_schema=None):
         """Validate JSON formats of Dataset.
 
         Check if JSON data structure is valid.
 
         Parameters
         ----------
-        format : string
-            Data formats to be validated. See `allowed_json_formats`.
         filename_schema : string
             Filename of JSON schema with full path.
 
@@ -571,16 +638,15 @@ class Dataset(DVObject):
             True
 
         """
-        is_valid = True
-        if not format:
-            format = self.default_json_format
-        if not filename_schema:
+        if filename_schema is None:
             filename_schema = self.default_json_schema_filename
+        assert isinstance(filename_schema, str)
 
-        data_json = self.to_json(format=format, validate=False)
+        is_valid = True
+
+        data_json = self.to_json(validate=False)
         if data_json:
-            is_valid = validate_data(json.loads(
-                data_json), filename_schema, file_format='json')
+            is_valid = validate_data(json.loads(data_json), filename_schema, file_format='json')
             if not is_valid:
                 return False
         else:
@@ -589,7 +655,7 @@ class Dataset(DVObject):
         # check if all required attributes are set
         for attr in self.__attr_dict_dv_up_required:
             if attr in list(self.__dict__.keys()):
-                if not self.__getattr__(attr):
+                if not self.__getattribute__(attr):
                     is_valid = False
                     print('Attribute \'{0}\' is `False`.'.format(attr))
             else:
@@ -598,7 +664,7 @@ class Dataset(DVObject):
 
         # check if attributes set are complete where necessary
         if 'timePeriodCovered' in list(self.__dict__.keys()):
-            tp_cov = self.__getattr__('timePeriodCovered')
+            tp_cov = self.__getattribute__('timePeriodCovered')
             if tp_cov:
                 for tp in tp_cov:
                     if 'timePeriodCoveredStart' in tp or 'timePeriodCoveredEnd' in tp:
@@ -607,7 +673,7 @@ class Dataset(DVObject):
                             print('timePeriodCovered attribute missing.')
 
         if 'dateOfCollection' in list(self.__dict__.keys()):
-            d_coll = self.__getattr__('dateOfCollection')
+            d_coll = self.__getattribute__('dateOfCollection')
             if d_coll:
                 for d in d_coll:
                     if 'dateOfCollectionStart' in d or 'dateOfCollectionEnd' in d:
@@ -616,7 +682,7 @@ class Dataset(DVObject):
                             print('dateOfCollection attribute missing.')
 
         if 'author' in list(self.__dict__.keys()):
-            authors = self.__getattr__('author')
+            authors = self.__getattribute__('author')
             if authors:
                 for a in authors:
                     if 'authorAffiliation' in a or 'authorIdentifierScheme' in a or 'authorIdentifier' in a:
@@ -625,7 +691,7 @@ class Dataset(DVObject):
                             print('author attribute missing.')
 
         if 'datasetContact' in list(self.__dict__.keys()):
-            ds_contac = self.__getattr__('datasetContact')
+            ds_contac = self.__getattribute__('datasetContact')
             if ds_contac:
                 for c in ds_contac:
                     if 'datasetContactAffiliation' in c or 'datasetContactEmail' in c:
@@ -634,7 +700,7 @@ class Dataset(DVObject):
                             print('datasetContact attribute missing.')
 
         if 'producer' in list(self.__dict__.keys()):
-            producer = self.__getattr__('producer')
+            producer = self.__getattribute__('producer')
             if producer:
                 for p in producer:
                     if 'producerAffiliation' in p or 'producerAbbreviation' in p or 'producerURL' in p or 'producerLogoURL' in p:
@@ -643,7 +709,7 @@ class Dataset(DVObject):
                             print('producer attribute missing.')
 
         if 'contributor' in list(self.__dict__.keys()):
-            contributor = self.__getattr__('contributor')
+            contributor = self.__getattribute__('contributor')
             if contributor:
                 for c in contributor:
                     if 'contributorType' in c:
@@ -652,7 +718,7 @@ class Dataset(DVObject):
                             print('contributor attribute missing.')
 
         if 'distributor' in list(self.__dict__.keys()):
-            distributor = self.__getattr__('distributor')
+            distributor = self.__getattribute__('distributor')
             if distributor:
                 for d in distributor:
                     if 'distributorAffiliation' in d or 'distributorAbbreviation' in d or 'distributorURL' in d or 'distributorLogoURL' in d:
@@ -661,7 +727,7 @@ class Dataset(DVObject):
                             print('distributor attribute missing.')
 
         if 'geographicBoundingBox' in list(self.__dict__.keys()):
-            bbox = self.__getattr__('geographicBoundingBox')
+            bbox = self.__getattribute__('geographicBoundingBox')
             if bbox:
                 for b in bbox:
                     if b:
@@ -679,9 +745,9 @@ class Dataset(DVObject):
 
         Parameters
         ----------
-        json_str : string
+        json_str : str
             JSON string to be imported.
-        data_format : string
+        data_format : str
             Data formats available for import. See `allowed_json_formats`.
         validate : bool
             `True`, if imported JSON should be validated against a JSON
@@ -703,7 +769,7 @@ class Dataset(DVObject):
         """
         assert isinstance(json_str, str)
         json_dict = json.loads(json_str)
-        assert json_dict
+        assert isinstance(json_dict, dict)
         assert isinstance(validate, bool)
         if data_format is None:
             data_format = self.default_json_format
@@ -887,13 +953,13 @@ class Dataset(DVObject):
             List of filled :class:`dict`s of metadata for Dataverse API upload.
 
         """
-        assert isinstnace(key, str)
-        assert isinstnace(sub_keys, list)
+        assert isinstance(key, str)
+        assert isinstance(sub_keys, list)
 
         # check if attribute exists
         tmp_list = []
-        if self.__getattr__(key):
-            attr = self.__getattr__(key)
+        if self.__getattribute__(key):
+            attr = self.__getattribute__(key)
             # loop over list of attribute dict
             for d in attr:
                 tmp_dict = {}
@@ -920,7 +986,7 @@ class Dataset(DVObject):
                         tmp_dict[k]['value'] = v
                 tmp_list.append(tmp_dict)
 
-        assert isinstance(tmp_lst, list)
+        assert isinstance(tmp_list, list)
         return tmp_list
 
     def to_json(self, data_format=None, validate=True, filename_schema=None):
@@ -950,9 +1016,10 @@ class Dataset(DVObject):
         if filename_schema is None:
             filename_schema = self.default_json_schema_filename
         assert isinstance(filename_schema, str)
+
         data = {}
 
-        if format == 'dataverse_upload':
+        if data_format == 'dataverse_upload':
             data_dict = self.get()
             data['datasetVersion'] = {}
             data['datasetVersion']['metadataBlocks'] = {}
@@ -1206,10 +1273,10 @@ class Dataset(DVObject):
                 data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
             if 'journal' in locals():
                 data['datasetVersion']['metadataBlocks']['journal'] = journal
-        elif format == 'dspace':
+        elif data_format == 'dspace':
             data = None
             print('INFO: Not implemented yet.')
-        elif format == 'custom':
+        elif data_format == 'custom':
             data = None
             print('INFO: Not implemented yet.')
         if validate:
