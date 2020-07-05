@@ -3,6 +3,7 @@
 """Datafile data model tests."""
 import json
 import os
+import platform
 
 import jsonschema
 
