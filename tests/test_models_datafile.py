@@ -360,9 +360,14 @@ class TestDatafileGeneric(object):
                 pdv = data_object()
                 pdv.from_json(data, validate=False)
 
-        with pytest.raises(json.decoder.JSONDecodeError):
-            pdv = data_object()
-            pdv.from_json('wrong', validate=False)
+        if int(platform.python_version_tuple()[1]) >= 5:
+            with pytest.raises(json.decoder.JSONDecodeError):
+                pdv = data_object()
+                pdv.from_json('wrong', validate=False)
+        else:
+            with pytest.raises(json.decoder.ValueError):
+                pdv = data_object()
+                pdv.from_json('wrong', validate=False)
 
         # invalid `filename_schema`
         with pytest.raises(FileNotFoundError):
