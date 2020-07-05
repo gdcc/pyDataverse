@@ -373,7 +373,7 @@ class TestDataverseGeneric(object):
                 pdv = data_object()
                 pdv.from_json('wrong', validate=False)
         else:
-            with pytest.raises(json.decoder.ValueError):
+            with pytest.raises(ValueError):
                 pdv = data_object()
                 pdv.from_json('wrong', validate=False)
 
