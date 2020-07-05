@@ -1,6 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Helper functions."""
+from __future__ import absolute_import
+
 import csv
 import json
 import pickle

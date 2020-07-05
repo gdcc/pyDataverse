@@ -1,6 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataverse API wrapper for all it's API's."""
+from __future__ import absolute_import
+
 import json
 import subprocess as sp
 from datetime import datetime

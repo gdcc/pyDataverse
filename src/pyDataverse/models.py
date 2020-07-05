@@ -1,6 +1,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataverse data-types data model."""
+from __future__ import absolute_import
+
 import json
 
 from pyDataverse.utils import read_json, validate_data, write_json
