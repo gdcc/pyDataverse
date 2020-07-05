@@ -10,18 +10,21 @@ import jsonschema
 import pytest
 from pyDataverse.models import Dataverse, DVObject
 
+# Global Variables
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 FILENAME_DATA_FULL = 'tests/data/dataverse_upload_full.json'
 FILENAME_DATA_MIN = 'tests/data/dataverse_upload_min.json'
 FILENAME_SCHEMA = 'schemas/json/dataverse_upload_schema.json'
-INVALID_SCHEMA_FILENAMES = [[], 12, set(), tuple(), True, False]
-INVALID_JSON_FILENAMES = INVALID_SCHEMA_FILENAMES + [None]
-INVALID_DATA_FORMATS = [[], 12, set(), tuple(), True, False]
-INVALID_VALIDATE = [None, 'wrong', {}, []]
-INVALID_JSON_DATA = [[], 12, set(), tuple(), True, False]
-INVALID_SET_DATA = [[], 'wrong', 12, set(), tuple(), True, False, None]
 FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + '/data/output/dataverse_pytest.json')
 
+INVALID_FILENAME_STRINGS = ['wrong', '']
+INVALID_FILENAME_TYPES = [(), [], 12, 12.12, set(), True, False]
+INVALID_VALIDATE_TYPES = [None, 'wrong', {}, []]
+INVALID_JSON_DATA_TYPES = [[], (), 12, set(), True, False, None]
+INVALID_SET_TYPES = INVALID_FILENAME_TYPES + ['', 'wrong']
+INVALID_JSON_STRINGS = INVALID_FILENAME_STRINGS
+INVALID_DATA_FORMAT_TYPES = INVALID_FILENAME_TYPES
+INVALID_DATA_FORMAT_STRINGS = INVALID_FILENAME_STRINGS
 
 def read_file(filename, mode='r'):
     """Read in a file.
@@ -331,7 +334,7 @@ class TestDataverseGeneric(object):
         """Test Dataverse.set() with invalid data."""
 
         # invalid data
-        for data in INVALID_SET_DATA:
+        for data in INVALID_SET_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.set(data)
@@ -344,6 +347,7 @@ class TestDataverseGeneric(object):
             (({json_upload_full()}, {}), object_data_full()),
             (({json_upload_min()}, {'data_format': 'dataverse_upload'}), object_data_min()),
             (({json_upload_min()}, {'validate': False}), object_data_min()),
+            (({json_upload_min()}, {'filename_schema': '', 'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}), object_data_min()),
             (({'{}'}, {'validate': False}), object_data_init())
@@ -363,38 +367,41 @@ class TestDataverseGeneric(object):
     def test_dataverse_from_json_invalid(self):
         """Test Dataverse.from_json() with invalid data."""
         # invalid data
-        for data in INVALID_JSON_DATA:
+        for data in INVALID_JSON_DATA_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.from_json(data, validate=False)
 
         if int(platform.python_version_tuple()[1]) >= 5:
-            with pytest.raises(json.decoder.JSONDecodeError):
-                pdv = data_object()
-                pdv.from_json('wrong', validate=False)
+            for json_string in INVALID_JSON_STRINGS:
+                with pytest.raises(json.decoder.JSONDecodeError):
+                    pdv = data_object()
+                    pdv.from_json(json_string, validate=False)
         else:
-            with pytest.raises(ValueError):
-                pdv = data_object()
-                pdv.from_json('wrong', validate=False)
+            for json_string in INVALID_JSON_STRINGS:
+                with pytest.raises(ValueError):
+                    pdv = data_object()
+                    pdv.from_json(json_string, validate=False)
 
         # invalid `filename_schema`
-        with pytest.raises(FileNotFoundError):
-            pdv = data_object()
-            pdv.from_json(json_upload_min(), filename_schema='wrong')
+        for filename_schema in INVALID_FILENAME_STRINGS:
+            with pytest.raises(FileNotFoundError):
+                pdv = data_object()
+                pdv.from_json(json_upload_min(), filename_schema=filename_schema)
 
-        for filename_schema in INVALID_SCHEMA_FILENAMES:
+        for filename_schema in INVALID_FILENAME_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.from_json(json_upload_min(), filename_schema=filename_schema)
 
         # invalid `data_format`
-        for data_format in INVALID_DATA_FORMATS + ['wrong']:
+        for data_format in INVALID_DATA_FORMAT_TYPES + INVALID_DATA_FORMAT_STRINGS:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.from_json(json_upload_min(), data_format=data_format, validate=False)
 
         # invalid `validate`
-        for validate in INVALID_VALIDATE:
+        for validate in INVALID_VALIDATE_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.from_json(json_upload_min(), validate=validate)
@@ -419,6 +426,7 @@ class TestDataverseGeneric(object):
             ((dict_flat_set_full(), {}), json.loads(json_upload_full())),
             ((dict_flat_set_min(), {'data_format': 'dataverse_upload'}), json.loads(json_upload_min())),
             ((dict_flat_set_min(), {'validate': False}), json.loads(json_upload_min())),
+            ((dict_flat_set_min(), {'filename_schema': '', 'validate': False}), json.loads(json_upload_min())),
             ((dict_flat_set_min(), {'filename_schema': 'wrong', 'validate': False}), json.loads(json_upload_min())),
             ((dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA, 'validate': True}), json.loads(json_upload_min())),
             (({}, {'validate': False}), {})
@@ -441,24 +449,25 @@ class TestDataverseGeneric(object):
     def test_dataverse_to_json_invalid(self):
         """Test Dataverse.to_json() with non-valid data."""
         # invalid `filename_schema`
-        with pytest.raises(FileNotFoundError):
-            obj = data_object()
-            result = obj.to_json(filename_schema='wrong')
+        for filename_schema in INVALID_FILENAME_STRINGS:
+            with pytest.raises(FileNotFoundError):
+                obj = data_object()
+                result = obj.to_json(filename_schema=filename_schema)
 
-        for filename_schema in INVALID_SCHEMA_FILENAMES:
+        for filename_schema in INVALID_FILENAME_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.to_json(filename_schema=filename_schema)
 
         # invalid `data_format`
-        for data_format in INVALID_DATA_FORMATS + ['wrong']:
+        for data_format in INVALID_DATA_FORMAT_TYPES + INVALID_DATA_FORMAT_STRINGS:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.set(dict_flat_set_min())
                 pdv.to_json(data_format=data_format, validate=False)
 
         # invalid `validate`
-        for validate in INVALID_VALIDATE:
+        for validate in INVALID_VALIDATE_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.set(dict_flat_set_min())
@@ -508,12 +517,13 @@ class TestDataverseGeneric(object):
                     pdv.validate_json()
 
         # invalid `filename_schema`
-        with pytest.raises(FileNotFoundError):
-            pdv = data_object()
-            pdv.set(dict_flat_set_min())
-            pdv.validate_json(filename_schema='wrong')
+        for filename_schema in INVALID_FILENAME_STRINGS:
+            with pytest.raises(FileNotFoundError):
+                pdv = data_object()
+                pdv.set(dict_flat_set_min())
+                pdv.validate_json(filename_schema=filename_schema)
 
-        for filename_schema in INVALID_SCHEMA_FILENAMES:
+        for filename_schema in INVALID_FILENAME_TYPES:
             with pytest.raises(AssertionError):
                 pdv = data_object()
                 pdv.set(dict_flat_set_min())
@@ -544,7 +554,7 @@ class TestDataverseSpecific(object):
         pdv = Dataverse()
 
         # invalid data
-        for data in INVALID_DATA_FORMATS:
+        for data in INVALID_SET_TYPES:
             with pytest.raises(AssertionError):
                 pdv.set(data)
 
@@ -560,6 +570,7 @@ if not os.environ.get('TRAVIS'):
                 ({json_upload_full()}, {}),
                 ({json_upload_min()}, {'data_format': 'dataverse_upload'}),
                 ({json_upload_min()}, {'validate': False}),
+                ({json_upload_min()}, {'filename_schema': '', 'validate': False}),
                 ({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}),
                 ({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}),
                 ({'{}'}, {'validate': False})
