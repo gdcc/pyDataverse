@@ -12,7 +12,6 @@ from pyDataverse.models import Dataverse, DVObject
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 FILENAME_DATA_FULL = 'tests/data/dataverse_upload_full.json'
 FILENAME_DATA_MIN = 'tests/data/dataverse_upload_min.json'
-FILENAME_DATA_EMPTY = 'tests/data/dataverse_upload_empty.json'
 FILENAME_SCHEMA = 'schemas/json/dataverse_upload_schema.json'
 INVALID_SCHEMA_FILENAMES = [[], 12, set(), tuple(), True, False]
 INVALID_JSON_FILENAMES = INVALID_SCHEMA_FILENAMES + [None]
@@ -21,6 +20,7 @@ INVALID_VALIDATE = [None, 'wrong', {}, []]
 INVALID_JSON_DATA = [[], 12, set(), tuple(), True, False]
 INVALID_SET_DATA = [[], 'wrong', 12, set(), tuple(), True, False, None]
 FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + '/data/output/dataverse_pytest.json')
+
 
 def read_file(filename, mode='r'):
     """Read in a file.
@@ -115,12 +115,12 @@ def dict_flat_set_full():
 
 
 def object_data_init():
-    """Get :class:Dataverse() with initial attributes.
+    """Get dictionary for Dataverse with initial attributes.
 
     Returns
     -------
-    pyDataverse.Dataverse()
-        :class:Dataverse() with init attributes set.
+    dict
+        Dictionary of init data attributes set.
 
     """
     data = {
@@ -140,7 +140,7 @@ def object_data_init():
 
 
 def object_data_min():
-    """Get :class:Dataverse() with attributes of minimum Dataverse.
+    """Get dictionary for Dataverse with minimum attributes.
 
     Returns
     -------
@@ -158,7 +158,7 @@ def object_data_min():
 
 
 def object_data_full():
-    """Get :class:Dataverse() with attributes of full Dataverse.
+    """Get dictionary for Dataverse with full attributes.
 
     Returns
     -------
@@ -179,17 +179,12 @@ def object_data_full():
 
 
 def dict_flat_get_init():
-    """Get flat dict for :func:`get()` of init data of Dataverse.
+    """Get flat dict for :func:`get()` with init data of Dataverse.
 
     Returns
     -------
-    type
-        Description of returned object.
-
-    Raises
-    -------
-    ExceptionName
-        Why the exception is raised.
+    dict
+        Initial Dataverse dictionary returned by :func:`get().
 
     """
     data = {
@@ -201,12 +196,12 @@ def dict_flat_get_init():
     return data
 
 def dict_flat_get_min():
-    """Get flat dict for :func:`get()` of minimum data of Dataverse.
+    """Get flat dict for :func:`get()` with minimum data of Dataverse.
 
     Returns
     -------
     dict
-        Flat dict with minimum Dataverse data.
+        Minimum Dataverse dictionary returned by :func:`get().
 
     """
     data = {
@@ -226,7 +221,7 @@ def dict_flat_get_full():
     Returns
     -------
     dict
-        Flat dict with full Dataverse data.
+        Full Datafile dictionary returned by :func:`get().
 
     """
     data = {
@@ -249,7 +244,7 @@ def json_upload_min():
 
     Returns
     -------
-    string
+    str
         JSON string.
 
     """
@@ -262,7 +257,7 @@ def json_upload_full():
 
     Returns
     -------
-    string
+    str
         JSON string.
 
     """
@@ -552,7 +547,7 @@ if not os.environ.get('TRAVIS'):
     class TestDataverseGenericTravisNot(object):
         """Generic tests for Dataverse(), not running on Travis (no file-write permissions)."""
 
-        def test_dataverse_to_json_from_json_valid(self):
+        def test_dataverse_from_json_to_json_valid(self):
             """Test Dataverse to JSON from JSON with valid data."""
             data = [
                 ({json_upload_min()}, {}),
