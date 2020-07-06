@@ -8,15 +8,11 @@ import json
 from pyDataverse.utils import read_json, validate_data, write_json
 
 
+INTERNAL_ATTRIBUTES = ['_default_json_format', '_default_json_schema_filename', '_allowed_json_formats', '_json_dataverse_upload_attr', '_internal_attributes']
+
+
 class DVObject(object):
     """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`.
-
-    Attributes
-    ----------
-    default_json_format : string
-        Default format to be validated against in :func:`from_json` and
-        :func:`to_json`.
-
     """
     def __init__(self, data=None):
         """Init :class:`DVObject`.
@@ -52,7 +48,10 @@ class DVObject(object):
         assert isinstance(data, dict)
 
         for key, val in data.items():
-            self.__setattr__(key, val)
+            if key in self._internal_attributes:
+                print('Importing attribute {0} not allowed.'.format(key))
+            else:
+                self.__setattr__(key, val)
 
     def get(self):
         """Create flat `dict` of all attributes.
@@ -69,7 +68,8 @@ class DVObject(object):
         data = {}
 
         for attr in list(self.__dict__.keys()):
-            data[attr] = self.__getattribute__(attr)
+            if attr not in INTERNAL_ATTRIBUTES:
+                data[attr] = self.__getattribute__(attr)
 
         assert isinstance(data, dict)
         return data
@@ -91,7 +91,7 @@ class DVObject(object):
 
         """
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         return validate_data(json.loads(self.to_json(validate=False)), filename_schema, file_format='json')
@@ -106,7 +106,7 @@ class DVObject(object):
         json_str : string
             JSON string to be imported.
         data_format : string
-            Data formats available for import. See `allowed_json_formats`.
+            Data formats available for import. See `_allowed_json_formats`.
         validate : bool
             `True`, if imported JSON should be validated against a JSON
             schema file. `False`, if JSON string should be imported directly and
@@ -125,11 +125,11 @@ class DVObject(object):
         assert isinstance(json_dict, dict)
         assert isinstance(validate, bool)
         if data_format is None:
-            data_format = self.default_json_format
+            data_format = self._default_json_format
         assert isinstance(data_format, str)
-        assert data_format in self.allowed_json_formats
+        assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -139,7 +139,7 @@ class DVObject(object):
                 validate_data(json_dict, filename_schema)
             # get first level metadata and parse it automatically
             for key, val in json_dict.items():
-                if key in self.json_dataverse_upload_attr:
+                if key in self._json_dataverse_upload_attr:
                     data[key] = json_dict[key]
                 else:
                     print('INFO: Attribute {0} not valid for import (data format=`{1}`).'.format(key, data_format))
@@ -161,7 +161,7 @@ class DVObject(object):
         Parameters
         ----------
         data_format : string
-            Data formats to be validated. See `allowed_json_formats`.
+            Data formats to be validated. See `_allowed_json_formats`.
         validate : bool
             `True`, if created JSON should be validated against a JSON schema
             file. `False`, if JSON string should be created and not checked if
@@ -176,17 +176,17 @@ class DVObject(object):
         """
         assert isinstance(validate, bool)
         if data_format is None:
-            data_format = self.default_json_format
+            data_format = self._default_json_format
         assert isinstance(data_format, str)
-        assert data_format in self.allowed_json_formats
+        assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         data = {}
 
         if data_format == 'dataverse_upload':
-            for attr in self.json_dataverse_upload_attr:
+            for attr in self._json_dataverse_upload_attr:
                 # check if attribute exists
                 if hasattr(self, attr):
                     data[attr] = self.__getattribute__(attr)
@@ -209,13 +209,13 @@ class Dataverse(DVObject):
 
     Attributes
     ----------
-    default_json_format : string
+    _default_json_format : string
         Default JSON data format.
-    default_json_schema_filename : string
+    _default_json_schema_filename : string
         Default JSON schema filename.
-    allowed_json_formats : list
+    _allowed_json_formats : list
         List of all possible JSON data formats.
-    json_dataverse_upload_attr : list
+    _json_dataverse_upload_attr : list
         List of all attributes to be exported in :func:`to_json`.
     """
 
@@ -236,19 +236,21 @@ class Dataverse(DVObject):
 
             >>> from pyDataverse.models import Dataverse
             >>> dv = Dataverse()
-            >>> print(dv.default_json_schema_filename)
+            >>> print(dv._default_json_schema_filename)
             'schemas/json/dataverse_upload_schema.json'
 
         """
+        self._internal_attributes = ['_Dataverse' + attr for attr in INTERNAL_ATTRIBUTES]
+
         super().__init__(data=data)
 
-        self.default_json_format = 'dataverse_upload'
-        self.default_json_schema_filename = 'schemas/json/dataverse_upload_schema.json'
-        self.allowed_json_formats = [
+        self._default_json_format = 'dataverse_upload'
+        self._default_json_schema_filename = 'schemas/json/dataverse_upload_schema.json'
+        self._allowed_json_formats = [
         'dataverse_upload',
         'dataverse_download'
         ]
-        self.json_dataverse_upload_attr = [
+        self._json_dataverse_upload_attr = [
             'affiliation',
             'alias',
             'dataverseContacts',
@@ -263,13 +265,13 @@ class Dataset(DVObject):
 
     Attributes
     ----------
-    default_json_format : string
+    _default_json_format : string
         Default JSON data format.
-    default_json_schema_filename : string
+    _default_json_schema_filename : string
         Default JSON schema filename.
-    allowed_json_formats : list
+    _allowed_json_formats : list
         List of all possible JSON data formats.
-    json_dataverse_upload_attr : list
+    _json_dataverse_upload_attr : list
         List with all attributes to be exported in :func:`to_json`.
     """
 
@@ -514,21 +516,23 @@ class Dataset(DVObject):
 
             >>> from pyDataverse.models import Dataset
             >>> ds = Dataset()
-            >>> print(ds.default_json_schema_filename)
+            >>> print(ds._default_json_schema_filename)
             'schemas/json/dataset_upload_default_schema.json'
 
         """
+        self._internal_attributes = ['_Dataset' + attr for attr in INTERNAL_ATTRIBUTES]
+
         super().__init__(data=data)
 
-        self.default_json_format = 'dataverse_upload'
-        self.default_json_schema_filename = 'schemas/json/dataset_upload_default_schema.json'
-        self.allowed_json_formats = [
+        self._default_json_format = 'dataverse_upload'
+        self._default_json_schema_filename = 'schemas/json/dataset_upload_default_schema.json'
+        self._allowed_json_formats = [
             'dataverse_upload',
             'dataverse_download',
             'dspace',
             'custom'
         ]
-        self.json_dataverse_upload_attr = [
+        self._json_dataverse_upload_attr = [
             'license',
             'termsOfUse',
             'termsOfAccess',
@@ -641,7 +645,7 @@ class Dataset(DVObject):
 
         """
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         is_valid = True
@@ -750,7 +754,7 @@ class Dataset(DVObject):
         json_str : str
             JSON string to be imported.
         data_format : str
-            Data formats available for import. See `allowed_json_formats`.
+            Data formats available for import. See `_allowed_json_formats`.
         validate : bool
             `True`, if imported JSON should be validated against a JSON
             schema file. `False`, if JSON string should be imported directly and
@@ -774,11 +778,11 @@ class Dataset(DVObject):
         assert isinstance(json_dict, dict)
         assert isinstance(validate, bool)
         if data_format is None:
-            data_format = self.default_json_format
+            data_format = self._default_json_format
         assert isinstance(data_format, str)
-        assert data_format in self.allowed_json_formats
+        assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -997,7 +1001,7 @@ class Dataset(DVObject):
         Parameters
         ----------
         format : string
-            Data formats to be validated. See `allowed_json_formats`.
+            Data formats to be validated. See `_allowed_json_formats`.
         validate : bool
             `True`, if created JSON should be validated against a JSON schema
             file. `False`, if JSON string should be created and not checked if
@@ -1012,11 +1016,11 @@ class Dataset(DVObject):
         """
         assert isinstance(validate, bool)
         if data_format is None:
-            data_format = self.default_json_format
+            data_format = self._default_json_format
         assert isinstance(data_format, str)
-        assert data_format in self.allowed_json_formats
+        assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self.default_json_schema_filename
+            filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -1294,13 +1298,13 @@ class Datafile(DVObject):
 
     Attributes
     ----------
-    default_json_format : string
+    _default_json_format : string
         Default JSON data format.
-    default_json_schema_filename : string
+    _default_json_schema_filename : string
         Default JSON schema filename.
-    allowed_json_formats : list
+    _allowed_json_formats : list
         List of all possible JSON data formats.
-    json_dataverse_upload_attr : list
+    _json_dataverse_upload_attr : list
         List of all attributes to be exported in :func:`to_json`.
     """
 
@@ -1321,19 +1325,21 @@ class Datafile(DVObject):
 
             >>> from pyDataverse.models import Datafile
             >>> df = Datafile()
-            >>> print(df.default_json_schema_filename)
+            >>> print(df._default_json_schema_filename)
             'schemas/json/datafile_upload_schema.json'
 
         """
+        self._internal_attributes = ['_Datafile' + attr for attr in INTERNAL_ATTRIBUTES]
+        
         super().__init__(data=data)
 
-        self.default_json_format = 'dataverse_upload'
-        self.default_json_schema_filename = 'schemas/json/datafile_upload_schema.json'
-        self.allowed_json_formats = [
+        self._default_json_format = 'dataverse_upload'
+        self._default_json_schema_filename = 'schemas/json/datafile_upload_schema.json'
+        self._allowed_json_formats = [
             'dataverse_upload',
             'dataverse_download'
         ]
-        self.json_dataverse_upload_attr = [
+        self._json_dataverse_upload_attr = [
             'description',
             'categories',
             'restrict',

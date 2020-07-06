@@ -128,17 +128,18 @@ def object_data_init():
 
     """
     data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
-        'json_dataverse_upload_attr': [
+        '_Dataverse_default_json_format': 'dataverse_upload',
+        '_Dataverse_default_json_schema_filename': FILENAME_SCHEMA,
+        '_Dataverse_allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
+        '_Dataverse_json_dataverse_upload_attr': [
             'affiliation',
             'alias',
             'dataverseContacts',
             'dataverseType',
             'description',
             'name'
-        ]
+        ],
+        '_internal_attributes': []
     }
     return data
 
@@ -157,7 +158,6 @@ def object_data_min():
         'name': 'Test pyDataverse',
         'dataverseContacts': [{'contactEmail': 'info@aussda.at'}]
     }
-    data.update(object_data_init())
     return data
 
 
@@ -178,26 +178,8 @@ def object_data_full():
         'description': 'We do all the science.',
         'dataverseType': 'LABORATORY'
     }
-    data.update(object_data_init())
     return data
 
-
-def dict_flat_get_init():
-    """Get flat dict for :func:`get()` with init data of Dataverse.
-
-    Returns
-    -------
-    dict
-        Initial Dataverse dictionary returned by :func:`get().
-
-    """
-    data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
-        'json_dataverse_upload_attr': json_dataverse_upload_attr()
-    }
-    return data
 
 def dict_flat_get_min():
     """Get flat dict for :func:`get()` with minimum data of Dataverse.
@@ -215,7 +197,6 @@ def dict_flat_get_min():
             {'contactEmail': 'info@aussda.at'}
         ]
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -239,7 +220,6 @@ def dict_flat_get_full():
         'description': 'We do all the science.',
         'dataverseType': 'LABORATORY',
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -314,7 +294,7 @@ class TestDataverseGeneric(object):
         data = [
             ((dict_flat_set_min(), object_data_min()), dict_flat_get_min()),
             ((dict_flat_set_full(), object_data_full()), dict_flat_get_full()),
-            (({}, object_data_init()), dict_flat_get_init())
+            (({}, {}), {})
         ]
 
         pdv = data_object()
@@ -350,7 +330,7 @@ class TestDataverseGeneric(object):
             (({json_upload_min()}, {'filename_schema': '', 'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}), object_data_min()),
-            (({'{}'}, {'validate': False}), object_data_init())
+            (({'{}'}, {'validate': False}), {})
         ]
 
         for input, data_eval in data:
@@ -361,7 +341,7 @@ class TestDataverseGeneric(object):
 
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_dataverse_from_json_invalid(self):
@@ -537,16 +517,18 @@ class TestDataverseSpecific(object):
         """Test Dataverse.__init__() with valid data."""
         # specific
         data = [
-            (Dataverse(), object_data_init()),
+            (Dataverse(), {}),
             (Dataverse(dict_flat_set_min()), object_data_min()),
             (Dataverse(dict_flat_set_full()), object_data_full()),
-            (Dataverse({}), object_data_init())
+            (Dataverse({}), {})
         ]
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
+                print(getattr(pdv, key))
+                print(data_eval[key])
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_dataverse_init_invalid(self):

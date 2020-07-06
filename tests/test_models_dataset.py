@@ -210,10 +210,11 @@ def object_data_init():
 
     """
     data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download', 'dspace', 'custom'],
-        'json_dataverse_upload_attr': json_dataverse_upload_attr()
+        '_Dataset_default_json_format': 'dataverse_upload',
+        '_Dataset_default_json_schema_filename': FILENAME_SCHEMA,
+        '_Dataset_allowed_json_formats': ['dataverse_upload', 'dataverse_download', 'dspace', 'custom'],
+        '_Dataset_json_dataverse_upload_attr': json_dataverse_upload_attr(),
+        '_internal_attributes': []
     }
     return data
 
@@ -236,7 +237,6 @@ def object_data_min():
         'subject': ['Medicine, Health and Life Sciences'],
         'citation_displayName': 'Citation Metadata'
     }
-    data.update(object_data_init())
     return data
 
 
@@ -323,25 +323,6 @@ def object_data_full():
         'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
         'journalArticleType': 'abstract'
     }
-    data.update(object_data_init())
-    return data
-
-
-def dict_flat_get_init():
-    """Get flat dict for :func:`get()` with init data of Dataset.
-
-    Returns
-    -------
-    dict
-        Initial Datafile dictionary returned by :func:`get().
-
-    """
-    data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download', 'dspace', 'custom'],
-        'json_dataverse_upload_attr': json_dataverse_upload_attr()
-    }
     return data
 
 
@@ -377,7 +358,6 @@ def dict_flat_get_min():
         ],
         'citation_displayName': 'Citation Metadata'
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -465,7 +445,6 @@ def dict_flat_get_full():
         'journalArticleType': 'abstract',
         'citation_displayName': 'Citation Metadata'
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -606,7 +585,7 @@ class TestDatasetGeneric(object):
         data = [
             ((dict_flat_set_min(), object_data_min()), dict_flat_get_min()),
             ((dict_flat_set_full(), object_data_full()), dict_flat_get_full()),
-            (({}, object_data_init()), dict_flat_get_init())
+            (({}, {}), {})
         ]
 
         pdv = data_object()
@@ -673,7 +652,7 @@ class TestDatasetSpecific(object):
 
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_dataset_to_json_valid(self):
@@ -708,16 +687,16 @@ class TestDatasetSpecific(object):
         """Test Dataset.__init__() with valid data."""
         # specific
         data = [
-            (Dataset(), object_data_init()),
+            (Dataset(), {}),
             (Dataset(dict_flat_set_min()), object_data_min()),
             (Dataset(dict_flat_set_full()), object_data_full()),
-            (Dataset({}), object_data_init())
+            (Dataset({}), {})
         ]
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_dataset_init_invalid(self):

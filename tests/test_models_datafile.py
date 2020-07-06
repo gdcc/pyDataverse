@@ -125,10 +125,10 @@ def object_data_init():
 
     """
     data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
-        'json_dataverse_upload_attr': [
+        '_Datafile_default_json_format': 'dataverse_upload',
+        '_Datafile_default_json_schema_filename': FILENAME_SCHEMA,
+        '_Datafile_allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
+        '_Datafile_json_dataverse_upload_attr': [
             'description',
             'categories',
             'restrict',
@@ -136,7 +136,8 @@ def object_data_init():
             'directoryLabel',
             'pid',
             'filename'
-        ]
+        ],
+        '_internal_attributes': []
     }
     return data
 
@@ -154,7 +155,6 @@ def object_data_min():
         'pid': 'doi:10.11587/RRKEA9',
         'filename': '10109_qu_de_v1_0.pdf'
     }
-    data.update(object_data_init())
     return data
 
 
@@ -176,25 +176,6 @@ def object_data_full():
         'title': 'Questionnaire',
         'directoryLabel': 'data/subdir1'
     }
-    data.update(object_data_init())
-    return data
-
-
-def dict_flat_get_init():
-    """Get flat dict for :func:`get()` with init data of Datafile.
-
-    Returns
-    -------
-    dict
-        Initial Datafile dictionary returned by :func:`get().
-
-    """
-    data = {
-        'default_json_format': 'dataverse_upload',
-        'default_json_schema_filename': FILENAME_SCHEMA,
-        'allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
-        'json_dataverse_upload_attr': json_dataverse_upload_attr()
-    }
     return data
 
 
@@ -211,7 +192,6 @@ def dict_flat_get_min():
         'pid': 'doi:10.11587/RRKEA9',
         'filename': '10109_qu_de_v1_0.pdf'
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -233,7 +213,6 @@ def dict_flat_get_full():
         'title': 'Questionnaire',
         'directoryLabel': 'data/subdir1',
     }
-    data.update(dict_flat_get_init())
     return data
 
 
@@ -308,7 +287,7 @@ class TestDatafileGeneric(object):
         data = [
             ((dict_flat_set_min(), object_data_min()), dict_flat_get_min()),
             ((dict_flat_set_full(), object_data_full()), dict_flat_get_full()),
-            (({}, object_data_init()), dict_flat_get_init())
+            (({}, {}), {})
         ]
 
         pdv = data_object()
@@ -343,7 +322,7 @@ class TestDatafileGeneric(object):
             (({json_upload_min()}, {'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}), object_data_min()),
             (({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}), object_data_min()),
-            (({'{}'}, {'validate': False}), object_data_init())
+            (({'{}'}, {'validate': False}), {})
         ]
 
         for input, data_eval in data:
@@ -354,7 +333,7 @@ class TestDatafileGeneric(object):
 
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_datafile_from_json_invalid(self):
@@ -529,16 +508,16 @@ class TestDatafileSpecific(object):
         """Test Datafile.__init__() with valid data."""
         # specific
         data = [
-            (Datafile(), object_data_init()),
+            (Datafile(), {}),
             (Datafile(dict_flat_set_min()), object_data_min()),
             (Datafile(dict_flat_set_full()), object_data_full()),
-            (Datafile({}), object_data_init())
+            (Datafile({}), {})
         ]
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
-            assert len(pdv.__dict__) == len(data_eval)
+            assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
 
     def test_datafile_init_invalid(self):
