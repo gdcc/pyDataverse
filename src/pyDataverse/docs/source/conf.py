@@ -16,6 +16,7 @@
 
 # -- Project information -----------------------------------------------------
 
+from datetime import date
 import os
 import sys
 sys.path.insert(0, os.path.abspath("../../.."))
@@ -24,8 +25,8 @@ import pyDataverse
 
 
 project = 'pyDataverse'
-copyright = '2019, Stefan Kasberger'
 author = 'Stefan Kasberger'
+copyright = '{0}, {1}'.format(date.today().strftime('%Y'), author)
 
 
 # The short X.Y version
