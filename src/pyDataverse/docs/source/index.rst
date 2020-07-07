@@ -1,3 +1,5 @@
+.. _homepage:
+
 pyDataverse
 =========================================
 
@@ -43,9 +45,14 @@ some API calls - **pyDataverse can help you!**
 Install
 -----------------------------
 
+To install pyDataverse, simply run this simple command in your terminal of choice:
+
 .. code-block:: shell
 
     pip install pyDataverse
+
+
+You can find more options at :ref:`user_installation`.
 
 **Requirements**
 
@@ -103,9 +110,7 @@ Features
 - Easy mass imports and exports via pyDataverse’s own CSV format
 - Helper functions to handle Dataverse metadata and data
 - Custom exceptions
-- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_
-(`pytest <https://docs.pytest.org/en/latest/>`_ +
-from datetime import date`tox <http://tox.readthedocs.io/>`_)
+- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + from datetime import date`tox <http://tox.readthedocs.io/>`_)
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
 
 
@@ -163,8 +168,9 @@ To everyone who has contributed to pyDataverse - with an idea, an issue, a
 pull request, sharing it with others or by any other means:
 Thank you for your support!
 
-Open Source projects live from the cooperation of the many and are standing
-on the shoulders of many people, so this is crucial.
+Open Source projects in general live from the cooperation of the many and pyDataverse is
+standing on the shoulders of so many contributors, so to say thanks is the
+least that can be done.
 
 Special thanks to Lars Kaczmirek, Veronika Heider, Christian Bischof, Iris
 Butzlaff and everyone else from AUSSDA, Slava Tykhonov and Marion Wittenberg
@@ -184,4 +190,4 @@ Copyright Stefan Kasberger and others, 2019-2020.
 
 Distributed under the terms of the MIT license, pyDataverse is free and open source software.
 
-.. include:: ../../../../LICENSE.txt
+`Full License text <https://github.com/AUSSDA/pyDataverse/blob/master/LICENSE.txt>`:

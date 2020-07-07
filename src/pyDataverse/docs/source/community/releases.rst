@@ -1,5 +1,4 @@
-.. _releases:
-
+.. _community_releases:
 
 Release and Version History
 ===========================
