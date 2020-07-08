@@ -15,8 +15,8 @@ pyDataverse officially supports Python 3.4–3.7.
 
 Python packages:
 
-- requests>=2.12.0
-- jsonschema>=3.2.0
+- `requests <https://requests.readthedocs.io/en/master/>`_>=2.12.0
+- `jsonschema <https://github.com/Julian/jsonschema>`_>=3.2.0
 
 
 Pip
@@ -66,11 +66,21 @@ package,
 
 Or install it in editable mode into your site-packages (for pyDataverse development):
 
+Although not required, it’s common to locally install your project in
+“editable” or “develop” mode while you’re working on it. This allows your
+project to be both installed and editable in project form.
+
 .. code-block:: shell
 
     cd pyDataverse
     pip install -e .
 
+Although somewhat cryptic, -e is short for --editable, and . refers to the
+current working directory, so together, it means to install the current
+directory (i.e. your project) in editable mode. This will also install
+any dependencies declared with “install_requires” and any scripts declared
+with “console_scripts”. Dependencies will be installed in the usual,
+non-editable mode.
 
 Pipenv
 -----------------------------

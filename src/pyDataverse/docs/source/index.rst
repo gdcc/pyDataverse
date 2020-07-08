@@ -60,8 +60,8 @@ pyDataverse officially supports Python 3.4–3.7.
 
 Python packages:
 
-- requests>=2.12.0
-- jsonschema>=3.2.0
+- `requests <https://requests.readthedocs.io/en/master/>`_>=2.12.0
+- `jsonschema <https://github.com/Julian/jsonschema>`_>=3.2.0
 
 
 Quickstart
@@ -124,6 +124,7 @@ User Guide
    user/basic-usage
    user/advanced-usage
    user/use-cases
+   user/faq
 
 
 Reference / API
@@ -190,4 +191,4 @@ Copyright Stefan Kasberger and others, 2019-2020.
 
 Distributed under the terms of the MIT license, pyDataverse is free and open source software.
 
-`Full License text <https://github.com/AUSSDA/pyDataverse/blob/master/LICENSE.txt>`:
+Full License Text: `LICENSE.txt <https://github.com/AUSSDA/pyDataverse/blob/master/LICENSE.txt>`_
