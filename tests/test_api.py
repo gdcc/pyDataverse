@@ -1,17 +1,17 @@
-# coding: utf-8
-from datetime import datetime
-import json
-import os
-from pyDataverse.api import NativeApi
-from pyDataverse.exceptions import ApiResponseError
-from pyDataverse.exceptions import ApiUrlError
-import pytest
-from requests import Response
-from time import sleep
-
-
-TEST_DIR = os.path.dirname(os.path.realpath(__file__))
-
+# # coding: utf-8
+# from datetime import datetime
+# import json
+# import os
+# from pyDataverse.api import NativeApi
+# from pyDataverse.exceptions import ApiResponseError
+# from pyDataverse.exceptions import ApiUrlError
+# import pytest
+# from requests import Response
+# from time import sleep
+#
+#
+# TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+#
 # def native_api_connection():
 #     """Fixture, so set up an Api connection.
 #
@@ -22,7 +22,7 @@ TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 #
 #     """
 #     return NativeApi(BASE_URL, API_TOKEN)
-
+#
 #
 # class TestApiConnect(object):
 #     """Test the Api() class initalization."""

@@ -5,29 +5,27 @@ import json
 import os
 import platform
 
-import jsonschema
-
 import pytest
-from pyDataverse.models import Dataset, DVObject
+from pyDataverse.models import Dataset
 
 # Global Variables
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
-FILENAME_DATA_MIN = 'tests/data/dataset_upload_min_default.json'
-FILENAME_DATA_FULL = 'tests/data/dataset_upload_full_default.json'
-FILENAME_SCHEMA = 'schemas/json/dataset_upload_default_schema.json'
-FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + '/data/output/dataset_pytest.json')
+FILENAME_DATA_MIN = "tests/data/dataset_upload_min_default.json"
+FILENAME_DATA_FULL = "tests/data/dataset_upload_full_default.json"
+FILENAME_SCHEMA = "schemas/json/dataset_upload_default_schema.json"
+FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + "/data/output/dataset_pytest.json")
 
-INVALID_FILENAME_STRINGS = ['wrong', '']
+INVALID_FILENAME_STRINGS = ["wrong", ""]
 INVALID_FILENAME_TYPES = [(), [], 12, 12.12, set(), True, False]
-INVALID_VALIDATE_TYPES = [None, 'wrong', {}, []]
+INVALID_VALIDATE_TYPES = [None, "wrong", {}, []]
 INVALID_JSON_DATA_TYPES = [[], (), 12, set(), True, False, None]
-INVALID_SET_TYPES = INVALID_FILENAME_TYPES + ['', 'wrong']
+INVALID_SET_TYPES = INVALID_FILENAME_TYPES + ["", "wrong"]
 INVALID_JSON_STRINGS = INVALID_FILENAME_STRINGS
 INVALID_DATA_FORMAT_TYPES = INVALID_FILENAME_TYPES
 INVALID_DATA_FORMAT_STRINGS = INVALID_FILENAME_STRINGS
 
 
-def read_file(filename, mode='r'):
+def read_file(filename, mode="r"):
     """Read in a file.
 
     Parameters
@@ -49,7 +47,7 @@ def read_file(filename, mode='r'):
     return data
 
 
-def write_json(filename, data, mode='w', encoding='utf-8'):
+def write_json(filename, data, mode="w", encoding="utf-8"):
     """Write data to a json file.
 
     Parameters
@@ -88,28 +86,21 @@ def dict_flat_set_min():
 
     """
     data = {
-        'title': 'Darwin\'s Finches',
-        'author': [
+        "title": "Darwin's Finches",
+        "author": [{"authorName": "Finch, Fiona", "authorAffiliation": "Birds Inc."}],
+        "datasetContact": [
             {
-                'authorName': 'Finch, Fiona',
-                'authorAffiliation': 'Birds Inc.'
+                "datasetContactEmail": "finch@mailinator.com",
+                "datasetContactName": "Finch, Fiona",
             }
         ],
-        'datasetContact': [
+        "dsDescription": [
             {
-                'datasetContactEmail': 'finch@mailinator.com',
-                'datasetContactName': 'Finch, Fiona'
+                "dsDescriptionValue": "Darwin's finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds."
             }
         ],
-        'dsDescription': [
-            {
-                'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'
-            }
-        ],
-        'subject': [
-            'Medicine, Health and Life Sciences'
-        ],
-        'citation_displayName': 'Citation Metadata'
+        "subject": ["Medicine, Health and Life Sciences"],
+        "citation_displayName": "Citation Metadata",
     }
     return data
 
@@ -124,78 +115,186 @@ def dict_flat_set_full():
 
     """
     data = {
-        'license': 'CC0',
-        'termsOfUse': 'CC0 Waiver',
-        'termsOfAccess': 'Terms of Access',
-        'fileAccessRequest': True,
-        'protocol': 'doi',
-        'authority': '10.11587',
-        'identifier': '6AQBYW',
-        'citation_displayName': 'Citation Metadata',
-        'title': 'Replication Data for: Title',
-        'subtitle': 'Subtitle',
-        'alternativeTitle': 'Alternative Title',
-        'alternativeURL': 'http://AlternativeURL.org',
-        'otherId': [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}],
-        'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
-        'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
-        'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
-        'subject': ['Agricultural Sciences', 'Business and Management', 'Engineering', 'Law'],
-        'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
-        'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
-        'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
-        'notesText': 'Notes1',
-        'producer': [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}],
-        'productionDate': '1003-01-01',
-        'productionPlace': 'ProductionPlace',
-        'contributor': [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}],
-        'grantNumber': [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}],
-        'distributor': [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}],
-        'distributionDate': '1004-01-01',
-        'depositor': 'LastDepositor, FirstDepositor',
-        'dateOfDeposit': '1002-01-01',
-        'timePeriodCovered': [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}],
-        'dateOfCollection': [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}],
-        'kindOfData': ['KindOfData1', 'KindOfData2'],
-        'language': ['German'],
-        'series': {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'},
-        'software': [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}],
-        'relatedMaterial': ['RelatedMaterial1', 'RelatedMaterial2'],
-        'relatedDatasets': ['RelatedDatasets1', 'RelatedDatasets2'],
-        'otherReferences': ['OtherReferences1', 'OtherReferences2'],
-        'dataSources': ['DataSources1', 'DataSources2'],
-        'originOfSources': 'OriginOfSources',
-        'characteristicOfSources': 'CharacteristicOfSourcesNoted',
-        'accessToSources': 'DocumentationAndAccessToSources',
-        'geospatial_displayName': 'Geospatial Metadata',
-        'geographicCoverage': [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}],
-        'geographicUnit': ['GeographicUnit1', 'GeographicUnit2'],
-        'geographicBoundingBox': [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}],
-        'socialscience_displayName': 'Social Science and Humanities Metadata',
-        'unitOfAnalysis': ['UnitOfAnalysis1', 'UnitOfAnalysis2'],
-        'universe': ['Universe1', 'Universe2'],
-        'timeMethod': 'TimeMethod',
-        'dataCollector': 'LastDataCollector1, FirstDataCollector1',
-        'collectorTraining': 'CollectorTraining',
-        'frequencyOfDataCollection': 'Frequency',
-        'samplingProcedure': 'SamplingProcedure',
-        'targetSampleSize': {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'},
-        'deviationsFromSampleDesign': 'MajorDeviationsForSampleDesign',
-        'collectionMode': 'CollectionMode',
-        'researchInstrument': 'TypeOfResearchInstrument',
-        'dataCollectionSituation': 'CharacteristicsOfDataCollectionSituation',
-        'actionsToMinimizeLoss': 'ActionsToMinimizeLosses',
-        'controlOperations': 'ControlOperations',
-        'weighting': 'Weighting',
-        'cleaningOperations': 'CleaningOperations',
-        'datasetLevelErrorNotes': 'StudyLevelErrorNotes',
-        'responseRate': 'ResponseRate',
-        'samplingErrorEstimates': 'EstimatesOfSamplingError',
-        'otherDataAppraisal': 'OtherFormsOfDataAppraisal',
-        'socialScienceNotes': {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'},
-        'journal_displayName': 'Journal Metadata',
-        'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
-        'journalArticleType': 'abstract'
+        "license": "CC0",
+        "termsOfUse": "CC0 Waiver",
+        "termsOfAccess": "Terms of Access",
+        "fileAccessRequest": True,
+        "protocol": "doi",
+        "authority": "10.11587",
+        "identifier": "6AQBYW",
+        "citation_displayName": "Citation Metadata",
+        "title": "Replication Data for: Title",
+        "subtitle": "Subtitle",
+        "alternativeTitle": "Alternative Title",
+        "alternativeURL": "http://AlternativeURL.org",
+        "otherId": [
+            {"otherIdAgency": "OtherIDAgency1", "otherIdValue": "OtherIDIdentifier1"}
+        ],
+        "author": [
+            {
+                "authorName": "LastAuthor1, FirstAuthor1",
+                "authorAffiliation": "AuthorAffiliation1",
+                "authorIdentifierScheme": "ORCID",
+                "authorIdentifier": "AuthorIdentifier1",
+            }
+        ],
+        "datasetContact": [
+            {
+                "datasetContactName": "LastContact1, FirstContact1",
+                "datasetContactAffiliation": "ContactAffiliation1",
+                "datasetContactEmail": "ContactEmail1@mailinator.com",
+            }
+        ],
+        "dsDescription": [
+            {
+                "dsDescriptionValue": "DescriptionText2",
+                "dsDescriptionDate": "1000-02-02",
+            }
+        ],
+        "subject": [
+            "Agricultural Sciences",
+            "Business and Management",
+            "Engineering",
+            "Law",
+        ],
+        "keyword": [
+            {
+                "keywordValue": "KeywordTerm1",
+                "keywordVocabulary": "KeywordVocabulary1",
+                "keywordVocabularyURI": "http://KeywordVocabularyURL1.org",
+            }
+        ],
+        "topicClassification": [
+            {
+                "topicClassValue": "Topic Class Value1",
+                "topicClassVocab": "Topic Classification Vocabulary",
+            }
+        ],
+        "publication": [
+            {
+                "publicationCitation": "RelatedPublicationCitation1",
+                "publicationIDType": "ark",
+                "publicationIDNumber": "RelatedPublicationIDNumber1",
+                "publicationURL": "http://RelatedPublicationURL1.org",
+            }
+        ],
+        "notesText": "Notes1",
+        "producer": [
+            {
+                "producerName": "LastProducer1, FirstProducer1",
+                "producerAffiliation": "ProducerAffiliation1",
+                "producerAbbreviation": "ProducerAbbreviation1",
+                "producerURL": "http://ProducerURL1.org",
+                "producerLogoURL": "http://ProducerLogoURL1.org",
+            }
+        ],
+        "productionDate": "1003-01-01",
+        "productionPlace": "ProductionPlace",
+        "contributor": [
+            {
+                "contributorType": "Data Collector",
+                "contributorName": "LastContributor1, FirstContributor1",
+            }
+        ],
+        "grantNumber": [
+            {
+                "grantNumberAgency": "GrantInformationGrantAgency1",
+                "grantNumberValue": "GrantInformationGrantNumber1",
+            }
+        ],
+        "distributor": [
+            {
+                "distributorName": "LastDistributor1, FirstDistributor1",
+                "distributorAffiliation": "DistributorAffiliation1",
+                "distributorAbbreviation": "DistributorAbbreviation1",
+                "distributorURL": "http://DistributorURL1.org",
+                "distributorLogoURL": "http://DistributorLogoURL1.org",
+            }
+        ],
+        "distributionDate": "1004-01-01",
+        "depositor": "LastDepositor, FirstDepositor",
+        "dateOfDeposit": "1002-01-01",
+        "timePeriodCovered": [
+            {
+                "timePeriodCoveredStart": "1005-01-01",
+                "timePeriodCoveredEnd": "1005-01-02",
+            }
+        ],
+        "dateOfCollection": [
+            {"dateOfCollectionStart": "1006-01-01", "dateOfCollectionEnd": "1006-01-01"}
+        ],
+        "kindOfData": ["KindOfData1", "KindOfData2"],
+        "language": ["German"],
+        "series": {
+            "seriesName": "SeriesName",
+            "seriesInformation": "SeriesInformation",
+        },
+        "software": [
+            {"softwareName": "SoftwareName1", "softwareVersion": "SoftwareVersion1"}
+        ],
+        "relatedMaterial": ["RelatedMaterial1", "RelatedMaterial2"],
+        "relatedDatasets": ["RelatedDatasets1", "RelatedDatasets2"],
+        "otherReferences": ["OtherReferences1", "OtherReferences2"],
+        "dataSources": ["DataSources1", "DataSources2"],
+        "originOfSources": "OriginOfSources",
+        "characteristicOfSources": "CharacteristicOfSourcesNoted",
+        "accessToSources": "DocumentationAndAccessToSources",
+        "geospatial_displayName": "Geospatial Metadata",
+        "geographicCoverage": [
+            {
+                "country": "Afghanistan",
+                "state": "GeographicCoverageStateProvince1",
+                "city": "GeographicCoverageCity1",
+                "otherGeographicCoverage": "GeographicCoverageOther1",
+            }
+        ],
+        "geographicUnit": ["GeographicUnit1", "GeographicUnit2"],
+        "geographicBoundingBox": [
+            {
+                "westLongitude": "10",
+                "eastLongitude": "20",
+                "northLongitude": "30",
+                "southLongitude": "40",
+            }
+        ],
+        "socialscience_displayName": "Social Science and Humanities Metadata",
+        "unitOfAnalysis": ["UnitOfAnalysis1", "UnitOfAnalysis2"],
+        "universe": ["Universe1", "Universe2"],
+        "timeMethod": "TimeMethod",
+        "dataCollector": "LastDataCollector1, FirstDataCollector1",
+        "collectorTraining": "CollectorTraining",
+        "frequencyOfDataCollection": "Frequency",
+        "samplingProcedure": "SamplingProcedure",
+        "targetSampleSize": {
+            "targetSampleActualSize": "100",
+            "targetSampleSizeFormula": "TargetSampleSizeFormula",
+        },
+        "deviationsFromSampleDesign": "MajorDeviationsForSampleDesign",
+        "collectionMode": "CollectionMode",
+        "researchInstrument": "TypeOfResearchInstrument",
+        "dataCollectionSituation": "CharacteristicsOfDataCollectionSituation",
+        "actionsToMinimizeLoss": "ActionsToMinimizeLosses",
+        "controlOperations": "ControlOperations",
+        "weighting": "Weighting",
+        "cleaningOperations": "CleaningOperations",
+        "datasetLevelErrorNotes": "StudyLevelErrorNotes",
+        "responseRate": "ResponseRate",
+        "samplingErrorEstimates": "EstimatesOfSamplingError",
+        "otherDataAppraisal": "OtherFormsOfDataAppraisal",
+        "socialScienceNotes": {
+            "socialScienceNotesType": "NotesType",
+            "socialScienceNotesSubject": "NotesSubject",
+            "socialScienceNotesText": "NotesText",
+        },
+        "journal_displayName": "Journal Metadata",
+        "journalVolumeIssue": [
+            {
+                "journalVolume": "JournalVolume1",
+                "journalIssue": "JournalIssue1",
+                "journalPubDate": "1008-01-01",
+            }
+        ],
+        "journalArticleType": "abstract",
     }
     return data
 
@@ -210,11 +309,16 @@ def object_data_init():
 
     """
     data = {
-        '_Dataset_default_json_format': 'dataverse_upload',
-        '_Dataset_default_json_schema_filename': FILENAME_SCHEMA,
-        '_Dataset_allowed_json_formats': ['dataverse_upload', 'dataverse_download', 'dspace', 'custom'],
-        '_Dataset_json_dataverse_upload_attr': json_dataverse_upload_attr(),
-        '_internal_attributes': []
+        "_Dataset_default_json_format": "dataverse_upload",
+        "_Dataset_default_json_schema_filename": FILENAME_SCHEMA,
+        "_Dataset_allowed_json_formats": [
+            "dataverse_upload",
+            "dataverse_download",
+            "dspace",
+            "custom",
+        ],
+        "_Dataset_json_dataverse_upload_attr": json_dataverse_upload_attr(),
+        "_internal_attributes": [],
     }
     return data
 
@@ -230,12 +334,21 @@ def object_data_min():
     """
 
     data = {
-        'title': 'Darwin\'s Finches',
-        'author': [{'authorName': 'Finch, Fiona', 'authorAffiliation': 'Birds Inc.'}],
-        'datasetContact': [{'datasetContactEmail': 'finch@mailinator.com', 'datasetContactName': 'Finch, Fiona'}],
-        'dsDescription': [{'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'}],
-        'subject': ['Medicine, Health and Life Sciences'],
-        'citation_displayName': 'Citation Metadata'
+        "title": "Darwin's Finches",
+        "author": [{"authorName": "Finch, Fiona", "authorAffiliation": "Birds Inc."}],
+        "datasetContact": [
+            {
+                "datasetContactEmail": "finch@mailinator.com",
+                "datasetContactName": "Finch, Fiona",
+            }
+        ],
+        "dsDescription": [
+            {
+                "dsDescriptionValue": "Darwin's finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds."
+            }
+        ],
+        "subject": ["Medicine, Health and Life Sciences"],
+        "citation_displayName": "Citation Metadata",
     }
     return data
 
@@ -250,78 +363,186 @@ def object_data_full():
 
     """
     data = {
-        'license': 'CC0',
-        'termsOfUse': 'CC0 Waiver',
-        'termsOfAccess': 'Terms of Access',
-        'fileAccessRequest': True,
-        'protocol': 'doi',
-        'authority': '10.11587',
-        'identifier': '6AQBYW',
-        'citation_displayName': 'Citation Metadata',
-        'title': 'Replication Data for: Title',
-        'subtitle': 'Subtitle',
-        'alternativeTitle': 'Alternative Title',
-        'alternativeURL': 'http://AlternativeURL.org',
-        'otherId': [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}],
-        'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
-        'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
-        'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
-        'subject': ['Agricultural Sciences', 'Business and Management', 'Engineering', 'Law'],
-        'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
-        'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
-        'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
-        'notesText': 'Notes1',
-        'producer': [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}],
-        'productionDate': '1003-01-01',
-        'productionPlace': 'ProductionPlace',
-        'contributor': [{'contributorType': 'Data Collector',         'contributorName': 'LastContributor1, FirstContributor1'}],
-        'grantNumber': [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}],
-        'distributor': [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}],
-        'distributionDate': '1004-01-01',
-        'depositor': 'LastDepositor, FirstDepositor',
-        'dateOfDeposit': '1002-01-01',
-        'timePeriodCovered': [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}],
-        'dateOfCollection': [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}],
-        'kindOfData': ['KindOfData1', 'KindOfData2'],
-        'language': ['German'],
-        'series': {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'},
-        'software': [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}],
-        'relatedMaterial': ['RelatedMaterial1', 'RelatedMaterial2'],
-        'relatedDatasets': ['RelatedDatasets1', 'RelatedDatasets2'],
-        'otherReferences': ['OtherReferences1', 'OtherReferences2'],
-        'dataSources': ['DataSources1', 'DataSources2'],
-        'originOfSources': 'OriginOfSources',
-        'characteristicOfSources': 'CharacteristicOfSourcesNoted',
-        'accessToSources': 'DocumentationAndAccessToSources',
-        'geospatial_displayName': 'Geospatial Metadata',
-        'geographicCoverage': [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}],
-        'geographicUnit': ['GeographicUnit1', 'GeographicUnit2'],
-        'geographicBoundingBox': [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}],
-        'socialscience_displayName': 'Social Science and Humanities Metadata',
-        'unitOfAnalysis': ['UnitOfAnalysis1', 'UnitOfAnalysis2'],
-        'universe': ['Universe1', 'Universe2'],
-        'timeMethod': 'TimeMethod',
-        'dataCollector': 'LastDataCollector1, FirstDataCollector1',
-        'collectorTraining': 'CollectorTraining',
-        'frequencyOfDataCollection': 'Frequency',
-        'samplingProcedure': 'SamplingProcedure',
-        'targetSampleSize': {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'},
-        'deviationsFromSampleDesign': 'MajorDeviationsForSampleDesign',
-        'collectionMode': 'CollectionMode',
-        'researchInstrument': 'TypeOfResearchInstrument',
-        'dataCollectionSituation': 'CharacteristicsOfDataCollectionSituation',
-        'actionsToMinimizeLoss': 'ActionsToMinimizeLosses',
-        'controlOperations': 'ControlOperations',
-        'weighting': 'Weighting',
-        'cleaningOperations': 'CleaningOperations',
-        'datasetLevelErrorNotes': 'StudyLevelErrorNotes',
-        'responseRate': 'ResponseRate',
-        'samplingErrorEstimates': 'EstimatesOfSamplingError',
-        'otherDataAppraisal': 'OtherFormsOfDataAppraisal',
-        'socialScienceNotes': {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'},
-        'journal_displayName': 'Journal Metadata',
-        'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
-        'journalArticleType': 'abstract'
+        "license": "CC0",
+        "termsOfUse": "CC0 Waiver",
+        "termsOfAccess": "Terms of Access",
+        "fileAccessRequest": True,
+        "protocol": "doi",
+        "authority": "10.11587",
+        "identifier": "6AQBYW",
+        "citation_displayName": "Citation Metadata",
+        "title": "Replication Data for: Title",
+        "subtitle": "Subtitle",
+        "alternativeTitle": "Alternative Title",
+        "alternativeURL": "http://AlternativeURL.org",
+        "otherId": [
+            {"otherIdAgency": "OtherIDAgency1", "otherIdValue": "OtherIDIdentifier1"}
+        ],
+        "author": [
+            {
+                "authorName": "LastAuthor1, FirstAuthor1",
+                "authorAffiliation": "AuthorAffiliation1",
+                "authorIdentifierScheme": "ORCID",
+                "authorIdentifier": "AuthorIdentifier1",
+            }
+        ],
+        "datasetContact": [
+            {
+                "datasetContactName": "LastContact1, FirstContact1",
+                "datasetContactAffiliation": "ContactAffiliation1",
+                "datasetContactEmail": "ContactEmail1@mailinator.com",
+            }
+        ],
+        "dsDescription": [
+            {
+                "dsDescriptionValue": "DescriptionText2",
+                "dsDescriptionDate": "1000-02-02",
+            }
+        ],
+        "subject": [
+            "Agricultural Sciences",
+            "Business and Management",
+            "Engineering",
+            "Law",
+        ],
+        "keyword": [
+            {
+                "keywordValue": "KeywordTerm1",
+                "keywordVocabulary": "KeywordVocabulary1",
+                "keywordVocabularyURI": "http://KeywordVocabularyURL1.org",
+            }
+        ],
+        "topicClassification": [
+            {
+                "topicClassValue": "Topic Class Value1",
+                "topicClassVocab": "Topic Classification Vocabulary",
+            }
+        ],
+        "publication": [
+            {
+                "publicationCitation": "RelatedPublicationCitation1",
+                "publicationIDType": "ark",
+                "publicationIDNumber": "RelatedPublicationIDNumber1",
+                "publicationURL": "http://RelatedPublicationURL1.org",
+            }
+        ],
+        "notesText": "Notes1",
+        "producer": [
+            {
+                "producerName": "LastProducer1, FirstProducer1",
+                "producerAffiliation": "ProducerAffiliation1",
+                "producerAbbreviation": "ProducerAbbreviation1",
+                "producerURL": "http://ProducerURL1.org",
+                "producerLogoURL": "http://ProducerLogoURL1.org",
+            }
+        ],
+        "productionDate": "1003-01-01",
+        "productionPlace": "ProductionPlace",
+        "contributor": [
+            {
+                "contributorType": "Data Collector",
+                "contributorName": "LastContributor1, FirstContributor1",
+            }
+        ],
+        "grantNumber": [
+            {
+                "grantNumberAgency": "GrantInformationGrantAgency1",
+                "grantNumberValue": "GrantInformationGrantNumber1",
+            }
+        ],
+        "distributor": [
+            {
+                "distributorName": "LastDistributor1, FirstDistributor1",
+                "distributorAffiliation": "DistributorAffiliation1",
+                "distributorAbbreviation": "DistributorAbbreviation1",
+                "distributorURL": "http://DistributorURL1.org",
+                "distributorLogoURL": "http://DistributorLogoURL1.org",
+            }
+        ],
+        "distributionDate": "1004-01-01",
+        "depositor": "LastDepositor, FirstDepositor",
+        "dateOfDeposit": "1002-01-01",
+        "timePeriodCovered": [
+            {
+                "timePeriodCoveredStart": "1005-01-01",
+                "timePeriodCoveredEnd": "1005-01-02",
+            }
+        ],
+        "dateOfCollection": [
+            {"dateOfCollectionStart": "1006-01-01", "dateOfCollectionEnd": "1006-01-01"}
+        ],
+        "kindOfData": ["KindOfData1", "KindOfData2"],
+        "language": ["German"],
+        "series": {
+            "seriesName": "SeriesName",
+            "seriesInformation": "SeriesInformation",
+        },
+        "software": [
+            {"softwareName": "SoftwareName1", "softwareVersion": "SoftwareVersion1"}
+        ],
+        "relatedMaterial": ["RelatedMaterial1", "RelatedMaterial2"],
+        "relatedDatasets": ["RelatedDatasets1", "RelatedDatasets2"],
+        "otherReferences": ["OtherReferences1", "OtherReferences2"],
+        "dataSources": ["DataSources1", "DataSources2"],
+        "originOfSources": "OriginOfSources",
+        "characteristicOfSources": "CharacteristicOfSourcesNoted",
+        "accessToSources": "DocumentationAndAccessToSources",
+        "geospatial_displayName": "Geospatial Metadata",
+        "geographicCoverage": [
+            {
+                "country": "Afghanistan",
+                "state": "GeographicCoverageStateProvince1",
+                "city": "GeographicCoverageCity1",
+                "otherGeographicCoverage": "GeographicCoverageOther1",
+            }
+        ],
+        "geographicUnit": ["GeographicUnit1", "GeographicUnit2"],
+        "geographicBoundingBox": [
+            {
+                "westLongitude": "10",
+                "eastLongitude": "20",
+                "northLongitude": "30",
+                "southLongitude": "40",
+            }
+        ],
+        "socialscience_displayName": "Social Science and Humanities Metadata",
+        "unitOfAnalysis": ["UnitOfAnalysis1", "UnitOfAnalysis2"],
+        "universe": ["Universe1", "Universe2"],
+        "timeMethod": "TimeMethod",
+        "dataCollector": "LastDataCollector1, FirstDataCollector1",
+        "collectorTraining": "CollectorTraining",
+        "frequencyOfDataCollection": "Frequency",
+        "samplingProcedure": "SamplingProcedure",
+        "targetSampleSize": {
+            "targetSampleActualSize": "100",
+            "targetSampleSizeFormula": "TargetSampleSizeFormula",
+        },
+        "deviationsFromSampleDesign": "MajorDeviationsForSampleDesign",
+        "collectionMode": "CollectionMode",
+        "researchInstrument": "TypeOfResearchInstrument",
+        "dataCollectionSituation": "CharacteristicsOfDataCollectionSituation",
+        "actionsToMinimizeLoss": "ActionsToMinimizeLosses",
+        "controlOperations": "ControlOperations",
+        "weighting": "Weighting",
+        "cleaningOperations": "CleaningOperations",
+        "datasetLevelErrorNotes": "StudyLevelErrorNotes",
+        "responseRate": "ResponseRate",
+        "samplingErrorEstimates": "EstimatesOfSamplingError",
+        "otherDataAppraisal": "OtherFormsOfDataAppraisal",
+        "socialScienceNotes": {
+            "socialScienceNotesType": "NotesType",
+            "socialScienceNotesSubject": "NotesSubject",
+            "socialScienceNotesText": "NotesText",
+        },
+        "journal_displayName": "Journal Metadata",
+        "journalVolumeIssue": [
+            {
+                "journalVolume": "JournalVolume1",
+                "journalIssue": "JournalIssue1",
+                "journalPubDate": "1008-01-01",
+            }
+        ],
+        "journalArticleType": "abstract",
     }
     return data
 
@@ -336,27 +557,21 @@ def dict_flat_get_min():
 
     """
     data = {
-        'title': 'Darwin\'s Finches',
-        'author': [
+        "title": "Darwin's Finches",
+        "author": [{"authorName": "Finch, Fiona", "authorAffiliation": "Birds Inc."}],
+        "datasetContact": [
             {
-                'authorName': 'Finch, Fiona',
-                'authorAffiliation': 'Birds Inc.'
+                "datasetContactEmail": "finch@mailinator.com",
+                "datasetContactName": "Finch, Fiona",
             }
         ],
-        'datasetContact': [
+        "dsDescription": [
             {
-                'datasetContactEmail': 'finch@mailinator.com',
-                'datasetContactName': 'Finch, Fiona'
-            }
+                "dsDescriptionValue": "Darwin's finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds."
+            },
         ],
-        'dsDescription': [
-            {
-                'dsDescriptionValue': 'Darwin\'s finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.'},
-        ],
-        'subject': [
-            'Medicine, Health and Life Sciences'
-        ],
-        'citation_displayName': 'Citation Metadata'
+        "subject": ["Medicine, Health and Life Sciences"],
+        "citation_displayName": "Citation Metadata",
     }
     return data
 
@@ -371,79 +586,186 @@ def dict_flat_get_full():
 
     """
     data = {
-        'license': 'CC0',
-        'termsOfUse': 'CC0 Waiver',
-        'termsOfAccess': 'Terms of Access',
-        'fileAccessRequest': True,
-        'protocol': 'doi',
-        'authority': '10.11587',
-        'identifier': '6AQBYW',
-        'citation_displayName': 'Citation Metadat',
-        'title': 'Replication Data for: Title',
-        'subtitle': 'Subtitle',
-        'alternativeTitle': 'Alternative Title',
-        'alternativeURL': 'http://AlternativeURL.org',
-        'otherId': [{'otherIdAgency': 'OtherIDAgency1', 'otherIdValue': 'OtherIDIdentifier1'}],
-        'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1', 'authorIdentifierScheme': 'ORCID', 'authorIdentifier': 'AuthorIdentifier1'}],
-        'datasetContact': [{'datasetContactName': 'LastContact1, FirstContact1', 'datasetContactAffiliation': 'ContactAffiliation1', 'datasetContactEmail': 'ContactEmail1@mailinator.com'}],
-        'dsDescription': [{'dsDescriptionValue': 'DescriptionText2', 'dsDescriptionDate': '1000-02-02'}],
-        'subject': ['Agricultural Sciences', 'Business and Management', 'Engineering', 'Law'],
-        'keyword': [{'keywordValue': 'KeywordTerm1', 'keywordVocabulary': 'KeywordVocabulary1', 'keywordVocabularyURI': 'http://KeywordVocabularyURL1.org'}],
-        'topicClassification': [{'topicClassValue': 'Topic Class Value1', 'topicClassVocab': 'Topic Classification Vocabulary'}],
-        'publication': [{'publicationCitation': 'RelatedPublicationCitation1', 'publicationIDType': 'ark', 'publicationIDNumber': 'RelatedPublicationIDNumber1', 'publicationURL': 'http://RelatedPublicationURL1.org'}],
-        'notesText': 'Notes1',
-        'producer': [{'producerName': 'LastProducer1, FirstProducer1', 'producerAffiliation': 'ProducerAffiliation1', 'producerAbbreviation': 'ProducerAbbreviation1', 'producerURL': 'http://ProducerURL1.org', 'producerLogoURL': 'http://ProducerLogoURL1.org'}],
-        'productionDate': '1003-01-01',
-        'productionPlace': 'ProductionPlace',
-        'contributor': [{'contributorType': 'Data Collector', 'contributorName': 'LastContributor1, FirstContributor1'}],
-        'grantNumber': [{'grantNumberAgency': 'GrantInformationGrantAgency1', 'grantNumberValue': 'GrantInformationGrantNumber1'}],
-        'distributor': [{'distributorName': 'LastDistributor1, FirstDistributor1', 'distributorAffiliation': 'DistributorAffiliation1', 'distributorAbbreviation': 'DistributorAbbreviation1', 'distributorURL': 'http://DistributorURL1.org', 'distributorLogoURL': 'http://DistributorLogoURL1.org'}],
-        'distributionDate': '1004-01-01',
-        'depositor': 'LastDepositor, FirstDepositor',
-        'dateOfDeposit': '1002-01-01',
-        'timePeriodCovered': [{'timePeriodCoveredStart': '1005-01-01', 'timePeriodCoveredEnd': '1005-01-02'}],
-        'dateOfCollection': [{'dateOfCollectionStart': '1006-01-01', 'dateOfCollectionEnd': '1006-01-01'}],
-        'kindOfData': ['KindOfData1', 'KindOfData2'],
-        'language': ['German'],
-        'series': {'seriesName': 'SeriesName', 'seriesInformation': 'SeriesInformation'},
-        'software': [{'softwareName': 'SoftwareName1', 'softwareVersion': 'SoftwareVersion1'}],
-        'relatedMaterial': ['RelatedMaterial1', 'RelatedMaterial2'],
-        'relatedDatasets': ['RelatedDatasets1', 'RelatedDatasets2'],
-        'otherReferences': ['OtherReferences1', 'OtherReferences2'],
-        'dataSources': ['DataSources1', 'DataSources2'],
-        'originOfSources': 'OriginOfSources',
-        'characteristicOfSources': 'CharacteristicOfSourcesNoted',
-        'accessToSources': 'DocumentationAndAccessToSources',
-        'geospatial_displayName': 'Geospatial Metadata',
-        'geographicCoverage': [{'country': 'Afghanistan', 'state': 'GeographicCoverageStateProvince1', 'city': 'GeographicCoverageCity1', 'otherGeographicCoverage': 'GeographicCoverageOther1'}],
-        'geographicUnit': ['GeographicUnit1', 'GeographicUnit2'],
-        'geographicBoundingBox': [{'westLongitude': '10', 'eastLongitude': '20', 'northLongitude': '30', 'southLongitude': '40'}],
-        'socialscience_displayName': 'Social Science and Humanities Metadata',
-        'unitOfAnalysis': ['UnitOfAnalysis1', 'UnitOfAnalysis2'],
-        'universe': ['Universe1', 'Universe2'],
-        'timeMethod': 'TimeMethod',
-        'dataCollector': 'LastDataCollector1, FirstDataCollector1',
-        'collectorTraining': 'CollectorTraining',
-        'frequencyOfDataCollection': 'Frequency',
-        'samplingProcedure': 'SamplingProcedure',
-        'targetSampleSize': {'targetSampleActualSize': '100', 'targetSampleSizeFormula': 'TargetSampleSizeFormula'},
-        'deviationsFromSampleDesign': 'MajorDeviationsForSampleDesign',
-        'collectionMode': 'CollectionMode',
-        'researchInstrument': 'TypeOfResearchInstrument',
-        'dataCollectionSituation': 'CharacteristicsOfDataCollectionSituation',
-        'actionsToMinimizeLoss': 'ActionsToMinimizeLosses',
-        'controlOperations': 'ControlOperations',
-        'weighting': 'Weighting',
-        'cleaningOperations': 'CleaningOperations',
-        'datasetLevelErrorNotes': 'StudyLevelErrorNotes',
-        'responseRate': 'ResponseRate',
-        'samplingErrorEstimates': 'EstimatesOfSamplingError',
-        'otherDataAppraisal': 'OtherFormsOfDataAppraisal',
-        'socialScienceNotes': {'socialScienceNotesType': 'NotesType', 'socialScienceNotesSubject': 'NotesSubject', 'socialScienceNotesText': 'NotesText'},
-        'journal_displayName': 'Journal Metadata',
-        'journalVolumeIssue': [{'journalVolume': 'JournalVolume1', 'journalIssue': 'JournalIssue1', 'journalPubDate': '1008-01-01'}],
-        'journalArticleType': 'abstract',
-        'citation_displayName': 'Citation Metadata'
+        "license": "CC0",
+        "termsOfUse": "CC0 Waiver",
+        "termsOfAccess": "Terms of Access",
+        "fileAccessRequest": True,
+        "protocol": "doi",
+        "authority": "10.11587",
+        "identifier": "6AQBYW",
+        "title": "Replication Data for: Title",
+        "subtitle": "Subtitle",
+        "alternativeTitle": "Alternative Title",
+        "alternativeURL": "http://AlternativeURL.org",
+        "otherId": [
+            {"otherIdAgency": "OtherIDAgency1", "otherIdValue": "OtherIDIdentifier1"}
+        ],
+        "author": [
+            {
+                "authorName": "LastAuthor1, FirstAuthor1",
+                "authorAffiliation": "AuthorAffiliation1",
+                "authorIdentifierScheme": "ORCID",
+                "authorIdentifier": "AuthorIdentifier1",
+            }
+        ],
+        "datasetContact": [
+            {
+                "datasetContactName": "LastContact1, FirstContact1",
+                "datasetContactAffiliation": "ContactAffiliation1",
+                "datasetContactEmail": "ContactEmail1@mailinator.com",
+            }
+        ],
+        "dsDescription": [
+            {
+                "dsDescriptionValue": "DescriptionText2",
+                "dsDescriptionDate": "1000-02-02",
+            }
+        ],
+        "subject": [
+            "Agricultural Sciences",
+            "Business and Management",
+            "Engineering",
+            "Law",
+        ],
+        "keyword": [
+            {
+                "keywordValue": "KeywordTerm1",
+                "keywordVocabulary": "KeywordVocabulary1",
+                "keywordVocabularyURI": "http://KeywordVocabularyURL1.org",
+            }
+        ],
+        "topicClassification": [
+            {
+                "topicClassValue": "Topic Class Value1",
+                "topicClassVocab": "Topic Classification Vocabulary",
+            }
+        ],
+        "publication": [
+            {
+                "publicationCitation": "RelatedPublicationCitation1",
+                "publicationIDType": "ark",
+                "publicationIDNumber": "RelatedPublicationIDNumber1",
+                "publicationURL": "http://RelatedPublicationURL1.org",
+            }
+        ],
+        "notesText": "Notes1",
+        "producer": [
+            {
+                "producerName": "LastProducer1, FirstProducer1",
+                "producerAffiliation": "ProducerAffiliation1",
+                "producerAbbreviation": "ProducerAbbreviation1",
+                "producerURL": "http://ProducerURL1.org",
+                "producerLogoURL": "http://ProducerLogoURL1.org",
+            }
+        ],
+        "productionDate": "1003-01-01",
+        "productionPlace": "ProductionPlace",
+        "contributor": [
+            {
+                "contributorType": "Data Collector",
+                "contributorName": "LastContributor1, FirstContributor1",
+            }
+        ],
+        "grantNumber": [
+            {
+                "grantNumberAgency": "GrantInformationGrantAgency1",
+                "grantNumberValue": "GrantInformationGrantNumber1",
+            }
+        ],
+        "distributor": [
+            {
+                "distributorName": "LastDistributor1, FirstDistributor1",
+                "distributorAffiliation": "DistributorAffiliation1",
+                "distributorAbbreviation": "DistributorAbbreviation1",
+                "distributorURL": "http://DistributorURL1.org",
+                "distributorLogoURL": "http://DistributorLogoURL1.org",
+            }
+        ],
+        "distributionDate": "1004-01-01",
+        "depositor": "LastDepositor, FirstDepositor",
+        "dateOfDeposit": "1002-01-01",
+        "timePeriodCovered": [
+            {
+                "timePeriodCoveredStart": "1005-01-01",
+                "timePeriodCoveredEnd": "1005-01-02",
+            }
+        ],
+        "dateOfCollection": [
+            {"dateOfCollectionStart": "1006-01-01", "dateOfCollectionEnd": "1006-01-01"}
+        ],
+        "kindOfData": ["KindOfData1", "KindOfData2"],
+        "language": ["German"],
+        "series": {
+            "seriesName": "SeriesName",
+            "seriesInformation": "SeriesInformation",
+        },
+        "software": [
+            {"softwareName": "SoftwareName1", "softwareVersion": "SoftwareVersion1"}
+        ],
+        "relatedMaterial": ["RelatedMaterial1", "RelatedMaterial2"],
+        "relatedDatasets": ["RelatedDatasets1", "RelatedDatasets2"],
+        "otherReferences": ["OtherReferences1", "OtherReferences2"],
+        "dataSources": ["DataSources1", "DataSources2"],
+        "originOfSources": "OriginOfSources",
+        "characteristicOfSources": "CharacteristicOfSourcesNoted",
+        "accessToSources": "DocumentationAndAccessToSources",
+        "geospatial_displayName": "Geospatial Metadata",
+        "geographicCoverage": [
+            {
+                "country": "Afghanistan",
+                "state": "GeographicCoverageStateProvince1",
+                "city": "GeographicCoverageCity1",
+                "otherGeographicCoverage": "GeographicCoverageOther1",
+            }
+        ],
+        "geographicUnit": ["GeographicUnit1", "GeographicUnit2"],
+        "geographicBoundingBox": [
+            {
+                "westLongitude": "10",
+                "eastLongitude": "20",
+                "northLongitude": "30",
+                "southLongitude": "40",
+            }
+        ],
+        "socialscience_displayName": "Social Science and Humanities Metadata",
+        "unitOfAnalysis": ["UnitOfAnalysis1", "UnitOfAnalysis2"],
+        "universe": ["Universe1", "Universe2"],
+        "timeMethod": "TimeMethod",
+        "dataCollector": "LastDataCollector1, FirstDataCollector1",
+        "collectorTraining": "CollectorTraining",
+        "frequencyOfDataCollection": "Frequency",
+        "samplingProcedure": "SamplingProcedure",
+        "targetSampleSize": {
+            "targetSampleActualSize": "100",
+            "targetSampleSizeFormula": "TargetSampleSizeFormula",
+        },
+        "deviationsFromSampleDesign": "MajorDeviationsForSampleDesign",
+        "collectionMode": "CollectionMode",
+        "researchInstrument": "TypeOfResearchInstrument",
+        "dataCollectionSituation": "CharacteristicsOfDataCollectionSituation",
+        "actionsToMinimizeLoss": "ActionsToMinimizeLosses",
+        "controlOperations": "ControlOperations",
+        "weighting": "Weighting",
+        "cleaningOperations": "CleaningOperations",
+        "datasetLevelErrorNotes": "StudyLevelErrorNotes",
+        "responseRate": "ResponseRate",
+        "samplingErrorEstimates": "EstimatesOfSamplingError",
+        "otherDataAppraisal": "OtherFormsOfDataAppraisal",
+        "socialScienceNotes": {
+            "socialScienceNotesType": "NotesType",
+            "socialScienceNotesSubject": "NotesSubject",
+            "socialScienceNotesText": "NotesText",
+        },
+        "journal_displayName": "Journal Metadata",
+        "journalVolumeIssue": [
+            {
+                "journalVolume": "JournalVolume1",
+                "journalIssue": "JournalIssue1",
+                "journalPubDate": "1008-01-01",
+            }
+        ],
+        "journalArticleType": "abstract",
+        "citation_displayName": "Citation Metadata",
     }
     return data
 
@@ -482,78 +804,78 @@ def json_dataverse_upload_attr():
 
     """
     data = [
-        'license',
-        'termsOfUse',
-        'termsOfAccess',
-        'fileAccessRequest',
-        'protocol',
-        'authority',
-        'identifier',
-        'citation_displayName',
-        'title',
-        'subtitle',
-        'alternativeTitle',
-        'alternativeURL',
-        'otherId',
-        'author',
-        'datasetContact',
-        'dsDescription',
-        'subject',
-        'keyword',
-        'topicClassification',
-        'publication',
-        'notesText',
-        'producer',
-        'productionDate',
-        'productionPlace',
-        'contributor',
-        'grantNumber',
-        'distributor',
-        'distributionDate',
-        'depositor',
-        'dateOfDeposit',
-        'timePeriodCovered',
-        'dateOfCollection',
-        'kindOfData',
-        'language',
-        'series',
-        'software',
-        'relatedMaterial',
-        'relatedDatasets',
-        'otherReferences',
-        'dataSources',
-        'originOfSources',
-        'characteristicOfSources',
-        'accessToSources',
-        'geospatial_displayName',
-        'geographicCoverage',
-        'geographicUnit',
-        'geographicBoundingBox',
-        'socialscience_displayName',
-        'unitOfAnalysis',
-        'universe',
-        'timeMethod',
-        'dataCollector',
-        'collectorTraining',
-        'frequencyOfDataCollection',
-        'samplingProcedure',
-        'targetSampleSize',
-        'deviationsFromSampleDesign',
-        'collectionMode',
-        'researchInstrument',
-        'dataCollectionSituation',
-        'actionsToMinimizeLoss',
-        'controlOperations',
-        'weighting',
-        'cleaningOperations',
-        'datasetLevelErrorNotes',
-        'responseRate',
-        'samplingErrorEstimates',
-        'otherDataAppraisal',
-        'socialScienceNotes',
-        'journal_displayName',
-        'journalVolumeIssue',
-        'journalArticleType'
+        "license",
+        "termsOfUse",
+        "termsOfAccess",
+        "fileAccessRequest",
+        "protocol",
+        "authority",
+        "identifier",
+        "citation_displayName",
+        "title",
+        "subtitle",
+        "alternativeTitle",
+        "alternativeURL",
+        "otherId",
+        "author",
+        "datasetContact",
+        "dsDescription",
+        "subject",
+        "keyword",
+        "topicClassification",
+        "publication",
+        "notesText",
+        "producer",
+        "productionDate",
+        "productionPlace",
+        "contributor",
+        "grantNumber",
+        "distributor",
+        "distributionDate",
+        "depositor",
+        "dateOfDeposit",
+        "timePeriodCovered",
+        "dateOfCollection",
+        "kindOfData",
+        "language",
+        "series",
+        "software",
+        "relatedMaterial",
+        "relatedDatasets",
+        "otherReferences",
+        "dataSources",
+        "originOfSources",
+        "characteristicOfSources",
+        "accessToSources",
+        "geospatial_displayName",
+        "geographicCoverage",
+        "geographicUnit",
+        "geographicBoundingBox",
+        "socialscience_displayName",
+        "unitOfAnalysis",
+        "universe",
+        "timeMethod",
+        "dataCollector",
+        "collectorTraining",
+        "frequencyOfDataCollection",
+        "samplingProcedure",
+        "targetSampleSize",
+        "deviationsFromSampleDesign",
+        "collectionMode",
+        "researchInstrument",
+        "dataCollectionSituation",
+        "actionsToMinimizeLoss",
+        "controlOperations",
+        "weighting",
+        "cleaningOperations",
+        "datasetLevelErrorNotes",
+        "responseRate",
+        "samplingErrorEstimates",
+        "otherDataAppraisal",
+        "socialScienceNotes",
+        "journal_displayName",
+        "journalVolumeIssue",
+        "journalArticleType",
     ]
     return data
 
@@ -567,13 +889,7 @@ def json_dataverse_upload_required_attr():
         List of attributes, which will be used for import and export.
 
     """
-    data = [
-        'title',
-        'author',
-        'datasetContact',
-        'dsDescription',
-        'subject'
-    ]
+    data = ["title", "author", "datasetContact", "dsDescription", "subject"]
     return data
 
 
@@ -585,7 +901,7 @@ class TestDatasetGeneric(object):
         data = [
             ((dict_flat_set_min(), object_data_min()), dict_flat_get_min()),
             ((dict_flat_set_full(), object_data_full()), dict_flat_get_full()),
-            (({}, {}), {})
+            (({}, {}), {}),
         ]
 
         pdv = data_object()
@@ -600,7 +916,6 @@ class TestDatasetGeneric(object):
                 assert data[key] == input[1][key] == data_eval[key]
             assert len(data) == len(input[1]) == len(data_eval)
 
-
     def test_dataset_set_invalid(self):
         """Test Dataset.set() with invalid data."""
 
@@ -610,21 +925,28 @@ class TestDatasetGeneric(object):
                 pdv = data_object()
                 pdv.set(data)
 
-
     def test_dataset_validate_json_valid(self):
         """Test Dataset.validate_json() with valid data."""
         data = [
             ((dict_flat_set_min(), {}), True),
             ((dict_flat_set_full(), {}), True),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload'}), True),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload', 'filename_schema': FILENAME_SCHEMA}), True),
-            ((dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA}), True)
+            ((dict_flat_set_min(), {"data_format": "dataverse_upload"}), True),
+            (
+                (
+                    dict_flat_set_min(),
+                    {
+                        "data_format": "dataverse_upload",
+                        "filename_schema": FILENAME_SCHEMA,
+                    },
+                ),
+                True,
+            ),
+            ((dict_flat_set_min(), {"filename_schema": FILENAME_SCHEMA}), True),
         ]
 
         for input, data_eval in data:
             pdv = data_object()
             pdv.set(input[0])
-            kwargs = input[1]
 
             assert pdv.validate_json() == data_eval
 
@@ -637,11 +959,26 @@ class TestDatasetSpecific(object):
         data = [
             (({json_upload_min()}, {}), object_data_min()),
             (({json_upload_full()}, {}), object_data_full()),
-            (({json_upload_min()}, {'data_format': 'dataverse_upload'}), object_data_min()),
-            (({json_upload_min()}, {'validate': False}), object_data_min()),
-            (({json_upload_min()}, {'filename_schema': '', 'validate': False}), object_data_min()),
-            (({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}), object_data_min()),
-            (({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}), object_data_min())
+            (
+                ({json_upload_min()}, {"data_format": "dataverse_upload"}),
+                object_data_min(),
+            ),
+            (({json_upload_min()}, {"validate": False}), object_data_min()),
+            (
+                ({json_upload_min()}, {"filename_schema": "", "validate": False},),
+                object_data_min(),
+            ),
+            (
+                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                object_data_min(),
+            ),
+            (
+                (
+                    {json_upload_min()},
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
+                object_data_min(),
+            ),
         ]
 
         for input, data_eval in data:
@@ -654,17 +991,34 @@ class TestDatasetSpecific(object):
                 assert getattr(pdv, key) == data_eval[key]
             assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
-
     def test_dataset_to_json_valid(self):
         """Test Dataset.to_json() with valid data."""
         data = [
             ((dict_flat_set_min(), {}), json.loads(json_upload_min())),
             ((dict_flat_set_full(), {}), json.loads(json_upload_full())),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload'}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'validate': False}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'filename_schema': '', 'validate': False}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'filename_schema': 'wrong', 'validate': False}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA, 'validate': True}), json.loads(json_upload_min()))
+            (
+                (dict_flat_set_min(), {"data_format": "dataverse_upload"}),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (dict_flat_set_min(), {"validate": False}),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (dict_flat_set_min(), {"filename_schema": "", "validate": False},),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
+                json.loads(json_upload_min()),
+            ),
         ]
 
         pdv = data_object()
@@ -680,8 +1034,14 @@ class TestDatasetSpecific(object):
             assert data
             assert isinstance(data, dict)
             assert len(data) == len(data_eval)
-            assert len(data['datasetVersion']['metadataBlocks']['citation']) == len(data_eval['datasetVersion']['metadataBlocks']['citation'])
-            assert len(data['datasetVersion']['metadataBlocks']['citation']['fields']) == len(data_eval['datasetVersion']['metadataBlocks']['citation']['fields'])
+            assert len(data["datasetVersion"]["metadataBlocks"]["citation"]) == len(
+                data_eval["datasetVersion"]["metadataBlocks"]["citation"]
+            )
+            assert len(
+                data["datasetVersion"]["metadataBlocks"]["citation"]["fields"]
+            ) == len(
+                data_eval["datasetVersion"]["metadataBlocks"]["citation"]["fields"]
+            )
 
     def test_dataset_init_valid(self):
         """Test Dataset.__init__() with valid data."""
@@ -690,14 +1050,13 @@ class TestDatasetSpecific(object):
             (Dataset(), {}),
             (Dataset(dict_flat_set_min()), object_data_min()),
             (Dataset(dict_flat_set_full()), object_data_full()),
-            (Dataset({}), {})
+            (Dataset({}), {}),
         ]
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
             assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
-
 
     def test_dataset_init_invalid(self):
         """Test Dataset.init() with invalid data."""
@@ -707,7 +1066,6 @@ class TestDatasetSpecific(object):
         for data in INVALID_SET_TYPES:
             with pytest.raises(AssertionError):
                 pdv.set(data)
-
 
     def test_dataset_from_json_invalid(self):
         """Test Dataset.from_json() with invalid data."""
@@ -743,7 +1101,9 @@ class TestDatasetSpecific(object):
         for data_format in INVALID_DATA_FORMAT_TYPES + INVALID_DATA_FORMAT_STRINGS:
             with pytest.raises(AssertionError):
                 pdv = data_object()
-                pdv.from_json(json_upload_min(), data_format=data_format, validate=False)
+                pdv.from_json(
+                    json_upload_min(), data_format=data_format, validate=False
+                )
 
         # invalid `validate`
         for validate in INVALID_VALIDATE_TYPES:
@@ -751,14 +1111,13 @@ class TestDatasetSpecific(object):
                 pdv = data_object()
                 pdv.from_json(json_upload_min(), validate=validate)
 
-
     def test_dataset_to_json_invalid(self):
         """Test Dataset.to_json() with non-valid data."""
         # invalid `filename_schema`
         for filename_schema in INVALID_FILENAME_STRINGS:
             with pytest.raises(FileNotFoundError):
                 obj = data_object()
-                result = obj.to_json(filename_schema=filename_schema)
+                obj.to_json(filename_schema=filename_schema)
 
         for filename_schema in INVALID_FILENAME_TYPES:
             with pytest.raises(AssertionError):
@@ -779,7 +1138,6 @@ class TestDatasetSpecific(object):
                 pdv.set(dict_flat_set_min())
                 pdv.to_json(validate=validate)
 
-
     def test_dataset_validate_json_invalid(self):
         """Test Dataset.validate_json() with non-valid data."""
         # invalid `filename_schema`
@@ -796,7 +1154,8 @@ class TestDatasetSpecific(object):
                 pdv.validate_json(filename_schema=filename_schema)
 
 
-if not os.environ.get('TRAVIS'):
+if not os.environ.get("TRAVIS"):
+
     class TestDatasetSpecificTravisNot(object):
         """Generic tests for Dataset(), not running on Travis (no file-write permissions)."""
 
@@ -805,10 +1164,13 @@ if not os.environ.get('TRAVIS'):
             data = [
                 (dict_flat_set_min(), {}),
                 (dict_flat_set_full(), {}),
-                (dict_flat_set_min(), {'data_format': 'dataverse_upload'}),
-                (dict_flat_set_min(), {'validate': False}),
-                (dict_flat_set_min(), {'filename_schema': 'wrong', 'validate': False}),
-                (dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA, 'validate': True})
+                (dict_flat_set_min(), {"data_format": "dataverse_upload"}),
+                (dict_flat_set_min(), {"validate": False}),
+                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
             ]
 
             for data_set, kwargs_from in data:
@@ -816,10 +1178,12 @@ if not os.environ.get('TRAVIS'):
                 kwargs = {}
                 pdv_start = data_object()
                 pdv_start.set(data_set)
-                if 'validate' in kwargs_from:
-                    if kwargs_from['validate'] == False:
-                        kwargs = {'validate': False}
-                write_json(FILENAME_JSON_OUTPUT, json.loads(pdv_start.to_json(**kwargs)))
+                if "validate" in kwargs_from:
+                    if not kwargs_from["validate"]:
+                        kwargs = {"validate": False}
+                write_json(
+                    FILENAME_JSON_OUTPUT, json.loads(pdv_start.to_json(**kwargs)),
+                )
 
                 pdv_end = data_object()
                 kwargs = kwargs_from

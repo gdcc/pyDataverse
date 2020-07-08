@@ -8,26 +8,25 @@ import platform
 import jsonschema
 
 import pytest
-from pyDataverse.models import Datafile, DVObject
+from pyDataverse.models import Datafile
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
-FILENAME_DATA_FULL = 'tests/data/datafile_upload_full.json'
-FILENAME_DATA_MIN = 'tests/data/datafile_upload_min.json'
-FILENAME_SCHEMA = 'schemas/json/datafile_upload_schema.json'
-FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + '/data/output/datafile_pytest.json')
+FILENAME_DATA_FULL = "tests/data/datafile_upload_full.json"
+FILENAME_DATA_MIN = "tests/data/datafile_upload_min.json"
+FILENAME_SCHEMA = "schemas/json/datafile_upload_schema.json"
+FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + "/data/output/datafile_pytest.json")
 
-INVALID_FILENAME_STRINGS = ['wrong', '']
+INVALID_FILENAME_STRINGS = ["wrong", ""]
 INVALID_FILENAME_TYPES = [(), [], 12, 12.12, set(), True, False]
-INVALID_VALIDATE_TYPES = [None, 'wrong', {}, []]
+INVALID_VALIDATE_TYPES = [None, "wrong", {}, []]
 INVALID_JSON_DATA_TYPES = [[], (), 12, set(), True, False, None]
-INVALID_SET_TYPES = INVALID_FILENAME_TYPES + ['', 'wrong']
+INVALID_SET_TYPES = INVALID_FILENAME_TYPES + ["", "wrong"]
 INVALID_JSON_STRINGS = INVALID_FILENAME_STRINGS
 INVALID_DATA_FORMAT_TYPES = INVALID_FILENAME_TYPES
 INVALID_DATA_FORMAT_STRINGS = INVALID_FILENAME_STRINGS
 
 
-
-def read_file(filename, mode='r'):
+def read_file(filename, mode="r"):
     """Read in a file.
 
     Parameters
@@ -49,7 +48,7 @@ def read_file(filename, mode='r'):
     return data
 
 
-def write_json(filename, data, mode='w', encoding='utf-8'):
+def write_json(filename, data, mode="w", encoding="utf-8"):
     """Write data to a json file.
 
     Parameters
@@ -87,10 +86,7 @@ def dict_flat_set_min():
         Minimum Datafile metadata.
 
     """
-    data = {
-        'pid': 'doi:10.11587/RRKEA9',
-        'filename': '10109_qu_de_v1_0.pdf'
-    }
+    data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
     return data
 
 
@@ -104,13 +100,13 @@ def dict_flat_set_full():
 
     """
     data = {
-        'pid': 'doi:10.11587/NVWE8Y',
-        'filename': '20001_ta_de_v1_0.pdf',
-        'description': 'Another data file.',
-        'restrict': True,
-        'categories': ['Documentation'],
-        'title': 'Questionnaire',
-        'directoryLabel': 'data/subdir1'
+        "pid": "doi:10.11587/NVWE8Y",
+        "filename": "20001_ta_de_v1_0.pdf",
+        "description": "Another data file.",
+        "restrict": True,
+        "categories": ["Documentation"],
+        "title": "Questionnaire",
+        "directoryLabel": "data/subdir1",
     }
     return data
 
@@ -125,19 +121,19 @@ def object_data_init():
 
     """
     data = {
-        '_Datafile_default_json_format': 'dataverse_upload',
-        '_Datafile_default_json_schema_filename': FILENAME_SCHEMA,
-        '_Datafile_allowed_json_formats': ['dataverse_upload', 'dataverse_download'],
-        '_Datafile_json_dataverse_upload_attr': [
-            'description',
-            'categories',
-            'restrict',
-            'title',
-            'directoryLabel',
-            'pid',
-            'filename'
+        "_Datafile_default_json_format": "dataverse_upload",
+        "_Datafile_default_json_schema_filename": FILENAME_SCHEMA,
+        "_Datafile_allowed_json_formats": ["dataverse_upload", "dataverse_download"],
+        "_Datafile_json_dataverse_upload_attr": [
+            "description",
+            "categories",
+            "restrict",
+            "title",
+            "directoryLabel",
+            "pid",
+            "filename",
         ],
-        '_internal_attributes': []
+        "_internal_attributes": [],
     }
     return data
 
@@ -151,10 +147,7 @@ def object_data_min():
         Minimum Datafile metadata.
 
     """
-    data = {
-        'pid': 'doi:10.11587/RRKEA9',
-        'filename': '10109_qu_de_v1_0.pdf'
-    }
+    data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
     return data
 
 
@@ -168,13 +161,13 @@ def object_data_full():
 
     """
     data = {
-        'pid': 'doi:10.11587/NVWE8Y',
-        'filename': '20001_ta_de_v1_0.pdf',
-        'description': 'Another data file.',
-        'restrict': True,
-        'categories': ['Documentation'],
-        'title': 'Questionnaire',
-        'directoryLabel': 'data/subdir1'
+        "pid": "doi:10.11587/NVWE8Y",
+        "filename": "20001_ta_de_v1_0.pdf",
+        "description": "Another data file.",
+        "restrict": True,
+        "categories": ["Documentation"],
+        "title": "Questionnaire",
+        "directoryLabel": "data/subdir1",
     }
     return data
 
@@ -188,10 +181,7 @@ def dict_flat_get_min():
         Minimum Datafile dictionary returned by :func:`get().
 
     """
-    data = {
-        'pid': 'doi:10.11587/RRKEA9',
-        'filename': '10109_qu_de_v1_0.pdf'
-    }
+    data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
     return data
 
 
@@ -205,13 +195,13 @@ def dict_flat_get_full():
 
     """
     data = {
-        'pid': 'doi:10.11587/NVWE8Y',
-        'filename': '20001_ta_de_v1_0.pdf',
-        'description': 'Another data file.',
-        'restrict': True,
-        'categories': ['Documentation'],
-        'title': 'Questionnaire',
-        'directoryLabel': 'data/subdir1',
+        "pid": "doi:10.11587/NVWE8Y",
+        "filename": "20001_ta_de_v1_0.pdf",
+        "description": "Another data file.",
+        "restrict": True,
+        "categories": ["Documentation"],
+        "title": "Questionnaire",
+        "directoryLabel": "data/subdir1",
     }
     return data
 
@@ -252,13 +242,13 @@ def json_dataverse_upload_attr():
 
     """
     data = [
-        'description',
-        'categories',
-        'restrict',
-        'title',
-        'directoryLabel',
-        'pid',
-        'filename'
+        "description",
+        "categories",
+        "restrict",
+        "title",
+        "directoryLabel",
+        "pid",
+        "filename",
     ]
     return data
 
@@ -272,10 +262,7 @@ def json_dataverse_upload_required_attr():
         List of attributes, which will be used for import and export.
 
     """
-    data = [
-        'pid',
-        'filename'
-    ]
+    data = ["pid", "filename"]
     return data
 
 
@@ -287,7 +274,7 @@ class TestDatafileGeneric(object):
         data = [
             ((dict_flat_set_min(), object_data_min()), dict_flat_get_min()),
             ((dict_flat_set_full(), object_data_full()), dict_flat_get_full()),
-            (({}, {}), {})
+            (({}, {}), {}),
         ]
 
         pdv = data_object()
@@ -302,7 +289,6 @@ class TestDatafileGeneric(object):
                 assert data[key] == input[1][key] == data_eval[key]
             assert len(data) == len(input[1]) == len(data_eval)
 
-
     def test_datafile_set_invalid(self):
         """Test Datafile.set() with invalid data."""
 
@@ -312,17 +298,28 @@ class TestDatafileGeneric(object):
                 pdv = data_object()
                 pdv.set(data)
 
-
     def test_datafile_from_json_valid(self):
         """Test Datafile.from_json() with valid data."""
         data = [
             (({json_upload_min()}, {}), object_data_min()),
             (({json_upload_full()}, {}), object_data_full()),
-            (({json_upload_min()}, {'data_format': 'dataverse_upload'}), object_data_min()),
-            (({json_upload_min()}, {'validate': False}), object_data_min()),
-            (({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}), object_data_min()),
-            (({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}), object_data_min()),
-            (({'{}'}, {'validate': False}), {})
+            (
+                ({json_upload_min()}, {"data_format": "dataverse_upload"}),
+                object_data_min(),
+            ),
+            (({json_upload_min()}, {"validate": False}), object_data_min()),
+            (
+                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                object_data_min(),
+            ),
+            (
+                (
+                    {json_upload_min()},
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
+                object_data_min(),
+            ),
+            (({"{}"}, {"validate": False}), {}),
         ]
 
         for input, data_eval in data:
@@ -334,7 +331,6 @@ class TestDatafileGeneric(object):
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
             assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
-
 
     def test_datafile_from_json_invalid(self):
         """Test Datafile.from_json() with invalid data."""
@@ -370,7 +366,9 @@ class TestDatafileGeneric(object):
         for data_format in INVALID_DATA_FORMAT_TYPES + INVALID_DATA_FORMAT_STRINGS:
             with pytest.raises(AssertionError):
                 pdv = data_object()
-                pdv.from_json(json_upload_min(), data_format=data_format, validate=False)
+                pdv.from_json(
+                    json_upload_min(), data_format=data_format, validate=False
+                )
 
         # invalid `validate`
         for validate in INVALID_VALIDATE_TYPES:
@@ -380,7 +378,7 @@ class TestDatafileGeneric(object):
 
         with pytest.raises(jsonschema.exceptions.ValidationError):
             pdv = data_object()
-            pdv.from_json('{}')
+            pdv.from_json("{}")
 
         for attr in json_dataverse_upload_required_attr():
             with pytest.raises(jsonschema.exceptions.ValidationError):
@@ -390,17 +388,31 @@ class TestDatafileGeneric(object):
                 data = json.dumps(data)
                 pdv.from_json(data, validate=True)
 
-
     def test_datafile_to_json_valid(self):
         """Test Datafile.to_json() with valid data."""
         data = [
             ((dict_flat_set_min(), {}), json.loads(json_upload_min())),
             ((dict_flat_set_full(), {}), json.loads(json_upload_full())),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload'}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'validate': False}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'filename_schema': 'wrong', 'validate': False}), json.loads(json_upload_min())),
-            ((dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA, 'validate': True}), json.loads(json_upload_min())),
-            (({}, {'validate': False}), {})
+            (
+                (dict_flat_set_min(), {"data_format": "dataverse_upload"}),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (dict_flat_set_min(), {"validate": False}),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                json.loads(json_upload_min()),
+            ),
+            (
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
+                json.loads(json_upload_min()),
+            ),
+            (({}, {"validate": False}), {}),
         ]
 
         pdv = data_object()
@@ -416,14 +428,13 @@ class TestDatafileGeneric(object):
                 assert data[key] == data_eval[key]
             assert len(data) == len(data_eval)
 
-
     def test_datafile_to_json_invalid(self):
         """Test Datafile.to_json() with non-valid data."""
         # invalid `filename_schema`
         for filename_schema in INVALID_FILENAME_STRINGS:
             with pytest.raises(FileNotFoundError):
                 obj = data_object()
-                result = obj.to_json(filename_schema=filename_schema)
+                obj.to_json(filename_schema=filename_schema)
 
         for filename_schema in INVALID_FILENAME_TYPES:
             with pytest.raises(AssertionError):
@@ -457,24 +468,30 @@ class TestDatafileGeneric(object):
                 pdv.set(data)
                 pdv.to_json(validate=True)
 
-
     def test_datafile_validate_json_valid(self):
         """Test Datafile.validate_json() with valid data."""
         data = [
             ((dict_flat_set_min(), {}), True),
             ((dict_flat_set_full(), {}), True),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload'}), True),
-            ((dict_flat_set_min(), {'data_format': 'dataverse_upload', 'filename_schema': FILENAME_SCHEMA}), True),
-            ((dict_flat_set_min(), {'filename_schema': FILENAME_SCHEMA}), True)
+            ((dict_flat_set_min(), {"data_format": "dataverse_upload"}), True),
+            (
+                (
+                    dict_flat_set_min(),
+                    {
+                        "data_format": "dataverse_upload",
+                        "filename_schema": FILENAME_SCHEMA,
+                    },
+                ),
+                True,
+            ),
+            ((dict_flat_set_min(), {"filename_schema": FILENAME_SCHEMA}), True),
         ]
 
         for input, data_eval in data:
             pdv = data_object()
             pdv.set(input[0])
-            kwargs = input[1]
 
             assert pdv.validate_json() == data_eval
-
 
     def test_datafile_validate_json_invalid(self):
         """Test Datafile.validate_json() with non-valid data."""
@@ -511,14 +528,13 @@ class TestDatafileSpecific(object):
             (Datafile(), {}),
             (Datafile(dict_flat_set_min()), object_data_min()),
             (Datafile(dict_flat_set_full()), object_data_full()),
-            (Datafile({}), {})
+            (Datafile({}), {}),
         ]
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
                 assert getattr(pdv, key) == data_eval[key]
             assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
-
 
     def test_datafile_init_invalid(self):
         """Test Datafile.init() with invalid data."""
@@ -530,7 +546,8 @@ class TestDatafileSpecific(object):
                 pdv.set(data)
 
 
-if not os.environ.get('TRAVIS'):
+if not os.environ.get("TRAVIS"):
+
     class TestDatafileGenericTravisNot(object):
         """Generic tests for Datafile(), not running on Travis (no file-write permissions)."""
 
@@ -539,11 +556,14 @@ if not os.environ.get('TRAVIS'):
             data = [
                 ({json_upload_min()}, {}),
                 ({json_upload_full()}, {}),
-                ({json_upload_min()}, {'data_format': 'dataverse_upload'}),
-                ({json_upload_min()}, {'validate': False}),
-                ({json_upload_min()}, {'filename_schema': 'wrong', 'validate': False}),
-                ({json_upload_min()}, {'filename_schema': FILENAME_SCHEMA, 'validate': True}),
-                ({'{}'}, {'validate': False})
+                ({json_upload_min()}, {"data_format": "dataverse_upload"}),
+                ({json_upload_min()}, {"validate": False}),
+                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                (
+                    {json_upload_min()},
+                    {"filename_schema": FILENAME_SCHEMA, "validate": True},
+                ),
+                ({"{}"}, {"validate": False}),
             ]
 
             for args_from, kwargs_from in data:
@@ -551,10 +571,12 @@ if not os.environ.get('TRAVIS'):
                 args = args_from
                 kwargs = kwargs_from
                 pdv_start.from_json(*args, **kwargs)
-                if 'validate' in kwargs:
-                    if kwargs['validate'] == False:
-                        kwargs = {'validate': False}
-                write_json(FILENAME_JSON_OUTPUT, json.loads(pdv_start.to_json(**kwargs)))
+                if "validate" in kwargs:
+                    if not kwargs["validate"]:
+                        kwargs = {"validate": False}
+                write_json(
+                    FILENAME_JSON_OUTPUT, json.loads(pdv_start.to_json(**kwargs)),
+                )
                 pdv_end = data_object()
                 kwargs = kwargs_from
                 pdv_end.from_json(read_file(FILENAME_JSON_OUTPUT), **kwargs)

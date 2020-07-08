@@ -5,15 +5,22 @@ from __future__ import absolute_import
 
 import json
 
-from pyDataverse.utils import read_json, validate_data, write_json
+from pyDataverse.utils import validate_data
 
 
-INTERNAL_ATTRIBUTES = ['_default_json_format', '_default_json_schema_filename', '_allowed_json_formats', '_json_dataverse_upload_attr', '_internal_attributes']
+INTERNAL_ATTRIBUTES = [
+    "_default_json_format",
+    "_default_json_schema_filename",
+    "_allowed_json_formats",
+    "_json_dataverse_upload_attr",
+    "_internal_attributes",
+]
 
 
 class DVObject(object):
     """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`.
     """
+
     def __init__(self, data=None):
         """Init :class:`DVObject`.
 
@@ -49,7 +56,7 @@ class DVObject(object):
 
         for key, val in data.items():
             if key in self._internal_attributes:
-                print('Importing attribute {0} not allowed.'.format(key))
+                print("Importing attribute {0} not allowed.".format(key))
             else:
                 self.__setattr__(key, val)
 
@@ -94,9 +101,15 @@ class DVObject(object):
             filename_schema = self._default_json_schema_filename
         assert isinstance(filename_schema, str)
 
-        return validate_data(json.loads(self.to_json(validate=False)), filename_schema, file_format='json')
+        return validate_data(
+            json.loads(self.to_json(validate=False)),
+            filename_schema,
+            file_format="json",
+        )
 
-    def from_json(self, json_str, data_format=None, validate=True, filename_schema=None):
+    def from_json(
+        self, json_str, data_format=None, validate=True, filename_schema=None
+    ):
         """Import metadata from a JSON file.
 
         Parses in the metadata from different JSON formats.
@@ -134,7 +147,7 @@ class DVObject(object):
 
         data = {}
 
-        if data_format == 'dataverse_upload':
+        if data_format == "dataverse_upload":
             if validate:
                 validate_data(json_dict, filename_schema)
             # get first level metadata and parse it automatically
@@ -142,13 +155,17 @@ class DVObject(object):
                 if key in self._json_dataverse_upload_attr:
                     data[key] = json_dict[key]
                 else:
-                    print('INFO: Attribute {0} not valid for import (data format=`{1}`).'.format(key, data_format))
-        elif data_format == 'dataverse_download':
-            print('INFO: Not implemented yet.')
-        elif data_format == 'dspace':
-            print('INFO: Not implemented yet.')
-        elif data_format == 'custom':
-            print('INFO: Not implemented yet.')
+                    print(
+                        "INFO: Attribute {0} not valid for import (data format=`{1}`).".format(
+                            key, data_format
+                        )
+                    )
+        elif data_format == "dataverse_download":
+            print("INFO: Not implemented yet.")
+        elif data_format == "dspace":
+            print("INFO: Not implemented yet.")
+        elif data_format == "custom":
+            print("INFO: Not implemented yet.")
         else:
             # TODO: add exception for wrong data format
             pass
@@ -185,16 +202,16 @@ class DVObject(object):
 
         data = {}
 
-        if data_format == 'dataverse_upload':
+        if data_format == "dataverse_upload":
             for attr in self._json_dataverse_upload_attr:
                 # check if attribute exists
                 if hasattr(self, attr):
                     data[attr] = self.__getattribute__(attr)
-        elif data_format == 'dspace':
-            print('INFO: Not implemented yet.')
+        elif data_format == "dspace":
+            print("INFO: Not implemented yet.")
             return False
-        elif data_format == 'custom':
-            print('INFO: Not implemented yet.')
+        elif data_format == "custom":
+            print("INFO: Not implemented yet.")
             return False
         if validate:
             validate_data(data, filename_schema)
@@ -240,23 +257,22 @@ class Dataverse(DVObject):
             'schemas/json/dataverse_upload_schema.json'
 
         """
-        self._internal_attributes = ['_Dataverse' + attr for attr in INTERNAL_ATTRIBUTES]
+        self._internal_attributes = [
+            "_Dataverse" + attr for attr in INTERNAL_ATTRIBUTES
+        ]
 
         super().__init__(data=data)
 
-        self._default_json_format = 'dataverse_upload'
-        self._default_json_schema_filename = 'schemas/json/dataverse_upload_schema.json'
-        self._allowed_json_formats = [
-        'dataverse_upload',
-        'dataverse_download'
-        ]
+        self._default_json_format = "dataverse_upload"
+        self._default_json_schema_filename = "schemas/json/dataverse_upload_schema.json"
+        self._allowed_json_formats = ["dataverse_upload", "dataverse_download"]
         self._json_dataverse_upload_attr = [
-            'affiliation',
-            'alias',
-            'dataverseContacts',
-            'dataverseType',
-            'description',
-            'name'
+            "affiliation",
+            "alias",
+            "dataverseContacts",
+            "dataverseType",
+            "description",
+            "name",
         ]
 
 
@@ -280,13 +296,13 @@ class Dataset(DVObject):
     ds[\'datasetVersion\'].
     """
     __attr_import_dv_up_datasetVersion_values = [
-        'license',
-        'termsOfAccess',
-        'fileAccessRequest',
-        'protocol',
-        'authority',
-        'identifier',
-        'termsOfUse'
+        "license",
+        "termsOfAccess",
+        "fileAccessRequest",
+        "protocol",
+        "authority",
+        "identifier",
+        "termsOfUse",
     ]
 
     """
@@ -294,26 +310,26 @@ class Dataset(DVObject):
     ds[\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
     """
     __attr_import_dv_up_citation_fields_values = [
-        'accessToSources',
-        'alternativeTitle',
-        'alternativeURL',
-        'characteristicOfSources',
-        'dateOfDeposit',
-        'dataSources',
-        'depositor',
-        'distributionDate',
-        'kindOfData',
-        'language',
-        'notesText',
-        'originOfSources',
-        'otherReferences',
-        'productionDate',
-        'productionPlace',
-        'relatedDatasets',
-        'relatedMaterial',
-        'subject',
-        'subtitle',
-        'title'
+        "accessToSources",
+        "alternativeTitle",
+        "alternativeURL",
+        "characteristicOfSources",
+        "dateOfDeposit",
+        "dataSources",
+        "depositor",
+        "distributionDate",
+        "kindOfData",
+        "language",
+        "notesText",
+        "originOfSources",
+        "otherReferences",
+        "productionDate",
+        "productionPlace",
+        "relatedDatasets",
+        "relatedMaterial",
+        "subject",
+        "subtitle",
+        "title",
     ]
 
     """
@@ -321,47 +337,66 @@ class Dataset(DVObject):
     [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
     """
     __attr_import_dv_up_citation_fields_arrays = {
-        'author': ['authorName', 'authorAffiliation', 'authorIdentifierScheme',
-                   'authorIdentifier'],
-        'contributor': ['contributorType', 'contributorName'],
-        'dateOfCollection': ['dateOfCollectionStart', 'dateOfCollectionEnd'],
-        'datasetContact': ['datasetContactName', 'datasetContactAffiliation',
-                           'datasetContactEmail'],
-        'distributor': ['distributorName', 'distributorAffiliation',
-                        'distributorAbbreviation', 'distributorURL',
-                        'distributorLogoURL'],
-        'dsDescription': ['dsDescriptionValue', 'dsDescriptionDate'],
-        'grantNumber': ['grantNumberAgency', 'grantNumberValue'],
-        'keyword': ['keywordValue', 'keywordVocabulary',
-                    'keywordVocabularyURI'],
-        'producer': ['producerName', 'producerAffiliation',
-                     'producerAbbreviation', 'producerURL', 'producerLogoURL'],
-        'otherId': ['otherIdAgency', 'otherIdValue'],
-        'publication': ['publicationCitation', 'publicationIDType',
-                        'publicationIDNumber', 'publicationURL'],
-        'software': ['softwareName', 'softwareVersion'],
-        'timePeriodCovered': ['timePeriodCoveredStart',
-                              'timePeriodCoveredEnd'],
-        'topicClassification': ['topicClassValue', 'topicClassVocab']
+        "author": [
+            "authorName",
+            "authorAffiliation",
+            "authorIdentifierScheme",
+            "authorIdentifier",
+        ],
+        "contributor": ["contributorType", "contributorName"],
+        "dateOfCollection": ["dateOfCollectionStart", "dateOfCollectionEnd"],
+        "datasetContact": [
+            "datasetContactName",
+            "datasetContactAffiliation",
+            "datasetContactEmail",
+        ],
+        "distributor": [
+            "distributorName",
+            "distributorAffiliation",
+            "distributorAbbreviation",
+            "distributorURL",
+            "distributorLogoURL",
+        ],
+        "dsDescription": ["dsDescriptionValue", "dsDescriptionDate"],
+        "grantNumber": ["grantNumberAgency", "grantNumberValue"],
+        "keyword": ["keywordValue", "keywordVocabulary", "keywordVocabularyURI"],
+        "producer": [
+            "producerName",
+            "producerAffiliation",
+            "producerAbbreviation",
+            "producerURL",
+            "producerLogoURL",
+        ],
+        "otherId": ["otherIdAgency", "otherIdValue"],
+        "publication": [
+            "publicationCitation",
+            "publicationIDType",
+            "publicationIDNumber",
+            "publicationURL",
+        ],
+        "software": ["softwareName", "softwareVersion"],
+        "timePeriodCovered": ["timePeriodCoveredStart", "timePeriodCoveredEnd"],
+        "topicClassification": ["topicClassValue", "topicClassVocab"],
     }
 
     """
     Attributes of Dataverse API Upload Dataset JSON metadata standard inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
     """
-    __attr_import_dv_up_geospatial_fields_values = [
-        'geographicUnit'
-    ]
+    __attr_import_dv_up_geospatial_fields_values = ["geographicUnit"]
 
     """
     Attributes of Dataverse API Upload Dataset JSON metadata standard inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
     """
     __attr_import_dv_up_geospatial_fields_arrays = {
-        'geographicBoundingBox': ['westLongitude', 'eastLongitude',
-                                  'northLongitude', 'southLongitude'],
-        'geographicCoverage': ['country', 'state', 'city',
-                               'otherGeographicCoverage']
+        "geographicBoundingBox": [
+            "westLongitude",
+            "eastLongitude",
+            "northLongitude",
+            "southLongitude",
+        ],
+        "geographicCoverage": ["country", "state", "city", "otherGeographicCoverage"],
     }
 
     """
@@ -369,136 +404,137 @@ class Dataset(DVObject):
     [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'][\'fields\'].
     """
     __attr_import_dv_up_socialscience_fields_values = [
-        'actionsToMinimizeLoss',
-        'cleaningOperations',
-        'collectionMode',
-        'collectorTraining',
-        'controlOperations',
-        'dataCollectionSituation',
-        'dataCollector',
-        'datasetLevelErrorNotes',
-        'deviationsFromSampleDesign',
-        'frequencyOfDataCollection',
-        'otherDataAppraisal',
-        'researchInstrument',
-        'responseRate',
-        'samplingErrorEstimates',
-        'samplingProcedure',
-        'unitOfAnalysis',
-        'universe',
-        'timeMethod',
-        'weighting'
+        "actionsToMinimizeLoss",
+        "cleaningOperations",
+        "collectionMode",
+        "collectorTraining",
+        "controlOperations",
+        "dataCollectionSituation",
+        "dataCollector",
+        "datasetLevelErrorNotes",
+        "deviationsFromSampleDesign",
+        "frequencyOfDataCollection",
+        "otherDataAppraisal",
+        "researchInstrument",
+        "responseRate",
+        "samplingErrorEstimates",
+        "samplingProcedure",
+        "unitOfAnalysis",
+        "universe",
+        "timeMethod",
+        "weighting",
     ]
 
     """
     Attributes of Dataverse API Upload Dataset JSON metadata standard inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
     """
-    __attr_import_dv_up_journal_fields_values = [
-        'journalArticleType'
-    ]
+    __attr_import_dv_up_journal_fields_values = ["journalArticleType"]
 
     """
     Attributes of Dataverse API Upload Dataset JSON metadata standard inside
     [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
     """
     __attr_import_dv_up_journal_fields_arrays = {
-        'journalVolumeIssue': ['journalVolume', 'journalIssue',
-                               'journalPubDate']
+        "journalVolumeIssue": ["journalVolume", "journalIssue", "journalPubDate"]
     }
 
     """Required attributes for valid `dv_up` metadata dict creation."""
     __attr_dict_dv_up_required = [
-        'author',
-        'datasetContact',
-        'dsDescription',
-        'subject',
-        'title'
+        "author",
+        "datasetContact",
+        "dsDescription",
+        "subject",
+        "title",
     ]
 
     """typeClass primitive."""
-    __attr_dict_dv_up_typeClass_primitive = [
-        'accessToSources',
-        'alternativeTitle',
-        'alternativeURL',
-        'authorAffiliation',
-        'authorIdentifier',
-        'authorName',
-        'characteristicOfSources',
-        'city',
-        'contributorName',
-        'dateOfDeposit',
-        'dataSources',
-        'depositor',
-        'distributionDate',
-        'kindOfData',
-        'notesText',
-        'originOfSources',
-        'otherGeographicCoverage',
-        'otherReferences',
-        'productionDate',
-        'productionPlace',
-        'publicationCitation',
-        'publicationIDNumber',
-        'publicationURL',
-        'relatedDatasets',
-        'relatedMaterial',
-        'seriesInformation',
-        'seriesName',
-        'state',
-        'subtitle',
-        'title'
-    ] + __attr_import_dv_up_citation_fields_arrays['dateOfCollection'] \
-        + __attr_import_dv_up_citation_fields_arrays['datasetContact'] \
-        + __attr_import_dv_up_citation_fields_arrays['distributor'] \
-        + __attr_import_dv_up_citation_fields_arrays['dsDescription'] \
-        + __attr_import_dv_up_citation_fields_arrays['grantNumber'] \
-        + __attr_import_dv_up_citation_fields_arrays['keyword'] \
-        + __attr_import_dv_up_citation_fields_arrays['producer'] \
-        + __attr_import_dv_up_citation_fields_arrays['otherId'] \
-        + __attr_import_dv_up_citation_fields_arrays['software'] \
-        + __attr_import_dv_up_citation_fields_arrays['timePeriodCovered'] \
-        + __attr_import_dv_up_citation_fields_arrays['topicClassification'] \
-        + __attr_import_dv_up_geospatial_fields_values \
-        + __attr_import_dv_up_geospatial_fields_arrays['geographicBoundingBox'] \
-        + __attr_import_dv_up_socialscience_fields_values \
-        + __attr_import_dv_up_journal_fields_arrays['journalVolumeIssue'] \
-        + ['socialScienceNotesType', 'socialScienceNotesSubject', 'socialScienceNotesText'] \
-        + ['targetSampleActualSize', 'targetSampleSizeFormula'] \
-
+    __attr_dict_dv_up_typeClass_primitive = (
+        [
+            "accessToSources",
+            "alternativeTitle",
+            "alternativeURL",
+            "authorAffiliation",
+            "authorIdentifier",
+            "authorName",
+            "characteristicOfSources",
+            "city",
+            "contributorName",
+            "dateOfDeposit",
+            "dataSources",
+            "depositor",
+            "distributionDate",
+            "kindOfData",
+            "notesText",
+            "originOfSources",
+            "otherGeographicCoverage",
+            "otherReferences",
+            "productionDate",
+            "productionPlace",
+            "publicationCitation",
+            "publicationIDNumber",
+            "publicationURL",
+            "relatedDatasets",
+            "relatedMaterial",
+            "seriesInformation",
+            "seriesName",
+            "state",
+            "subtitle",
+            "title",
+        ]
+        + __attr_import_dv_up_citation_fields_arrays["dateOfCollection"]
+        + __attr_import_dv_up_citation_fields_arrays["datasetContact"]
+        + __attr_import_dv_up_citation_fields_arrays["distributor"]
+        + __attr_import_dv_up_citation_fields_arrays["dsDescription"]
+        + __attr_import_dv_up_citation_fields_arrays["grantNumber"]
+        + __attr_import_dv_up_citation_fields_arrays["keyword"]
+        + __attr_import_dv_up_citation_fields_arrays["producer"]
+        + __attr_import_dv_up_citation_fields_arrays["otherId"]
+        + __attr_import_dv_up_citation_fields_arrays["software"]
+        + __attr_import_dv_up_citation_fields_arrays["timePeriodCovered"]
+        + __attr_import_dv_up_citation_fields_arrays["topicClassification"]
+        + __attr_import_dv_up_geospatial_fields_values
+        + __attr_import_dv_up_geospatial_fields_arrays["geographicBoundingBox"]
+        + __attr_import_dv_up_socialscience_fields_values
+        + __attr_import_dv_up_journal_fields_arrays["journalVolumeIssue"]
+        + [
+            "socialScienceNotesType",
+            "socialScienceNotesSubject",
+            "socialScienceNotesText",
+        ]
+        + ["targetSampleActualSize", "targetSampleSizeFormula"]
+    )
     """typeClass compound."""
-    __attr_dict_dv_up_typeClass_compound = [
-    ] + list(__attr_import_dv_up_citation_fields_arrays.keys()) \
-        + list(__attr_import_dv_up_geospatial_fields_arrays.keys()) \
-        + list(__attr_import_dv_up_journal_fields_arrays.keys()) \
-        + ['series', 'socialScienceNotes', 'targetSampleSize']
+    __attr_dict_dv_up_typeClass_compound = (
+        []
+        + list(__attr_import_dv_up_citation_fields_arrays.keys())
+        + list(__attr_import_dv_up_geospatial_fields_arrays.keys())
+        + list(__attr_import_dv_up_journal_fields_arrays.keys())
+        + ["series", "socialScienceNotes", "targetSampleSize"]
+    )
 
     """typeClass controlledVocabulary."""
     __attr_dict_dv_up_typeClass_controlledVocabulary = [
-        'authorIdentifierScheme',
-        'contributorType',
-        'country',
-        'journalArticleType',
-        'language',
-        'publicationIDType',
-        'subject',
+        "authorIdentifierScheme",
+        "contributorType",
+        "country",
+        "journalArticleType",
+        "language",
+        "publicationIDType",
+        "subject",
     ]
 
     """
     This attributes are excluded from automatic parsing in ds.get() creation.
     """
-    __attr_dict_dv_up_single_dict = [
-        'series',
-        'socialScienceNotes',
-        'targetSampleSize'
-    ]
+    __attr_dict_dv_up_single_dict = ["series", "socialScienceNotes", "targetSampleSize"]
 
     """Attributes of displayName."""
     __attr_displayNames = [
-        'citation_displayName',
-        'geospatial_displayName',
-        'socialscience_displayName',
-        'journal_displayName'
+        "citation_displayName",
+        "geospatial_displayName",
+        "socialscience_displayName",
+        "journal_displayName",
     ]
 
     def __init__(self, data=None):
@@ -520,91 +556,93 @@ class Dataset(DVObject):
             'schemas/json/dataset_upload_default_schema.json'
 
         """
-        self._internal_attributes = ['_Dataset' + attr for attr in INTERNAL_ATTRIBUTES]
+        self._internal_attributes = ["_Dataset" + attr for attr in INTERNAL_ATTRIBUTES]
 
         super().__init__(data=data)
 
-        self._default_json_format = 'dataverse_upload'
-        self._default_json_schema_filename = 'schemas/json/dataset_upload_default_schema.json'
+        self._default_json_format = "dataverse_upload"
+        self._default_json_schema_filename = (
+            "schemas/json/dataset_upload_default_schema.json"
+        )
         self._allowed_json_formats = [
-            'dataverse_upload',
-            'dataverse_download',
-            'dspace',
-            'custom'
+            "dataverse_upload",
+            "dataverse_download",
+            "dspace",
+            "custom",
         ]
         self._json_dataverse_upload_attr = [
-            'license',
-            'termsOfUse',
-            'termsOfAccess',
-            'fileAccessRequest',
-            'protocol',
-            'authority',
-            'identifier',
-            'citation_displayName',
-            'title',
-            'subtitle',
-            'alternativeTitle',
-            'alternativeURL',
-            'otherId',
-            'author',
-            'datasetContact',
-            'dsDescription',
-            'subject',
-            'keyword',
-            'topicClassification',
-            'publication',
-            'notesText',
-            'producer',
-            'productionDate',
-            'productionPlace',
-            'contributor',
-            'grantNumber',
-            'distributor',
-            'distributionDate',
-            'depositor',
-            'dateOfDeposit',
-            'timePeriodCovered',
-            'dateOfCollection',
-            'kindOfData',
-            'language',
-            'series',
-            'software',
-            'relatedMaterial',
-            'relatedDatasets',
-            'otherReferences',
-            'dataSources',
-            'originOfSources',
-            'characteristicOfSources',
-            'accessToSources',
-            'geospatial_displayName',
-            'geographicCoverage',
-            'geographicUnit',
-            'geographicBoundingBox',
-            'socialscience_displayName',
-            'unitOfAnalysis',
-            'universe',
-            'timeMethod',
-            'dataCollector',
-            'collectorTraining',
-            'frequencyOfDataCollection',
-            'samplingProcedure',
-            'targetSampleSize',
-            'deviationsFromSampleDesign',
-            'collectionMode',
-            'researchInstrument',
-            'dataCollectionSituation',
-            'actionsToMinimizeLoss',
-            'controlOperations',
-            'weighting',
-            'cleaningOperations',
-            'datasetLevelErrorNotes',
-            'responseRate',
-            'samplingErrorEstimates',
-            'otherDataAppraisal',
-            'socialScienceNotes',
-            'journal_displayName',
-            'journalVolumeIssue',
-            'journalArticleType'
+            "license",
+            "termsOfUse",
+            "termsOfAccess",
+            "fileAccessRequest",
+            "protocol",
+            "authority",
+            "identifier",
+            "citation_displayName",
+            "title",
+            "subtitle",
+            "alternativeTitle",
+            "alternativeURL",
+            "otherId",
+            "author",
+            "datasetContact",
+            "dsDescription",
+            "subject",
+            "keyword",
+            "topicClassification",
+            "publication",
+            "notesText",
+            "producer",
+            "productionDate",
+            "productionPlace",
+            "contributor",
+            "grantNumber",
+            "distributor",
+            "distributionDate",
+            "depositor",
+            "dateOfDeposit",
+            "timePeriodCovered",
+            "dateOfCollection",
+            "kindOfData",
+            "language",
+            "series",
+            "software",
+            "relatedMaterial",
+            "relatedDatasets",
+            "otherReferences",
+            "dataSources",
+            "originOfSources",
+            "characteristicOfSources",
+            "accessToSources",
+            "geospatial_displayName",
+            "geographicCoverage",
+            "geographicUnit",
+            "geographicBoundingBox",
+            "socialscience_displayName",
+            "unitOfAnalysis",
+            "universe",
+            "timeMethod",
+            "dataCollector",
+            "collectorTraining",
+            "frequencyOfDataCollection",
+            "samplingProcedure",
+            "targetSampleSize",
+            "deviationsFromSampleDesign",
+            "collectionMode",
+            "researchInstrument",
+            "dataCollectionSituation",
+            "actionsToMinimizeLoss",
+            "controlOperations",
+            "weighting",
+            "cleaningOperations",
+            "datasetLevelErrorNotes",
+            "responseRate",
+            "samplingErrorEstimates",
+            "otherDataAppraisal",
+            "socialScienceNotes",
+            "journal_displayName",
+            "journalVolumeIssue",
+            "journalArticleType",
         ]
 
     def validate_json(self, filename_schema=None):
@@ -652,7 +690,9 @@ class Dataset(DVObject):
 
         data_json = self.to_json(validate=False)
         if data_json:
-            is_valid = validate_data(json.loads(data_json), filename_schema, file_format='json')
+            is_valid = validate_data(
+                json.loads(data_json), filename_schema, file_format="json"
+            )
             if not is_valid:
                 return False
         else:
@@ -663,88 +703,114 @@ class Dataset(DVObject):
             if attr in list(self.__dict__.keys()):
                 if not self.__getattribute__(attr):
                     is_valid = False
-                    print('Attribute \'{0}\' is `False`.'.format(attr))
+                    print("Attribute '{0}' is `False`.".format(attr))
             else:
                 is_valid = False
-                print('Attribute \'{0}\' missing.'.format(attr))
+                print("Attribute '{0}' missing.".format(attr))
 
         # check if attributes set are complete where necessary
-        if 'timePeriodCovered' in list(self.__dict__.keys()):
-            tp_cov = self.__getattribute__('timePeriodCovered')
+        if "timePeriodCovered" in list(self.__dict__.keys()):
+            tp_cov = self.__getattribute__("timePeriodCovered")
             if tp_cov:
                 for tp in tp_cov:
-                    if 'timePeriodCoveredStart' in tp or 'timePeriodCoveredEnd' in tp:
-                        if not ('timePeriodCoveredStart' in tp and 'timePeriodCoveredEnd' in tp):
+                    if "timePeriodCoveredStart" in tp or "timePeriodCoveredEnd" in tp:
+                        if not (
+                            "timePeriodCoveredStart" in tp
+                            and "timePeriodCoveredEnd" in tp
+                        ):
                             is_valid = False
-                            print('timePeriodCovered attribute missing.')
+                            print("timePeriodCovered attribute missing.")
 
-        if 'dateOfCollection' in list(self.__dict__.keys()):
-            d_coll = self.__getattribute__('dateOfCollection')
+        if "dateOfCollection" in list(self.__dict__.keys()):
+            d_coll = self.__getattribute__("dateOfCollection")
             if d_coll:
                 for d in d_coll:
-                    if 'dateOfCollectionStart' in d or 'dateOfCollectionEnd' in d:
-                        if not ('dateOfCollectionStart' in d and 'dateOfCollectionEnd' in d):
+                    if "dateOfCollectionStart" in d or "dateOfCollectionEnd" in d:
+                        if not (
+                            "dateOfCollectionStart" in d and "dateOfCollectionEnd" in d
+                        ):
                             is_valid = False
-                            print('dateOfCollection attribute missing.')
+                            print("dateOfCollection attribute missing.")
 
-        if 'author' in list(self.__dict__.keys()):
-            authors = self.__getattribute__('author')
+        if "author" in list(self.__dict__.keys()):
+            authors = self.__getattribute__("author")
             if authors:
                 for a in authors:
-                    if 'authorAffiliation' in a or 'authorIdentifierScheme' in a or 'authorIdentifier' in a:
-                        if 'authorName' not in a:
+                    if (
+                        "authorAffiliation" in a
+                        or "authorIdentifierScheme" in a
+                        or "authorIdentifier" in a
+                    ):
+                        if "authorName" not in a:
                             is_valid = False
-                            print('author attribute missing.')
+                            print("author attribute missing.")
 
-        if 'datasetContact' in list(self.__dict__.keys()):
-            ds_contac = self.__getattribute__('datasetContact')
+        if "datasetContact" in list(self.__dict__.keys()):
+            ds_contac = self.__getattribute__("datasetContact")
             if ds_contac:
                 for c in ds_contac:
-                    if 'datasetContactAffiliation' in c or 'datasetContactEmail' in c:
-                        if 'datasetContactName' not in c:
+                    if "datasetContactAffiliation" in c or "datasetContactEmail" in c:
+                        if "datasetContactName" not in c:
                             is_valid = False
-                            print('datasetContact attribute missing.')
+                            print("datasetContact attribute missing.")
 
-        if 'producer' in list(self.__dict__.keys()):
-            producer = self.__getattribute__('producer')
+        if "producer" in list(self.__dict__.keys()):
+            producer = self.__getattribute__("producer")
             if producer:
                 for p in producer:
-                    if 'producerAffiliation' in p or 'producerAbbreviation' in p or 'producerURL' in p or 'producerLogoURL' in p:
-                        if not p['producerName']:
+                    if (
+                        "producerAffiliation" in p
+                        or "producerAbbreviation" in p
+                        or "producerURL" in p
+                        or "producerLogoURL" in p
+                    ):
+                        if not p["producerName"]:
                             is_valid = False
-                            print('producer attribute missing.')
+                            print("producer attribute missing.")
 
-        if 'contributor' in list(self.__dict__.keys()):
-            contributor = self.__getattribute__('contributor')
+        if "contributor" in list(self.__dict__.keys()):
+            contributor = self.__getattribute__("contributor")
             if contributor:
                 for c in contributor:
-                    if 'contributorType' in c:
-                        if 'contributorName' not in c:
+                    if "contributorType" in c:
+                        if "contributorName" not in c:
                             is_valid = False
-                            print('contributor attribute missing.')
+                            print("contributor attribute missing.")
 
-        if 'distributor' in list(self.__dict__.keys()):
-            distributor = self.__getattribute__('distributor')
+        if "distributor" in list(self.__dict__.keys()):
+            distributor = self.__getattribute__("distributor")
             if distributor:
                 for d in distributor:
-                    if 'distributorAffiliation' in d or 'distributorAbbreviation' in d or 'distributorURL' in d or 'distributorLogoURL' in d:
-                        if 'distributorName' not in d:
+                    if (
+                        "distributorAffiliation" in d
+                        or "distributorAbbreviation" in d
+                        or "distributorURL" in d
+                        or "distributorLogoURL" in d
+                    ):
+                        if "distributorName" not in d:
                             is_valid = False
-                            print('distributor attribute missing.')
+                            print("distributor attribute missing.")
 
-        if 'geographicBoundingBox' in list(self.__dict__.keys()):
-            bbox = self.__getattribute__('geographicBoundingBox')
+        if "geographicBoundingBox" in list(self.__dict__.keys()):
+            bbox = self.__getattribute__("geographicBoundingBox")
             if bbox:
                 for b in bbox:
                     if b:
-                        if not ('westLongitude' in b and 'eastLongitude' in b and 'northLongitude' in b and 'southLongitude' in b):
+                        if not (
+                            "westLongitude" in b
+                            and "eastLongitude" in b
+                            and "northLongitude" in b
+                            and "southLongitude" in b
+                        ):
                             is_valid = False
-                            print('geographicBoundingBox attribute missing.')
+                            print("geographicBoundingBox attribute missing.")
 
         assert isinstance(is_valid, bool)
         return is_valid
 
-    def from_json(self, json_str, data_format=None, validate=True, filename_schema=None):
+    def from_json(
+        self, json_str, data_format=None, validate=True, filename_schema=None
+    ):
         """Import Dataset metadata from JSON file.
 
         Parses in the metadata of a Dataset from different JSON formats.
@@ -787,127 +853,191 @@ class Dataset(DVObject):
 
         data = {}
 
-        if data_format == 'dataverse_upload':
+        if data_format == "dataverse_upload":
             if validate:
-                validate_data(json_dict, filename_schema, file_format='json')
+                validate_data(json_dict, filename_schema, file_format="json")
             """dataset"""
             # get first level metadata and parse it automatically
-            for key, val in json_dict['datasetVersion'].items():
-                if not key == 'metadataBlocks':
+            for key, val in json_dict["datasetVersion"].items():
+                if not key == "metadataBlocks":
                     if key in self.__attr_import_dv_up_datasetVersion_values:
                         data[key] = val
                     else:
-                        print('Attribute {0} not valid for import (format={1}).'.format(
-                            key, data_format))
+                        print(
+                            "Attribute {0} not valid for import (format={1}).".format(
+                                key, data_format
+                            )
+                        )
 
-            if 'metadataBlocks' in json_dict['datasetVersion']:
+            if "metadataBlocks" in json_dict["datasetVersion"]:
 
                 """citation"""
-                if 'citation' in json_dict['datasetVersion']['metadataBlocks']:
-                    citation = json_dict['datasetVersion']['metadataBlocks']['citation']
-                    if 'displayName' in citation:
-                        data['citation_displayName'] = citation['displayName']
+                if "citation" in json_dict["datasetVersion"]["metadataBlocks"]:
+                    citation = json_dict["datasetVersion"]["metadataBlocks"]["citation"]
+                    if "displayName" in citation:
+                        data["citation_displayName"] = citation["displayName"]
 
-                    for field in citation['fields']:
-                        if field['typeName'] in self.__attr_import_dv_up_citation_fields_values:
-                            data[field['typeName']] = field['value']
-                        elif field['typeName'] in self.__attr_import_dv_up_citation_fields_arrays:
-                            data[field['typeName']] = self.__parse_field_array(
-                                field['value'],
-                                self.__attr_import_dv_up_citation_fields_arrays[field['typeName']])
-                        elif field['typeName'] == 'series':
-                            data['series'] = {}
-                            if 'seriesName' in field['value']:
-                                data['series']['seriesName'] = field['value']['seriesName']['value']
-                            if 'seriesInformation' in field['value']:
-                                data['series']['seriesInformation'] = field['value']['seriesInformation']['value']
+                    for field in citation["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_citation_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_citation_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_citation_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
+                        elif field["typeName"] == "series":
+                            data["series"] = {}
+                            if "seriesName" in field["value"]:
+                                data["series"]["seriesName"] = field["value"][
+                                    "seriesName"
+                                ]["value"]
+                            if "seriesInformation" in field["value"]:
+                                data["series"]["seriesInformation"] = field["value"][
+                                    "seriesInformation"
+                                ]["value"]
                         else:
-                            print('Attribute {0} not valid for import (dv_up).'.format(
-                                field['typeName']))
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
                 else:
                     # TODO: Exception
                     pass
 
                 """geospatial"""
-                if 'geospatial' in json_dict['datasetVersion']['metadataBlocks']:
-                    geospatial = json_dict['datasetVersion']['metadataBlocks']['geospatial']
-                    if 'displayName' in geospatial:
-                        self.__setattr__('geospatial_displayName',
-                                         geospatial['displayName'])
+                if "geospatial" in json_dict["datasetVersion"]["metadataBlocks"]:
+                    geospatial = json_dict["datasetVersion"]["metadataBlocks"][
+                        "geospatial"
+                    ]
+                    if "displayName" in geospatial:
+                        self.__setattr__(
+                            "geospatial_displayName", geospatial["displayName"]
+                        )
 
-                    for field in geospatial['fields']:
-                        if field['typeName'] in self.__attr_import_dv_up_geospatial_fields_values:
-                            data[field['typeName']] = field['value']
-                        elif field['typeName'] in self.__attr_import_dv_up_geospatial_fields_arrays:
-                            data[field['typeName']] = self.__parse_field_array(
-                                field['value'],
-                                self.__attr_import_dv_up_geospatial_fields_arrays[field['typeName']])
+                    for field in geospatial["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_geospatial_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_geospatial_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_geospatial_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
                         else:
-                            print('Attribute {0} not valid for import (dv_up).'.format(
-                                field['typeName']))
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
                 else:
                     # TODO: Exception
                     pass
 
                 """socialscience"""
-                if 'socialscience' in json_dict['datasetVersion']['metadataBlocks']:
-                    socialscience = json_dict['datasetVersion']['metadataBlocks']['socialscience']
+                if "socialscience" in json_dict["datasetVersion"]["metadataBlocks"]:
+                    socialscience = json_dict["datasetVersion"]["metadataBlocks"][
+                        "socialscience"
+                    ]
 
-                    if 'displayName' in socialscience:
-                        self.__setattr__('socialscience_displayName',
-                                         socialscience['displayName'])
+                    if "displayName" in socialscience:
+                        self.__setattr__(
+                            "socialscience_displayName", socialscience["displayName"],
+                        )
 
-                    for field in socialscience['fields']:
-                        if field['typeName'] in self.__attr_import_dv_up_socialscience_fields_values:
-                            data[field['typeName']] = field['value']
-                        elif field['typeName'] == 'targetSampleSize':
-                            data['targetSampleSize'] = {}
-                            if 'targetSampleActualSize' in field['value']:
-                                data['targetSampleSize']['targetSampleActualSize'] = field['value']['targetSampleActualSize']['value']
-                            if 'targetSampleSizeFormula' in field['value']:
-                                data['targetSampleSize']['targetSampleSizeFormula'] = field['value']['targetSampleSizeFormula']['value']
-                        elif field['typeName'] == 'socialScienceNotes':
-                            data['socialScienceNotes'] = {}
-                            if 'socialScienceNotesType' in field['value']:
-                                data['socialScienceNotes']['socialScienceNotesType'] = field['value']['socialScienceNotesType']['value']
-                            if 'socialScienceNotesSubject' in field['value']:
-                                data['socialScienceNotes']['socialScienceNotesSubject'] = field['value']['socialScienceNotesSubject']['value']
-                            if 'socialScienceNotesText' in field['value']:
-                                data['socialScienceNotes']['socialScienceNotesText'] = field['value']['socialScienceNotesText']['value']
+                    for field in socialscience["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_socialscience_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif field["typeName"] == "targetSampleSize":
+                            data["targetSampleSize"] = {}
+                            if "targetSampleActualSize" in field["value"]:
+                                data["targetSampleSize"][
+                                    "targetSampleActualSize"
+                                ] = field["value"]["targetSampleActualSize"]["value"]
+                            if "targetSampleSizeFormula" in field["value"]:
+                                data["targetSampleSize"][
+                                    "targetSampleSizeFormula"
+                                ] = field["value"]["targetSampleSizeFormula"]["value"]
+                        elif field["typeName"] == "socialScienceNotes":
+                            data["socialScienceNotes"] = {}
+                            if "socialScienceNotesType" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesType"
+                                ] = field["value"]["socialScienceNotesType"]["value"]
+                            if "socialScienceNotesSubject" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesSubject"
+                                ] = field["value"]["socialScienceNotesSubject"]["value"]
+                            if "socialScienceNotesText" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesText"
+                                ] = field["value"]["socialScienceNotesText"]["value"]
                         else:
-                            print('Attribute {0} not valid for import (dv_up).'.format(
-                                field['typeName']))
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
                 else:
                     # TODO: Exception
                     pass
 
                 """journal"""
-                if 'journal' in json_dict['datasetVersion']['metadataBlocks']:
-                    journal = json_dict['datasetVersion']['metadataBlocks']['journal']
+                if "journal" in json_dict["datasetVersion"]["metadataBlocks"]:
+                    journal = json_dict["datasetVersion"]["metadataBlocks"]["journal"]
 
-                    if 'displayName' in journal:
-                        self.__setattr__('journal_displayName',
-                                         journal['displayName'])
+                    if "displayName" in journal:
+                        self.__setattr__("journal_displayName", journal["displayName"])
 
-                    for field in journal['fields']:
-                        if field['typeName'] in self.__attr_import_dv_up_journal_fields_values:
-                            data[field['typeName']] = field['value']
-                        elif field['typeName'] in self.__attr_import_dv_up_journal_fields_arrays:
-                            data[field['typeName']] = self.__parse_field_array(
-                                field['value'],
-                                self.__attr_import_dv_up_journal_fields_arrays[field['typeName']])
+                    for field in journal["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_journal_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_journal_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_journal_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
                         else:
-                            print('Attribute {0} not valid for import (dv_up).'.format(
-                                field['typeName']))
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
                 else:
                     # TODO: Exception
                     pass
-        elif data_format == 'dataverse_download':
-            print('INFO: Not implemented yet.')
-        elif data_format == 'dspace':
-            print('INFO: Not implemented yet.')
-        elif data_format == 'custom':
-            print('INFO: Not implemented yet.')
+        elif data_format == "dataverse_download":
+            print("INFO: Not implemented yet.")
+        elif data_format == "dspace":
+            print("INFO: Not implemented yet.")
+        elif data_format == "custom":
+            print("INFO: Not implemented yet.")
         self.set(data)
 
     def __parse_field_array(self, data, attr_list):
@@ -935,9 +1065,9 @@ class Dataset(DVObject):
             tmp_dict = {}
             for key, val in d.items():
                 if key in attr_list:
-                    tmp_dict[key] = val['value']
+                    tmp_dict[key] = val["value"]
                 else:
-                    print('Key \'{0}\' not in attribute list'.format(key))
+                    print("Key '{0}' not in attribute list".format(key))
             data_tmp.append(tmp_dict)
 
         assert isinstance(data_tmp, list)
@@ -980,16 +1110,16 @@ class Dataset(DVObject):
                         else:
                             multiple = False
                         if k in self.__attr_dict_dv_up_typeClass_primitive:
-                            typeClass = 'primitive'
+                            typeClass = "primitive"
                         elif k in self.__attr_dict_dv_up_typeClass_compound:
-                            typeClass = 'compound'
+                            typeClass = "compound"
                         elif k in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                            typeClass = 'controlledVocabulary'
+                            typeClass = "controlledVocabulary"
                         tmp_dict[k] = {}
-                        tmp_dict[k]['typeName'] = k
-                        tmp_dict[k]['typeClass'] = typeClass
-                        tmp_dict[k]['multiple'] = multiple
-                        tmp_dict[k]['value'] = v
+                        tmp_dict[k]["typeName"] = k
+                        tmp_dict[k]["typeClass"] = typeClass
+                        tmp_dict[k]["multiple"] = multiple
+                        tmp_dict[k]["value"] = v
                 tmp_list.append(tmp_dict)
 
         assert isinstance(tmp_list, list)
@@ -1025,22 +1155,22 @@ class Dataset(DVObject):
 
         data = {}
 
-        if data_format == 'dataverse_upload':
+        if data_format == "dataverse_upload":
             data_dict = self.get()
-            data['datasetVersion'] = {}
-            data['datasetVersion']['metadataBlocks'] = {}
+            data["datasetVersion"] = {}
+            data["datasetVersion"]["metadataBlocks"] = {}
             citation = {}
-            citation['fields'] = []
+            citation["fields"] = []
 
             """dataset"""
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_datasetVersion_values:
                 if attr in data_dict:
-                    data['datasetVersion'][attr] = data_dict[attr]
+                    data["datasetVersion"][attr] = data_dict[attr]
 
             """citation"""
-            if 'citation_displayName' in data_dict:
-                citation['displayName'] = data_dict['citation_displayName']
+            if "citation_displayName" in data_dict:
+                citation["displayName"] = data_dict["citation_displayName"]
 
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_citation_fields_values:
@@ -1051,64 +1181,76 @@ class Dataset(DVObject):
                     else:
                         multiple = False
                     if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = 'primitive'
+                        typeClass = "primitive"
                     elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = 'compound'
+                        typeClass = "compound"
                     elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = 'controlledVocabulary'
-                    citation['fields'].append({
-                        'typeName': attr,
-                        'multiple': multiple,
-                        'typeClass': typeClass,
-                        'value': v
-                    })
+                        typeClass = "controlledVocabulary"
+                    citation["fields"].append(
+                        {
+                            "typeName": attr,
+                            "multiple": multiple,
+                            "typeClass": typeClass,
+                            "value": v,
+                        }
+                    )
 
             # Generate fields attributes
-            for key, val in self.__attr_import_dv_up_citation_fields_arrays.items():
+            for (key, val,) in self.__attr_import_dv_up_citation_fields_arrays.items():
                 if key in data_dict:
                     v = data_dict[key]
-                    citation['fields'].append({
-                        'typeName': key,
-                        'multiple': True,
-                        'typeClass': 'compound',
-                        'value': self.__generate_field_arrays(key, val)
-                    })
+                    citation["fields"].append(
+                        {
+                            "typeName": key,
+                            "multiple": True,
+                            "typeClass": "compound",
+                            "value": self.__generate_field_arrays(key, val),
+                        }
+                    )
 
             # Generate series attributes
-            if 'series' in data_dict:
-                series = data_dict['series']
+            if "series" in data_dict:
+                series = data_dict["series"]
                 tmp_dict = {}
-                if 'seriesName' in series:
-                    if series['seriesName'] is not None:
-                        tmp_dict['seriesName'] = {}
-                        tmp_dict['seriesName']['typeName'] = 'seriesName'
-                        tmp_dict['seriesName']['multiple'] = False
-                        tmp_dict['seriesName']['typeClass'] = 'primitive'
-                        tmp_dict['seriesName']['value'] = series['seriesName']
-                if 'seriesInformation' in series:
-                    if series['seriesInformation'] is not None:
-                        tmp_dict['seriesInformation'] = {}
-                        tmp_dict['seriesInformation']['typeName'] = 'seriesInformation'
-                        tmp_dict['seriesInformation']['multiple'] = False
-                        tmp_dict['seriesInformation']['typeClass'] = 'primitive'
-                        tmp_dict['seriesInformation']['value'] = series['seriesInformation']
-                citation['fields'].append({
-                    'typeName': 'series',
-                    'multiple': False,
-                    'typeClass': 'compound',
-                    'value': tmp_dict
-                })
+                if "seriesName" in series:
+                    if series["seriesName"] is not None:
+                        tmp_dict["seriesName"] = {}
+                        tmp_dict["seriesName"]["typeName"] = "seriesName"
+                        tmp_dict["seriesName"]["multiple"] = False
+                        tmp_dict["seriesName"]["typeClass"] = "primitive"
+                        tmp_dict["seriesName"]["value"] = series["seriesName"]
+                if "seriesInformation" in series:
+                    if series["seriesInformation"] is not None:
+                        tmp_dict["seriesInformation"] = {}
+                        tmp_dict["seriesInformation"]["typeName"] = "seriesInformation"
+                        tmp_dict["seriesInformation"]["multiple"] = False
+                        tmp_dict["seriesInformation"]["typeClass"] = "primitive"
+                        tmp_dict["seriesInformation"]["value"] = series[
+                            "seriesInformation"
+                        ]
+                citation["fields"].append(
+                    {
+                        "typeName": "series",
+                        "multiple": False,
+                        "typeClass": "compound",
+                        "value": tmp_dict,
+                    }
+                )
 
             """geospatial"""
-            for attr in self.__attr_import_dv_up_geospatial_fields_values + list(self.__attr_import_dv_up_geospatial_fields_arrays.keys()) + ['geospatial_displayName']:
+            for attr in (
+                self.__attr_import_dv_up_geospatial_fields_values
+                + list(self.__attr_import_dv_up_geospatial_fields_arrays.keys())
+                + ["geospatial_displayName"]
+            ):
                 if attr in data_dict:
                     geospatial = {}
-                    if attr != 'geospatial_displayName':
-                        geospatial['fields'] = []
+                    if attr != "geospatial_displayName":
+                        geospatial["fields"] = []
                         break
 
-            if 'geospatial_displayName' in data_dict:
-                geospatial['displayName'] = data_dict['geospatial_displayName']
+            if "geospatial_displayName" in data_dict:
+                geospatial["displayName"] = data_dict["geospatial_displayName"]
 
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_geospatial_fields_values:
@@ -1119,38 +1261,47 @@ class Dataset(DVObject):
                     else:
                         multiple = False
                     if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = 'primitive'
+                        typeClass = "primitive"
                     elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = 'compound'
+                        typeClass = "compound"
                     elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = 'controlledVocabulary'
-                    geospatial['fields'].append({
-                        'typeName': attr,
-                        'multiple': multiple,
-                        'typeClass': typeClass,
-                        'value': v
-                    })
+                        typeClass = "controlledVocabulary"
+                    geospatial["fields"].append(
+                        {
+                            "typeName": attr,
+                            "multiple": multiple,
+                            "typeClass": typeClass,
+                            "value": v,
+                        }
+                    )
 
             # Generate fields attributes
-            for key, val in self.__attr_import_dv_up_geospatial_fields_arrays.items():
+            for (
+                key,
+                val,
+            ) in self.__attr_import_dv_up_geospatial_fields_arrays.items():
                 if key in data_dict:
-                    geospatial['fields'].append({
-                        'typeName': key,
-                        'multiple': True,
-                        'typeClass': 'compound',
-                        'value': self.__generate_field_arrays(key, val)
-                    })
+                    geospatial["fields"].append(
+                        {
+                            "typeName": key,
+                            "multiple": True,
+                            "typeClass": "compound",
+                            "value": self.__generate_field_arrays(key, val),
+                        }
+                    )
 
             """socialscience"""
-            for attr in self.__attr_import_dv_up_socialscience_fields_values + ['socialscience_displayName']:
+            for attr in self.__attr_import_dv_up_socialscience_fields_values + [
+                "socialscience_displayName"
+            ]:
                 if attr in data_dict:
                     socialscience = {}
-                    if attr != 'socialscience_displayName':
-                        socialscience['fields'] = []
+                    if attr != "socialscience_displayName":
+                        socialscience["fields"] = []
                         break
 
-            if 'socialscience_displayName' in data_dict:
-                socialscience['displayName'] = data_dict['socialscience_displayName']
+            if "socialscience_displayName" in data_dict:
+                socialscience["displayName"] = data_dict["socialscience_displayName"]
 
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_socialscience_fields_values:
@@ -1161,85 +1312,115 @@ class Dataset(DVObject):
                     else:
                         multiple = False
                     if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = 'primitive'
+                        typeClass = "primitive"
                     elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = 'compound'
+                        typeClass = "compound"
                     elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = 'controlledVocabulary'
-                    socialscience['fields'].append({
-                        'typeName': attr,
-                        'multiple': multiple,
-                        'typeClass': typeClass,
-                        'value': v
-                    })
+                        typeClass = "controlledVocabulary"
+                    socialscience["fields"].append(
+                        {
+                            "typeName": attr,
+                            "multiple": multiple,
+                            "typeClass": typeClass,
+                            "value": v,
+                        }
+                    )
 
             # Generate targetSampleSize attributes
-            if 'targetSampleSize' in data_dict:
-                target_sample_size = data_dict['targetSampleSize']
+            if "targetSampleSize" in data_dict:
+                target_sample_size = data_dict["targetSampleSize"]
                 tmp_dict = {}
-                if 'targetSampleActualSize' in target_sample_size:
-                    if target_sample_size['targetSampleActualSize'] is not None:
-                        tmp_dict['targetSampleActualSize'] = {}
-                        tmp_dict['targetSampleActualSize']['typeName'] = 'targetSampleActualSize'
-                        tmp_dict['targetSampleActualSize']['multiple'] = False
-                        tmp_dict['targetSampleActualSize']['typeClass'] = 'primitive'
-                        tmp_dict['targetSampleActualSize']['value'] = target_sample_size['targetSampleActualSize']
-                if 'targetSampleSizeFormula' in target_sample_size:
-                    if target_sample_size['targetSampleSizeFormula'] is not None:
-                        tmp_dict['targetSampleSizeFormula'] = {}
-                        tmp_dict['targetSampleSizeFormula']['typeName'] = 'targetSampleSizeFormula'
-                        tmp_dict['targetSampleSizeFormula']['multiple'] = False
-                        tmp_dict['targetSampleSizeFormula']['typeClass'] = 'primitive'
-                        tmp_dict['targetSampleSizeFormula']['value'] = target_sample_size['targetSampleSizeFormula']
-                socialscience['fields'].append({
-                    'typeName': 'targetSampleSize',
-                    'multiple': False,
-                    'typeClass': 'compound',
-                    'value': tmp_dict
-                })
+                if "targetSampleActualSize" in target_sample_size:
+                    if target_sample_size["targetSampleActualSize"] is not None:
+                        tmp_dict["targetSampleActualSize"] = {}
+                        tmp_dict["targetSampleActualSize"][
+                            "typeName"
+                        ] = "targetSampleActualSize"
+                        tmp_dict["targetSampleActualSize"]["multiple"] = False
+                        tmp_dict["targetSampleActualSize"]["typeClass"] = "primitive"
+                        tmp_dict["targetSampleActualSize"][
+                            "value"
+                        ] = target_sample_size["targetSampleActualSize"]
+                if "targetSampleSizeFormula" in target_sample_size:
+                    if target_sample_size["targetSampleSizeFormula"] is not None:
+                        tmp_dict["targetSampleSizeFormula"] = {}
+                        tmp_dict["targetSampleSizeFormula"][
+                            "typeName"
+                        ] = "targetSampleSizeFormula"
+                        tmp_dict["targetSampleSizeFormula"]["multiple"] = False
+                        tmp_dict["targetSampleSizeFormula"]["typeClass"] = "primitive"
+                        tmp_dict["targetSampleSizeFormula"][
+                            "value"
+                        ] = target_sample_size["targetSampleSizeFormula"]
+                socialscience["fields"].append(
+                    {
+                        "typeName": "targetSampleSize",
+                        "multiple": False,
+                        "typeClass": "compound",
+                        "value": tmp_dict,
+                    }
+                )
 
             # Generate socialScienceNotes attributes
-            if 'socialScienceNotes' in data_dict:
-                social_science_notes = data_dict['socialScienceNotes']
+            if "socialScienceNotes" in data_dict:
+                social_science_notes = data_dict["socialScienceNotes"]
                 tmp_dict = {}
-                if 'socialScienceNotesType' in social_science_notes:
-                    if social_science_notes['socialScienceNotesType'] is not None:
-                        tmp_dict['socialScienceNotesType'] = {}
-                        tmp_dict['socialScienceNotesType']['typeName'] = 'socialScienceNotesType'
-                        tmp_dict['socialScienceNotesType']['multiple'] = False
-                        tmp_dict['socialScienceNotesType']['typeClass'] = 'primitive'
-                        tmp_dict['socialScienceNotesType']['value'] = social_science_notes['socialScienceNotesType']
-                if 'socialScienceNotesSubject' in social_science_notes:
-                    if social_science_notes['socialScienceNotesSubject'] is not None:
-                        tmp_dict['socialScienceNotesSubject'] = {}
-                        tmp_dict['socialScienceNotesSubject']['typeName'] = 'socialScienceNotesSubject'
-                        tmp_dict['socialScienceNotesSubject']['multiple'] = False
-                        tmp_dict['socialScienceNotesSubject']['typeClass'] = 'primitive'
-                        tmp_dict['socialScienceNotesSubject']['value'] = social_science_notes['socialScienceNotesSubject']
-                if 'socialScienceNotesText' in social_science_notes:
-                    if social_science_notes['socialScienceNotesText'] is not None:
-                        tmp_dict['socialScienceNotesText'] = {}
-                        tmp_dict['socialScienceNotesText']['typeName'] = 'socialScienceNotesText'
-                        tmp_dict['socialScienceNotesText']['multiple'] = False
-                        tmp_dict['socialScienceNotesText']['typeClass'] = 'primitive'
-                        tmp_dict['socialScienceNotesText']['value'] = social_science_notes['socialScienceNotesText']
-                socialscience['fields'].append({
-                    'typeName': 'socialScienceNotes',
-                    'multiple': False,
-                    'typeClass': 'compound',
-                    'value': tmp_dict
-                })
+                if "socialScienceNotesType" in social_science_notes:
+                    if social_science_notes["socialScienceNotesType"] is not None:
+                        tmp_dict["socialScienceNotesType"] = {}
+                        tmp_dict["socialScienceNotesType"][
+                            "typeName"
+                        ] = "socialScienceNotesType"
+                        tmp_dict["socialScienceNotesType"]["multiple"] = False
+                        tmp_dict["socialScienceNotesType"]["typeClass"] = "primitive"
+                        tmp_dict["socialScienceNotesType"][
+                            "value"
+                        ] = social_science_notes["socialScienceNotesType"]
+                if "socialScienceNotesSubject" in social_science_notes:
+                    if social_science_notes["socialScienceNotesSubject"] is not None:
+                        tmp_dict["socialScienceNotesSubject"] = {}
+                        tmp_dict["socialScienceNotesSubject"][
+                            "typeName"
+                        ] = "socialScienceNotesSubject"
+                        tmp_dict["socialScienceNotesSubject"]["multiple"] = False
+                        tmp_dict["socialScienceNotesSubject"]["typeClass"] = "primitive"
+                        tmp_dict["socialScienceNotesSubject"][
+                            "value"
+                        ] = social_science_notes["socialScienceNotesSubject"]
+                if "socialScienceNotesText" in social_science_notes:
+                    if social_science_notes["socialScienceNotesText"] is not None:
+                        tmp_dict["socialScienceNotesText"] = {}
+                        tmp_dict["socialScienceNotesText"][
+                            "typeName"
+                        ] = "socialScienceNotesText"
+                        tmp_dict["socialScienceNotesText"]["multiple"] = False
+                        tmp_dict["socialScienceNotesText"]["typeClass"] = "primitive"
+                        tmp_dict["socialScienceNotesText"][
+                            "value"
+                        ] = social_science_notes["socialScienceNotesText"]
+                socialscience["fields"].append(
+                    {
+                        "typeName": "socialScienceNotes",
+                        "multiple": False,
+                        "typeClass": "compound",
+                        "value": tmp_dict,
+                    }
+                )
 
             """journal"""
-            for attr in self.__attr_import_dv_up_journal_fields_values + list(self.__attr_import_dv_up_journal_fields_arrays.keys()) + ['journal_displayName']:
+            for attr in (
+                self.__attr_import_dv_up_journal_fields_values
+                + list(self.__attr_import_dv_up_journal_fields_arrays.keys())
+                + ["journal_displayName"]
+            ):
                 if attr in data_dict:
                     journal = {}
-                    if attr != 'journal_displayName':
-                        journal['fields'] = []
+                    if attr != "journal_displayName":
+                        journal["fields"] = []
                         break
 
-            if 'journal_displayName' in data_dict:
-                journal['displayName'] = data_dict['journal_displayName']
+            if "journal_displayName" in data_dict:
+                journal["displayName"] = data_dict["journal_displayName"]
 
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_journal_fields_values:
@@ -1250,41 +1431,47 @@ class Dataset(DVObject):
                     else:
                         multiple = False
                     if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = 'primitive'
+                        typeClass = "primitive"
                     elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = 'compound'
+                        typeClass = "compound"
                     elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = 'controlledVocabulary'
-                    journal['fields'].append({
-                        'typeName': attr,
-                        'multiple': multiple,
-                        'typeClass': typeClass,
-                        'value': v
-                    })
+                        typeClass = "controlledVocabulary"
+                    journal["fields"].append(
+                        {
+                            "typeName": attr,
+                            "multiple": multiple,
+                            "typeClass": typeClass,
+                            "value": v,
+                        }
+                    )
 
             # Generate fields attributes
-            for key, val in self.__attr_import_dv_up_journal_fields_arrays.items():
+            for (key, val,) in self.__attr_import_dv_up_journal_fields_arrays.items():
                 if key in data_dict:
-                    journal['fields'].append({
-                        'typeName': key,
-                        'multiple': True,
-                        'typeClass': 'compound',
-                        'value': self.__generate_field_arrays(key, val)
-                    })
+                    journal["fields"].append(
+                        {
+                            "typeName": key,
+                            "multiple": True,
+                            "typeClass": "compound",
+                            "value": self.__generate_field_arrays(key, val),
+                        }
+                    )
 
-            data['datasetVersion']['metadataBlocks']['citation'] = citation
-            if 'socialscience' in locals():
-                data['datasetVersion']['metadataBlocks']['socialscience'] = socialscience
-            if 'geospatial' in locals():
-                data['datasetVersion']['metadataBlocks']['geospatial'] = geospatial
-            if 'journal' in locals():
-                data['datasetVersion']['metadataBlocks']['journal'] = journal
-        elif data_format == 'dspace':
+            data["datasetVersion"]["metadataBlocks"]["citation"] = citation
+            if "socialscience" in locals():
+                data["datasetVersion"]["metadataBlocks"][
+                    "socialscience"
+                ] = socialscience
+            if "geospatial" in locals():
+                data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
+            if "journal" in locals():
+                data["datasetVersion"]["metadataBlocks"]["journal"] = journal
+        elif data_format == "dspace":
             data = None
-            print('INFO: Not implemented yet.')
-        elif data_format == 'custom':
+            print("INFO: Not implemented yet.")
+        elif data_format == "custom":
             data = None
-            print('INFO: Not implemented yet.')
+            print("INFO: Not implemented yet.")
         if validate:
             validate_data(data, filename_schema)
 
@@ -1329,22 +1516,19 @@ class Datafile(DVObject):
             'schemas/json/datafile_upload_schema.json'
 
         """
-        self._internal_attributes = ['_Datafile' + attr for attr in INTERNAL_ATTRIBUTES]
-        
+        self._internal_attributes = ["_Datafile" + attr for attr in INTERNAL_ATTRIBUTES]
+
         super().__init__(data=data)
 
-        self._default_json_format = 'dataverse_upload'
-        self._default_json_schema_filename = 'schemas/json/datafile_upload_schema.json'
-        self._allowed_json_formats = [
-            'dataverse_upload',
-            'dataverse_download'
-        ]
+        self._default_json_format = "dataverse_upload"
+        self._default_json_schema_filename = "schemas/json/datafile_upload_schema.json"
+        self._allowed_json_formats = ["dataverse_upload", "dataverse_download"]
         self._json_dataverse_upload_attr = [
-            'description',
-            'categories',
-            'restrict',
-            'title',
-            'directoryLabel',
-            'pid',
-            'filename'
+            "description",
+            "categories",
+            "restrict",
+            "title",
+            "directoryLabel",
+            "pid",
+            "filename",
         ]
