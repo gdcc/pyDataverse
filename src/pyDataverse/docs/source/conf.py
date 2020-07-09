@@ -1,3 +1,4 @@
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
@@ -27,7 +28,7 @@ sys.path.insert(0, os.path.abspath("../../.."))
 project = "pyDataverse"
 author = "Stefan Kasberger"
 copyright = "{0}, {1}".format(date.today().strftime("%Y"), author)
-description = "pyDataverse helps to easily work with Dataverses API and data types."
+description = "pyDataverse helps to easily work with Dataverses API's and data types."
 
 # The short X.Y version
 version = pyDataverse.__version__

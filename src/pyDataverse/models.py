@@ -18,8 +18,7 @@ INTERNAL_ATTRIBUTES = [
 
 
 class DVObject(object):
-    """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`.
-    """
+    """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`."""
 
     def __init__(self, data=None):
         """Init :class:`DVObject`.
