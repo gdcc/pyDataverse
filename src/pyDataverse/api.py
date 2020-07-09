@@ -1312,7 +1312,7 @@ class NativeApi(Api):
         -------
         Get dataset metadata::
 
-            >>> data = api.get_dataset_metadata(doi, auth=True)
+            >>> data = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
             >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
             >>> resp.status_code
             200: metadata updated
