@@ -26,6 +26,9 @@ Release v\ |version|.
 .. image:: https://img.shields.io/github/license/aussda/pydataverse.svg
     :target: https://opensource.org/licenses/MIT
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 -------------------
 
 **pyDataverse** is a tool to easily connect with the
