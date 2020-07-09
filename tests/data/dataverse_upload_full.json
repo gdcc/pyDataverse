@@ -1,7 +1,8 @@
 {
   "name": "Scientific Research",
   "alias": "science",
-  "dataverseContacts": [{
+  "dataverseContacts": [
+    {
       "contactEmail": "pi@example.edu"
     },
     {

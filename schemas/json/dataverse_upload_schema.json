@@ -24,20 +24,22 @@
       "type": "array",
       "additionalItems": false,
       "items": {
-        "anyOf": [{
-          "$id": "#/properties/dataverseContacts/items/anyOf/0",
-          "type": "object",
-          "required": [
-            "contactEmail"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "contactEmail": {
-              "$id": "#/properties/dataverseContacts/items/anyOf/0/properties/contactEmail",
-              "type": "string"
+        "anyOf": [
+          {
+            "$id": "#/properties/dataverseContacts/items/anyOf/0",
+            "type": "object",
+            "required": [
+              "contactEmail"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "contactEmail": {
+                "$id": "#/properties/dataverseContacts/items/anyOf/0/properties/contactEmail",
+                "type": "string"
+              }
             }
           }
-        }],
+        ],
         "$id": "#/properties/dataverseContacts/items"
       }
     },
