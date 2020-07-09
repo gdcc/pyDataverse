@@ -169,7 +169,7 @@ def write_pickle(filename, data):
 def read_csv(filename, newline="", delimiter=",", quotechar='"', encoding="utf-8"):
     """Read in a CSV file.
 
-    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
+    See more at `csv <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
@@ -207,12 +207,12 @@ def write_csv(
 ):
     """Short summary.
 
-    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
+    See more at `csv <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
     data : list
-        List of :class:`dict`s. Key is column, value is cell content.
+        List of :class:`dict`. Key is column, value is cell content.
     filename : string
         Full filename with path of file.
     newline : string
@@ -241,10 +241,11 @@ def write_csv(
 def read_csv_as_dicts(
     filename, newline="", delimiter=",", quotechar='"', encoding="utf-8"
 ):
-    """Read in CSV file into a list of :class:`dict`s.
+    """Read in CSV file into a list of :class:`dict`.
 
     This offers an easy import functionality of your data from CSV files.
-    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
+    See more at
+    `csv <https://docs.python.org/3/library/csv.html>`_.
 
     CSV file structure:
     1) The header row contains the column names.
@@ -296,7 +297,7 @@ def write_dicts_as_csv(data, fieldnames, filename, delimiter=",", quotechar='"')
     """Write :class:`dict` to a CSV file
 
     This offers an easy export functionality of your data to a CSV files.
-    See more at `csv.reader() <https://docs.python.org/3/library/csv.html>`_.
+    See more at `csv <https://docs.python.org/3/library/csv.html>`_.
 
     Parameters
     ----------
