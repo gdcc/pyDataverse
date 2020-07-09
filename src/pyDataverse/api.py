@@ -1267,7 +1267,7 @@ class NativeApi(Api):
     ):
         """Edit metadata of a given dataset.
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+        `edit-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
 
         HTTP Request:
 
@@ -1702,7 +1702,7 @@ class NativeApi(Api):
         existing files and tells if already in the database (most likely via
         hashing).
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
+        `adding-files <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
 
         Parameters
         ----------
@@ -1755,7 +1755,7 @@ class NativeApi(Api):
             curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' $SERVER_URL/api/files/$ID/metadata
             curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+        `updating-file-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
 
         Parameters
         ----------
@@ -1810,7 +1810,7 @@ class NativeApi(Api):
 
             POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/replace?key={apiKey}
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
+        `replacing-files <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
 
         Parameters
         ----------
