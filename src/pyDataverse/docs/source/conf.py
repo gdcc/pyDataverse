@@ -52,6 +52,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -136,7 +137,6 @@ html_sidebars = {
     ],
 }
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -173,13 +173,11 @@ latex_documents = [
     ),
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "pyDataverse", "pyDataverse Documentation", [author], 1)]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -200,3 +198,9 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+
+# Intersphinx
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
