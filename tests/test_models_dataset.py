@@ -71,18 +71,18 @@ def data_object():
     Returns
     -------
     pydataverse.models.Dataset
-        Dataset object.
+        :class:`Dataset` object.
     """
     return Dataset()
 
 
 def dict_flat_set_min():
-    """Import minimum Dataset dict.
+    """Get flat dict for set() of minimum Dataset.
 
     Returns
     -------
     dict
-        Minimum Dataset metadata.
+        Flat dict with minimum Dataset data.
 
     """
     data = {
@@ -106,12 +106,12 @@ def dict_flat_set_min():
 
 
 def dict_flat_set_full():
-    """Import full Dataset dict.
+    """Get flat dict for set() of full Dataset.
 
     Returns
     -------
     dict
-        Full Dataset metadata.
+        Flat dict with full Dataset data.
 
     """
     data = {
@@ -328,8 +328,8 @@ def object_data_min():
 
     Returns
     -------
-    dict
-        Dictionary of minimum data attributes set.
+    pyDataverse.Dataset
+        :class:`Dataset` with minimum attributes set.
 
     """
 
@@ -358,8 +358,8 @@ def object_data_full():
 
     Returns
     -------
-    dict
-        Dictionary of full data attributes set.
+    pyDataverse.Dataset
+        :class:`Dataset` with full attributes set.
 
     """
     data = {
@@ -548,12 +548,12 @@ def object_data_full():
 
 
 def dict_flat_get_min():
-    """Import minimum Dataset dict.
+    """Get flat dict for :func:`get` with minimum data of Dataset.
 
     Returns
     -------
     dict
-        Minimum Dataset metadata.
+        Minimum Dataset dictionary returned by :func:`get`.
 
     """
     data = {
@@ -577,12 +577,12 @@ def dict_flat_get_min():
 
 
 def dict_flat_get_full():
-    """Import minimum Dataset dict.
+    """Get flat dict for :func:`get` of full data of Dataset.
 
     Returns
     -------
     dict
-        Minimum Dataset metadata.
+        Full Datafile dictionary returned by :func:`get`.
 
     """
     data = {

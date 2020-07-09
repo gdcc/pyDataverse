@@ -10,6 +10,7 @@ import jsonschema
 import pytest
 from pyDataverse.models import Datafile
 
+# Global Variables
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 FILENAME_DATA_FULL = "tests/data/datafile_upload_full.json"
 FILENAME_DATA_MIN = "tests/data/datafile_upload_min.json"
@@ -72,18 +73,18 @@ def data_object():
     Returns
     -------
     pydataverse.models.Datafile
-        Datafile object.
+        :class:`Datafile` object.
     """
     return Datafile()
 
 
 def dict_flat_set_min():
-    """Import minimum Datafile dict.
+    """Get flat dict for set() of minimum Datafile.
 
     Returns
     -------
     dict
-        Minimum Datafile metadata.
+        Flat dict with minimum Datafile data.
 
     """
     data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
@@ -91,12 +92,12 @@ def dict_flat_set_min():
 
 
 def dict_flat_set_full():
-    """Import full Datafile dict.
+    """Get flat dict for set() of full Datafile.
 
     Returns
     -------
     dict
-        Full Datafile metadata.
+        Flat dict with full Datafile data.
 
     """
     data = {
@@ -117,7 +118,7 @@ def object_data_init():
     Returns
     -------
     dict
-        Minimum Datafile metadata.
+        Dictionary of init data attributes set.
 
     """
     data = {
@@ -143,8 +144,8 @@ def object_data_min():
 
     Returns
     -------
-    dict
-        Minimum Datafile metadata.
+    pyDataverse.Datafile
+        :class:`Datafile` with minimum attributes set.
 
     """
     data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
@@ -156,8 +157,8 @@ def object_data_full():
 
     Returns
     -------
-    dict
-        Minimum Datafile metadata.
+    pyDataverse.Datafile
+        :class:`Datafile` with full attributes set.
 
     """
     data = {
@@ -173,12 +174,12 @@ def object_data_full():
 
 
 def dict_flat_get_min():
-    """Get flat dict for :func:`get()` with minimum data of Datafile.
+    """Get flat dict for :func:`get` with minimum data of Datafile.
 
     Returns
     -------
     dict
-        Minimum Datafile dictionary returned by :func:`get().
+        Minimum Datafile dictionary returned by :func:`get`.
 
     """
     data = {"pid": "doi:10.11587/RRKEA9", "filename": "10109_qu_de_v1_0.pdf"}
@@ -186,12 +187,12 @@ def dict_flat_get_min():
 
 
 def dict_flat_get_full():
-    """Get flat dict for :func:`get()` with full data of Datafile.
+    """Get flat dict for :func:`get` of full data of Datafile.
 
     Returns
     -------
     dict
-        Full Datafile dictionary returned by :func:`get().
+        Full Datafile dictionary returned by :func:`get`.
 
     """
     data = {

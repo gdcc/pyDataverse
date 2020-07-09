@@ -73,7 +73,7 @@ def data_object():
     Returns
     -------
     pydataverse.models.Dataverse
-        Dataverse object.
+        :class:`Dataverse` object.
     """
     return Dataverse()
 
@@ -148,8 +148,8 @@ def object_data_min():
 
     Returns
     -------
-    pyDataverse.Dataverse()
-        :class:Dataverse() with minimum attributes set.
+    pyDataverse.Dataverse
+        :class:`Dataverse` with minimum attributes set.
 
     """
     data = {
@@ -165,8 +165,8 @@ def object_data_full():
 
     Returns
     -------
-    pyDataverse.Dataverse()
-        :class:Dataverse() with full attributes set.
+    pyDataverse.Dataverse
+        :class:`Dataverse` with full attributes set.
 
     """
     data = {
@@ -184,12 +184,12 @@ def object_data_full():
 
 
 def dict_flat_get_min():
-    """Get flat dict for :func:`get()` with minimum data of Dataverse.
+    """Get flat dict for :func:`get` with minimum data of Dataverse.
 
     Returns
     -------
     dict
-        Minimum Dataverse dictionary returned by :func:`get().
+        Minimum Dataverse dictionary returned by :func:`get`.
 
     """
     data = {
@@ -201,12 +201,12 @@ def dict_flat_get_min():
 
 
 def dict_flat_get_full():
-    """Get flat dict for :func:`get()` of full data of Dataverse.
+    """Get flat dict for :func:`get` of full data of Dataverse.
 
     Returns
     -------
     dict
-        Full Datafile dictionary returned by :func:`get().
+        Full Datafile dictionary returned by :func:`get`.
 
     """
     data = {
