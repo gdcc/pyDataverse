@@ -60,7 +60,6 @@ class Api(object):
             'OK'
 
         """
-
         if not isinstance(base_url, ("".__class__, u"".__class__)):
             raise ApiUrlError("base_url {0} is not a string.".format(base_url))
         self.base_url = base_url
@@ -141,8 +140,9 @@ class Api(object):
                 params["key"] = str(self.api_token)
             else:
                 raise ApiAuthorizationError(
-                    "ERROR: GET - Api token not passed to "
-                    "`get_request` {}.".format(url)
+                    "ERROR: GET - Api token not passed to `get_request` {0}.".format(
+                        url
+                    )
                 )
 
         try:
@@ -150,8 +150,9 @@ class Api(object):
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    "ERROR: GET - Authorization invalid {0}. MSG: {1}."
-                    "".format(url, error_msg)
+                    "ERROR: GET - Authorization invalid {0}. MSG: {1}.".format(
+                        url, error_msg
+                    )
                 )
             elif resp.status_code >= 300:
                 if resp.text:
@@ -164,7 +165,7 @@ class Api(object):
             return resp
         except ConnectionError:
             raise ConnectionError(
-                "ERROR: GET - Could not establish connection to api {}." "".format(url)
+                "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
     def post_request(self, url, data=None, auth=False, params=None, files=None):
@@ -205,13 +206,14 @@ class Api(object):
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    "ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}"
-                    "".format(url, error_msg)
+                    "ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}".format(
+                        url, error_msg
+                    )
                 )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                "ERROR: POST - Could not establish connection to API: {}" "".format(url)
+                "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
 
     def put_request(self, url, data=None, auth=False, params=None):
@@ -242,8 +244,9 @@ class Api(object):
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
-                    "ERROR: PUT - Api token not passed to "
-                    "`put_request` {}.".format(url)
+                    "ERROR: PUT - Api token not passed to `put_request` {0}.".format(
+                        url
+                    )
                 )
 
         try:
@@ -251,13 +254,14 @@ class Api(object):
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    "ERROR: PUT HTTP 401 - Authorization error {0}. MSG: {1}"
-                    "".format(url, error_msg)
+                    "ERROR: PUT HTTP 401 - Authorization error {0}. MSG: {1}".format(
+                        url, error_msg
+                    )
                 )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                "ERROR: PUT - Could not establish connection to api {}." "".format(url)
+                "ERROR: PUT - Could not establish connection to api {0}.".format(url)
             )
 
     def delete_request(self, url, auth=False, params=None):
@@ -286,8 +290,9 @@ class Api(object):
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
-                    "ERROR: DELETE - Api token not passed to "
-                    "`delete_request` {}.".format(url)
+                    "ERROR: DELETE - Api token not passed to `delete_request` {}.".format(
+                        url
+                    )
                 )
 
         try:
@@ -295,7 +300,7 @@ class Api(object):
             return resp
         except ConnectionError:
             raise ConnectionError(
-                "ERROR: DELETE could not establish connection to api {}." "".format(url)
+                "ERROR: DELETE could not establish connection to api {}.".format(url)
             )
 
 
@@ -318,8 +323,7 @@ class DataAccessApi(Api):
     """
 
     def __init__(self, base_url, api_token=None):
-        """Init an DataAccessApi() class.
-        """
+        """Init an DataAccessApi() class."""
         super().__init__(base_url, api_token)
         if base_url:
             self.base_url_api_data_access = "{0}/access".format(self.base_url_api)
@@ -545,8 +549,7 @@ class MetricsApi(Api):
     """
 
     def __init__(self, base_url, api_token=None, api_version="latest"):
-        """Init an MetricsApi() class.
-        """
+        """Init an MetricsApi() class."""
         super().__init__(base_url, api_token, api_version)
         if base_url:
             self.base_url_api_metrics = "{0}/api/info/metrics".format(self.base_url)
@@ -751,9 +754,8 @@ class NativeApi(Api):
         """
         if not parent:
             raise DataverseNotFoundError(
-                "Dataverse {} not found. No parent dataverse passed to `create_dataverse()`.".format(
-                    identifier
-                )
+                "Dataverse {} not found. No parent dataverse passed to"
+                " `create_dataverse()`.".format(identifier)
             )
 
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, parent)
@@ -866,14 +868,16 @@ class NativeApi(Api):
         if resp.status_code == 401:
             error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                "ERROR: HTTP 401 - Delete Dataverse {0} unauthorized. "
-                "MSG: {1}".format(identifier, error_msg)
+                "ERROR: HTTP 401 - Delete Dataverse {0} unauthorized. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 404:
             error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}"
-                "".format(identifier, error_msg)
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 403:
             error_msg = resp.json()["message"]
@@ -885,8 +889,9 @@ class NativeApi(Api):
         elif resp.status_code != 200:
             error_msg = resp.json()["message"]
             raise OperationFailedError(
-                "ERROR: HTTP {0} - Dataverse {1} could not be deleted. MSG: "
-                "{2}".format(resp.status_code, identifier, error_msg)
+                "ERROR: HTTP {0} - Dataverse {1} could not be deleted. MSG: {2}".format(
+                    resp.status_code, identifier, error_msg
+                )
             )
         elif resp.status_code == 200:
             print("Dataverse {} deleted.".format(identifier))
@@ -1234,8 +1239,9 @@ class NativeApi(Api):
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}"
-                "".format(dataverse, error_msg)
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    dataverse, error_msg
+                )
             )
         elif resp.status_code == 401:
             error_msg = resp.json()["message"]
@@ -1335,7 +1341,8 @@ class NativeApi(Api):
                 print("Wrong passed data format.")
             else:
                 print(
-                    "You may not add data to a field that already has data and does not allow multiples. Use is_replace=true to replace existing data."
+                    "You may not add data to a field that already has data and does not"
+                    " allow multiples. Use is_replace=true to replace existing data."
                 )
         elif resp.status_code == 200:
             print("Dataset {0} updated".format(identifier))
@@ -1473,8 +1480,9 @@ class NativeApi(Api):
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
             raise DatasetNotFoundError(
-                "ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}"
-                "".format(pid, error_msg)
+                "ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}".format(
+                    pid, error_msg
+                )
             )
         elif resp.status_code == 401:
             error_msg = resp.json()["message"]
@@ -1567,8 +1575,9 @@ class NativeApi(Api):
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
             raise DatasetNotFoundError(
-                "ERROR: HTTP 404 - Dataset '{0}' was not found. MSG: {1}"
-                "".format(identifier, error_msg)
+                "ERROR: HTTP 404 - Dataset '{0}' was not found. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 405:
             error_msg = resp.json()["message"]
@@ -2145,7 +2154,8 @@ class NativeApi(Api):
             and "datasets" not in children_types
         ):
             print(
-                "ERROR: Wrong children_types passed: 'dataverses' and 'datafiles' passed, 'datasets' missing."
+                "ERROR: Wrong children_types passed: 'dataverses' and 'datafiles'"
+                " passed, 'datasets' missing."
             )
             return False
 
@@ -2232,8 +2242,7 @@ class SearchApi(Api):
     """
 
     def __init__(self, base_url, api_token=None, api_version="latest"):
-        """Init an SearchApi() class.
-        """
+        """Init an SearchApi() class."""
         super().__init__(base_url, api_token, api_version)
         if base_url:
             self.base_url_api_search = "{0}/search?q=".format(self.base_url_api)

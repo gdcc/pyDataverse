@@ -1,17 +1,16 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
+"""Find out more at https://github.com/AUSSDA/pyDataverse.
+
+Copyright 2019 Stefan Kasberger
+
+Licensed under the MIT License.
+"""
 from __future__ import absolute_import
 
 from requests.packages import urllib3
 
 urllib3.disable_warnings()  # noqa
-
-"""pyDataverse
-Copyright 2019 Stefan Kasberger
-
-Licensed under the MIT License.
-"""
 
 __author__ = "Stefan Kasberger"
 __email__ = "stefan.kasberger@univie.ac.at"

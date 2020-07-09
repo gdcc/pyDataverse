@@ -83,7 +83,7 @@ setup(
     author_email="stefan.kasberger@univie.ac.at",
     name="pyDataverse",
     version=find_version("src", "pyDataverse", "__init__.py"),
-    description="A wrapper for the Dataverse API",
+    description="A Python module for Dataverses API's and its data types",
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
     license="MIT",
