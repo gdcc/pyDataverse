@@ -22,10 +22,10 @@ class Api(object):
 
     Parameters
     ----------
-        base_url : string
+        base_url : str
             Base URL of Dataverse instance. Without trailing `/` at the end.
             e.g. `http://demo.dataverse.org`
-        api_token : string
+        api_token : str
             Authenication token for the api.
 
     Attributes
@@ -44,9 +44,9 @@ class Api(object):
 
         Parameters
         ----------
-        base_url : string
+        base_url : str
             Base url for Dataverse api.
-        api_token : string
+        api_token : str
             Api token for Dataverse api.
 
         Examples
@@ -108,7 +108,7 @@ class Api(object):
 
         Returns
         -------
-        string
+        str
             Naming of the API class.
 
         """
@@ -119,7 +119,7 @@ class Api(object):
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
         params : dict
             Dictionary of parameters to be passed with the request.
@@ -175,9 +175,9 @@ class Api(object):
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
-        data : string
+        data : str
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -221,9 +221,9 @@ class Api(object):
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
-        data : string
+        data : str
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -261,7 +261,7 @@ class Api(object):
             return resp
         except ConnectionError:
             raise ConnectionError(
-                "ERROR: PUT - Could not establish connection to api {0}.".format(url)
+                "ERROR: PUT - Could not establish connection to api '{0}'.".format(url)
             )
 
     def delete_request(self, url, auth=False, params=None):
@@ -269,7 +269,7 @@ class Api(object):
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -290,7 +290,7 @@ class Api(object):
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
-                    "ERROR: DELETE - Api token not passed to `delete_request` {}.".format(
+                    "ERROR: DELETE - Api token not passed to `delete_request` {0}.".format(
                         url
                     )
                 )
@@ -335,7 +335,7 @@ class DataAccessApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the DataAccess API class.
 
         """
@@ -415,7 +415,7 @@ class DataAccessApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be datafile id or persistent
             identifier of the datafile (e. g. doi).
 
@@ -458,7 +458,7 @@ class DataAccessApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
 
         Returns
@@ -561,7 +561,7 @@ class MetricsApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the MetricsApi() class.
 
         """
@@ -669,7 +669,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        native_api_version : string
+        native_api_version : str
             Api version of Dataverse native api. Default is `v1`.
 
         """
@@ -681,7 +681,7 @@ class NativeApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the NativeApi() class.
 
         """
@@ -698,7 +698,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -735,14 +735,14 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust). If identifier is omitted, a root dataverse is created.
-        metadata : string
+        metadata : str
             Metadata of the Dataverse as a json-formatted string.
         auth : bool
             True if api authorization is necessary. Defaults to ``True``.
-        parent : string
+        parent : str
             Parent dataverse, if existing, to which the Dataverse gets attached
             to. Defaults to ``:root``.
 
@@ -754,7 +754,7 @@ class NativeApi(Api):
         """
         if not parent:
             raise DataverseNotFoundError(
-                "Dataverse {} not found. No parent dataverse passed to"
+                "Dataverse '{0}' not found. No parent dataverse passed to"
                 " `create_dataverse()`.".format(identifier)
             )
 
@@ -796,7 +796,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
         auth : bool
@@ -835,7 +835,7 @@ class NativeApi(Api):
                 )
             )
         elif resp.status_code == 200:
-            print("Dataverse {} published.".format(identifier))
+            print("Dataverse {0} published.".format(identifier))
         return resp
 
     def delete_dataverse(self, identifier, auth=True):
@@ -852,7 +852,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
 
@@ -894,7 +894,7 @@ class NativeApi(Api):
                 )
             )
         elif resp.status_code == 200:
-            print("Dataverse {} deleted.".format(identifier))
+            print("Dataverse {0} deleted.".format(identifier))
         return resp
 
     def get_dataverse_roles(self, identifier, auth=False):
@@ -908,7 +908,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -927,7 +927,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
         auth : bool
@@ -954,7 +954,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -981,7 +981,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -1037,12 +1037,12 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
             True, if identifier is a persistent identifier.
-        version : string
+        version : str
             Version to be retrieved:
             ``:latest-published``: the latest published version
             ``:latest``: either a draft (if exists) or the latest published version.
@@ -1084,7 +1084,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
@@ -1124,10 +1124,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
-        version : string
+        version : str
             Version string of the Dataset.
         is_pid : bool
             True, if identifier is a persistent identifier.
@@ -1161,9 +1161,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset. (e.g. ``doi:10.11587/8H3N93``).
-        export_format : string
+        export_format : str
             Export format as a string. Formats: ``ddi``, ``oai_ddi``,
             ``dcterms``, ``oai_dc``, ``schema.org``, ``dataverse_json``.
 
@@ -1216,10 +1216,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        dataverse : string
+        dataverse : str
             "alias" of the dataverse (e.g. ``root``) or the database id of the
             dataverse (e.g. ``1``)
-        metadata : string
+        metadata : str
             Metadata of the Dataset as a json-formatted string (e. g.
             `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_)
 
@@ -1254,10 +1254,10 @@ class NativeApi(Api):
             if "data" in resp.json():
                 if "persistentId" in resp.json()["data"]:
                     identifier = resp.json()["data"]["persistentId"]
-                    print("Dataset with pid '{}' created.".format(identifier))
+                    print("Dataset with pid '{0}' created.".format(identifier))
                 elif "id" in resp.json()["data"]:
                     identifier = resp.json()["data"]["id"]
-                    print("Dataset with id '{}' created.".format(identifier))
+                    print("Dataset with id '{0}' created.".format(identifier))
                 else:
                     print("ERROR: No identifier returned for created Dataset.")
         return resp
@@ -1291,10 +1291,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
-        metadata : string
+        metadata : str
             Metadata of the Dataset as a json-formatted string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
@@ -1332,7 +1332,7 @@ class NativeApi(Api):
         if resp.status_code == 401:
             error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                "ERROR: HTTP 401 - Updating metadata unauthorized. MSG:{0}".format(
+                "ERROR: HTTP 401 - Updating metadata unauthorized. MSG: {0}".format(
                     error_msg
                 )
             )
@@ -1345,7 +1345,7 @@ class NativeApi(Api):
                     " allow multiples. Use is_replace=true to replace existing data."
                 )
         elif resp.status_code == 200:
-            print("Dataset {0} updated".format(identifier))
+            print("Dataset '{0}' updated".format(identifier))
         return resp
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
@@ -1453,10 +1453,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset (e.g.
             ``doi:10.11587/8H3N93``).
-        type : string
+        type : str
             Passing ``minor`` increases the minor version number (2.3 is
             updated to 2.4). Passing ``major`` increases the major version
             number (2.3 is updated to 3.0). Superusers can pass
@@ -1491,7 +1491,7 @@ class NativeApi(Api):
                 "MSG: {1}".format(pid, error_msg)
             )
         elif resp.status_code == 200:
-            print("Dataset {} published".format(pid))
+            print("Dataset {0} published".format(pid))
         return resp
 
     def get_dataset_lock(self, pid):
@@ -1501,8 +1501,8 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
-            Persistent identifier of the dataset (e.g.
+        pid : str
+            Persistent identifier of the Dataset (e.g.
             ``doi:10.11587/8H3N93``).
 
         Returns
@@ -1552,7 +1552,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
@@ -1595,7 +1595,7 @@ class NativeApi(Api):
                 "MSG: {1}".format(identifier, error_msg)
             )
         elif resp.status_code == 200:
-            print("Dataset '{}' deleted.".format(identifier))
+            print("Dataset '{0}' deleted.".format(identifier))
         return resp
 
     def destroy_dataset(self, identifier, is_pid=True, auth=True):
@@ -1615,6 +1615,7 @@ class NativeApi(Api):
         remove the dataset and its datafiles, then re-index the parent
         dataverse in Solr. This endpoint requires the API token of a
         superuser.
+
         """
         if is_pid:
             url = "{0}/datasets/:persistentId/destroy/?persistentId={1}".format(
@@ -1644,9 +1645,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset. e.g. ``doi:10.11587/8H3N93``.
-        version : string
+        version : str
             Version of dataset. Defaults to `1`.
 
         Returns
@@ -1706,11 +1707,11 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        filename : string
+        filename : str
             Full filename with path.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
@@ -1759,9 +1760,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_filepid : bool
             ``True`` to use persistent identifier for datafile. ``False``, if
@@ -1814,11 +1815,11 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        filename : string
+        filename : str
             Full filename with path.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_filepid : bool
             ``True`` to use persistent identifier for datafile. ``False``, if
@@ -1944,7 +1945,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be block's id, or it's name.
 
         Returns
@@ -2025,7 +2026,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        dataverse_id : string
+        dataverse_id : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2049,7 +2050,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2066,14 +2067,11 @@ class NativeApi(Api):
         """Delete role of a Dataverse.
 
         HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/roles/$id
+        `DELETE http://$SERVER/api/roles/$id`
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2118,9 +2116,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        parent : string
+        parent : str
             Description of parameter `parent`.
-        parent_type : string
+        parent_type : str
             Description of parameter `parent_type`.
         children_types : list
             Types of children to be collected. 'dataverses', 'datasets' and 'datafiles' are valid list items.
@@ -2254,7 +2252,7 @@ class SearchApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the Search API class.
 
         """
@@ -2336,7 +2334,7 @@ class SwordApi(Api):
 
         Parameters
         ----------
-        sword_api_version : string
+        sword_api_version : str
             Api version of Dataverse SWORD API.
 
         """
@@ -2360,7 +2358,7 @@ class SwordApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the SWORD API class.
 
         """

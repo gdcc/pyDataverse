@@ -32,15 +32,15 @@ def read_file(filename, mode="r"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
-    mode : string
+    mode : str
         Read mode of file. Defaults to `r`. See more at
         https://docs.python.org/3.5/library/functions.html#open
 
     Returns
     -------
-    string
+    str
         Returns data as string.
 
     """
@@ -54,11 +54,11 @@ def write_json(filename, data, mode="w", encoding="utf-8"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
     data : dict
         Data to be written in the json file.
-    mode : string
+    mode : str
         Write mode of file. Defaults to `w`. See more at
         https://docs.python.org/3/library/functions.html#open
 

@@ -15,15 +15,15 @@ def read_file(filename, mode="r", encoding="utf-8"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
-    mode : string
+    mode : str
         Read mode of file. Defaults to `r`. See more at
         https://docs.python.org/3.5/library/functions.html#open
 
     Returns
     -------
-    string
+    str
         Returns data as string.
 
     """
@@ -43,14 +43,14 @@ def write_file(filename, data, mode="w", encoding="utf-8"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
-    data : string
+    data : str
         Data to be stored.
-    mode : string
+    mode : str
         Read mode of file. Defaults to `w`. See more at
         https://docs.python.org/3.5/library/functions.html#open
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     """
@@ -71,12 +71,12 @@ def read_json(filename, mode="r", encoding="utf-8"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
-    mode : string
+    mode : str
         Read mode of file. Defaults to `w`. See more at
         https://docs.python.org/3.5/library/functions.html#open
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     Returns
@@ -101,14 +101,14 @@ def write_json(filename, data, mode="w", encoding="utf-8"):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
     data : dict
         Data to be written in the JSON file.
-    mode : string
+    mode : str
         Write mode of file. Defaults to `w`. See more at
         https://docs.python.org/3/library/functions.html#open
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     """
@@ -128,7 +128,7 @@ def read_pickle(filename):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Full filename with path of file.
 
     Returns
@@ -153,7 +153,7 @@ def write_pickle(filename, data):
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Full filename with path of file.
     data : dict
         Data to write in pickle file.
@@ -173,15 +173,15 @@ def read_csv(filename, newline="", delimiter=",", quotechar='"', encoding="utf-8
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Full filename with path of file.
-    newline : string
+    newline : str
         Newline character.
-    delimiter : string
+    delimiter : str
         Cell delimiter of CSV file. Defaults to ';'.
-    quotechar : string
+    quotechar : str
         Quote-character of CSV file. Defaults to '"'.
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     Returns
@@ -213,15 +213,15 @@ def write_csv(
     ----------
     data : list
         List of :class:`dict`. Key is column, value is cell content.
-    filename : string
+    filename : str
         Full filename with path of file.
-    newline : string
+    newline : str
         Newline character.
-    delimiter : string
+    delimiter : str
         Cell delimiter of CSV file. Defaults to ';'.
-    quotechar : string
+    quotechar : str
         Quote-character of CSV file. Defaults to '"'.
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     """
@@ -260,15 +260,15 @@ def read_csv_as_dicts(
 
     Parameters
     ----------
-    filename : string
+    filename : str
         Filename with full path.
-    newline : string
+    newline : str
         Newline character.
-    delimiter : string
+    delimiter : str
         Cell delimiter of CSV file. Defaults to ';'.
-    quotechar : string
+    quotechar : str
         Quote-character of CSV file. Defaults to '"'.
-    encoding : string
+    encoding : str
         Character encoding of file. Defaults to 'utf-8'.
 
     Returns
@@ -305,11 +305,11 @@ def write_dicts_as_csv(data, fieldnames, filename, delimiter=",", quotechar='"')
         Dictionary with columns as keys, to be written in the CSV file.
     fieldnames : list
         Sequence of keys that identify the order of the columns.
-    filename : string
+    filename : str
         Filename with full path.
-    delimiter : string
+    delimiter : str
         Cell delimiter of CSV file. Defaults to ';'.
-    quotechar : string
+    quotechar : str
         Quote-character of CSV file. Defaults to '"'.
 
     """
@@ -337,12 +337,12 @@ def clean_string(str):
 
     Parameters
     ----------
-    str : string
+    str : str
         String to be cleaned.
 
     Returns
     -------
-    string
+    str
         Cleaned string.
 
     """
@@ -362,9 +362,9 @@ def validate_data(data, filename_schema, file_format="json"):
     ----------
     data : dict
         Data to be validated.
-    filename_schema : string
+    filename_schema : str
         Filename with full path of the schema file.
-    file_format : string
+    file_format : str
         File format to be validated.
 
     Returns
@@ -397,7 +397,7 @@ def create_dataverse_url(base_url, identifier):
     ----------
     base_url : str
         Base URL of Dataverse instance
-    identifier : string
+    identifier : str
         Can either be a dataverse id (long), a dataverse alias (more
         robust), or the special value ``:root``.
 

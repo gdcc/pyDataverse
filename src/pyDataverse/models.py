@@ -87,7 +87,7 @@ class DVObject(object):
 
         Parameters
         ----------
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Returns
@@ -115,15 +115,15 @@ class DVObject(object):
 
         Parameters
         ----------
-        json_str : string
+        json_str : str
             JSON string to be imported.
-        data_format : string
+        data_format : str
             Data formats available for import. See `_allowed_json_formats`.
         validate : bool
             `True`, if imported JSON should be validated against a JSON
             schema file. `False`, if JSON string should be imported directly and
             not checked if valid.
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Returns
@@ -176,13 +176,13 @@ class DVObject(object):
 
         Parameters
         ----------
-        data_format : string
+        data_format : str
             Data formats to be validated. See `_allowed_json_formats`.
         validate : bool
             `True`, if created JSON should be validated against a JSON schema
             file. `False`, if JSON string should be created and not checked if
             valid.
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Returns
@@ -225,9 +225,9 @@ class Dataverse(DVObject):
 
     Attributes
     ----------
-    _default_json_format : string
+    _default_json_format : str
         Default JSON data format.
-    _default_json_schema_filename : string
+    _default_json_schema_filename : str
         Default JSON schema filename.
     _allowed_json_formats : list
         List of all possible JSON data formats.
@@ -280,9 +280,9 @@ class Dataset(DVObject):
 
     Attributes
     ----------
-    _default_json_format : string
+    _default_json_format : str
         Default JSON data format.
-    _default_json_schema_filename : string
+    _default_json_schema_filename : str
         Default JSON schema filename.
     _allowed_json_formats : list
         List of all possible JSON data formats.
@@ -651,7 +651,7 @@ class Dataset(DVObject):
 
         Parameters
         ----------
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Returns
@@ -824,7 +824,7 @@ class Dataset(DVObject):
             `True`, if imported JSON should be validated against a JSON
             schema file. `False`, if JSON string should be imported directly and
             not checked if valid.
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Examples
@@ -1077,7 +1077,7 @@ class Dataset(DVObject):
 
         Parameters
         ----------
-        key : string
+        key : str
             Name of attribute.
         sub_keys : list
             List of keys to be created.
@@ -1129,13 +1129,13 @@ class Dataset(DVObject):
 
         Parameters
         ----------
-        format : string
+        format : str
             Data formats to be validated. See `_allowed_json_formats`.
         validate : bool
             `True`, if created JSON should be validated against a JSON schema
             file. `False`, if JSON string should be created and not checked if
             valid.
-        filename_schema : string
+        filename_schema : str
             Filename of JSON schema with full path.
 
         Returns
@@ -1484,9 +1484,9 @@ class Datafile(DVObject):
 
     Attributes
     ----------
-    _default_json_format : string
+    _default_json_format : str
         Default JSON data format.
-    _default_json_schema_filename : string
+    _default_json_schema_filename : str
         Default JSON schema filename.
     _allowed_json_formats : list
         List of all possible JSON data formats.
