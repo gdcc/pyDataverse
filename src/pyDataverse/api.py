@@ -1179,7 +1179,7 @@ class NativeApi(Api):
         resp = self.get_request(url, auth=auth)
         return resp
 
-    def create_dataset(self, dataverse, metadata, auth=True):
+    def create_dataset(self, dataverse, metadata, pid=None, publish=False, auth=True):
         """Add dataset to a dataverse.
 
         `Dataverse Documentation
@@ -1214,11 +1214,30 @@ class NativeApi(Api):
         Status Code:
             201: dataset created
 
+        Import Dataset with existing PID:
+        `<http://guides.dataverse.org/en/latest/api/native-api.html#import-a-dataset-into-a-dataverse>`_
+        To import a dataset with an existing persistent identifier (PID), the
+        dataset’s metadata should be prepared in Dataverse’s native JSON format. The
+        PID is provided as a parameter at the URL. The following line imports a
+        dataset with the PID PERSISTENT_IDENTIFIER to Dataverse, and then releases it:
+
+        The pid parameter holds a persistent identifier (such as a DOI or Handle). The import will fail if no PID is provided, or if the provided PID fails validation.
+
+        The optional release parameter tells Dataverse to immediately publish the
+        dataset. If the parameter is changed to no, the imported dataset will
+        remain in DRAFT status.
+
         Parameters
         ----------
         dataverse : str
             "alias" of the dataverse (e.g. ``root``) or the database id of the
             dataverse (e.g. ``1``)
+        pid : str
+            PID of existing Dataset.
+        publish : bool
+            Publish only works when a Dataset with an existing PID is created. If it
+            is ``True``, Dataset should be instantly published, ``False``
+            if a Draft should be created.
         metadata : str
             Metadata of the Dataset as a json-formatted string (e. g.
             `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_)
@@ -1228,12 +1247,20 @@ class NativeApi(Api):
         requests.Response
             Response object of requests library.
 
-        Todo
-        -------
-        Link Dataset finch1.json
-
         """
-        url = "{0}/dataverses/{1}/datasets".format(self.base_url_api_native, dataverse)
+        if pid:
+            assert isinstance(pid, str)
+            url = "{0}/dataverses/{1}/datasets/:import?pid={2}".format(
+                self.base_url_api_native, dataverse, pid
+            )
+            if publish:
+                url += "&release=yes"
+            else:
+                url += "&release=no"
+        else:
+            url = "{0}/dataverses/{1}/datasets".format(
+                self.base_url_api_native, dataverse
+            )
         resp = self.post_request(url, metadata, auth)
 
         if resp.status_code == 404:
