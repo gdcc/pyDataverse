@@ -330,7 +330,7 @@ def write_dicts_as_csv(data, fieldnames, filename, delimiter=",", quotechar='"')
             writer.writerow(d)
 
 
-def clean_string(str):
+def clean_string(string):
     """Clean a string.
 
     Trims whitespace.
@@ -342,13 +342,13 @@ def clean_string(str):
 
     Returns
     -------
-    str
+    string
         Cleaned string.
 
     """
-    assert isinstance(str, str)
+    assert isinstance(string, str)
 
-    clean_str = str.strip()
+    clean_str = string.strip()
     clean_str = clean_str.replace("  ", " ")
 
     assert isinstance(clean_str, str)

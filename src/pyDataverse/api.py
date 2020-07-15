@@ -17,7 +17,7 @@ from pyDataverse.exceptions import (
 )
 
 
-class Api(object):
+class Api:
     """Base class.
 
     Parameters
@@ -265,7 +265,7 @@ class Api(object):
             )
 
     def delete_request(self, url, auth=False, params=None):
-        """Make a DELETE request.
+        """Make a Delete request.
 
         Parameters
         ----------
@@ -296,8 +296,7 @@ class Api(object):
                 )
 
         try:
-            resp = delete(url, params=params)
-            return resp
+            return delete(url, params=params)
         except ConnectionError:
             raise ConnectionError(
                 "ERROR: DELETE could not establish connection to api {}.".format(url)
@@ -344,9 +343,9 @@ class DataAccessApi(Api):
     def get_datafile(
         self,
         identifier,
-        format=None,
-        noVarHeader=None,
-        imageThumb=None,
+        data_format=None,
+        no_var_header=None,
+        image_thumb=None,
         is_pid=True,
         auth=False,
     ):
@@ -381,28 +380,27 @@ class DataAccessApi(Api):
         is_first_param = True
         if is_pid:
             url = "{0}/datafile/{1}".format(self.base_url_api_data_access, identifier)
-            if format or noVarHeader or imageThumb:
+            if data_format or no_var_header or image_thumb:
                 url += "?"
         else:
             url = "{0}/datafile/:persistentId/?persistentId={1}".format(
                 self.base_url_api_data_access, identifier
             )
-        if format:
-            url += "format={0}".format(format)
+        if data_format:
+            url += "format={0}".format(data_format)
             is_first_param = False
-        if noVarHeader:
+        if no_var_header:
             if not is_first_param:
                 url += "&"
-            url += "noVarHeader={0}".format(noVarHeader)
+            url += "noVarHeader={0}".format(no_var_header)
             is_first_param = False
-        if imageThumb:
+        if image_thumb:
             if not is_first_param:
                 url += "&"
-            url += "imageThumb={0}".format(imageThumb)
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url += "imageThumb={0}".format(image_thumb)
+        return self.get_request(url, auth=auth)
 
-    def get_datafiles(self, identifier, format=None, auth=False):
+    def get_datafiles(self, identifier, data_format=None, auth=False):
         """Download a datafile via the Dataverse Data Access API.
 
         Get by file id (HTTP Request).
@@ -426,12 +424,11 @@ class DataAccessApi(Api):
 
         """
         url = "{0}/datafiles/{1}".format(self.base_url_api_data_access, identifier)
-        if format:
-            url += "?format={0}".format(format)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        if data_format:
+            url += "?format={0}".format(data_format)
+        return self.get_request(url, auth=auth)
 
-    def get_datafile_bundle(self, identifier, fileMetadataId=None, auth=False):
+    def get_datafile_bundle(self, identifier, file_metadata_id=None, auth=False):
         """Download a datafile in all its formats.
 
         HTTP Request:
@@ -470,10 +467,9 @@ class DataAccessApi(Api):
         url = "{0}/datafile/bundle/{1}".format(
             self.base_url_api_data_access, identifier
         )
-        if fileMetadataId:
-            url += "?fileMetadataId={0}".format(fileMetadataId)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        if file_metadata_id:
+            url += "?fileMetadataId={0}".format(file_metadata_id)
+        return self.get_request(url, auth=auth)
 
     def request_access(self, identifier, auth=True, is_filepid=False):
         """
@@ -491,8 +487,7 @@ class DataAccessApi(Api):
             url = "{0}/datafile/{1}/requestAccess".format(
                 self.base_url_api_data_access, identifier
             )
-        resp = self.put_request(url, auth=auth)
-        return resp
+        return self.put_request(url, auth=auth)
 
     def allow_access_request(self, identifier, do_allow=True, auth=True, is_pid=True):
         """
@@ -512,8 +507,7 @@ class DataAccessApi(Api):
             data = "true"
         else:
             data = "false"
-        resp = self.put_request(url, data=data, auth=auth)
-        return resp
+        return self.put_request(url, data=data, auth=auth)
 
     def grant_file_access(self, identifier, user, auth=False):
         """
@@ -522,8 +516,7 @@ class DataAccessApi(Api):
         url = "{0}/datafile/{1}/grantAccess/{2}".format(
             self.base_url_api_data_access, identifier, user
         )
-        resp = self.put_request(url, auth=auth)
-        return resp
+        return self.put_request(url, auth=auth)
 
     def list_file_access_requests(self, identifier, auth=False):
         """
@@ -532,8 +525,7 @@ class DataAccessApi(Api):
         url = "{0}/datafile/{1}/listRequests".format(
             self.base_url_api_data_access, identifier
         )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
 
 class MetricsApi(Api):
@@ -567,29 +559,32 @@ class MetricsApi(Api):
         """
         return "Metrics API: {0}".format(self.base_url_api_metrics)
 
-    def total(self, type, date_str=None, auth=False):
+    def total(self, data_type, date_str=None, auth=False):
         """
         GET https://$SERVER/api/info/metrics/$type
         GET https://$SERVER/api/info/metrics/$type/toMonth/$YYYY-DD
 
         $type can be set to dataverses, datasets, files or downloads.
+
         """
-        url = "{0}/{1}".format(self.base_url_api_metrics, type)
+        url = "{0}/{1}".format(self.base_url_api_metrics, data_type)
         if date_str:
             url += "/toMonth/{0}".format(date_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
-    def past_days(self, type, days_str, auth=False):
+    def past_days(self, data_type, days_str, auth=False):
         """
+
+        http://guides.dataverse.org/en/4.18.1/api/metrics.html
         GET https://$SERVER/api/info/metrics/$type/pastDays/$days
 
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = "{0}/{1}/pastDays/{2}".format(self.base_url_api_metrics, type, days_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/{1}/pastDays/{2}".format(
+            self.base_url_api_metrics, data_type, days_str
+        )
+        return self.get_request(url, auth=auth)
 
     def get_dataverses_by_subject(self, auth=False):
         """
@@ -599,8 +594,7 @@ class MetricsApi(Api):
         """
         # TODO: check if date-string has proper format
         url = "{0}/dataverses/bySubject".format(self.base_url_api_metrics)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataverses_by_category(self, auth=False):
         """
@@ -610,8 +604,7 @@ class MetricsApi(Api):
         """
         # TODO: check if date-string has proper format
         url = "{0}/dataverses/byCategory".format(self.base_url_api_metrics)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_datasets_by_subject(self, date_str=None, auth=False):
         """
@@ -623,8 +616,7 @@ class MetricsApi(Api):
         url = "{0}/datasets/bySubject".format(self.base_url_api_metrics)
         if date_str:
             url += "/toMonth/{0}".format(date_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_datasets_by_data_location(self, data_location, auth=False):
         """
@@ -636,8 +628,7 @@ class MetricsApi(Api):
         url = "{0}/datasets/?dataLocation={1}".format(
             self.base_url_api_metrics, data_location
         )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
 
 class NativeApi(Api):
@@ -709,8 +700,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def create_dataverse(self, identifier, metadata, auth=True, parent=":root"):
         """Create a dataverse.
@@ -841,12 +831,6 @@ class NativeApi(Api):
     def delete_dataverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
 
-        HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/dataverses/$id
-
         Status Code:
             200: Dataverse deleted
 
@@ -919,8 +903,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}/roles".format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_contents(self, identifier, auth=False):
         """Gets contents of Dataverse.
@@ -940,8 +923,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}/contents".format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_assignments(self, identifier, auth=False):
         """Get dataverse assignments by alias or id.
@@ -967,8 +949,7 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}/assignments".format(
             self.base_url_api_native, identifier
         )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_facets(self, identifier, auth=False):
         """Get dataverse facets by alias or id.
@@ -992,8 +973,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}/facets".format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def dataverse_id2alias(self, dataverse_id):
         """Converts a Dataverse ID to an alias.
@@ -1012,11 +992,9 @@ class NativeApi(Api):
         resp = self.get_dataverse(dataverse_id)
         if "data" in resp.json():
             if "alias" in resp.json()["data"]:
-                alias = resp.json()["data"]["alias"]
-                return alias
-        else:
-            print("ERROR: Can not resolve Dataverse ID to alias.")
-            return False
+                return resp.json()["data"]["alias"]
+        print("ERROR: Can not resolve Dataverse ID to alias.")
+        return False
 
     def get_dataset(self, identifier, version=":latest", auth=True, is_pid=True):
         """Get metadata of a Dataset.
@@ -1064,8 +1042,7 @@ class NativeApi(Api):
         else:
             url = "{0}/datasets/{1}".format(self.base_url_api_native, identifier)
             # CHECK: Its not really clear, if the version query can also be done via ID.
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataset_versions(self, identifier, auth=True, is_pid=True):
         """Get versions of a Dataset.
@@ -1104,8 +1081,7 @@ class NativeApi(Api):
             url = "{0}/datasets/{1}/versions".format(
                 self.base_url_api_native, identifier
             )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataset_version(self, identifier, version, auth=True, is_pid=True):
         """Get version of a Dataset.
@@ -1146,8 +1122,7 @@ class NativeApi(Api):
             url = "{0}/datasets/{1}/versions/{2}".format(
                 self.base_url_api_native, identifier, version
             )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataset_export(self, pid, export_format, auth=False):
         """Get metadata of dataset exported in different formats.
@@ -1176,8 +1151,7 @@ class NativeApi(Api):
         url = "{0}/datasets/export?exporter={1}&persistentId={2}".format(
             self.base_url_api_native, export_format, pid
         )
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def create_dataset(self, dataverse, metadata, pid=None, publish=False, auth=True):
         """Add dataset to a dataverse.
@@ -1448,7 +1422,7 @@ class NativeApi(Api):
             print("Got Dataset private URL: {0}".format(resp.json()["data"]["link"]))
         return resp
 
-    def publish_dataset(self, pid, type="minor", auth=True):
+    def publish_dataset(self, pid, release_type="minor", auth=True):
         """Publish dataset.
 
         Publishes the dataset whose id is passed. If this is the first version
@@ -1483,7 +1457,7 @@ class NativeApi(Api):
         pid : str
             Persistent identifier of the dataset (e.g.
             ``doi:10.11587/8H3N93``).
-        type : str
+        release_type : str
             Passing ``minor`` increases the minor version number (2.3 is
             updated to 2.4). Passing ``major`` increases the major version
             number (2.3 is updated to 3.0). Superusers can pass
@@ -1501,7 +1475,7 @@ class NativeApi(Api):
         url = "{0}/datasets/:persistentId/actions/:publish".format(
             self.base_url_api_native
         )
-        url += "?persistentId={0}&type={1}".format(pid, type)
+        url += "?persistentId={0}&type={1}".format(pid, release_type)
         resp = self.post_request(url, auth=auth)
 
         if resp.status_code == 404:
@@ -1541,8 +1515,7 @@ class NativeApi(Api):
         url = "{0}/datasets/:persistentId/locks/?persistentId={1}".format(
             self.base_url_api_native, pid
         )
-        resp = self.get_request(url, auth=True)
-        return resp
+        return self.get_request(url, auth=True)
 
     def get_dataset_assignments(self, identifier, is_pid=True, auth=True):
         """Get Dataset assignments.
@@ -1559,20 +1532,12 @@ class NativeApi(Api):
             url = "{0}/datasets/{1}/assignments".format(
                 self.base_url_api_native, identifier
             )
-
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def delete_dataset(self, identifier, is_pid=True, auth=True):
         """Delete a dataset.
 
         Delete the dataset whose id is passed
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/datasets/$id
 
         Status Code:
             200: dataset deleted
@@ -1613,7 +1578,7 @@ class NativeApi(Api):
                 "Published datasets can only be deleted from the GUI. For "
                 "more information, please refer to "
                 "https://github.com/IQSS/dataverse/issues/778"
-                " MSG: {}".format(error_msg)
+                " MSG: {0}".format(error_msg)
             )
         elif resp.status_code == 401:
             error_msg = resp.json()["message"]
@@ -1687,8 +1652,7 @@ class NativeApi(Api):
             self.base_url_api_native
         )
         url = base_str + "{0}/files?persistentId={1}".format(version, pid)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_datafile_metadata(
         self, identifier, is_filepid=False, is_draft=False, auth=True
@@ -1712,8 +1676,7 @@ class NativeApi(Api):
             if is_draft:
                 url += "/draft"
             # CHECK: Its not really clear, if the version query can also be done via ID.
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
@@ -1757,10 +1720,9 @@ class NativeApi(Api):
             url += "/datasets/{0}/add".format(identifier)
 
         files = {"file": open(filename, "rb")}
-        resp = self.post_request(
+        return self.post_request(
             url, data={"jsonData": json_str}, files=files, auth=True
         )
-        return resp
 
     def update_datafile_metadata(self, identifier, json_str=None, is_filepid=False):
         """Update datafile metadata.
@@ -1826,8 +1788,7 @@ class NativeApi(Api):
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(self.api_token)
         shell_command += " -X POST -F 'jsonData={0}' {1}".format(json_str, query_str)
         # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        return result
+        return sp.run(shell_command, shell=True, stdout=sp.PIPE)
 
     def replace_datafile(self, identifier, filename, json_str, is_filepid=True):
         """Replace datafile.
@@ -1867,9 +1828,7 @@ class NativeApi(Api):
             url += "/files/:persistentId/replace?persistentId={0}".format(identifier)
         else:
             url += "/files/{0}/replace".format(identifier)
-
-        resp = self.post_request(url, data=data, files=files, auth=True)
-        return resp
+        return self.post_request(url, data=data, files=files, auth=True)
 
     def get_info_version(self, auth=False):
         """Get the Dataverse version and build number.
@@ -1890,8 +1849,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/info/version".format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_info_server(self, auth=False):
         """Get dataverse server name.
@@ -1912,10 +1870,9 @@ class NativeApi(Api):
 
         """
         url = "{0}/info/server".format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
-    def get_info_apiTermsOfUse(self, auth=False):
+    def get_info_api_terms_of_use(self, auth=False):
         """Get API Terms of Use url.
 
         The response contains the text value inserted as API Terms of use which
@@ -1934,8 +1891,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/info/apiTermsOfUse".format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_metadatablocks(self, auth=False):
         """Get info about all metadata blocks.
@@ -1955,8 +1911,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/metadatablocks".format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_metadatablock(self, identifier, auth=False):
         """Get info about single metadata block.
@@ -1982,8 +1937,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/metadatablocks/{1}".format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_user_apitoken_expirationdate(self, auth=False):
         """Get the expiration date of an Users's API token.
@@ -2001,8 +1955,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/users/token".format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def recreate_user_apitoken(self):
         """Recreate an Users API token.
@@ -2020,8 +1973,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/users/token/recreate".format(self.base_url_api_native)
-        resp = self.post_request(url)
-        return resp
+        return self.post_request(url)
 
     def delete_user_apitoken(self):
         """Delete an Users API token.
@@ -2039,8 +1991,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/users/token".format(self.base_url_api_native)
-        resp = self.delete_request(url)
-        return resp
+        return self.delete_request(url)
 
     def create_dataverse_role(self, dataverse_id):
         """Create a new role in a Dataverse.
@@ -2063,8 +2014,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/roles?dvo={1}".format(self.base_url_api_native, dataverse_id)
-        resp = self.post_request(url)
-        return resp
+        return self.post_request(url)
 
     def get_dataverse_role(self, role_id, auth=False):
         """Get role of a Dataverse.
@@ -2087,14 +2037,10 @@ class NativeApi(Api):
 
         """
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def delete_dataverse_role(self, role_id):
         """Delete role of a Dataverse.
-
-        HTTP Request:
-        `DELETE http://$SERVER/api/roles/$id`
 
         Parameters
         ----------
@@ -2108,10 +2054,11 @@ class NativeApi(Api):
 
         """
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
-        resp = self.delete_request(url)
-        return resp
+        return self.delete_request(url)
 
-    def get_children(self, parent=":root", parent_type="dataverse", children_types=[]):
+    def get_children(
+        self, parent=":root", parent_type="dataverse", children_types=None
+    ):
         """Walk through children of parent element in Dataverse tree.
 
         Default: gets all child dataverses if parent = dataverse or all
@@ -2164,8 +2111,9 @@ class NativeApi(Api):
         - Unify tree and models
 
         """
-
         children = []
+        if children_types is None:
+            children_types = []
 
         if len(children_types) == 0:
             if parent_type == "dataverse":
@@ -2189,11 +2137,14 @@ class NativeApi(Api):
             parent_alias = parent
             resp = self.get_dataverse_contents(parent_alias)
             if "data" in resp.json():
-                content = resp.json()["data"]
-                for c in content:
-                    if c["type"] == "dataverse" and "dataverses" in children_types:
-                        dataverse_id = c["id"]
-                        title = c["title"]
+                contents = resp.json()["data"]
+                for content in contents:
+                    if (
+                        content["type"] == "dataverse"
+                        and "dataverses" in children_types
+                    ):
+                        dataverse_id = content["id"]
+                        title = content["title"]
                         child_alias = self.dataverse_id2alias(dataverse_id)
                         children.append(
                             {
@@ -2208,10 +2159,14 @@ class NativeApi(Api):
                                 ),
                             }
                         )
-                    elif c["type"] == "dataset" and "datasets" in children_types:
-                        dataset_id = c["identifier"]
+                    elif content["type"] == "dataset" and "datasets" in children_types:
+                        dataset_id = content["identifier"]
                         pid = (
-                            c["protocol"] + ":" + c["authority"] + "/" + c["identifier"]
+                            content["protocol"]
+                            + ":"
+                            + content["authority"]
+                            + "/"
+                            + content["identifier"]
                         )
                         children.append(
                             {
@@ -2287,8 +2242,8 @@ class SearchApi(Api):
 
     def search(
         self,
-        q,
-        type=None,
+        q_str,
+        data_type=None,
         subtree=None,
         sort=None,
         order=None,
@@ -2296,19 +2251,19 @@ class SearchApi(Api):
         start=None,
         show_relevance=None,
         show_facets=None,
-        fq=None,
+        filter_query=None,
         show_entity_ids=None,
         query_entities=None,
         auth=False,
     ):
-        """
+        """Search.
 
         http://guides.dataverse.org/en/4.18.1/api/search.html
         """
-        url = "{0}{1}".format(self.base_url_api_search, q)
-        if type:
+        url = "{0}{1}".format(self.base_url_api_search, q_str)
+        if data_type:
             # TODO: pass list of types
-            url += "&type={0}".format(type)
+            url += "&type={0}".format(data_type)
         if subtree:
             # TODO: pass list of subtrees
             url += "&subtree={0}".format(subtree)
@@ -2324,14 +2279,13 @@ class SearchApi(Api):
             url += "&show_relevance={0}".format(show_relevance)
         if show_facets:
             url += "&show_facets={0}".format(show_facets)
-        if fq:
-            url += "&fq={0}".format(fq)
+        if filter_query:
+            url += "&fq={0}".format(filter_query)
         if show_entity_ids:
             url += "&show_entity_ids={0}".format(show_entity_ids)
         if query_entities:
             url += "&query_entities={0}".format(query_entities)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
 
 class SwordApi(Api):
@@ -2391,7 +2345,6 @@ class SwordApi(Api):
         """
         return "SWORD API: {0}".format(self.base_url_api_sword)
 
-    def get_service_document(self, auth=True):
+    def get_service_document(self):
         url = "{0}/swordv2/service-document".format(self.base_url_api_sword)
-        resp = self.get_request(url, auth=True)
-        return resp
+        return self.get_request(url, auth=True)

@@ -17,7 +17,7 @@ INTERNAL_ATTRIBUTES = [
 ]
 
 
-class DVObject(object):
+class DVObject:
     """Base class for the Dataverse data types `Dataverse`, `Dataset` and `Datafile`."""
 
     def __init__(self, data=None):
@@ -150,7 +150,7 @@ class DVObject(object):
             if validate:
                 validate_data(json_dict, filename_schema)
             # get first level metadata and parse it automatically
-            for key, val in json_dict.items():
+            for key in json_dict.keys():
                 if key in self._json_dataverse_upload_attr:
                     data[key] = json_dict[key]
                 else:
@@ -288,12 +288,43 @@ class Dataset(DVObject):
         List of all possible JSON data formats.
     _json_dataverse_upload_attr : list
         List with all attributes to be exported in :func:`to_json`.
+    __attr_import_dv_up_datasetVersion_values : list
+        Dataverse API Upload Dataset JSON attributes inside ds[\'datasetVersion\'].
+    __attr_import_dv_up_citation_fields_values : list
+        Dataverse API Upload Dataset JSON attributes inside
+        ds[\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
+    __attr_import_dv_up_citation_fields_arrays : dict
+        Dataverse API Upload Dataset JSON attributes inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
+    __attr_import_dv_up_geospatial_fields_values : list
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
+    __attr_import_dv_up_geospatial_fields_arrays : dict
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
+    __attr_import_dv_up_socialscience_fields_values : list
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'][\'fields\'].
+    __attr_import_dv_up_journal_fields_values : list
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
+    __attr_import_dv_up_journal_fields_arrays : dict
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
+    __attr_dict_dv_up_required :list
+        Required attributes for valid `dv_up` metadata dict creation.
+    __attr_dict_dv_up_type_class_primitive : list
+        typeClass primitive.
+    __attr_dict_dv_up_type_class_compound : list
+        typeClass compound.
+    __attr_dict_dv_up_type_class_controlled_vocabulary : list
+        typeClass controlledVocabulary.
+    __attr_dict_dv_up_single_dict : list
+        This attributes are excluded from automatic parsing in ds.get() creation.
+    __attr_displayNames : list
+        Attributes of displayName.
     """
 
-    """
-    Dataverse API Upload Dataset JSON attributes inside
-    ds[\'datasetVersion\'].
-    """
     __attr_import_dv_up_datasetVersion_values = [
         "license",
         "termsOfAccess",
@@ -303,11 +334,6 @@ class Dataset(DVObject):
         "identifier",
         "termsOfUse",
     ]
-
-    """
-    Dataverse API Upload Dataset JSON attributes inside
-    ds[\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
-    """
     __attr_import_dv_up_citation_fields_values = [
         "accessToSources",
         "alternativeTitle",
@@ -330,11 +356,6 @@ class Dataset(DVObject):
         "subtitle",
         "title",
     ]
-
-    """
-    Dataverse API Upload Dataset JSON attributes inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'citation\'][\'fields\'].
-    """
     __attr_import_dv_up_citation_fields_arrays = {
         "author": [
             "authorName",
@@ -377,17 +398,7 @@ class Dataset(DVObject):
         "timePeriodCovered": ["timePeriodCoveredStart", "timePeriodCoveredEnd"],
         "topicClassification": ["topicClassValue", "topicClassVocab"],
     }
-
-    """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
-    """
     __attr_import_dv_up_geospatial_fields_values = ["geographicUnit"]
-
-    """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'geospatial\'][\'fields\'].
-    """
     __attr_import_dv_up_geospatial_fields_arrays = {
         "geographicBoundingBox": [
             "westLongitude",
@@ -397,11 +408,6 @@ class Dataset(DVObject):
         ],
         "geographicCoverage": ["country", "state", "city", "otherGeographicCoverage"],
     }
-
-    """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'socialscience\'][\'fields\'].
-    """
     __attr_import_dv_up_socialscience_fields_values = [
         "actionsToMinimizeLoss",
         "cleaningOperations",
@@ -423,22 +429,10 @@ class Dataset(DVObject):
         "timeMethod",
         "weighting",
     ]
-
-    """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
-    """
     __attr_import_dv_up_journal_fields_values = ["journalArticleType"]
-
-    """
-    Attributes of Dataverse API Upload Dataset JSON metadata standard inside
-    [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
-    """
     __attr_import_dv_up_journal_fields_arrays = {
         "journalVolumeIssue": ["journalVolume", "journalIssue", "journalPubDate"]
     }
-
-    """Required attributes for valid `dv_up` metadata dict creation."""
     __attr_dict_dv_up_required = [
         "author",
         "datasetContact",
@@ -446,9 +440,7 @@ class Dataset(DVObject):
         "subject",
         "title",
     ]
-
-    """typeClass primitive."""
-    __attr_dict_dv_up_typeClass_primitive = (
+    __attr_dict_dv_up_type_class_primitive = (
         [
             "accessToSources",
             "alternativeTitle",
@@ -503,17 +495,13 @@ class Dataset(DVObject):
         ]
         + ["targetSampleActualSize", "targetSampleSizeFormula"]
     )
-    """typeClass compound."""
-    __attr_dict_dv_up_typeClass_compound = (
-        []
-        + list(__attr_import_dv_up_citation_fields_arrays.keys())
+    __attr_dict_dv_up_type_class_compound = (
+        list(__attr_import_dv_up_citation_fields_arrays.keys())
         + list(__attr_import_dv_up_geospatial_fields_arrays.keys())
         + list(__attr_import_dv_up_journal_fields_arrays.keys())
         + ["series", "socialScienceNotes", "targetSampleSize"]
     )
-
-    """typeClass controlledVocabulary."""
-    __attr_dict_dv_up_typeClass_controlledVocabulary = [
+    __attr_dict_dv_up_type_class_controlled_vocabulary = [
         "authorIdentifierScheme",
         "contributorType",
         "country",
@@ -522,13 +510,7 @@ class Dataset(DVObject):
         "publicationIDType",
         "subject",
     ]
-
-    """
-    This attributes are excluded from automatic parsing in ds.get() creation.
-    """
     __attr_dict_dv_up_single_dict = ["series", "socialScienceNotes", "targetSampleSize"]
-
-    """Attributes of displayName."""
     __attr_displayNames = [
         "citation_displayName",
         "geospatial_displayName",
@@ -855,7 +837,7 @@ class Dataset(DVObject):
         if data_format == "dataverse_upload":
             if validate:
                 validate_data(json_dict, filename_schema, file_format="json")
-            """dataset"""
+            # dataset
             # get first level metadata and parse it automatically
             for key, val in json_dict["datasetVersion"].items():
                 if not key == "metadataBlocks":
@@ -870,7 +852,7 @@ class Dataset(DVObject):
 
             if "metadataBlocks" in json_dict["datasetVersion"]:
 
-                """citation"""
+                # citation
                 if "citation" in json_dict["datasetVersion"]["metadataBlocks"]:
                     citation = json_dict["datasetVersion"]["metadataBlocks"]["citation"]
                     if "displayName" in citation:
@@ -912,7 +894,7 @@ class Dataset(DVObject):
                     # TODO: Exception
                     pass
 
-                """geospatial"""
+                # geospatial
                 if "geospatial" in json_dict["datasetVersion"]["metadataBlocks"]:
                     geospatial = json_dict["datasetVersion"]["metadataBlocks"][
                         "geospatial"
@@ -948,7 +930,7 @@ class Dataset(DVObject):
                     # TODO: Exception
                     pass
 
-                """socialscience"""
+                # socialscience
                 if "socialscience" in json_dict["datasetVersion"]["metadataBlocks"]:
                     socialscience = json_dict["datasetVersion"]["metadataBlocks"][
                         "socialscience"
@@ -999,7 +981,7 @@ class Dataset(DVObject):
                     # TODO: Exception
                     pass
 
-                """journal"""
+                # journal
                 if "journal" in json_dict["datasetVersion"]["metadataBlocks"]:
                     journal = json_dict["datasetVersion"]["metadataBlocks"]["journal"]
 
@@ -1103,20 +1085,22 @@ class Dataset(DVObject):
                     # check if key is in attribute list
                     if k in sub_keys:
                         multiple = None
-                        typeClass = None
+                        type_class = None
                         if isinstance(v, list):
                             multiple = True
                         else:
                             multiple = False
-                        if k in self.__attr_dict_dv_up_typeClass_primitive:
-                            typeClass = "primitive"
-                        elif k in self.__attr_dict_dv_up_typeClass_compound:
-                            typeClass = "compound"
-                        elif k in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                            typeClass = "controlledVocabulary"
+                        if k in self.__attr_dict_dv_up_type_class_primitive:
+                            type_class = "primitive"
+                        elif k in self.__attr_dict_dv_up_type_class_compound:
+                            type_class = "compound"
+                        elif (
+                            k in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                        ):
+                            type_class = "controlledVocabulary"
                         tmp_dict[k] = {}
                         tmp_dict[k]["typeName"] = k
-                        tmp_dict[k]["typeClass"] = typeClass
+                        tmp_dict[k]["typeClass"] = type_class
                         tmp_dict[k]["multiple"] = multiple
                         tmp_dict[k]["value"] = v
                 tmp_list.append(tmp_dict)
@@ -1161,13 +1145,13 @@ class Dataset(DVObject):
             citation = {}
             citation["fields"] = []
 
-            """dataset"""
+            # dataset
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_datasetVersion_values:
                 if attr in data_dict:
                     data["datasetVersion"][attr] = data_dict[attr]
 
-            """citation"""
+            # citation
             if "citation_displayName" in data_dict:
                 citation["displayName"] = data_dict["citation_displayName"]
 
@@ -1179,17 +1163,19 @@ class Dataset(DVObject):
                         multiple = True
                     else:
                         multiple = False
-                    if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = "primitive"
-                    elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = "compound"
-                    elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = "controlledVocabulary"
+                    if attr in self.__attr_dict_dv_up_type_class_primitive:
+                        type_class = "primitive"
+                    elif attr in self.__attr_dict_dv_up_type_class_compound:
+                        type_class = "compound"
+                    elif (
+                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                    ):
+                        type_class = "controlledVocabulary"
                     citation["fields"].append(
                         {
                             "typeName": attr,
                             "multiple": multiple,
-                            "typeClass": typeClass,
+                            "typeClass": type_class,
                             "value": v,
                         }
                     )
@@ -1236,7 +1222,7 @@ class Dataset(DVObject):
                     }
                 )
 
-            """geospatial"""
+            # geospatial
             for attr in (
                 self.__attr_import_dv_up_geospatial_fields_values
                 + list(self.__attr_import_dv_up_geospatial_fields_arrays.keys())
@@ -1259,17 +1245,19 @@ class Dataset(DVObject):
                         multiple = True
                     else:
                         multiple = False
-                    if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = "primitive"
-                    elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = "compound"
-                    elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = "controlledVocabulary"
+                    if attr in self.__attr_dict_dv_up_type_class_primitive:
+                        type_class = "primitive"
+                    elif attr in self.__attr_dict_dv_up_type_class_compound:
+                        type_class = "compound"
+                    elif (
+                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                    ):
+                        type_class = "controlledVocabulary"
                     geospatial["fields"].append(
                         {
                             "typeName": attr,
                             "multiple": multiple,
-                            "typeClass": typeClass,
+                            "typeClass": type_class,
                             "value": v,
                         }
                     )
@@ -1289,7 +1277,7 @@ class Dataset(DVObject):
                         }
                     )
 
-            """socialscience"""
+            # socialscience
             for attr in self.__attr_import_dv_up_socialscience_fields_values + [
                 "socialscience_displayName"
             ]:
@@ -1310,17 +1298,19 @@ class Dataset(DVObject):
                         multiple = True
                     else:
                         multiple = False
-                    if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = "primitive"
-                    elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = "compound"
-                    elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = "controlledVocabulary"
+                    if attr in self.__attr_dict_dv_up_type_class_primitive:
+                        type_class = "primitive"
+                    elif attr in self.__attr_dict_dv_up_type_class_compound:
+                        type_class = "compound"
+                    elif (
+                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                    ):
+                        type_class = "controlledVocabulary"
                     socialscience["fields"].append(
                         {
                             "typeName": attr,
                             "multiple": multiple,
-                            "typeClass": typeClass,
+                            "typeClass": type_class,
                             "value": v,
                         }
                     )
@@ -1406,7 +1396,7 @@ class Dataset(DVObject):
                     }
                 )
 
-            """journal"""
+            # journal
             for attr in (
                 self.__attr_import_dv_up_journal_fields_values
                 + list(self.__attr_import_dv_up_journal_fields_arrays.keys())
@@ -1429,17 +1419,19 @@ class Dataset(DVObject):
                         multiple = True
                     else:
                         multiple = False
-                    if attr in self.__attr_dict_dv_up_typeClass_primitive:
-                        typeClass = "primitive"
-                    elif attr in self.__attr_dict_dv_up_typeClass_compound:
-                        typeClass = "compound"
-                    elif attr in self.__attr_dict_dv_up_typeClass_controlledVocabulary:
-                        typeClass = "controlledVocabulary"
+                    if attr in self.__attr_dict_dv_up_type_class_primitive:
+                        type_class = "primitive"
+                    elif attr in self.__attr_dict_dv_up_type_class_compound:
+                        type_class = "compound"
+                    elif (
+                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                    ):
+                        type_class = "controlledVocabulary"
                     journal["fields"].append(
                         {
                             "typeName": attr,
                             "multiple": multiple,
-                            "typeClass": typeClass,
+                            "typeClass": type_class,
                             "value": v,
                         }
                     )
