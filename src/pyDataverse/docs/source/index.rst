@@ -113,7 +113,7 @@ Features
 - Easy mass imports and exports via pyDataverse’s own CSV format
 - Helper functions to handle Dataverse metadata and data
 - Custom exceptions
-- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + from datetime import date`tox <http://tox.readthedocs.io/>`_)
+- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_)
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
 
 
@@ -128,6 +128,7 @@ User Guide
    user/advanced-usage
    user/use-cases
    user/faq
+   user/resources
 
 
 Reference / API
@@ -183,7 +184,7 @@ at IQSS, but especially to Phil Durbin.
 
 pyDataverse is funded by
 `AUSSDA - The Austrian Social Science Data Archive <https://aussda.at/ueber-aussda/team/>`_
-and the EU Horizon2020 programme
+and through the EU Horizon2020 programme
 `SSHOC - Social Sciences & Humanities Open Cloud <https://www.sshopencloud.eu/about-sshoc>`_.
 
 

@@ -27,6 +27,7 @@ sys.path.insert(0, os.path.abspath("../../.."))
 
 project = "pyDataverse"
 author = "Stefan Kasberger"
+author_affiliation = "AUSSDA - The Austrian Social Science Data Archive"
 copyright = "{0}, {1}".format(date.today().strftime("%Y"), author)
 description = "pyDataverse helps to easily work with Dataverses API's and data types."
 
