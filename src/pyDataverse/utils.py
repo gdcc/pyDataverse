@@ -445,8 +445,8 @@ def create_dataset_url(base_url, identifier, is_pid):
     if is_pid:
         url = "{0}/dataset.xhtml?persistentId={1}".format(base_url, identifier)
     else:
-        url = "{0}/NOT-YET-IMPLEMENTED/{1}".format(base_url, identifier)
-        assert isinstance(url, str)
+        url = "{0}/dataset.xhtml?id{1}".format(base_url, identifier)
+    assert isinstance(url, str)
     return url
 
 
