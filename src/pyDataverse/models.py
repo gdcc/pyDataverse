@@ -1518,7 +1518,7 @@ class Datafile(DVObject):
             "description",
             "categories",
             "restrict",
-            "title",
+            "label",
             "directoryLabel",
             "pid",
             "filename",

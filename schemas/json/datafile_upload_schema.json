@@ -41,8 +41,8 @@
       "$id": "#/properties/filename",
       "type": "string"
     },
-    "title": {
-      "$id": "#/properties/title",
+    "label": {
+      "$id": "#/properties/label",
       "type": "string"
     },
     "directoryLabel": {

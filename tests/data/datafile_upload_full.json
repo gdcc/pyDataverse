@@ -6,6 +6,6 @@
   "restrict": true,
   "pid": "doi:10.11587/NVWE8Y",
   "filename": "20001_ta_de_v1_0.pdf",
-  "title": "Questionnaire",
+  "label": "Questionnaire",
   "directoryLabel": "data/subdir1"
 }

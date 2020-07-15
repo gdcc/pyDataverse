@@ -106,7 +106,7 @@ def dict_flat_set_full():
         "description": "Another data file.",
         "restrict": True,
         "categories": ["Documentation"],
-        "title": "Questionnaire",
+        "label": "Questionnaire",
         "directoryLabel": "data/subdir1",
     }
     return data
@@ -129,7 +129,7 @@ def object_data_init():
             "description",
             "categories",
             "restrict",
-            "title",
+            "label",
             "directoryLabel",
             "pid",
             "filename",
@@ -167,7 +167,7 @@ def object_data_full():
         "description": "Another data file.",
         "restrict": True,
         "categories": ["Documentation"],
-        "title": "Questionnaire",
+        "label": "Questionnaire",
         "directoryLabel": "data/subdir1",
     }
     return data
@@ -201,7 +201,7 @@ def dict_flat_get_full():
         "description": "Another data file.",
         "restrict": True,
         "categories": ["Documentation"],
-        "title": "Questionnaire",
+        "label": "Questionnaire",
         "directoryLabel": "data/subdir1",
     }
     return data
@@ -246,7 +246,7 @@ def json_dataverse_upload_attr():
         "description",
         "categories",
         "restrict",
-        "title",
+        "label",
         "directoryLabel",
         "pid",
         "filename",
