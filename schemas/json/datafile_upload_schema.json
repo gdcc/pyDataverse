@@ -20,10 +20,12 @@
       "type": "array",
       "additionalItems": false,
       "items": {
-        "anyOf": [{
-          "$id": "#/properties/categories/items/anyOf/0",
-          "type": "string"
-        }],
+        "anyOf": [
+          {
+            "$id": "#/properties/categories/items/anyOf/0",
+            "type": "string"
+          }
+        ],
         "$id": "#/properties/categories/items"
       }
     },
@@ -39,8 +41,8 @@
       "$id": "#/properties/filename",
       "type": "string"
     },
-    "title": {
-      "$id": "#/properties/title",
+    "label": {
+      "$id": "#/properties/label",
       "type": "string"
     },
     "directoryLabel": {

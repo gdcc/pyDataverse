@@ -1,3 +1,5 @@
+.. _homepage:
+
 pyDataverse
 =========================================
 
@@ -24,71 +26,121 @@ Release v\ |version|.
 .. image:: https://img.shields.io/github/license/aussda/pydataverse.svg
     :target: https://opensource.org/licenses/MIT
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 -------------------
 
-pyDataverse is a Python module for `Dataverse <http://dataverse.org>`_.
-It uses the `Dataverse API <http://guides.dataverse.org/en/latest/api/index.html>`_
-and it's metadata data model to import, manipulate and export Dataverses, Datasets
+**pyDataverse** is a tool to easily connect with the
+`Dataverse <http://dataverse.org>`_ world. It helps working with the
+`Dataverse API's <http://guides.dataverse.org/en/latest/api/index.html>`_
+and its metadata models.
+
+It's a wrapper for the Dataverse API’s to make convenient API calls and offers
+Python objects for each of Dataverses own data types: Dataverses, Datasets
 and Datafiles.
 
--------------------
+No matter, if you want to import huge masses of metadata and data into a
+Dataverse instance. connect your service with an instance or just want to make
+some API calls - **pyDataverse can help you!**
 
 
-Quickstart
+Install
 -----------------------------
 
-**Install**
+To install pyDataverse, simply run this simple command in your terminal of choice:
 
 .. code-block:: shell
 
     pip install pyDataverse
 
-**Usage**
 
->>> from pyDataverse.api import Api
->>> from pyDataverse.models import Dataverse
->>> # establish connection
->>> base_url = 'https://data.aussda.at/'
->>> api = Api(base_url)
->>> api.status
-'OK'
->>> # get dataverse
->>> dv = 'autnes'  # dataverse alias or id
->>> resp = api.get_dataverse(dv)
->>> resp.json()['data']['creationDate']
-'2017-11-09T13:53:27Z'
->>> # get dataset
->>> identifier = 'doi:10.11587/IMKDZI'
->>> resp = api.get_dataset(identifier)
->>> resp.json()['data']['id']
-345
->>> # get datafile
->>> datafile_id = '399'  # file id of the datafile
->>> resp = api.get_datafile(datafile_id)
->>> resp
-<Response [200]>
+You can find more options at :ref:`user_installation`.
 
+**Requirements**
 
-Requirements
------------------------------
-
-pyDataverse officially supports Python 2.7 & 3.4–3.7.
+pyDataverse officially supports Python 3.4–3.7.
 
 Python packages:
 
-- requests>=2.12.0
+- `requests <https://requests.readthedocs.io/en/master/>`_>=2.12.0
+- `jsonschema <https://github.com/Julian/jsonschema>`_>=3.2.0
+
+
+Quickstart
+-----------------------------
+
+.. warning::
+  Do not execute the examples code on your production instance!
+
+**Import Dataset metadata**
+
+Import metadata coming from Dataverses API JSON format (which is needed for
+API uploads).
+
+>>> from pyDataverse.models import Dataset
+>>> from pyDataverse.utils import read_file
+>>> ds = Dataset()
+>>> json_filename = 'tests/data/dataset_upload_min_tutorial_mass-migration.json'
+>>> ds.from_json(read_file(json_filename))
+>>> ds.get()
+{'citation_displayName': 'Citation Metadata', 'title': 'Youth in Austria 2005', 'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1'}], 'datasetContact': [{'datasetContactEmail': 'ContactEmail1@mailinator.com', 'datasetContactName': 'LastContact1, FirstContact1'}], 'dsDescription': [{'dsDescriptionValue': 'DescriptionText'}], 'subject': ['Medicine, Health and Life Sciences']}
+
+
+**Create Dataset via API**
+
+Create the Dataset via the API. Following variables related to your Dataverse
+instance must be changed before you can execute the code:
+
+- BASE_URL: (e. g. ‘https://demo.dataverse.org’))
+- API_TOKEN: API token of a Dataverse user with the right to create a Dataset
+- DV_PARENT_ALIAS: Alias of the Dataverse, in which the Dataset should be created.
+
+>>> from pyDataverse.api import NativeApi
+>>> api = NativeApi('BASE_URL', 'API_TOKEN')
+>>> resp = api.create_dataset('DV_PARENT_ALIAS', ds_json)
+Dataset with pid 'doi:10.5072/FK2/UTGITX' created.
+>>> resp.json()
+{'status': 'OK', 'data': {'id': 251, 'persistentId': 'doi:10.5072/FK2/UTGITX'}}
 
 
 Features
 -----------------------------
 
-- Dataverse Api functionalities to create, get, publish and delete Dataverses, Datasets and Datafiles of your Dataverse instance via Api.
-- Dataverse metadata model for easy manipulation and data conversion from and to other formats (e. g. Dataverse Api metadata JSON).
-- Utils to support core functionalities.
-- Custom exceptions.
-- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_).
+- Comprehensive API wrapper for all API’s and nearly all endpoints
+- Python objects for each Dataverse data type: Dataverse, Dataset and Datafile
+- Data conversion to and from Dataverses own API JSON format
+- Easy mass imports and exports via pyDataverse’s own CSV format
+- Helper functions to handle Dataverse metadata and data
+- Custom exceptions
+- Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_)
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
 
+
+User Guide
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   user/installation
+   user/basic-usage
+   user/advanced-usage
+   user/use-cases
+   user/faq
+   user/resources
+
+
+Reference / API
+-----------------------------
+
+If you are looking for information on a specific class, function, or method,
+this part of the documentation is for you.
+
+.. toctree::
+   :maxdepth: 2
+
+   reference
 
 
 Community Guide
@@ -98,45 +150,49 @@ This part of the documentation, which is mostly prose, details the
 pyDataverse ecosystem and community.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    community/contact
+   community/media
    community/releases
-
-
-Developer Guide
------------------------------
-
-If you are looking for information on a specific function, class, or method,
-this part of the documentation is for you.
-
-.. toctree::
-   :maxdepth: 2
-
-   developer
 
 
 Contributor Guide
 -----------------------------
 
-In the spirit of free software, everyone is encouraged to help improve this project.
+.. toctree::
+   :maxdepth: 1
 
-Here are some ways you can contribute:
+   contributor/index
 
-- by reporting bugs
-- by suggesting new features
-- by translating to a new language
-- by writing or editing documentation
-- by writing code (**no pull request is too small**: fix typos in the user interface, add code comments, clean up inconsistent whitespace)
-- by refactoring code or adding new features (please get in touch with us before you do, so we can syncronize the efforts and prevent misunderstandings)
-- by `closing issues <https://github.com/AUSSDA/pyDataverse/issues>`_
-- by `reviewing pull requests <https://github.com/AUSSDA/pyDataverse/pulls>`_
 
-When you are ready, submit a `pull request <https://github.com/AUSSDA/pyDataverse>`_.
+Thanks!
+-----------------------------
 
-**Submitting an Issue**
+To everyone who has contributed to pyDataverse - with an idea, an issue, a
+pull request, sharing it with others or by any other means:
+Thank you for your support!
 
-We use the `GitHub issue tracker <https://github.com/AUSSDA/pyDataverse/issues>`_
-to track bugs and features. Before submitting a bug report or feature request,
-check to make sure it hasn't already been submitted. When submitting a bug report,
-please try to provide a screenshot that demonstrates the problem.
+Open Source projects in general live from the cooperation of the many and pyDataverse is
+standing on the shoulders of so many contributors, so to say thanks is the
+least that can be done.
+
+Special thanks to Lars Kaczmirek, Veronika Heider, Christian Bischof, Iris
+Butzlaff and everyone else from AUSSDA, Slava Tykhonov and Marion Wittenberg
+from DANS and all the people who do an amazing job by developing Dataverse
+at IQSS, but especially to Phil Durbin.
+
+pyDataverse is funded by
+`AUSSDA - The Austrian Social Science Data Archive <https://aussda.at/ueber-aussda/team/>`_
+and through the EU Horizon2020 programme
+`SSHOC - Social Sciences & Humanities Open Cloud <https://www.sshopencloud.eu/about-sshoc>`_.
+
+
+License
+-----------------------------
+
+Copyright Stefan Kasberger and others, 2019-2020.
+
+Distributed under the terms of the MIT license, pyDataverse is free and open source software.
+
+Full License Text: `LICENSE.txt <https://github.com/AUSSDA/pyDataverse/blob/master/LICENSE.txt>`_

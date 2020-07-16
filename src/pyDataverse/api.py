@@ -1,28 +1,31 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataverse API wrapper for all it's API's."""
-import json
+from __future__ import absolute_import
+
 import subprocess as sp
-from datetime import datetime
 
 from requests import ConnectionError, delete, get, post, put
 
-from pyDataverse.exceptions import (ApiAuthorizationError, ApiUrlError,
-                                    DatasetNotFoundError,
-                                    DataverseNotEmptyError,
-                                    DataverseNotFoundError,
-                                    OperationFailedError)
+from pyDataverse.exceptions import (
+    ApiAuthorizationError,
+    ApiUrlError,
+    DatasetNotFoundError,
+    DataverseNotEmptyError,
+    DataverseNotFoundError,
+    OperationFailedError,
+)
 
 
-class Api(object):
+class Api:
     """Base class.
 
     Parameters
     ----------
-        base_url : string
+        base_url : str
             Base URL of Dataverse instance. Without trailing `/` at the end.
             e.g. `http://demo.dataverse.org`
-        api_token : string
+        api_token : str
             Authenication token for the api.
 
     Attributes
@@ -33,7 +36,7 @@ class Api(object):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version='latest'):
+    def __init__(self, base_url, api_token=None, api_version="latest"):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -41,9 +44,9 @@ class Api(object):
 
         Parameters
         ----------
-        base_url : string
+        base_url : str
             Base url for Dataverse api.
-        api_token : string
+        api_token : str
             Api token for Dataverse api.
 
         Examples
@@ -57,28 +60,26 @@ class Api(object):
             'OK'
 
         """
-
         if not isinstance(base_url, ("".__class__, u"".__class__)):
-            raise ApiUrlError('base_url {0} is not a string.'.format(base_url))
+            raise ApiUrlError("base_url {0} is not a string.".format(base_url))
         self.base_url = base_url
 
         if not isinstance(api_version, ("".__class__, u"".__class__)):
-            raise ApiUrlError('api_version {0} is not a string.'.format(
-                api_version))
+            raise ApiUrlError("api_version {0} is not a string.".format(api_version))
         self.api_version = api_version
 
         if api_token:
             if not isinstance(api_token, ("".__class__, u"".__class__)):
-                raise ApiAuthorizationError(
-                    'Api token passed is not a string.')
+                raise ApiAuthorizationError("Api token passed is not a string.")
         self.api_token = api_token
 
         if self.base_url:
-            if self.api_version == 'latest':
-                self.base_url_api = '{0}/api'.format(self.base_url)
+            if self.api_version == "latest":
+                self.base_url_api = "{0}/api".format(self.base_url)
             else:
-                self.base_url_api = '{0}/api/{1}'.format(
-                    self.base_url, self.api_version)
+                self.base_url_api = "{0}/api/{1}".format(
+                    self.base_url, self.api_version
+                )
         else:
             self.base_url_api = None
 
@@ -107,18 +108,18 @@ class Api(object):
 
         Returns
         -------
-        string
+        str
             Naming of the API class.
 
         """
-        return 'API: {0}'.format(self.base_url_api)
+        return "API: {0}".format(self.base_url_api)
 
     def get_request(self, url, params=None, auth=False):
         """Make a GET request.
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
         params : dict
             Dictionary of parameters to be passed with the request.
@@ -136,49 +137,47 @@ class Api(object):
             if self.api_token:
                 if not params:
                     params = {}
-                params['key'] = str(self.api_token)
+                params["key"] = str(self.api_token)
             else:
                 raise ApiAuthorizationError(
-                    'ERROR: GET - Api token not passed to '
-                    '`get_request` {}.'.format(url)
+                    "ERROR: GET - Api token not passed to `get_request` {0}.".format(
+                        url
+                    )
                 )
 
         try:
-            resp = get(
-                url,
-                params=params
-            )
+            resp = get(url, params=params)
             if resp.status_code == 401:
-                error_msg = resp.json()['message']
+                error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    'ERROR: GET - Authorization invalid {0}. MSG: {1}.'
-                    ''.format(url, error_msg)
+                    "ERROR: GET - Authorization invalid {0}. MSG: {1}.".format(
+                        url, error_msg
+                    )
                 )
             elif resp.status_code >= 300:
                 if resp.text:
                     error_msg = resp.text
                     raise OperationFailedError(
-                        'ERROR: GET HTTP {0} - {1}. MSG: {2}'.format(
-                            resp.status_code, url, error_msg)
+                        "ERROR: GET HTTP {0} - {1}. MSG: {2}".format(
+                            resp.status_code, url, error_msg
+                        )
                     )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'ERROR: GET - Could not establish connection to api {}.'
-                ''.format(url)
+                "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
-    def post_request(self, url, data=None, auth=False,
-                     params=None, files=None):
+    def post_request(self, url, data=None, auth=False, params=None, files=None):
         """Make a POST request.
 
         params will be added as key-value pairs to the URL.
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
-        data : string
+        data : str
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -198,40 +197,33 @@ class Api(object):
             if self.api_token:
                 if not params:
                     params = {}
-                params['key'] = self.api_token
+                params["key"] = self.api_token
             else:
-                raise ApiAuthorizationError(
-                    'ERROR: POST - Api token not available.')
+                raise ApiAuthorizationError("ERROR: POST - Api token not available.")
 
         try:
-            resp = post(
-                url,
-                data=data,
-                params=params,
-                files=files
-            )
+            resp = post(url, data=data, params=params, files=files)
             if resp.status_code == 401:
-                error_msg = resp.json()['message']
+                error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    'ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}'
-                    ''.format(url, error_msg)
+                    "ERROR: POST HTTP 401 - Authorization error {0}. MSG: {1}".format(
+                        url, error_msg
+                    )
                 )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'ERROR: POST - Could not establish connection to API: {}'
-                ''.format(url)
+                "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
 
-    def put_request(self, url, data=None, auth=False,
-                    params=None):
+    def put_request(self, url, data=None, auth=False, params=None):
         """Make a PUT request.
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
-        data : string
+        data : str
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -249,38 +241,35 @@ class Api(object):
             if self.api_token:
                 if not params:
                     params = {}
-                params['key'] = self.api_token
+                params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
-                    'ERROR: PUT - Api token not passed to '
-                    '`put_request` {}.'.format(url)
+                    "ERROR: PUT - Api token not passed to `put_request` {0}.".format(
+                        url
+                    )
                 )
 
         try:
-            resp = put(
-                url,
-                data=data,
-                params=params
-            )
+            resp = put(url, data=data, params=params)
             if resp.status_code == 401:
-                error_msg = resp.json()['message']
+                error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
-                    'ERROR: PUT HTTP 401 - Authorization error {0}. MSG: {1}'
-                    ''.format(url, error_msg)
+                    "ERROR: PUT HTTP 401 - Authorization error {0}. MSG: {1}".format(
+                        url, error_msg
+                    )
                 )
             return resp
         except ConnectionError:
             raise ConnectionError(
-                'ERROR: PUT - Could not establish connection to api {}.'
-                ''.format(url)
+                "ERROR: PUT - Could not establish connection to api '{0}'.".format(url)
             )
 
     def delete_request(self, url, auth=False, params=None):
-        """Make a DELETE request.
+        """Make a Delete request.
 
         Parameters
         ----------
-        url : string
+        url : str
             Full URL.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
@@ -298,23 +287,19 @@ class Api(object):
             if self.api_token:
                 if not params:
                     params = {}
-                params['key'] = self.api_token
+                params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
-                    'ERROR: DELETE - Api token not passed to '
-                    '`delete_request` {}.'.format(url)
+                    "ERROR: DELETE - Api token not passed to `delete_request` {0}.".format(
+                        url
+                    )
                 )
 
         try:
-            resp = delete(
-                url,
-                params=params
-            )
-            return resp
+            return delete(url, params=params)
         except ConnectionError:
             raise ConnectionError(
-                'ERROR: DELETE could not establish connection to api {}.'
-                ''.format(url)
+                "ERROR: DELETE could not establish connection to api {}.".format(url)
             )
 
 
@@ -337,12 +322,10 @@ class DataAccessApi(Api):
     """
 
     def __init__(self, base_url, api_token=None):
-        """Init an DataAccessApi() class.
-        """
+        """Init an DataAccessApi() class."""
         super().__init__(base_url, api_token)
         if base_url:
-            self.base_url_api_data_access = '{0}/access'.format(
-                self.base_url_api)
+            self.base_url_api_data_access = "{0}/access".format(self.base_url_api)
         else:
             self.base_url_api_data_access = self.base_url_api
 
@@ -351,14 +334,21 @@ class DataAccessApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the DataAccess API class.
 
         """
-        return 'Data Access API: {0}'.format(self.base_url_api_data_access)
+        return "Data Access API: {0}".format(self.base_url_api_data_access)
 
-    def get_datafile(self, identifier, format=None, noVarHeader=None,
-                     imageThumb=None, is_pid=True, auth=False):
+    def get_datafile(
+        self,
+        identifier,
+        data_format=None,
+        no_var_header=None,
+        image_thumb=None,
+        is_pid=True,
+        auth=False,
+    ):
         """Download a datafile via the Dataverse Data Access API.
 
         Get by file id (HTTP Request).
@@ -389,29 +379,28 @@ class DataAccessApi(Api):
         """
         is_first_param = True
         if is_pid:
-            url = '{0}/datafile/{1}'.format(
-                self.base_url_api_data_access, identifier)
-            if format or noVarHeader or imageThumb:
-                url += '?'
+            url = "{0}/datafile/{1}".format(self.base_url_api_data_access, identifier)
+            if data_format or no_var_header or image_thumb:
+                url += "?"
         else:
-            url = '{0}/datafile/:persistentId/?persistentId={1}'
-            ''.format(self.base_url_api_data_access, identifier)
-        if format:
-            url += 'format={0}'.format(format)
+            url = "{0}/datafile/:persistentId/?persistentId={1}".format(
+                self.base_url_api_data_access, identifier
+            )
+        if data_format:
+            url += "format={0}".format(data_format)
             is_first_param = False
-        if noVarHeader:
+        if no_var_header:
             if not is_first_param:
-                url += '&'
-            url += 'noVarHeader={0}'.format(noVarHeader)
+                url += "&"
+            url += "noVarHeader={0}".format(no_var_header)
             is_first_param = False
-        if imageThumb:
+        if image_thumb:
             if not is_first_param:
-                url += '&'
-            url += 'imageThumb={0}'.format(imageThumb)
-        resp = self.get_request(url, auth=auth)
-        return resp
+                url += "&"
+            url += "imageThumb={0}".format(image_thumb)
+        return self.get_request(url, auth=auth)
 
-    def get_datafiles(self, identifier, format=None, auth=False):
+    def get_datafiles(self, identifier, data_format=None, auth=False):
         """Download a datafile via the Dataverse Data Access API.
 
         Get by file id (HTTP Request).
@@ -424,7 +413,7 @@ class DataAccessApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be datafile id or persistent
             identifier of the datafile (e. g. doi).
 
@@ -434,14 +423,12 @@ class DataAccessApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/datafiles/{1}'.format(
-            self.base_url_api_data_access, identifier)
-        if format:
-            url += '?format={0}'.format(format)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/datafiles/{1}".format(self.base_url_api_data_access, identifier)
+        if data_format:
+            url += "?format={0}".format(data_format)
+        return self.get_request(url, auth=auth)
 
-    def get_datafile_bundle(self, identifier, fileMetadataId=None, auth=False):
+    def get_datafile_bundle(self, identifier, file_metadata_id=None, auth=False):
         """Download a datafile in all its formats.
 
         HTTP Request:
@@ -468,7 +455,7 @@ class DataAccessApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
 
         Returns
@@ -477,12 +464,12 @@ class DataAccessApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/datafile/bundle/{1}'.format(
-            self.base_url_api_data_access, identifier)
-        if fileMetadataId:
-            url += '?fileMetadataId={0}'.format(fileMetadataId)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/datafile/bundle/{1}".format(
+            self.base_url_api_data_access, identifier
+        )
+        if file_metadata_id:
+            url += "?fileMetadataId={0}".format(file_metadata_id)
+        return self.get_request(url, auth=auth)
 
     def request_access(self, identifier, auth=True, is_filepid=False):
         """
@@ -493,13 +480,14 @@ class DataAccessApi(Api):
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/{id}/requestAccess
         """
         if is_filepid:
-            url = '{0}/datafile/:persistentId/requestAccess?persistentId={1}'.format(
-                self.base_url_api_data_access, identifier)
+            url = "{0}/datafile/:persistentId/requestAccess?persistentId={1}".format(
+                self.base_url_api_data_access, identifier
+            )
         else:
-            url = '{0}/datafile/{1}/requestAccess'.format(
-                self.base_url_api_data_access, identifier)
-        resp = self.put_request(url, auth=auth)
-        return resp
+            url = "{0}/datafile/{1}/requestAccess".format(
+                self.base_url_api_data_access, identifier
+            )
+        return self.put_request(url, auth=auth)
 
     def allow_access_request(self, identifier, do_allow=True, auth=True, is_pid=True):
         """
@@ -507,39 +495,37 @@ class DataAccessApi(Api):
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/:persistentId/allowAccessRequest?persistentId={pid}
         """
         if is_pid:
-            url = '{0}/:persistentId/allowAccessRequest?persistentId={1}'.format(
-                self.base_url_api_data_access, identifier)
+            url = "{0}/:persistentId/allowAccessRequest?persistentId={1}".format(
+                self.base_url_api_data_access, identifier
+            )
         else:
-            url = '{0}/{1}/allowAccessRequest'.format(
-                self.base_url_api_data_access, identifier)
+            url = "{0}/{1}/allowAccessRequest".format(
+                self.base_url_api_data_access, identifier
+            )
 
-        if do_allow == True:
-            data = 'true'
-        elif do_allow == False:
-            data = 'false'
+        if do_allow:
+            data = "true"
         else:
-            print('ERROR: `do_allow` value not valid.')
-            return None
-        resp = self.put_request(url, data=data, auth=auth)
-        return resp
+            data = "false"
+        return self.put_request(url, data=data, auth=auth)
 
     def grant_file_access(self, identifier, user, auth=False):
         """
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/{id}/grantAccess/{@userIdentifier}
         """
-        url = '{0}/datafile/{1}/grantAccess/{2}'.format(
-            self.base_url_api_data_access, identifier, user)
-        resp = self.put_request(url, auth=auth)
-        return resp
+        url = "{0}/datafile/{1}/grantAccess/{2}".format(
+            self.base_url_api_data_access, identifier, user
+        )
+        return self.put_request(url, auth=auth)
 
-    def list_file_access_requests(self, identifier):
+    def list_file_access_requests(self, identifier, auth=False):
         """
         curl -H "X-Dataverse-key:$API_TOKEN" -X GET http://$SERVER/api/access/datafile/{id}/listRequests
         """
-        url = '{0}/datafile/{1}/listRequests'.format(
-            self.base_url_api_data_access, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/datafile/{1}/listRequests".format(
+            self.base_url_api_data_access, identifier
+        )
+        return self.get_request(url, auth=auth)
 
 
 class MetricsApi(Api):
@@ -554,13 +540,11 @@ class MetricsApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version='latest'):
-        """Init an MetricsApi() class.
-        """
+    def __init__(self, base_url, api_token=None, api_version="latest"):
+        """Init an MetricsApi() class."""
         super().__init__(base_url, api_token, api_version)
         if base_url:
-            self.base_url_api_metrics = '{0}/api/info/metrics'.format(
-                self.base_url)
+            self.base_url_api_metrics = "{0}/api/info/metrics".format(self.base_url)
         else:
             self.base_url_api_metrics = None
 
@@ -569,36 +553,38 @@ class MetricsApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the MetricsApi() class.
 
         """
-        return 'Metrics API: {0}'.format(self.base_url_api_metrics)
+        return "Metrics API: {0}".format(self.base_url_api_metrics)
 
-    def total(self, type, date_str=None, auth=False):
+    def total(self, data_type, date_str=None, auth=False):
         """
         GET https://$SERVER/api/info/metrics/$type
         GET https://$SERVER/api/info/metrics/$type/toMonth/$YYYY-DD
 
         $type can be set to dataverses, datasets, files or downloads.
-        """
-        url = '{0}/{1}'.format(self.base_url_api_metrics, type)
-        if date_str:
-            url += '/toMonth/{0}'.format(date_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
 
-    def past_days(self, type, days_str, auth=False):
         """
+        url = "{0}/{1}".format(self.base_url_api_metrics, data_type)
+        if date_str:
+            url += "/toMonth/{0}".format(date_str)
+        return self.get_request(url, auth=auth)
+
+    def past_days(self, data_type, days_str, auth=False):
+        """
+
+        http://guides.dataverse.org/en/4.18.1/api/metrics.html
         GET https://$SERVER/api/info/metrics/$type/pastDays/$days
 
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = '{0}/{1}/pastDays/{2}'.format(
-            self.base_url_api_metrics, type, days_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/{1}/pastDays/{2}".format(
+            self.base_url_api_metrics, data_type, days_str
+        )
+        return self.get_request(url, auth=auth)
 
     def get_dataverses_by_subject(self, auth=False):
         """
@@ -607,9 +593,8 @@ class MetricsApi(Api):
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = '{0}/dataverses/bySubject'.format(self.base_url_api_metrics)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/bySubject".format(self.base_url_api_metrics)
+        return self.get_request(url, auth=auth)
 
     def get_dataverses_by_category(self, auth=False):
         """
@@ -618,9 +603,8 @@ class MetricsApi(Api):
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = '{0}/dataverses/byCategory'.format(self.base_url_api_metrics)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/byCategory".format(self.base_url_api_metrics)
+        return self.get_request(url, auth=auth)
 
     def get_datasets_by_subject(self, date_str=None, auth=False):
         """
@@ -629,11 +613,10 @@ class MetricsApi(Api):
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = '{0}/datasets/bySubject'.format(self.base_url_api_metrics)
+        url = "{0}/datasets/bySubject".format(self.base_url_api_metrics)
         if date_str:
-            url += '/toMonth/{0}'.format(date_str)
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url += "/toMonth/{0}".format(date_str)
+        return self.get_request(url, auth=auth)
 
     def get_datasets_by_data_location(self, data_location, auth=False):
         """
@@ -642,10 +625,10 @@ class MetricsApi(Api):
         $type can be set to dataverses, datasets, files or downloads.
         """
         # TODO: check if date-string has proper format
-        url = '{0}/datasets/?dataLocation={1}'.format(
-            self.base_url_api_metrics, data_location)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/datasets/?dataLocation={1}".format(
+            self.base_url_api_metrics, data_location
+        )
+        return self.get_request(url, auth=auth)
 
 
 class NativeApi(Api):
@@ -669,7 +652,7 @@ class NativeApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version='v1'):
+    def __init__(self, base_url, api_token=None, api_version="v1"):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -677,7 +660,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        native_api_version : string
+        native_api_version : str
             Api version of Dataverse native api. Default is `v1`.
 
         """
@@ -689,11 +672,11 @@ class NativeApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the NativeApi() class.
 
         """
-        return 'Native API: {0}'.format(self.base_url_api_native)
+        return "Native API: {0}".format(self.base_url_api_native)
 
     def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
@@ -706,7 +689,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -716,12 +699,10 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}'.format(self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
+        return self.get_request(url, auth=auth)
 
-    def create_dataverse(self, identifier, metadata, auth=True,
-                         parent=':root'):
+    def create_dataverse(self, identifier, metadata, auth=True, parent=":root"):
         """Create a dataverse.
 
         Generates a new dataverse under identifier. Expects a JSON content
@@ -744,14 +725,14 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust). If identifier is omitted, a root dataverse is created.
-        metadata : string
+        metadata : str
             Metadata of the Dataverse as a json-formatted string.
         auth : bool
             True if api authorization is necessary. Defaults to ``True``.
-        parent : string
+        parent : str
             Parent dataverse, if existing, to which the Dataverse gets attached
             to. Defaults to ``:root``.
 
@@ -763,26 +744,29 @@ class NativeApi(Api):
         """
         if not parent:
             raise DataverseNotFoundError(
-                'Dataverse {} not found. No parent dataverse passed to '
-                '`create_dataverse()`.'.format(identifier)
+                "Dataverse '{0}' not found. No parent dataverse passed to"
+                " `create_dataverse()`.".format(identifier)
             )
 
-        url = '{0}/dataverses/{1}'.format(self.base_url_api_native, parent)
+        url = "{0}/dataverses/{1}".format(self.base_url_api_native, parent)
         resp = self.post_request(url, metadata, auth)
 
         if resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: '.format(
-                    parent, error_msg))
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    parent, error_msg
+                )
+            )
         elif resp.status_code != 200 and resp.status_code != 201:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise OperationFailedError(
-                'ERROR: HTTP {0} - Dataverse {1} could not be created. '
-                'MSG: {2}'.format(resp.status_code, identifier, error_msg)
+                "ERROR: HTTP {0} - Dataverse {1} could not be created. MSG: {2}".format(
+                    resp.status_code, identifier, error_msg
+                )
             )
         else:
-            print('Dataverse {0} created.'.format(identifier))
+            print("Dataverse {0} created.".format(identifier))
         return resp
 
     def publish_dataverse(self, identifier, auth=True):
@@ -802,7 +786,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
         auth : bool
@@ -814,48 +798,45 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}/actions/:publish'.format(
-            self.base_url_api_native, identifier)
+        url = "{0}/dataverses/{1}/actions/:publish".format(
+            self.base_url_api_native, identifier
+        )
         resp = self.post_request(url, auth=auth)
 
         if resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Publish Dataverse {0} unauthorized. '
-                'MSG: {1}'.format(identifier, error_msg)
+                "ERROR: HTTP 401 - Publish Dataverse {0} unauthorized. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                'ERROR: HTTP 404 - Dataverse {} was not found. MSG: {1}'
-                ''.format(
-                    identifier, error_msg)
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code != 200:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise OperationFailedError(
-                'ERROR: HTTP {0} - Dataverse {1} could not be published. MSG: '
-                '{2}'.format(resp.status_code, identifier, error_msg)
+                "ERROR: HTTP {0} - Dataverse {1} could not be published. MSG: {2}".format(
+                    resp.status_code, identifier, error_msg
+                )
             )
         elif resp.status_code == 200:
-            print('Dataverse {} published.'.format(identifier))
+            print("Dataverse {0} published.".format(identifier))
         return resp
 
     def delete_dataverse(self, identifier, auth=True):
         """Delete dataverse by alias or id.
-
-        HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/dataverses/$id
 
         Status Code:
             200: Dataverse deleted
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long) or a dataverse alias (more
             robust).
 
@@ -865,35 +846,39 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}'.format(self.base_url_api_native, identifier)
+        url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
         resp = self.delete_request(url, auth)
 
         if resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Delete Dataverse {0} unauthorized. '
-                'MSG: {1}'.format(identifier, error_msg)
+                "ERROR: HTTP 401 - Delete Dataverse {0} unauthorized. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}'
-                ''.format(identifier, error_msg)
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code == 403:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DataverseNotEmptyError(
-                'ERROR: HTTP 403 - Dataverse {0} not empty. MSG: {1}'.format(
-                    identifier, error_msg)
+                "ERROR: HTTP 403 - Dataverse {0} not empty. MSG: {1}".format(
+                    identifier, error_msg
+                )
             )
         elif resp.status_code != 200:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise OperationFailedError(
-                'ERROR: HTTP {0} - Dataverse {1} could not be deleted. MSG: '
-                '{2}'.format(resp.status_code, identifier, error_msg)
+                "ERROR: HTTP {0} - Dataverse {1} could not be deleted. MSG: {2}".format(
+                    resp.status_code, identifier, error_msg
+                )
             )
         elif resp.status_code == 200:
-            print('Dataverse {} deleted.'.format(identifier))
+            print("Dataverse {0} deleted.".format(identifier))
         return resp
 
     def get_dataverse_roles(self, identifier, auth=False):
@@ -907,7 +892,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -917,17 +902,15 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}/roles'.format(
-            self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/{1}/roles".format(self.base_url_api_native, identifier)
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_contents(self, identifier, auth=False):
         """Gets contents of Dataverse.
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
         auth : bool
@@ -939,10 +922,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}/contents'.format(
-            self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/{1}/contents".format(self.base_url_api_native, identifier)
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_assignments(self, identifier, auth=False):
         """Get dataverse assignments by alias or id.
@@ -955,7 +936,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -965,10 +946,10 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}/assignments'.format(
-            self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/{1}/assignments".format(
+            self.base_url_api_native, identifier
+        )
+        return self.get_request(url, auth=auth)
 
     def get_dataverse_facets(self, identifier, auth=False):
         """Get dataverse facets by alias or id.
@@ -981,7 +962,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can either be a dataverse id (long), a dataverse alias (more
             robust), or the special value ``:root``.
 
@@ -991,10 +972,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/dataverses/{1}/facets'.format(
-            self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/dataverses/{1}/facets".format(self.base_url_api_native, identifier)
+        return self.get_request(url, auth=auth)
 
     def dataverse_id2alias(self, dataverse_id):
         """Converts a Dataverse ID to an alias.
@@ -1011,15 +990,13 @@ class NativeApi(Api):
 
         """
         resp = self.get_dataverse(dataverse_id)
-        if 'data' in resp.json():
-            if 'alias' in resp.json()['data']:
-                alias = resp.json()['data']['alias']
-                return alias
-        else:
-            print('ERROR: Can not resolve Dataverse ID to alias.')
-            return False
+        if "data" in resp.json():
+            if "alias" in resp.json()["data"]:
+                return resp.json()["data"]["alias"]
+        print("ERROR: Can not resolve Dataverse ID to alias.")
+        return False
 
-    def get_dataset(self, identifier, version=':latest', auth=True, is_pid=True):
+    def get_dataset(self, identifier, version=":latest", auth=True, is_pid=True):
         """Get metadata of a Dataset.
 
         With Dataverse identifier:
@@ -1038,12 +1015,12 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
             True, if identifier is a persistent identifier.
-        version : string
+        version : str
             Version to be retrieved:
             ``:latest-published``: the latest published version
             ``:latest``: either a draft (if exists) or the latest published version.
@@ -1059,14 +1036,13 @@ class NativeApi(Api):
         """
         if is_pid:
             # TODO: Add version to query http://guides.dataverse.org/en/4.18.1/api/native-api.html#get-json-representation-of-a-dataset
-            url = '{0}/datasets/:persistentId/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}".format(self.base_url_api_native, identifier)
             # CHECK: Its not really clear, if the version query can also be done via ID.
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def get_dataset_versions(self, identifier, auth=True, is_pid=True):
         """Get versions of a Dataset.
@@ -1085,7 +1061,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
@@ -1098,13 +1074,14 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/versions?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/versions?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/versions'.format(
-                self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url = "{0}/datasets/{1}/versions".format(
+                self.base_url_api_native, identifier
+            )
+        return self.get_request(url, auth=auth)
 
     def get_dataset_version(self, identifier, version, auth=True, is_pid=True):
         """Get version of a Dataset.
@@ -1123,10 +1100,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
-        version : string
+        version : str
             Version string of the Dataset.
         is_pid : bool
             True, if identifier is a persistent identifier.
@@ -1138,13 +1115,14 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/versions/{1}?persistentId={2}'.format(
-                self.base_url_api_native, version, identifier)
+            url = "{0}/datasets/:persistentId/versions/{1}?persistentId={2}".format(
+                self.base_url_api_native, version, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/versions/{2}'.format(
-                self.base_url_api_native, identifier, version)
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url = "{0}/datasets/{1}/versions/{2}".format(
+                self.base_url_api_native, identifier, version
+            )
+        return self.get_request(url, auth=auth)
 
     def get_dataset_export(self, pid, export_format, auth=False):
         """Get metadata of dataset exported in different formats.
@@ -1158,9 +1136,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset. (e.g. ``doi:10.11587/8H3N93``).
-        export_format : string
+        export_format : str
             Export format as a string. Formats: ``ddi``, ``oai_ddi``,
             ``dcterms``, ``oai_dc``, ``schema.org``, ``dataverse_json``.
 
@@ -1170,12 +1148,12 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/datasets/export?exporter={1}&persistentId={2}'.format(
-            self.base_url_api_native, export_format, pid)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/datasets/export?exporter={1}&persistentId={2}".format(
+            self.base_url_api_native, export_format, pid
+        )
+        return self.get_request(url, auth=auth)
 
-    def create_dataset(self, dataverse, metadata, auth=True):
+    def create_dataset(self, dataverse, metadata, pid=None, publish=False, auth=True):
         """Add dataset to a dataverse.
 
         `Dataverse Documentation
@@ -1210,12 +1188,31 @@ class NativeApi(Api):
         Status Code:
             201: dataset created
 
+        Import Dataset with existing PID:
+        `<http://guides.dataverse.org/en/latest/api/native-api.html#import-a-dataset-into-a-dataverse>`_
+        To import a dataset with an existing persistent identifier (PID), the
+        dataset’s metadata should be prepared in Dataverse’s native JSON format. The
+        PID is provided as a parameter at the URL. The following line imports a
+        dataset with the PID PERSISTENT_IDENTIFIER to Dataverse, and then releases it:
+
+        The pid parameter holds a persistent identifier (such as a DOI or Handle). The import will fail if no PID is provided, or if the provided PID fails validation.
+
+        The optional release parameter tells Dataverse to immediately publish the
+        dataset. If the parameter is changed to no, the imported dataset will
+        remain in DRAFT status.
+
         Parameters
         ----------
-        dataverse : string
+        dataverse : str
             "alias" of the dataverse (e.g. ``root``) or the database id of the
             dataverse (e.g. ``1``)
-        metadata : string
+        pid : str
+            PID of existing Dataset.
+        publish : bool
+            Publish only works when a Dataset with an existing PID is created. If it
+            is ``True``, Dataset should be instantly published, ``False``
+            if a Draft should be created.
+        metadata : str
             Metadata of the Dataset as a json-formatted string (e. g.
             `dataset-finch1.json <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_)
 
@@ -1224,43 +1221,54 @@ class NativeApi(Api):
         requests.Response
             Response object of requests library.
 
-        Todo
-        -------
-        Link Dataset finch1.json
-
         """
-        url = '{0}/dataverses/{1}/datasets'.format(
-            self.base_url_api_native, dataverse)
+        if pid:
+            assert isinstance(pid, str)
+            url = "{0}/dataverses/{1}/datasets/:import?pid={2}".format(
+                self.base_url_api_native, dataverse, pid
+            )
+            if publish:
+                url += "&release=yes"
+            else:
+                url += "&release=no"
+        else:
+            url = "{0}/dataverses/{1}/datasets".format(
+                self.base_url_api_native, dataverse
+            )
         resp = self.post_request(url, metadata, auth)
 
         if resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DataverseNotFoundError(
-                'ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}'
-                ''.format(dataverse, error_msg))
+                "ERROR: HTTP 404 - Dataverse {0} was not found. MSG: {1}".format(
+                    dataverse, error_msg
+                )
+            )
         elif resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Create Dataset unauthorized. MSG: '
-                ''.format(error_msg)
+                "ERROR: HTTP 401 - Create Dataset unauthorized. MSG: {0}".format(
+                    error_msg
+                )
             )
         elif resp.status_code == 201:
-            if 'data' in resp.json():
-                if 'persistentId' in resp.json()['data']:
-                    identifier = resp.json()['data']['persistentId']
-                    print('Dataset with pid \'{}\' created.'.format(identifier))
-                elif 'id' in resp.json()['data']:
-                    identifier = resp.json()['data']['id']
-                    print('Dataset with id \'{}\' created.'.format(identifier))
+            if "data" in resp.json():
+                if "persistentId" in resp.json()["data"]:
+                    identifier = resp.json()["data"]["persistentId"]
+                    print("Dataset with pid '{0}' created.".format(identifier))
+                elif "id" in resp.json()["data"]:
+                    identifier = resp.json()["data"]["id"]
+                    print("Dataset with id '{0}' created.".format(identifier))
                 else:
-                    print('ERROR: No identifier returned for created Dataset.')
+                    print("ERROR: No identifier returned for created Dataset.")
         return resp
 
-    def edit_dataset_metadata(self, identifier, metadata, is_pid=True,
-                              replace=False, auth=True):
+    def edit_dataset_metadata(
+        self, identifier, metadata, is_pid=True, replace=False, auth=True
+    ):
         """Edit metadata of a given dataset.
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+        `edit-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
 
         HTTP Request:
 
@@ -1284,10 +1292,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
-        metadata : string
+        metadata : str
             Metadata of the Dataset as a json-formatted string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
@@ -1305,36 +1313,40 @@ class NativeApi(Api):
         -------
         Get dataset metadata::
 
-            >>> data = api.get_dataset_metadata(doi, auth=True)
+            >>> data = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
             >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
             >>> resp.status_code
             200: metadata updated
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/editMetadata/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/editMetadata/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/editMetadata/{0}'.format(
-                self.base_url_api_native, identifier)
-        params = {'replace': True} if replace else {}
+            url = "{0}/datasets/editMetadata/{1}".format(
+                self.base_url_api_native, identifier
+            )
+        params = {"replace": True} if replace else {}
         resp = self.put_request(url, metadata, auth, params)
 
         if resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - Updating metadata unauthorized. MSG: '
-                ''.format(error_msg)
+                "ERROR: HTTP 401 - Updating metadata unauthorized. MSG: {0}".format(
+                    error_msg
+                )
             )
         elif resp.status_code == 400:
-            if 'Error parsing' in resp.json()['message']:
-                print('Wrong passed data format.')
+            if "Error parsing" in resp.json()["message"]:
+                print("Wrong passed data format.")
             else:
-                print('You may not add data to a field that already has data ' +
-                      'and does not allow multiples. ' +
-                      'Use is_replace=true to replace existing data.')
+                print(
+                    "You may not add data to a field that already has data and does not"
+                    " allow multiples. Use is_replace=true to replace existing data."
+                )
         elif resp.status_code == 200:
-            print('Dataset {0} updated'.format(identifier))
+            print("Dataset '{0}' updated".format(identifier))
         return resp
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
@@ -1348,17 +1360,20 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/privateUrl/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/privateUrl/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/privateUrl'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}/privateUrl".format(
+                self.base_url_api_native, identifier
+            )
 
         resp = self.post_request(url, auth=auth)
 
         if resp.status_code == 200:
-            print('Dataset private URL created: {0}'.format(
-                resp.json()['data']['link']))
+            print(
+                "Dataset private URL created: {0}".format(resp.json()["data"]["link"])
+            )
         return resp
 
     def get_dataset_private_url(self, identifier, is_pid=True, auth=True):
@@ -1370,17 +1385,18 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/privateUrl/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/privateUrl/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/privateUrl'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}/privateUrl".format(
+                self.base_url_api_native, identifier
+            )
 
         resp = self.get_request(url, auth=auth)
 
         if resp.status_code == 200:
-            print('Got Dataset private URL: {0}'.format(
-                resp.json()['data']['link']))
+            print("Got Dataset private URL: {0}".format(resp.json()["data"]["link"]))
         return resp
 
     def delete_dataset_private_url(self, identifier, is_pid=True, auth=True):
@@ -1392,20 +1408,21 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/privateUrl/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/privateUrl/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/privateUrl'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}/privateUrl".format(
+                self.base_url_api_native, identifier
+            )
 
         resp = self.delete_request(url, auth=auth)
 
         if resp.status_code == 200:
-            print('Got Dataset private URL: {0}'.format(
-                resp.json()['data']['link']))
+            print("Got Dataset private URL: {0}".format(resp.json()["data"]["link"]))
         return resp
 
-    def publish_dataset(self, pid, type='minor', auth=True):
+    def publish_dataset(self, pid, release_type="minor", auth=True):
         """Publish dataset.
 
         Publishes the dataset whose id is passed. If this is the first version
@@ -1437,10 +1454,10 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset (e.g.
             ``doi:10.11587/8H3N93``).
-        type : string
+        release_type : str
             Passing ``minor`` increases the minor version number (2.3 is
             updated to 2.4). Passing ``major`` increases the major version
             number (2.3 is updated to 3.0). Superusers can pass
@@ -1455,23 +1472,27 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/datasets/:persistentId/actions/:publish'.format(
-            self.base_url_api_native)
-        url += '?persistentId={0}&type={1}'.format(pid, type)
+        url = "{0}/datasets/:persistentId/actions/:publish".format(
+            self.base_url_api_native
+        )
+        url += "?persistentId={0}&type={1}".format(pid, release_type)
         resp = self.post_request(url, auth=auth)
 
         if resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DatasetNotFoundError(
-                'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
-                ''.format(pid, error_msg))
+                "ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}".format(
+                    pid, error_msg
+                )
+            )
         elif resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - User not allowed to publish dataset {0}. '
-                'MSG: {1}'.format(pid, error_msg))
+                "ERROR: HTTP 401 - User not allowed to publish dataset {0}. "
+                "MSG: {1}".format(pid, error_msg)
+            )
         elif resp.status_code == 200:
-            print('Dataset {} published'.format(pid))
+            print("Dataset {0} published".format(pid))
         return resp
 
     def get_dataset_lock(self, pid):
@@ -1481,8 +1502,8 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
-            Persistent identifier of the dataset (e.g.
+        pid : str
+            Persistent identifier of the Dataset (e.g.
             ``doi:10.11587/8H3N93``).
 
         Returns
@@ -1491,10 +1512,10 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/datasets/:persistentId/locks/?persistentId={1}'.format(
-            self.base_url_api_native, pid)
-        resp = self.get_request(url, auth=True)
-        return resp
+        url = "{0}/datasets/:persistentId/locks/?persistentId={1}".format(
+            self.base_url_api_native, pid
+        )
+        return self.get_request(url, auth=True)
 
     def get_dataset_assignments(self, identifier, is_pid=True, auth=True):
         """Get Dataset assignments.
@@ -1504,32 +1525,26 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/assignments/?persistentId={0}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/assignments/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{0}/assignments'.format(
-                self.base_url_api_native, identifier)
-
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url = "{0}/datasets/{1}/assignments".format(
+                self.base_url_api_native, identifier
+            )
+        return self.get_request(url, auth=auth)
 
     def delete_dataset(self, identifier, is_pid=True, auth=True):
         """Delete a dataset.
 
         Delete the dataset whose id is passed
 
-        HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/datasets/$id
-
         Status Code:
             200: dataset deleted
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset. Can be a Dataverse identifier or a
             persistent identifier (e.g. ``doi:10.11587/8H3N93``).
         is_pid : bool
@@ -1542,34 +1557,37 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}".format(self.base_url_api_native, identifier)
         resp = self.delete_request(url, auth=auth)
 
         if resp.status_code == 404:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise DatasetNotFoundError(
-                'ERROR: HTTP 404 - Dataset \'{0}\' was not found. MSG: {1}'
-                ''.format(identifier, error_msg))
+                "ERROR: HTTP 404 - Dataset '{0}' was not found. MSG: {1}".format(
+                    identifier, error_msg
+                )
+            )
         elif resp.status_code == 405:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise OperationFailedError(
-                'ERROR: HTTP 405 - '
-                'Published datasets can only be deleted from the GUI. For '
-                'more information, please refer to '
-                'https://github.com/IQSS/dataverse/issues/778'
-                ' MSG: {}'.format(error_msg)
+                "ERROR: HTTP 405 - "
+                "Published datasets can only be deleted from the GUI. For "
+                "more information, please refer to "
+                "https://github.com/IQSS/dataverse/issues/778"
+                " MSG: {0}".format(error_msg)
             )
         elif resp.status_code == 401:
-            error_msg = resp.json()['message']
+            error_msg = resp.json()["message"]
             raise ApiAuthorizationError(
-                'ERROR: HTTP 401 - User not allowed to delete dataset \'{0}\'. '
-                'MSG: {1}'.format(identifier, error_msg))
+                "ERROR: HTTP 401 - User not allowed to delete dataset '{0}'. "
+                "MSG: {1}".format(identifier, error_msg)
+            )
         elif resp.status_code == 200:
-            print('Dataset \'{}\' deleted.'.format(identifier))
+            print("Dataset '{0}' deleted.".format(identifier))
         return resp
 
     def destroy_dataset(self, identifier, is_pid=True, auth=True):
@@ -1589,21 +1607,24 @@ class NativeApi(Api):
         remove the dataset and its datafiles, then re-index the parent
         dataverse in Solr. This endpoint requires the API token of a
         superuser.
+
         """
         if is_pid:
-            url = '{0}/datasets/:persistentId/destroy/?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/:persistentId/destroy/?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            url = '{0}/datasets/{1}/destroy'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/datasets/{1}/destroy".format(
+                self.base_url_api_native, identifier
+            )
 
         resp = self.delete_request(url, auth=auth)
 
         if resp.status_code == 200:
-            print('Dataset {0} destroyed'.format(resp.json()))
+            print("Dataset {0} destroyed".format(resp.json()))
         return resp
 
-    def get_datafiles(self, pid, version=':latest', auth=True):
+    def get_datafiles(self, pid, version=":latest", auth=True):
         """List metadata of all datafiles of a dataset.
 
         `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
@@ -1616,9 +1637,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        pid : string
+        pid : str
             Persistent identifier of the dataset. e.g. ``doi:10.11587/8H3N93``.
-        version : string
+        version : str
             Version of dataset. Defaults to `1`.
 
         Returns
@@ -1627,14 +1648,15 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        base_str = '{0}/datasets/:persistentId/versions/'.format(
-            self.base_url_api_native)
-        url = base_str + '{0}/files?persistentId={1}'.format(
-            version, pid)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        base_str = "{0}/datasets/:persistentId/versions/".format(
+            self.base_url_api_native
+        )
+        url = base_str + "{0}/files?persistentId={1}".format(version, pid)
+        return self.get_request(url, auth=auth)
 
-    def get_datafile_metadata(self, identifier, is_filepid=False, is_draft=False, auth=True):
+    def get_datafile_metadata(
+        self, identifier, is_filepid=False, is_draft=False, auth=True
+    ):
         """
         GET http://$SERVER/api/files/{id}/metadata
 
@@ -1645,19 +1667,16 @@ class NativeApi(Api):
 
         """
         if is_filepid:
-            url = '{0}/files/:persistentId/metadata'.format(
-                self.base_url_api_native)
+            url = "{0}/files/:persistentId/metadata".format(self.base_url_api_native)
             if is_draft:
-                url += '/draft'
-            url += '?persistentId={0}'.format(identifier)
+                url += "/draft"
+            url += "?persistentId={0}".format(identifier)
         else:
-            url = '{0}/files/{1}/metadata'.format(
-                self.base_url_api_native, identifier)
+            url = "{0}/files/{1}/metadata".format(self.base_url_api_native, identifier)
             if is_draft:
-                url += '/draft'
+                url += "/draft"
             # CHECK: Its not really clear, if the version query can also be done via ID.
-        resp = self.get_request(url, auth=auth)
-        return resp
+        return self.get_request(url, auth=auth)
 
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
@@ -1674,15 +1693,15 @@ class NativeApi(Api):
         existing files and tells if already in the database (most likely via
         hashing).
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
+        `adding-files <http://guides.dataverse.org/en/latest/api/native-api.html#adding-files>`_.
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        filename : string
+        filename : str
             Full filename with path.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
@@ -1696,19 +1715,14 @@ class NativeApi(Api):
         """
         url = self.base_url_api_native
         if is_pid:
-            url += '/datasets/:persistentId/add?persistentId={0}'.format(
-                identifier)
+            url += "/datasets/:persistentId/add?persistentId={0}".format(identifier)
         else:
-            url += '/datasets/{0}/add'.format(identifier)
+            url += "/datasets/{0}/add".format(identifier)
 
-        files = {'file': open(filename, 'rb')}
-        resp = self.post_request(
-            url,
-            data={'jsonData': json_str},
-            files=files,
-            auth=True
+        files = {"file": open(filename, "rb")}
+        return self.post_request(
+            url, data={"jsonData": json_str}, files=files, auth=True
         )
-        return resp
 
     def update_datafile_metadata(self, identifier, json_str=None, is_filepid=False):
         """Update datafile metadata.
@@ -1731,13 +1745,13 @@ class NativeApi(Api):
             curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' $SERVER_URL/api/files/$ID/metadata
             curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+        `updating-file-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_filepid : bool
             ``True`` to use persistent identifier for datafile. ``False``, if
@@ -1764,17 +1778,17 @@ class NativeApi(Api):
         #     )
         query_str = self.base_url_api_native
         if is_filepid:
-            query_str = '{0}/files/:persistentId/metadata?persistentId={1}'.format(
-                self.base_url_api_native, identifier)
+            query_str = "{0}/files/:persistentId/metadata?persistentId={1}".format(
+                self.base_url_api_native, identifier
+            )
         else:
-            query_str = '{0}/files/{1}/metadata'.format(
-                self.base_url_api_native, identifier)
+            query_str = "{0}/files/{1}/metadata".format(
+                self.base_url_api_native, identifier
+            )
         shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(self.api_token)
-        shell_command += ' -X POST -F \'jsonData={0}\' {1}'.format(
-            json_str, query_str)
+        shell_command += " -X POST -F 'jsonData={0}' {1}".format(json_str, query_str)
         # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        return result
+        return sp.run(shell_command, shell=True, stdout=sp.PIPE)
 
     def replace_datafile(self, identifier, filename, json_str, is_filepid=True):
         """Replace datafile.
@@ -1785,15 +1799,15 @@ class NativeApi(Api):
 
             POST -F 'file=@file.extension' -F 'jsonData={json}' http://$SERVER/api/files/{id}/replace?key={apiKey}
 
-        `Official documentation <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
+        `replacing-files <http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files>`_.
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Identifier of the dataset.
-        filename : string
+        filename : str
             Full filename with path.
-        json_str : string
+        json_str : str
             Metadata as JSON string.
         is_filepid : bool
             ``True`` to use persistent identifier for datafile. ``False``, if
@@ -1807,22 +1821,14 @@ class NativeApi(Api):
 
         """
         url = self.base_url_api_native
-        files = {'file': open(filename, 'rb')}
-        data = {'jsonData': json_str}
+        files = {"file": open(filename, "rb")}
+        data = {"jsonData": json_str}
 
         if is_filepid:
-            url += '/files/:persistentId/replace?persistentId={0}'.format(
-                identifier)
+            url += "/files/:persistentId/replace?persistentId={0}".format(identifier)
         else:
-            url += '/files/{0}/replace'.format(identifier)
-
-        resp = self.post_request(
-            url,
-            data=data,
-            files=files,
-            auth=True
-        )
-        return resp
+            url += "/files/{0}/replace".format(identifier)
+        return self.post_request(url, data=data, files=files, auth=True)
 
     def get_info_version(self, auth=False):
         """Get the Dataverse version and build number.
@@ -1842,9 +1848,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/info/version'.format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/info/version".format(self.base_url_api_native)
+        return self.get_request(url, auth=auth)
 
     def get_info_server(self, auth=False):
         """Get dataverse server name.
@@ -1864,11 +1869,10 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/info/server'.format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/info/server".format(self.base_url_api_native)
+        return self.get_request(url, auth=auth)
 
-    def get_info_apiTermsOfUse(self, auth=False):
+    def get_info_api_terms_of_use(self, auth=False):
         """Get API Terms of Use url.
 
         The response contains the text value inserted as API Terms of use which
@@ -1886,9 +1890,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/info/apiTermsOfUse'.format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/info/apiTermsOfUse".format(self.base_url_api_native)
+        return self.get_request(url, auth=auth)
 
     def get_metadatablocks(self, auth=False):
         """Get info about all metadata blocks.
@@ -1907,9 +1910,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/metadatablocks'.format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/metadatablocks".format(self.base_url_api_native)
+        return self.get_request(url, auth=auth)
 
     def get_metadatablock(self, identifier, auth=False):
         """Get info about single metadata block.
@@ -1925,7 +1927,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be block's id, or it's name.
 
         Returns
@@ -1934,10 +1936,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/metadatablocks/{1}'.format(
-            self.base_url_api_native, identifier)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/metadatablocks/{1}".format(self.base_url_api_native, identifier)
+        return self.get_request(url, auth=auth)
 
     def get_user_apitoken_expirationdate(self, auth=False):
         """Get the expiration date of an Users's API token.
@@ -1954,9 +1954,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/users/token'.format(self.base_url_api_native)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/users/token".format(self.base_url_api_native)
+        return self.get_request(url, auth=auth)
 
     def recreate_user_apitoken(self):
         """Recreate an Users API token.
@@ -1973,9 +1972,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/users/token/recreate'.format(self.base_url_api_native)
-        resp = self.post_request(url)
-        return resp
+        url = "{0}/users/token/recreate".format(self.base_url_api_native)
+        return self.post_request(url)
 
     def delete_user_apitoken(self):
         """Delete an Users API token.
@@ -1992,9 +1990,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/users/token'.format(self.base_url_api_native)
-        resp = self.delete_request(url)
-        return resp
+        url = "{0}/users/token".format(self.base_url_api_native)
+        return self.delete_request(url)
 
     def create_dataverse_role(self, dataverse_id):
         """Create a new role in a Dataverse.
@@ -2007,7 +2004,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        dataverse_id : string
+        dataverse_id : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2016,10 +2013,8 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/roles?dvo={1}'.format(
-            self.base_url_api_native, dataverse_id)
-        resp = self.post_request(url)
-        return resp
+        url = "{0}/roles?dvo={1}".format(self.base_url_api_native, dataverse_id)
+        return self.post_request(url)
 
     def get_dataverse_role(self, role_id, auth=False):
         """Get role of a Dataverse.
@@ -2032,7 +2027,7 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2041,22 +2036,15 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/roles/{1}'.format(self.base_url_api_native, role_id)
-        resp = self.get_request(url, auth=auth)
-        return resp
+        url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
+        return self.get_request(url, auth=auth)
 
     def delete_dataverse_role(self, role_id):
         """Delete role of a Dataverse.
 
-        HTTP Request:
-
-        .. code-block:: bash
-
-            DELETE http://$SERVER/api/roles/$id
-
         Parameters
         ----------
-        identifier : string
+        identifier : str
             Can be alias or id of a Dataverse.
 
         Returns
@@ -2065,11 +2053,12 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        url = '{0}/roles/{1}'.format(self.base_url_api_native, role_id)
-        resp = self.delete_request(url)
-        return resp
+        url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
+        return self.delete_request(url)
 
-    def get_children(self, parent=':root', parent_type='dataverse', children_types=[]):
+    def get_children(
+        self, parent=":root", parent_type="dataverse", children_types=None
+    ):
         """Walk through children of parent element in Dataverse tree.
 
         Default: gets all child dataverses if parent = dataverse or all
@@ -2101,9 +2090,9 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        parent : string
+        parent : str
             Description of parameter `parent`.
-        parent_type : string
+        parent_type : str
             Description of parameter `parent_type`.
         children_types : list
             Types of children to be collected. 'dataverses', 'datasets' and 'datafiles' are valid list items.
@@ -2122,79 +2111,95 @@ class NativeApi(Api):
         - Unify tree and models
 
         """
-
         children = []
+        if children_types is None:
+            children_types = []
 
         if len(children_types) == 0:
-            if parent_type == 'dataverse':
-                children_types = ['dataverses']
-            elif parent_type == 'dataset':
-                children_types = ['datafiles']
+            if parent_type == "dataverse":
+                children_types = ["dataverses"]
+            elif parent_type == "dataset":
+                children_types = ["datafiles"]
 
-        if 'dataverses' in children_types and 'datafiles' in children_types and 'datasets' not in children_types:
-            print('ERROR: Wrong children_types passed: \'dataverses\' and \'datafiles\' passed, \'datasets\' missing.')
+        if (
+            "dataverses" in children_types
+            and "datafiles" in children_types
+            and "datasets" not in children_types
+        ):
+            print(
+                "ERROR: Wrong children_types passed: 'dataverses' and 'datafiles'"
+                " passed, 'datasets' missing."
+            )
             return False
 
-        if parent_type == 'dataverse':
+        if parent_type == "dataverse":
             # check for dataverses and datasets as children and get their ID
             parent_alias = parent
             resp = self.get_dataverse_contents(parent_alias)
-            if 'data' in resp.json():
-                content = resp.json()['data']
-                for c in content:
-                    if c['type'] == 'dataverse' and 'dataverses' in children_types:
-                        dataverse_id = c['id']
-                        title = c['title']
+            if "data" in resp.json():
+                contents = resp.json()["data"]
+                for content in contents:
+                    if (
+                        content["type"] == "dataverse"
+                        and "dataverses" in children_types
+                    ):
+                        dataverse_id = content["id"]
+                        title = content["title"]
                         child_alias = self.dataverse_id2alias(dataverse_id)
                         children.append(
                             {
-                                'dataverse_id': dataverse_id,
-                                'title': dataverse_id,
-                                'dataverse_alias': child_alias,
-                                'type': 'dataverse',
-                                'children': self.get_children(
+                                "dataverse_id": dataverse_id,
+                                "title": title,
+                                "dataverse_alias": child_alias,
+                                "type": "dataverse",
+                                "children": self.get_children(
                                     parent=child_alias,
-                                    parent_type='dataverse',
-                                    children_types=children_types
-                                )
+                                    parent_type="dataverse",
+                                    children_types=children_types,
+                                ),
                             }
                         )
-                    elif c['type'] == 'dataset' and 'datasets' in children_types:
-                        dataset_id = c['identifier']
-                        pid = c['protocol'] + ':' + \
-                            c['authority'] + '/' + c['identifier']
+                    elif content["type"] == "dataset" and "datasets" in children_types:
+                        dataset_id = content["identifier"]
+                        pid = (
+                            content["protocol"]
+                            + ":"
+                            + content["authority"]
+                            + "/"
+                            + content["identifier"]
+                        )
                         children.append(
                             {
-                                'dataset_id': dataset_id,
-                                'pid': pid,
-                                'type': 'dataset',
-                                'children': self.get_children(
+                                "dataset_id": dataset_id,
+                                "pid": pid,
+                                "type": "dataset",
+                                "children": self.get_children(
                                     parent=pid,
-                                    parent_type='dataset',
-                                    children_types=children_types
-                                )
+                                    parent_type="dataset",
+                                    children_types=children_types,
+                                ),
                             }
                         )
             else:
-                print('ERROR: \'get_dataverse_contents()\' API request not working.')
-        elif parent_type == 'dataset' and 'datafiles' in children_types:
+                print("ERROR: 'get_dataverse_contents()' API request not working.")
+        elif parent_type == "dataset" and "datafiles" in children_types:
             # check for datafiles as children and get their ID
             pid = parent
-            resp = self.get_datafiles(parent, version=':latest')
-            if 'data' in resp.json():
-                for file in resp.json()['data']:
-                    datafile_id = file['dataFile']['id']
-                    filename = file['dataFile']['filename']
+            resp = self.get_datafiles(parent, version=":latest")
+            if "data" in resp.json():
+                for file in resp.json()["data"]:
+                    datafile_id = file["dataFile"]["id"]
+                    filename = file["dataFile"]["filename"]
                     children.append(
                         {
-                            'datafile_id': datafile_id,
-                            'filename': filename,
-                            'pid': pid,
-                            'type': 'datafile'
+                            "datafile_id": datafile_id,
+                            "filename": filename,
+                            "pid": pid,
+                            "type": "datafile",
                         }
                     )
             else:
-                print('ERROR: \'get_datafiles()\' API request not working.')
+                print("ERROR: 'get_datafiles()' API request not working.")
         return children
 
 
@@ -2216,13 +2221,11 @@ class SearchApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version='latest'):
-        """Init an SearchApi() class.
-        """
+    def __init__(self, base_url, api_token=None, api_version="latest"):
+        """Init an SearchApi() class."""
         super().__init__(base_url, api_token, api_version)
         if base_url:
-            self.base_url_api_search = '{0}/search?q='.format(
-                self.base_url_api)
+            self.base_url_api_search = "{0}/search?q=".format(self.base_url_api)
         else:
             self.base_url_api_search = self.base_url_api
 
@@ -2231,46 +2234,58 @@ class SearchApi(Api):
 
         Returns
         -------
-        string
+        str
             Naming of the Search API class.
 
         """
-        return 'Search API: {0}'.format(self.base_url_api_search)
+        return "Search API: {0}".format(self.base_url_api_search)
 
-    def search(self, q, type=None, subtree=None, sort=None, order=None,
-               per_page=None, start=None, show_relevance=None, show_facets=None,
-               fq=None, show_entity_ids=None, query_entities=None, auth=False):
-        """
+    def search(
+        self,
+        q_str,
+        data_type=None,
+        subtree=None,
+        sort=None,
+        order=None,
+        per_page=None,
+        start=None,
+        show_relevance=None,
+        show_facets=None,
+        filter_query=None,
+        show_entity_ids=None,
+        query_entities=None,
+        auth=False,
+    ):
+        """Search.
 
         http://guides.dataverse.org/en/4.18.1/api/search.html
         """
-        url = '{0}{1}'.format(self.base_url_api_search, q)
-        if type:
+        url = "{0}{1}".format(self.base_url_api_search, q_str)
+        if data_type:
             # TODO: pass list of types
-            url += '&type={0}'.format(type)
+            url += "&type={0}".format(data_type)
         if subtree:
             # TODO: pass list of subtrees
-            url += '&subtree={0}'.format(subtree)
+            url += "&subtree={0}".format(subtree)
         if sort:
-            url += '&sort={0}'.format(sort)
+            url += "&sort={0}".format(sort)
         if order:
-            url += '&order={0}'.format(order)
+            url += "&order={0}".format(order)
         if per_page:
-            url += '&per_page={0}'.format(per_page)
+            url += "&per_page={0}".format(per_page)
         if start:
-            url += '&start={0}'.format(start)
+            url += "&start={0}".format(start)
         if show_relevance:
-            url += '&show_relevance={0}'.format(show_relevance)
+            url += "&show_relevance={0}".format(show_relevance)
         if show_facets:
-            url += '&show_facets={0}'.format(show_facets)
-        if fq:
-            url += '&fq={0}'.format(fq)
+            url += "&show_facets={0}".format(show_facets)
+        if filter_query:
+            url += "&fq={0}".format(filter_query)
         if show_entity_ids:
-            url += '&show_entity_ids={0}'.format(show_entity_ids)
+            url += "&show_entity_ids={0}".format(show_entity_ids)
         if query_entities:
-            url += '&query_entities={0}'.format(query_entities)
-        resp = self.get_request(url, auth=auth)
-        return resp
+            url += "&query_entities={0}".format(query_entities)
+        return self.get_request(url, auth=auth)
 
 
 class SwordApi(Api):
@@ -2293,40 +2308,43 @@ class SwordApi(Api):
 
     """
 
-    def __init__(self, base_url, api_version='v1.1', api_token=None, sword_api_version='v1.1'):
+    def __init__(
+        self, base_url, api_version="v1.1", api_token=None, sword_api_version="v1.1"
+    ):
         """Init an SwordApi() class.
 
         Parameters
         ----------
-        sword_api_version : string
+        sword_api_version : str
             Api version of Dataverse SWORD API.
 
         """
         super().__init__(base_url, api_token, api_version)
         if not isinstance(sword_api_version, ("".__class__, u"".__class__)):
-            raise ApiUrlError('sword_api_version {0} is not a string.'.format(
-                sword_api_version))
+            raise ApiUrlError(
+                "sword_api_version {0} is not a string.".format(sword_api_version)
+            )
         self.sword_api_version = sword_api_version
 
         # Test connection.
         if self.base_url and sword_api_version:
-            self.base_url_api_sword = '{0}/dvn/api/data-deposit/{1}'.format(self.base_url,
-                                                                            self.sword_api_version)
+            self.base_url_api_sword = "{0}/dvn/api/data-deposit/{1}".format(
+                self.base_url, self.sword_api_version
+            )
         else:
-            self.base_url_api_sword = base_url_api
+            self.base_url_api_sword = base_url
 
     def __str__(self):
         """Return name of Api() class for users.
 
         Returns
         -------
-        string
+        str
             Naming of the SWORD API class.
 
         """
-        return 'SWORD API: {0}'.format(self.base_url_api_sword)
+        return "SWORD API: {0}".format(self.base_url_api_sword)
 
-    def get_service_document(self, auth=True):
-        url = '{0}/swordv2/service-document'.format(self.base_url_api_sword)
-        resp = self.get_request(url, auth=True)
-        return resp
+    def get_service_document(self):
+        url = "{0}/swordv2/service-document".format(self.base_url_api_sword)
+        return self.get_request(url, auth=True)
