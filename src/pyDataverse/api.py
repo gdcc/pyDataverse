@@ -532,6 +532,18 @@ class Api(object):
             print('Dataverse {} deleted.'.format(identifier))
         return resp
 
+    def get_dataset_metadata(self, identifier, auth=True, is_pid=True,
+                             version="latestVersion"):
+        r = self.get_dataset(identifier=identifier,
+                             auth=auth,
+                             is_pid=is_pid)
+        rjson = r.json()
+        metadata_json = {}
+        metadata_json["datasetVersion"] = dict()
+        metadata_json["datasetVersion"]["metadataBlocks"] = rjson["data"][version]["metadataBlocks"]
+
+        return metadata_json
+
     def get_dataset(self, identifier, auth=True, is_pid=True):
         """Get metadata of a Dataset.
 
@@ -724,21 +736,21 @@ class Api(object):
 
         """
         query_str = '/datasets/:persistentId/actions/:publish'
-        query_str += '?persistentId={0}&type={1}'.format(identifier, type)
+        query_str += '?persistentId={0}&type={1}'.format(pid, type)
         resp = self.post_request(query_str, auth=auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()['message']
             raise DatasetNotFoundError(
                 'ERROR: HTTP 404 - Dataset {0} was not found. MSG: {1}'
-                ''.format(identifier, error_msg))
+                ''.format(pid, error_msg))
         elif resp.status_code == 401:
             error_msg = resp.json()['message']
             raise ApiAuthorizationError(
                 'ERROR: HTTP 401 - User not allowed to publish dataset {0}. '
-                'MSG: {1}'.format(identifier, error_msg))
+                'MSG: {1}'.format(pid, error_msg))
         elif resp.status_code == 200:
-            print('Dataset {} published'.format(identifier))
+            print('Dataset {} published'.format(pid))
         return resp
 
     def delete_dataset(self, identifier, is_pid=True, auth=True):
@@ -912,6 +924,20 @@ class Api(object):
         resp = self.get_request(query_str)
         return resp
 
+    def get_datafile_metadata(self, identifier, is_pid=True, auth=True):
+        if is_pid:
+            query_str = '/files/:persistentId/metadata/draft?persistentId={0}'.format(identifier)
+        else:
+            query_str = '/files/{0}/metadata/draft'.format(identifier)
+
+        resp = self.get_request(query_str, auth=auth)
+        try:
+            j = resp.json()
+            return j
+        except:
+            print("Failed getting file metadata: " + identifier)
+        return resp
+
     def get_datafile(self, identifier, is_pid=True):
         """Download a datafile via the Dataverse Data Access API.
 
@@ -989,7 +1015,11 @@ class Api(object):
         data = self.get_request(query_str)
         return data
 
-    def upload_file(self, identifier, filename, is_pid=True):
+    def upload_file(self, identifier, filename,
+                    is_pid=True, description="",
+                    tags=None,
+                    fileObject=None,
+                    restricted=True):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1026,13 +1056,28 @@ class Api(object):
                 identifier)
         else:
             query_str += '/datasets/{0}/add'.format(identifier)
-        shell_command = 'curl -H "X-Dataverse-key: {0}"'.format(
-            self.api_token)
-        shell_command += ' -X POST {0} -F file=@{1}'.format(
-            query_str, filename)
-        # TODO(Shell): is shell=True necessary?
-        result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
-        resp = json.loads(result.stdout)
+
+        headers = {'X-Dataverse-key': self.api_token}
+
+        pl = {"description": description,
+              "restricted": str(restricted).lower()}
+        if tags is not None:
+            pl["categories"] = tags
+        payload = {"jsonData": json.dumps(pl)}
+
+        if fileObject is None:
+            fin = open(filename, "b")
+        else:
+            fin = fileObject
+        fin.seek(0)
+        files = {'file': (filename, fin.read())}
+
+        r = post(url=query_str,
+                 headers=headers,
+                 data=payload,
+                 files=files)
+
+        resp = r.json()
         return resp
 
     def get_info_version(self):
