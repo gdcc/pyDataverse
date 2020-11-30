@@ -2202,6 +2202,14 @@ class NativeApi(Api):
                 print("ERROR: 'get_datafiles()' API request not working.")
         return children
 
+    def get_user(self):
+        """
+        Get details of the current authenticated user.
+        Note that auth must be True for this to work.
+        """
+        dv_url = '/users/:me'
+        return self.get_request(dv_url, auth=True)
+
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
