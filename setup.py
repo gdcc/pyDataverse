@@ -71,10 +71,9 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.4",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
     "Natural Language :: English",
 ]
 
@@ -88,7 +87,7 @@ setup(
     long_description_content_type="text/markdown",
     license="MIT",
     url="https://github.com/AUSSDA/pyDataverse",
-    python_requires=">=3.4",
+    python_requires=">=3.6",
     platforms=["OS Independent"],
     classifiers=CLASSIFIERS,
     install_requires=INSTALL_REQUIREMENTS,
