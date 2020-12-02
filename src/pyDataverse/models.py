@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 
 import json
+import os
 
 from pyDataverse.utils import validate_data
 
@@ -97,7 +98,7 @@ class DVObject:
 
         """
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         return validate_data(
@@ -141,7 +142,7 @@ class DVObject:
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -196,7 +197,7 @@ class DVObject:
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -664,7 +665,7 @@ class Dataset(DVObject):
 
         """
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         is_valid = True
@@ -829,7 +830,7 @@ class Dataset(DVObject):
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -1133,7 +1134,7 @@ class Dataset(DVObject):
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = self._default_json_schema_filename
+            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
         assert isinstance(filename_schema, str)
 
         data = {}

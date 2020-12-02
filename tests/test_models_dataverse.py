@@ -14,7 +14,7 @@ from pyDataverse.models import Dataverse
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 FILENAME_DATA_FULL = "tests/data/dataverse_upload_full.json"
 FILENAME_DATA_MIN = "tests/data/dataverse_upload_min.json"
-FILENAME_SCHEMA = "schemas/json/dataverse_upload_schema.json"
+FILENAME_SCHEMA = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "src/pyDataverse/schemas/json/dataverse_upload_schema.json")
 FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + "/data/output/dataverse_pytest.json")
 
 INVALID_FILENAME_STRINGS = ["wrong", ""]

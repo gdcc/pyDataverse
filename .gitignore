@@ -9,6 +9,7 @@ venv_home/
 *~
 .*.sw?
 .env/
+core
 
 # Personal
 notes*.md
@@ -17,6 +18,8 @@ setup.sh
 .pypirc
 data/
 dev/
+internal/
+*.code-workspace
 
 # Distribution / packaging
 build/

@@ -12,7 +12,7 @@ from pyDataverse.models import Dataset
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 FILENAME_DATA_MIN = "tests/data/dataset_upload_min_default.json"
 FILENAME_DATA_FULL = "tests/data/dataset_upload_full_default.json"
-FILENAME_SCHEMA = "schemas/json/dataset_upload_default_schema.json"
+FILENAME_SCHEMA = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "src/pyDataverse/schemas/json/dataset_upload_default_schema.json")
 FILENAME_JSON_OUTPUT = os.path.join(TEST_DIR + "/data/output/dataset_pytest.json")
 
 INVALID_FILENAME_STRINGS = ["wrong", ""]
