@@ -52,49 +52,6 @@ class TestApiRequests(object):
         cls.dataverse_id = "test-pyDataverse"
         cls.dataset_id = None
 
-    # def test_create_dataverse(self, native_api):
-    #     """Test successfull `.create_dataverse()` request`."""
-    #     if not test_config["travis"]:
-    #         metadata = import_dataverse_min_dict()
-    #         resp = native_api.create_dataverse(self.dataverse_id, json.dumps(metadata))
-    #         sleep(test_config["wait_time"])
-
-    #         assert isinstance(resp, Response)
-    #         assert native_api.get_dataverse(self.dataverse_id).json()
-
-    # def test_create_dataset(self, native_api):
-    #     """Test successfull `.create_dataset()` request`."""
-    #     if not test_config["travis"]:
-    #         metadata = import_dataset_min_dict()
-    #         resp = native_api.create_dataset(":root", json.dumps(metadata))
-    #         sleep(test_config["wait_time"])
-    #         TestApiRequests.dataset_id = resp.json()["data"]["persistentId"]
-
-    #         assert isinstance(resp, Response)
-
-    # def test_get_dataset(self, native_api):
-    #     """Test successfull `.get_dataset()` request`."""
-    #     if not test_config["travis"]:
-    #         resp = native_api.get_dataset(TestApiRequests.dataset_id)
-    #         sleep(test_config["wait_time"])
-
-    #         assert isinstance(resp, Response)
-
-    # def test_delete_dataset(self, native_api):
-    #     """Test successfull `.delete_dataset()` request`."""
-    #     if not test_config["travis"]:
-    #         resp = native_api.delete_dataset(TestApiRequests.dataset_id)
-    #         sleep(test_config["wait_time"])
-    #         assert isinstance(resp, Response)
-
-    # def test_delete_dataverse(self, native_api):
-    #     """Test successfull `.delete_dataverse()` request`."""
-    #     if not test_config["travis"]:
-    #         resp = native_api.delete_dataverse(self.dataverse_id)
-    #         sleep(test_config["wait_time"])
-
-    #         assert isinstance(resp, Response)
-
     def test_get_request(self, native_api):
         """Test successfull `.get_request()` request."""
         # TODO: test params und auth default

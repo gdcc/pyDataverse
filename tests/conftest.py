@@ -77,7 +77,7 @@ test_config = test_config()
 
 
 @pytest.fixture()
-def native_api():
+def native_api(monkeypatch):
     """Fixture, so set up an Api connection.
 
     Returns
@@ -86,7 +86,8 @@ def native_api():
         Api object.
 
     """
-    return NativeApi(test_config["base_url"], test_config["api_token"])
+    monkeypatch.setenv("BASE_URL", "https://demo.dataverse.org")
+    return NativeApi(test_config["base_url"])
 
 
 def import_dataverse_min_dict():
