@@ -63,7 +63,7 @@ def write_file(filename, data, mode="w", encoding="utf-8"):
         f.write(data)
 
 
-def read_json(filename, mode="r", encoding="utf-8"):
+def read_json(filename: str, mode: str = "r", encoding: str = "utf-8") -> dict:
     """Read in a json file.
 
     See more about the json module at
@@ -85,14 +85,10 @@ def read_json(filename, mode="r", encoding="utf-8"):
         Data as a json-formatted string.
 
     """
-    assert isinstance(filename, str)
-    assert isinstance(mode, str)
-    assert isinstance(encoding, str)
-
+    # TODO: add kwargs
     with open(filename, mode, encoding=encoding) as f:
         data = json.load(f)
 
-    assert isinstance(data, dict)
     return data
 
 
@@ -113,7 +109,7 @@ def write_json(filename, data, mode="w", encoding="utf-8"):
 
     """
     assert isinstance(filename, str)
-    assert isinstance(data, str)
+    assert isinstance(data, dict)
     assert isinstance(mode, str)
     assert isinstance(encoding, str)
 

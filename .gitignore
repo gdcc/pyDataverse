@@ -18,8 +18,10 @@ setup.sh
 .pypirc
 data/
 dev/
-internal/
+internal
 *.code-workspace
+.python-version
+devel.py
 
 # Distribution / packaging
 build/

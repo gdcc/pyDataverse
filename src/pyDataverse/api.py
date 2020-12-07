@@ -82,25 +82,6 @@ class Api:
                 )
         else:
             self.base_url_api = None
-
-        # try:
-        #     resp = self.get_info_version()
-        #     if 'data' in resp.json().keys():
-        #         if 'version' in resp.json()['data'].keys():
-        #             self.dataverse_version = resp.json()['data']['version']
-        #         else:
-        #             # TODO: raise exception
-        #             self.dataverse_version = None
-        #             print('Key not in response.')
-        #     else:
-        #         self.dataverse_version = None
-        #         # TODO: raise exception
-        #         print('Key not in response.')
-        # except:
-        #     self.dataverse_version = None
-        #     # TODO: raise exception
-        #     print('Dataverse build version can not be retrieved.')
-
         self.timeout = 500
 
     def __str__(self):

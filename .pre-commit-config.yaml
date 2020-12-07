@@ -1,5 +1,6 @@
 default_language_version:
     python: python3
+exclude: ^migrations/
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
@@ -26,38 +27,3 @@ repos:
     hooks:
     -   id: blacken-docs
         additional_dependencies: [black==19.10b0]
-# -   repo: local
-#     hooks:
-#     -   id: rst
-#         name: rst
-#         entry: rst-lint --encoding utf-8
-#         language: python
-#         types: [rst]
-#         additional_dependencies: [pygments, restructuredtext_lint]
-# -   repo: https://github.com/pycqa/flake8
-#     rev: 3.8.3
-#     hooks:
-#     -   id: flake8
-#         alias: flake8
-#         language_version: python3
-#         args: [--exclude=tests/test_*.py,src/pyDataverse/docs/.py]
-#         additional_dependencies: [flake8-blind-except==v0.1.1,flake8-builtins==1.5.3,flake8-bandit==v2.1.0,flake8-breakpoint==v1.1.0,flake8-bugbear==20.1.4,flake8-comprehensions==3.2.3,flake8-requirements==v1.3.2,flake8-return==0.3.0]
-#     -   id: flake8
-#         alias: flake8_docs
-#         language_version: python3
-#         args: [--docstring-convention numpy]
-#         additional_dependencies: [flake8-docstrings==1.5.0,flake8-rst-docstrings==v0.0.13]
-#     -   id: flake8
-#         alias: flake8_tests
-#         language_version: python3
-#         args: [--exclude=src/pyDataverse/*.py,src/pyDataverse/docs/.py]
-#         additional_dependencies: [flake8-pytest-style==v1.2.1,flake8-blind-except==v0.1.1,flake8-builtins==1.5.3,flake8-bandit==v2.1.0,flake8-breakpoint==v1.1.0,flake8-bugbear==20.1.4,flake8-comprehensions==3.2.3,flake8-requirements==v1.3.2,flake8-return==0.3.0]
-# -   repo: https://github.com/PyCQA/pylint
-#     rev: pylint-2.5.3
-#     hooks:
-#     -   id: pylint
-#         exclude: conf.py
-# -   repo: https://github.com/gvanderest/pylama-pre-commit
-#     rev: 0.1.2
-#     hooks:
-#     - id: pylama

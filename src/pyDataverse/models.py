@@ -98,13 +98,14 @@ class DVObject:
 
         """
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         return validate_data(
-            json.loads(self.to_json(validate=False)),
-            filename_schema,
-            file_format="json",
+            json.loads(self.json(validate=False)), filename_schema, file_format="json",
         )
 
     def from_json(
@@ -142,7 +143,10 @@ class DVObject:
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -172,7 +176,7 @@ class DVObject:
 
         self.set(data)
 
-    def to_json(self, data_format=None, validate=True, filename_schema=None):
+    def json(self, data_format=None, validate=True, filename_schema=None):
         r"""Create JSON from :class:`DVObject` attributes.
 
         Parameters
@@ -197,7 +201,10 @@ class DVObject:
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -233,7 +240,7 @@ class Dataverse(DVObject):
     _allowed_json_formats : list
         List of all possible JSON data formats.
     _json_dataverse_upload_attr : list
-        List of all attributes to be exported in :func:`to_json`.
+        List of all attributes to be exported in :func:`json`.
     """
 
     def __init__(self, data=None):
@@ -288,7 +295,7 @@ class Dataset(DVObject):
     _allowed_json_formats : list
         List of all possible JSON data formats.
     _json_dataverse_upload_attr : list
-        List with all attributes to be exported in :func:`to_json`.
+        List with all attributes to be exported in :func:`json`.
     __attr_import_dv_up_datasetVersion_values : list
         Dataverse API Upload Dataset JSON attributes inside ds[\'datasetVersion\'].
     __attr_import_dv_up_citation_fields_values : list
@@ -665,12 +672,15 @@ class Dataset(DVObject):
 
         """
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         is_valid = True
 
-        data_json = self.to_json(validate=False)
+        data_json = self.json(validate=False)
         if data_json:
             is_valid = validate_data(
                 json.loads(data_json), filename_schema, file_format="json"
@@ -830,7 +840,10 @@ class Dataset(DVObject):
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -1109,7 +1122,7 @@ class Dataset(DVObject):
         assert isinstance(tmp_list, list)
         return tmp_list
 
-    def to_json(self, data_format=None, validate=True, filename_schema=None):
+    def json(self, data_format=None, validate=True, filename_schema=None):
         """Create Dataset JSON from attributes.
 
         Parameters
@@ -1134,7 +1147,10 @@ class Dataset(DVObject):
         assert isinstance(data_format, str)
         assert data_format in self._allowed_json_formats
         if filename_schema is None:
-            filename_schema = os.path.join(os.path.dirname(os.path.realpath(__file__)), self._default_json_schema_filename)
+            filename_schema = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                self._default_json_schema_filename,
+            )
         assert isinstance(filename_schema, str)
 
         data = {}
@@ -1484,7 +1500,7 @@ class Datafile(DVObject):
     _allowed_json_formats : list
         List of all possible JSON data formats.
     _json_dataverse_upload_attr : list
-        List of all attributes to be exported in :func:`to_json`.
+        List of all attributes to be exported in :func:`json`.
     """
 
     def __init__(self, data=None):

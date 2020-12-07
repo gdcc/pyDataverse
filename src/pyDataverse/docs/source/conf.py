@@ -24,7 +24,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../.."))
 
-
 project = "pyDataverse"
 author = "Stefan Kasberger"
 author_affiliation = "AUSSDA - The Austrian Social Science Data Archive"

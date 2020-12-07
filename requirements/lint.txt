@@ -14,3 +14,5 @@ flake8-return==0.3.0
 flake8-pytest-style==v1.2.1
 pylint
 radon
+mypy==0.790
+autopep8

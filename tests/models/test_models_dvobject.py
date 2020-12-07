@@ -1,11 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dataverse data model tests."""
-import os
-
 from pyDataverse.models import DVObject
-
-TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestDVObject(object):
