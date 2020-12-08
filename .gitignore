@@ -17,6 +17,8 @@ stash*.*
 setup.sh
 .pypirc
 data/
+!tests/data
+tests/data/output/
 dev/
 internal
 *.code-workspace

@@ -3,6 +3,10 @@
 Basic Usage
 =================
 
+
+For this tutorial, the test data inside tests/data/ is used.
+
+
 Requirements
 -----------------------------
 
@@ -38,13 +42,13 @@ Youth from Austria 2005
 
 Export metadata as JSON string for API upload (format=dataverse_upload)
 
->>> ds_json = ds.to_json()
+>>> ds_json = ds.json()
 
 Init Native API
 
 >>> from pyDataverse.api import NativeApi
 >>> base_url = 'YOUR_BASE_URL'  # e.g. 'https://demo.dataverse.org'
->>> api_token = 'YOUR_API_TOKEN'  # @USERNAME
+>>> api_token = 'YOUR_API_TOKEN'  # @USERNAME e. g. dataverseAdmin
 >>> api = NativeApi(base_url, api_token)
 
 Upload Dataset via API
@@ -70,6 +74,6 @@ Set Datafile metadata
 
 Upload Datafile via API
 
->>> resp = api.upload_datafile(ds_pid, df_filename, json_str=df.to_json())
+>>> resp = api.upload_datafile(ds_pid, df_filename, json_str=df.json())
 >>> resp.status_code
 200

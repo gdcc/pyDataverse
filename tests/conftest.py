@@ -58,6 +58,7 @@ def test_config():
         "datafile_json_output_filename": os.path.join(
             test_data_output_dir, "datafile_pytest.json"
         ),
+        "tree_filename": os.path.join(test_data_dir, "tree.json"),
         "invalid_filename_strings": ["wrong", ""],
         "invalid_filename_types": [(), [], 12, 12.12, set(), True, False],
         "invalid_validate_types": [None, "wrong", {}, []],
