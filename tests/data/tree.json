@@ -17,13 +17,15 @@
           {
             "datafile_id": 1,
             "filename": "appendix.pdf",
-            "pid": "doi:12.34567/1AB23C",
+            "label": "appendix.pdf",
+            "pid": "doi:12.34567/1AB23C/ABC123",
             "type": "datafile"
           },
           {
             "datafile_id": 2,
             "filename": "survey.zsav",
-            "pid": "doi:12.34567/1AB23C",
+            "label": "survey.zsav",
+            "pid": "doi:12.34567/1AB23C/DEF456",
             "type": "datafile"
           }
         ]
@@ -36,7 +38,8 @@
           {
             "datafile_id": 3,
             "filename": "manual.pdf",
-            "pid": "doi:12.34567/4DE56F",
+            "label": "manual.pdf",
+            "pid": "doi:12.34567/4DE56F/GHI789",
             "type": "datafile"
           }
         ]
@@ -56,7 +59,8 @@
           {
             "datafile_id": 4,
             "filename": "study.zsav",
-            "pid": "doi:12.34567/7GH89I",
+            "label": "study.zsav",
+            "pid": "doi:12.34567/7GH89I/JKL012",
             "type": "datafile"
           }
         ]
@@ -69,13 +73,15 @@
           {
             "datafile_id": 5,
             "filename": "documentation.pdf",
-            "pid": "doi:12.34567/0JK1LM",
+            "label": "documentation.pdf",
+            "pid": "doi:12.34567/0JK1LM/MNO345",
             "type": "datafile"
           },
           {
             "datafile_id": 6,
             "filename": "data.R",
-            "pid": "doi:12.34567/0JK1LM",
+            "label": "data.R",
+            "pid": "doi:12.34567/0JK1LM/PQR678",
             "type": "datafile"
           }
         ]
@@ -90,7 +96,8 @@
       {
         "datafile_id": 7,
         "filename": "summary.md",
-        "pid": "doi:12.34567/2NO34P",
+        "label": "summary.md",
+        "pid": "doi:12.34567/2NO34P/STU901",
         "type": "datafile"
       }
     ]

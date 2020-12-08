@@ -4,9 +4,6 @@ from ..conftest import test_config
 
 class TestUtilsSaveTreeData:
     def test_dv_tree_walker_valid_default(self):
-        data = read_json(test_config["tree_filename"])
-        dataverses, datasets, datafiles = dv_tree_walker(data)
-
         dv_ids = [1, 2, 3]
         dv_aliases = ["parent_dv_1", "parent_dv_1_sub_dv_1", "parent_dv_2"]
         ds_ids = ["1AB23C", "4DE56F", "7GH89I", "0JK1LM", "2NO34P"]
@@ -27,15 +24,27 @@ class TestUtilsSaveTreeData:
             "data.R",
             "summary.md",
         ]
-        df_pids = [
-            "doi:12.34567/1AB23C",
-            "doi:12.34567/1AB23C",
-            "doi:12.34567/4DE56F",
-            "doi:12.34567/7GH89I",
-            "doi:12.34567/0JK1LM",
-            "doi:12.34567/0JK1LM",
-            "doi:12.34567/2NO34P",
+        df_labels = [
+            "appendix.pdf",
+            "survey.zsav",
+            "manual.pdf",
+            "study.zsav",
+            "documentation.pdf",
+            "data.R",
+            "summary.md",
         ]
+        df_pids = [
+            "doi:12.34567/1AB23C/ABC123",
+            "doi:12.34567/1AB23C/DEF456",
+            "doi:12.34567/4DE56F/GHI789",
+            "doi:12.34567/7GH89I/JKL012",
+            "doi:12.34567/0JK1LM/MNO345",
+            "doi:12.34567/0JK1LM/PQR678",
+            "doi:12.34567/2NO34P/STU901",
+        ]
+
+        data = read_json(test_config["tree_filename"])
+        dataverses, datasets, datafiles = dv_tree_walker(data)
 
         assert isinstance(dataverses, list)
         assert isinstance(datasets, list)
@@ -67,11 +76,14 @@ class TestUtilsSaveTreeData:
         for df in datafiles:
             assert "datafile_id" in df
             assert "filename" in df
+            assert "label" in df
             assert "pid" in df
             assert df["datafile_id"] in df_ids
             df_ids.pop(df_ids.index(df["datafile_id"]))
             assert df["filename"] in df_filenames
             df_filenames.pop(df_filenames.index(df["filename"]))
+            assert df["label"] in df_labels
+            df_labels.pop(df_labels.index(df["label"]))
             assert df["pid"] in df_pids
             df_pids.pop(df_pids.index(df["pid"]))
         assert (len(df_ids)) == 0

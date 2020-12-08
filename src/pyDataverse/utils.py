@@ -475,7 +475,7 @@ def dv_tree_walker(
     data: list,
     dv_keys: list = ["dataverse_id", "dataverse_alias"],
     ds_keys: list = ["dataset_id", "pid"],
-    df_keys: list = ["datafile_id", "filename", "pid"],
+    df_keys: list = ["datafile_id", "filename", "pid", "label"],
 ) -> tuple:
     """Walk through a Dataverse tree by get_children().
 

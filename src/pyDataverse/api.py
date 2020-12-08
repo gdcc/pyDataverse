@@ -2093,6 +2093,7 @@ class NativeApi(Api):
 
         """
         children = []
+
         if children_types is None:
             children_types = []
 
@@ -2125,12 +2126,11 @@ class NativeApi(Api):
                         and "dataverses" in children_types
                     ):
                         dataverse_id = content["id"]
-                        title = content["title"]
                         child_alias = self.dataverse_id2alias(dataverse_id)
                         children.append(
                             {
                                 "dataverse_id": dataverse_id,
-                                "title": title,
+                                "title": content["title"],
                                 "dataverse_alias": child_alias,
                                 "type": "dataverse",
                                 "children": self.get_children(
@@ -2141,7 +2141,6 @@ class NativeApi(Api):
                             }
                         )
                     elif content["type"] == "dataset" and "datasets" in children_types:
-                        dataset_id = content["identifier"]
                         pid = (
                             content["protocol"]
                             + ":"
@@ -2151,7 +2150,7 @@ class NativeApi(Api):
                         )
                         children.append(
                             {
-                                "dataset_id": dataset_id,
+                                "dataset_id": content["id"],
                                 "pid": pid,
                                 "type": "dataset",
                                 "children": self.get_children(
@@ -2168,14 +2167,13 @@ class NativeApi(Api):
             pid = parent
             resp = self.get_datafiles(parent, version=":latest")
             if "data" in resp.json():
-                for file in resp.json()["data"]:
-                    datafile_id = file["dataFile"]["id"]
-                    filename = file["dataFile"]["filename"]
+                for datafile in resp.json()["data"]:
                     children.append(
                         {
-                            "datafile_id": datafile_id,
-                            "filename": filename,
-                            "pid": pid,
+                            "datafile_id": datafile["dataFile"]["id"],
+                            "filename": datafile["dataFile"]["filename"],
+                            "label": datafile["label"],
+                            "pid": datafile["dataFile"]["persistentId"],
                             "type": "datafile",
                         }
                     )
