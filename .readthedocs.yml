@@ -16,7 +16,7 @@ formats:            all
 python:
    version:         3.6
    install:
-      - requirements: deps/docs-requirements.txt
+      - requirements: requirements/docs.txt
       - method:     pip
         path:       .
    system_packages: true
