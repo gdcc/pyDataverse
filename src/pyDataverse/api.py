@@ -1,12 +1,7 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Dataverse API wrapper for all it's API's."""
-from __future__ import absolute_import
-
+import json
+from requests import Response, ConnectionError, delete, get, post, put
 import subprocess as sp
-
-from requests import ConnectionError, delete, get, post, put
-
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
     ApiUrlError,
@@ -683,7 +678,9 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def create_dataverse(self, identifier, metadata, auth=True, parent=":root"):
+    def create_dataverse(
+        self, parent: str, metadata: dict, auth: bool = True
+    ) -> Response:
         """Create a dataverse.
 
         Generates a new dataverse under identifier. Expects a JSON content
@@ -706,16 +703,12 @@ class NativeApi(Api):
 
         Parameters
         ----------
-        identifier : str
-            Can either be a dataverse id (long) or a dataverse alias (more
-            robust). If identifier is omitted, a root dataverse is created.
-        metadata : str
-            Metadata of the Dataverse as a json-formatted string.
+        parent : str
+            Parent dataverse, to which the Dataverse gets attached to.
+        metadata : dict
+            Metadata of the Dataverse.
         auth : bool
             True if api authorization is necessary. Defaults to ``True``.
-        parent : str
-            Parent dataverse, if existing, to which the Dataverse gets attached
-            to. Defaults to ``:root``.
 
         Returns
         -------
@@ -723,14 +716,9 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        if not parent:
-            raise DataverseNotFoundError(
-                "Dataverse '{0}' not found. No parent dataverse passed to"
-                " `create_dataverse()`.".format(identifier)
-            )
-
+        identifier = metadata["alias"]
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, parent)
-        resp = self.post_request(url, metadata, auth)
+        resp = self.post_request(url, json.dumps(metadata), auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
