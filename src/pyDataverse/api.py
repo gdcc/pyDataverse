@@ -60,16 +60,16 @@ class Api:
             'OK'
 
         """
-        if not isinstance(base_url, ("".__class__, u"".__class__)):
+        if not isinstance(base_url, ("".__class__, "".__class__)):
             raise ApiUrlError("base_url {0} is not a string.".format(base_url))
         self.base_url = base_url
 
-        if not isinstance(api_version, ("".__class__, u"".__class__)):
+        if not isinstance(api_version, ("".__class__, "".__class__)):
             raise ApiUrlError("api_version {0} is not a string.".format(api_version))
         self.api_version = api_version
 
         if api_token:
-            if not isinstance(api_token, ("".__class__, u"".__class__)):
+            if not isinstance(api_token, ("".__class__, "".__class__)):
                 raise ApiAuthorizationError("Api token passed is not a string.")
         self.api_token = api_token
 
@@ -2182,12 +2182,12 @@ class NativeApi(Api):
         return children
 
     def get_user(self):
+        """Get details of the current authenticated user.
+
+        Auth must be ``true`` for this to work.
         """
-        Get details of the current authenticated user.
-        Note that auth must be True for this to work.
-        """
-        dv_url = '/users/:me'
-        return self.get_request(dv_url, auth=True)
+        url = f"{self.base_url}/api/users/:me"
+        return self.get_request(url, auth=True)
 
 
 class SearchApi(Api):
@@ -2307,7 +2307,7 @@ class SwordApi(Api):
 
         """
         super().__init__(base_url, api_token, api_version)
-        if not isinstance(sword_api_version, ("".__class__, u"".__class__)):
+        if not isinstance(sword_api_version, ("".__class__, "".__class__)):
             raise ApiUrlError(
                 "sword_api_version {0} is not a string.".format(sword_api_version)
             )
