@@ -681,7 +681,7 @@ class NativeApi(Api):
         return self.get_request(url, auth=auth)
 
     def create_dataverse(
-        self, parent: str, metadata: dict, auth: bool = True
+        self, parent: str, metadata: str, auth: bool = True
     ) -> Response:
         """Create a dataverse.
 
@@ -707,7 +707,7 @@ class NativeApi(Api):
         ----------
         parent : str
             Parent dataverse, to which the Dataverse gets attached to.
-        metadata : dict
+        metadata : str
             Metadata of the Dataverse.
         auth : bool
             True if api authorization is necessary. Defaults to ``True``.
@@ -718,9 +718,10 @@ class NativeApi(Api):
             Response object of requests library.
 
         """
-        identifier = metadata["alias"]
+        metadata_dict = json.loads(metadata)
+        identifier = metadata_dict["alias"]
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, parent)
-        resp = self.post_request(url, json.dumps(metadata), auth)
+        resp = self.post_request(url, metadata, auth)
 
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
