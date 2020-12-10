@@ -538,7 +538,9 @@ def dv_tree_walker(
 
 
 def save_tree_data(
-    data: list,
+    dataverses: list,
+    datasets: list,
+    datafiles: list,
     filename_dv: str = "dataverses.json",
     filename_ds: str = "datasets.json",
     filename_df: str = "datafiles.json",
@@ -561,7 +563,6 @@ def save_tree_data(
     filename_md : str
         Filename with full path for the metadata JSON file.
     """
-    dataverses, datasets, datafiles = dv_tree_walker(data)
     if os.path.isfile(filename_dv):
         os.remove(filename_dv)
     if os.path.isfile(filename_ds):
