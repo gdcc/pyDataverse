@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://github.com/AUSSDA/pyDataverse/schemas/json/datafile_upload_schema.json",
+  "$id": "https://github.com/GDCC/pyDataverse/schemas/json/datafile_upload_schema.json",
   "type": "object",
   "title": "Datafile JSON upload schema",
   "description": "Describes the full Datafile metadata JSON file structure for a Dataverse API upload.",

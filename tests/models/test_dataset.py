@@ -1,5 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Dataset data model tests."""
 import json
 import os

@@ -1,5 +1,3 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Dataverse data model tests."""
 from pyDataverse.models import DVObject
 

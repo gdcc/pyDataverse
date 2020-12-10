@@ -11,7 +11,7 @@ GitHub
 ------
 
 The best way to track the development of pyDataverse is through
-`the GitHub repo <https://github.com/aussda/pyDataverse>`_.
+`the GitHub repo <https://github.com/GDCC/pyDataverse>`_.
 
 
 Email

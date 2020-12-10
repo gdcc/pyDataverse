@@ -1,6 +1,4 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
+"""Find out more at https://github.com/GDCC/pyDataverse."""
 import codecs
 import os
 import re
@@ -86,7 +84,7 @@ setup(
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
     license="MIT",
-    url="https://github.com/AUSSDA/pyDataverse",
+    url="https://github.com/GDCC/pyDataverse",
     python_requires=">=3.6",
     platforms=["OS Independent"],
     classifiers=CLASSIFIERS,
@@ -101,7 +99,7 @@ setup(
     zip_safe=False,
     project_urls={
         "Documentation": "https://pydataverse.readthedocs.io/",
-        "Issue Tracker": "https://github.com/AUSSDA/pyDataverse/issues",
+        "Issue Tracker": "https://github.com/GDCC/pyDataverse/issues",
         "Changelog": "https://pydataverse.readthedocs.io/en/latest/community/releases.html",
     },
 )

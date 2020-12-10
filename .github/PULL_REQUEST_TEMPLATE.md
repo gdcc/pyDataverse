@@ -23,7 +23,7 @@ Thanks for submitting a pull request! It's great, that you want contribute to py
 
 **Follow best practices**
 
-* [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/AUSSDA/pyDataverse/pulls) for the same update/change?
+* [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/GDCC/pyDataverse/pulls) for the same update/change?
 * [ ] Have you followed the guidelines in our [Contribution Guide](https://pydataverse.readthedocs.io/)?
 * [ ] Have you used pre-commit?
 

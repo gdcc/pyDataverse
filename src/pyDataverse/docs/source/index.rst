@@ -195,4 +195,4 @@ Copyright Stefan Kasberger and others, 2019-2020.
 
 Distributed under the terms of the MIT license, pyDataverse is free and open source software.
 
-Full License Text: `LICENSE.txt <https://github.com/AUSSDA/pyDataverse/blob/master/LICENSE.txt>`_
+Full License Text: `LICENSE.txt <https://github.com/GDCC/pyDataverse/blob/master/LICENSE.txt>`_

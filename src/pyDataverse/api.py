@@ -2173,6 +2173,8 @@ class NativeApi(Api):
         """Get details of the current authenticated user.
 
         Auth must be ``true`` for this to work.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
         """
         url = f"{self.base_url}/api/users/:me"
         return self.get_request(url, auth=True)

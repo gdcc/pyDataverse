@@ -15,7 +15,7 @@ It's great, that you want contribute to pyDataverse.
 
 Before moving on, please check some things first:
 
-* [ ] Your issue may already be reported! Please search on the [issue tracker](https://github.com/AUSSDA/pyDataverse/issues) before creating one.
+* [ ] Your issue may already be reported! Please search on the [issue tracker](https://github.com/GDCC/pyDataverse/issues) before creating one.
 * [ ] Use our issue templates for bug reports and feature requests, if that's what you need.
 * [ ] Are you running the expected version of pyDataverse? (check via `pip freeze`).
 * [ ] Is this something you can **debug and fix**? Send a pull request! Bug fixes and documentation fixes are welcome. For more information, see the contributor guide in the [docs](https://pydataverse.readthedocs.io/).

@@ -10,7 +10,7 @@ PyDataverse
 
 **Additional**
 
--   `pyDataverse CSV Templates <https://github.com/AUSSDA/pyDataverse_templates>`_: GitHub repository with CSV templates for pyDataverse
+-   `pyDataverse CSV Templates <https://github.com/GDCC/pyDataverse_templates>`_: GitHub repository with CSV templates for pyDataverse
 
 **Presentations**
 

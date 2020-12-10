@@ -34,26 +34,26 @@ Source Code
 -----------------------------
 
 PyDataverse is actively developed on GitHub, where the code is
-`always available <https://github.com/AUSSDA/pyDataverse>`_.
+`always available <https://github.com/GDCC/pyDataverse>`_.
 
 You can either clone the public repository:
 
 .. code-block:: shell
 
-    git clone git://github.com/aussda/pyDataverse.git
+    git clone git://github.com/GDCC/pyDataverse.git
 
 Or install via pip from the branch or commit you want (in this case the `develop` branch):
 
 .. code-block:: shell
 
-    pip install -U git+https://github.com/aussda/pyDataverse.git@develop
+    pip install -U git+https://github.com/GDCC/pyDataverse.git@develop
 
 
-Or, download the `tarball <https://github.com/aussda/pyDataverse/tarball/master>`_:
+Or, download the `tarball <https://github.com/GDCC/pyDataverse/tarball/master>`_:
 
 .. code-block:: shell
 
-    curl -OL https://github.com/aussda/pyDataverse/tarball/master
+    curl -OL https://github.com/GDCC/pyDataverse/tarball/master
     # optionally, zipball is also available (for Windows users).
 
 Once you have a copy of the source, you can embed it in your own Python
