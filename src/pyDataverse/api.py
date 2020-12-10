@@ -2205,6 +2205,24 @@ class NativeApi(Api):
         url = f"{self.base_url}/api/files/{datafile_id}/redetect?dryRun={dry_run_str}"
         return self.post_request(url, auth=True)
 
+    def reingest_datafile(self, datafile_id: str) -> Response:
+        """Reingest datafile.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file
+
+        Parameters
+        ----------
+        datafile_id : str
+            Datafile id (fileid)
+
+        Returns
+        -------
+        Response
+            Request Response() object.
+        """
+        url = f"{self.base_url}/api/files/{datafile_id}/reingest"
+        return self.post_request(url, auth=True)
+
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
