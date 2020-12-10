@@ -1,6 +1,7 @@
 """Dataverse data-types data model."""
 import json
 import os
+
 from pyDataverse.utils import validate_data
 
 

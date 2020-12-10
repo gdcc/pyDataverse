@@ -1,9 +1,10 @@
 """Helper functions."""
 import csv
 import json
-from jsonschema import validate
 import os
 import pickle
+
+from jsonschema import validate
 
 
 def read_file(filename, mode="r", encoding="utf-8"):

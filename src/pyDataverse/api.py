@@ -1,7 +1,9 @@
 """Dataverse API wrapper for all it's API's."""
 import json
-from requests import Response, ConnectionError, delete, get, post, put
 import subprocess as sp
+
+from requests import ConnectionError, Response, delete, get, post, put
+
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
     ApiUrlError,
@@ -2178,6 +2180,30 @@ class NativeApi(Api):
         """
         url = f"{self.base_url}/api/users/:me"
         return self.get_request(url, auth=True)
+
+    def redetect_file_type(self, datafile_id: str, dry_run: bool = True) -> Response:
+        """Redetect file type.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#redetect-file-type
+
+        Parameters
+        ----------
+        datafile_id : str
+            Datafile id (fileid)
+        dry_run : bool, optional
+            [description], by default True
+
+        Returns
+        -------
+        Response
+            Request Response() object.
+        """
+        if dry_run is True:
+            dry_run_str = "true"
+        elif dry_run is False:
+            dry_run_str = "false"
+        url = f"{self.base_url}/api/files/{datafile_id}/redetect?dryRun={dry_run_str}"
+        return self.post_request(url, auth=True)
 
 
 class SearchApi(Api):
