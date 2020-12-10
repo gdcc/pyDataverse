@@ -2178,20 +2178,24 @@ class NativeApi(Api):
 
         https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
         """
-        url = f"{self.base_url}/api/users/:me"
+        url = f"{self.base_url_api_native}/users/:me"
         return self.get_request(url, auth=True)
 
-    def redetect_file_type(self, datafile_id: str, dry_run: bool = True) -> Response:
+    def redetect_file_type(
+        self, identifier: str, is_pid: bool = False, dry_run: bool = False
+    ) -> Response:
         """Redetect file type.
 
         https://guides.dataverse.org/en/latest/api/native-api.html#redetect-file-type
 
         Parameters
         ----------
-        datafile_id : str
-            Datafile id (fileid)
+        identifier : str
+            Datafile id (fileid) or file PID.
+        is_pid : bool
+            Is the identifier a PID, by default False.
         dry_run : bool, optional
-            [description], by default True
+            [description], by default False
 
         Returns
         -------
@@ -2202,44 +2206,80 @@ class NativeApi(Api):
             dry_run_str = "true"
         elif dry_run is False:
             dry_run_str = "false"
-        url = f"{self.base_url}/api/files/{datafile_id}/redetect?dryRun={dry_run_str}"
+        if is_pid:
+            url = f"{self.base_url_api_native}/files/:persistentId/redetect?persistentId={identifier}&dryRun={dry_run_str}"
+        else:
+            url = f"{self.base_url_api_native}/files/{identifier}/redetect?dryRun={dry_run_str}"
         return self.post_request(url, auth=True)
 
-    def reingest_datafile(self, datafile_id: str) -> Response:
+    def reingest_datafile(self, identifier: str, is_pid: bool = False) -> Response:
         """Reingest datafile.
 
         https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file
 
         Parameters
         ----------
-        datafile_id : str
-            Datafile id (fileid)
+        identifier : str
+            Datafile id (fileid) or file PID.
+        is_pid : bool
+            Is the identifier a PID, by default False.
 
         Returns
         -------
         Response
             Request Response() object.
         """
-        url = f"{self.base_url}/api/files/{datafile_id}/reingest"
+        if is_pid:
+            url = f"{self.base_url_api_native}/files/:persistentId/reingest?persistentId={identifier}"
+        else:
+            url = f"{self.base_url_api_native}/files/{identifier}/reingest"
         return self.post_request(url, auth=True)
 
-    def uningest_datafile(self, datafile_id: str) -> Response:
+    def uningest_datafile(self, identifier: str, is_pid: bool = False) -> Response:
         """Uningest datafile.
 
         https://guides.dataverse.org/en/latest/api/native-api.html#uningest-a-file
 
         Parameters
         ----------
-        datafile_id : str
-            Datafile id (fileid)
+        identifier : str
+            Datafile id (fileid) or file PID.
+        is_pid : bool
+            Is the identifier a PID, by default False.
 
         Returns
         -------
         Response
             Request Response() object.
         """
-        url = f"{self.base_url}/api/files/{datafile_id}/uningest"
+        if is_pid:
+            url = f"{self.base_url_api_native}/files/:persistentId/uningest?persistentId={identifier}"
+        else:
+            url = f"{self.base_url_api_native}/files/{identifier}/uningest"
         return self.post_request(url, auth=True)
+
+    def restrict_datafile(self, identifier: str, is_pid: bool = False) -> Response:
+        """Uningest datafile.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#restrict-files
+
+        Parameters
+        ----------
+        identifier : str
+            Datafile id (fileid) or file PID.
+        is_pid : bool
+            Is the identifier a PID, by default False.
+
+        Returns
+        -------
+        Response
+            Request Response() object.
+        """
+        if is_pid:
+            url = f"{self.base_url_api_native}/files/:persistentId/restrict?persistentId={identifier}"
+        else:
+            url = f"{self.base_url_api_native}/files/{identifier}/restrict"
+        return self.put_request(url, auth=True)
 
 
 class SearchApi(Api):
