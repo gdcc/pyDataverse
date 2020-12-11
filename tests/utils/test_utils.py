@@ -1,9 +1,9 @@
-from pyDataverse.utils import read_json, save_tree_data, dv_tree_walker
+from pyDataverse.utils import read_json, save_tree_data, dataverse_tree_walker
 from ..conftest import test_config
 
 
 class TestUtilsSaveTreeData:
-    def test_dv_tree_walker_valid_default(self):
+    def test_dataverse_tree_walker_valid_default(self):
         dv_ids = [1, 2, 3]
         dv_aliases = ["parent_dv_1", "parent_dv_1_sub_dv_1", "parent_dv_2"]
         ds_ids = ["1AB23C", "4DE56F", "7GH89I", "0JK1LM", "2NO34P"]
@@ -44,7 +44,7 @@ class TestUtilsSaveTreeData:
         ]
 
         data = read_json(test_config["tree_filename"])
-        dataverses, datasets, datafiles = dv_tree_walker(data)
+        dataverses, datasets, datafiles = dataverse_tree_walker(data)
 
         assert isinstance(dataverses, list)
         assert isinstance(datasets, list)

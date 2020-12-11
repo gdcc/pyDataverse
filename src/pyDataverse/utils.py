@@ -343,7 +343,7 @@ def clean_string(string):
     return clean_str
 
 
-def validate_data(data, filename_schema, file_format="json"):
+def validate_data(data: dict, filename_schema: str, file_format: str = "json") -> bool:
     """Validate data against a schema.
 
     Parameters
@@ -472,7 +472,7 @@ def create_datafile_url(base_url, identifier, is_filepid):
     return url
 
 
-def dv_tree_walker(
+def dataverse_tree_walker(
     data: list,
     dv_keys: list = ["dataverse_id", "dataverse_alias"],
     ds_keys: list = ["dataset_id", "pid"],
@@ -505,7 +505,7 @@ def dv_tree_walker(
 
     if type(data) == list:
         for elem in data:
-            dv, ds, df = dv_tree_walker(elem)
+            dv, ds, df = dataverse_tree_walker(elem)
             dataverses += dv
             datasets += ds
             datafiles += df
@@ -530,7 +530,7 @@ def dv_tree_walker(
             datafiles.append(df_tmp)
         if "children" in data:
             if len(data["children"]) > 0:
-                dv, ds, df = dv_tree_walker(data["children"])
+                dv, ds, df = dataverse_tree_walker(data["children"])
                 dataverses += dv
                 datasets += ds
                 datafiles += df

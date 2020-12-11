@@ -450,8 +450,11 @@ class DataAccessApi(Api):
         return self.get_request(url, auth=auth)
 
     def request_access(self, identifier, auth=True, is_filepid=False):
-        """
+        """Request datafile access.
+
         This method requests access to the datafile whose id is passed on the behalf of an authenticated user whose key is passed. Note that not all datasets allow access requests to restricted files.
+
+        https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#request-access
 
         /api/access/datafile/$id/requestAccess
 
@@ -468,7 +471,10 @@ class DataAccessApi(Api):
         return self.put_request(url, auth=auth)
 
     def allow_access_request(self, identifier, do_allow=True, auth=True, is_pid=True):
-        """
+        """Allow access request for datafiles.
+
+        https://guides.dataverse.org/en/latest/api/dataaccess.html#allow-access-requests
+
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/{id}/allowAccessRequest
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/:persistentId/allowAccessRequest?persistentId={pid}
         """
@@ -488,7 +494,10 @@ class DataAccessApi(Api):
         return self.put_request(url, data=data, auth=auth)
 
     def grant_file_access(self, identifier, user, auth=False):
-        """
+        """Grant datafile access.
+
+        https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#grant-file-access
+
         curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/{id}/grantAccess/{@userIdentifier}
         """
         url = "{0}/datafile/{1}/grantAccess/{2}".format(
@@ -497,7 +506,10 @@ class DataAccessApi(Api):
         return self.put_request(url, auth=auth)
 
     def list_file_access_requests(self, identifier, auth=False):
-        """
+        """Liste datafile access requests.
+
+        https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#list-file-access-requests
+
         curl -H "X-Dataverse-key:$API_TOKEN" -X GET http://$SERVER/api/access/datafile/{id}/listRequests
         """
         url = "{0}/datafile/{1}/listRequests".format(
@@ -853,10 +865,10 @@ class NativeApi(Api):
             print("Dataverse {0} deleted.".format(identifier))
         return resp
 
-    def get_dataverse_roles(self, identifier, auth=False):
-        """Get dataverse roles by alias or id.
+    def get_dataverse_roles(self, identifier: str, auth: bool = False) -> Response:
+        """All the roles defined directly in the dataverse by identifier.
 
-        View roles of a dataverse.
+        `Docs <https://guides.dataverse.org/en/latest/api/native-api.html#list-roles-defined-in-a-dataverse>`_
 
         .. code-block:: bash
 
@@ -1596,7 +1608,7 @@ class NativeApi(Api):
             print("Dataset {0} destroyed".format(resp.json()))
         return resp
 
-    def get_datafiles(self, pid, version=":latest", auth=True):
+    def get_datafiles_metadata(self, pid, version=":latest", auth=True):
         """List metadata of all datafiles of a dataset.
 
         `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
@@ -1911,7 +1923,7 @@ class NativeApi(Api):
         url = "{0}/metadatablocks/{1}".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def get_user_apitoken_expirationdate(self, auth=False):
+    def get_user_api_token_expiration_date(self, auth=False):
         """Get the expiration date of an Users's API token.
 
         HTTP Request:
@@ -1929,7 +1941,7 @@ class NativeApi(Api):
         url = "{0}/users/token".format(self.base_url_api_native)
         return self.get_request(url, auth=auth)
 
-    def recreate_user_apitoken(self):
+    def recreate_user_api_token(self):
         """Recreate an Users API token.
 
         HTTP Request:
@@ -1947,7 +1959,7 @@ class NativeApi(Api):
         url = "{0}/users/token/recreate".format(self.base_url_api_native)
         return self.post_request(url)
 
-    def delete_user_apitoken(self):
+    def delete_user_api_token(self):
         """Delete an Users API token.
 
         HTTP Request:
@@ -1965,8 +1977,10 @@ class NativeApi(Api):
         url = "{0}/users/token".format(self.base_url_api_native)
         return self.delete_request(url)
 
-    def create_dataverse_role(self, dataverse_id):
-        """Create a new role in a Dataverse.
+    def create_role(self, dataverse_id):
+        """Create a new role.
+
+        `Docs <https://guides.dataverse.org/en/latest/api/native-api.html#id2>`_
 
         HTTP Request:
 
@@ -1988,8 +2002,10 @@ class NativeApi(Api):
         url = "{0}/roles?dvo={1}".format(self.base_url_api_native, dataverse_id)
         return self.post_request(url)
 
-    def get_dataverse_role(self, role_id, auth=False):
-        """Get role of a Dataverse.
+    def show_role(self, role_id, auth=False):
+        """Show role.
+
+        `Docs <https://guides.dataverse.org/en/latest/api/native-api.html#show-role>`_
 
         HTTP Request:
 
@@ -2011,8 +2027,10 @@ class NativeApi(Api):
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
         return self.get_request(url, auth=auth)
 
-    def delete_dataverse_role(self, role_id):
-        """Delete role of a Dataverse.
+    def delete_role(self, role_id):
+        """Delete role.
+
+        `Docs <https://guides.dataverse.org/en/latest/api/native-api.html#delete-role>`_
 
         Parameters
         ----------
