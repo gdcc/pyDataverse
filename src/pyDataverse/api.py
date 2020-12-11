@@ -111,10 +111,10 @@ class Api:
             Response object of requests library.
 
         """
+        params = {}
+        params["User-Agent"] = "pydataverse"
         if auth:
             if self.api_token:
-                if not params:
-                    params = {}
                 params["key"] = str(self.api_token)
             else:
                 raise ApiAuthorizationError(
@@ -171,10 +171,10 @@ class Api:
             Response object of requests library.
 
         """
+        params = {}
+        params["User-Agent"] = "pydataverse"
         if auth:
             if self.api_token:
-                if not params:
-                    params = {}
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError("ERROR: POST - Api token not available.")
@@ -215,10 +215,10 @@ class Api:
             Response object of requests library.
 
         """
+        params = {}
+        params["User-Agent"] = "pydataverse"
         if auth:
             if self.api_token:
-                if not params:
-                    params = {}
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
@@ -261,10 +261,10 @@ class Api:
             Response object of requests library.
 
         """
+        params = {}
+        params["User-Agent"] = "pydataverse"
         if auth:
             if self.api_token:
-                if not params:
-                    params = {}
                 params["key"] = self.api_token
             else:
                 raise ApiAuthorizationError(
