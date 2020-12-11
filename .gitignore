@@ -24,6 +24,7 @@ internal
 *.code-workspace
 .python-version
 devel.py
+test_manual.py
 
 # Distribution / packaging
 build/
