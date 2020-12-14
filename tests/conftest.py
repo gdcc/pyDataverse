@@ -86,7 +86,7 @@ def native_api(monkeypatch):
 
     """
     monkeypatch.setenv("BASE_URL", "https://demo.dataverse.org")
-    return NativeApi(test_config["base_url"])
+    return NativeApi(os.getenv("BASE_URL"))
 
 
 def import_dataverse_min_dict():
