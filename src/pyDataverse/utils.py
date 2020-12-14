@@ -7,6 +7,40 @@ import pickle
 from jsonschema import validate
 
 
+CSV_JSON_COLS = [
+    "otherId",
+    "series",
+    "author",
+    "dsDescription",
+    "subject",
+    "keyword",
+    "topicClassification",
+    "language",
+    "grantNumber",
+    "dateOfCollection",
+    "kindOfData",
+    "dataSources",
+    "otherReferences",
+    "contributor",
+    "relatedDatasets",
+    "relatedMaterial",
+    "datasetContact",
+    "distributor",
+    "producer",
+    "publication",
+    "software",
+    "timePeriodCovered",
+    "geographicUnit",
+    "geographicBoundingBox",
+    "geographicCoverage",
+    "socialScienceNotes",
+    "unitOfAnalysis",
+    "universe",
+    "targetSampleActualSize",
+    "categories",
+]
+
+
 def read_file(filename, mode="r", encoding="utf-8"):
     """Read in a file.
 
@@ -227,7 +261,16 @@ def write_csv(
 
 
 def read_csv_as_dicts(
-    filename, newline="", delimiter=",", quotechar='"', encoding="utf-8"
+    filename,
+    newline="",
+    delimiter=",",
+    quotechar='"',
+    encoding="utf-8",
+    remove_prefix=True,
+    prefix="dv.",
+    json_cols=CSV_JSON_COLS,
+    false_values=["FALSE"],
+    true_values=["TRUE"],
 ):
     """Read in CSV file into a list of :class:`dict`.
 
@@ -277,7 +320,46 @@ def read_csv_as_dicts(
         data = []
         for row in reader:
             data.append(dict(row))
-    assert isinstance(data, list)
+
+    data_tmp = []
+    for ds in data:
+        ds_tmp = {}
+        for key, val in ds.items():
+            if val in false_values:
+                ds_tmp[key] = False
+                ds_tmp[key] = True
+            elif val in true_values:
+                ds_tmp[key] = True
+            else:
+                ds_tmp[key] = val
+
+        data_tmp.append(ds_tmp)
+    data = data_tmp
+
+    if remove_prefix:
+        data_tmp = []
+        for ds in data:
+            ds_tmp = {}
+            for key, val in ds.items():
+                if key.startswith(prefix):
+                    ds_tmp[key[len(prefix) :]] = val
+                else:
+                    ds_tmp[key] = val
+            data_tmp.append(ds_tmp)
+        data = data_tmp
+
+    if len(json_cols) > 0:
+        data_tmp = []
+        for ds in data:
+            ds_tmp = {}
+            for key, val in ds.items():
+                if key in json_cols:
+                    ds_tmp[key] = json.loads(val)
+                else:
+                    ds_tmp[key] = val
+            data_tmp.append(ds_tmp)
+        data = data_tmp
+
     return data
 
 
