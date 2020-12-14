@@ -33,7 +33,7 @@ class Api:
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version="latest"):
+    def __init__(self, base_url: str, api_token=None, api_version="latest"):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -57,7 +57,7 @@ class Api:
             'OK'
 
         """
-        if not isinstance(base_url, ("".__class__, "".__class__)):
+        if not isinstance(base_url, str):
             raise ApiUrlError("base_url {0} is not a string.".format(base_url))
         self.base_url = base_url
 
@@ -642,7 +642,7 @@ class NativeApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version="v1"):
+    def __init__(self, base_url: str, api_token=None, api_version="v1"):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -1719,7 +1719,10 @@ class NativeApi(Api):
         persisted, so if you want to update a specific field first get the
         json with the above command and alter the fields you want.
 
+
         Also note that dataFileTags are not versioned and changes to these will update the published version of the file.
+
+        This functions needs CURL to work!
 
         HTTP Request:
 
@@ -1729,7 +1732,7 @@ class NativeApi(Api):
             curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' $SERVER_URL/api/files/$ID/metadata
             curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData={"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false}' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
 
-        `updating-file-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
+        `Docs <http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata>`_.
 
         Parameters
         ----------
@@ -2174,7 +2177,7 @@ class NativeApi(Api):
         elif parent_type == "dataset" and "datafiles" in children_types:
             # check for datafiles as children and get their ID
             pid = parent
-            resp = self.get_datafiles(parent, version=":latest")
+            resp = self.get_datafiles_metadata(parent, version=":latest")
             if "data" in resp.json():
                 for datafile in resp.json()["data"]:
                     children.append(
@@ -2197,7 +2200,7 @@ class NativeApi(Api):
 
         https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
         """
-        url = f"{self.base_url_api_native}/users/:me"
+        url = f"{self.base_url}/users/:me"
         return self.get_request(url, auth=True)
 
     def redetect_file_type(
