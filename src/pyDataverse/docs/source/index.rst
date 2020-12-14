@@ -5,6 +5,9 @@ pyDataverse
 
 Release v\ |version|.
 
+.. image:: https://img.shields.io/github/v/release/gdcc/pyDataverse
+    :target: https://github.com/gdcc/pyDataverse
+
 .. image:: https://travis-ci.com/AUSSDA/pyDataverse.svg?branch=master
     :target: https://travis-ci.com/AUSSDA/pyDataverse
 
@@ -42,7 +45,7 @@ and Datafiles.
 
 No matter, if you want to import huge masses of metadata and data into a
 Dataverse instance. connect your service with an instance or just want to make
-some API calls - **pyDataverse can help you!**
+some API calls - **pyDataverse helps you with Dataverse!**
 
 
 Install
@@ -81,8 +84,8 @@ API uploads).
 >>> from pyDataverse.models import Dataset
 >>> from pyDataverse.utils import read_file
 >>> ds = Dataset()
->>> json_filename = 'tests/data/dataset_upload_min_tutorial_mass-migration.json'
->>> ds.from_json(read_file(json_filename))
+>>> ds_filename = "tests/data/user-guide/dataset.json"
+>>> ds.from_json(read_file(ds_filename))
 >>> ds.get()
 {'citation_displayName': 'Citation Metadata', 'title': 'Youth in Austria 2005', 'author': [{'authorName': 'LastAuthor1, FirstAuthor1', 'authorAffiliation': 'AuthorAffiliation1'}], 'datasetContact': [{'datasetContactEmail': 'ContactEmail1@mailinator.com', 'datasetContactName': 'LastContact1, FirstContact1'}], 'dsDescription': [{'dsDescriptionValue': 'DescriptionText'}], 'subject': ['Medicine, Health and Life Sciences']}
 
@@ -97,21 +100,23 @@ instance must be changed before you can execute the code:
 - DV_PARENT_ALIAS: Alias of the Dataverse, in which the Dataset should be created.
 
 >>> from pyDataverse.api import NativeApi
->>> api = NativeApi('BASE_URL', 'API_TOKEN')
->>> resp = api.create_dataset('DV_PARENT_ALIAS', ds_json)
+>>> api = NativeApi('{BASE_URL}', '{API_TOKEN}')
+>>> resp = api.create_dataset(DV_PARENT_ALIAS, ds.json())
 Dataset with pid 'doi:10.5072/FK2/UTGITX' created.
 >>> resp.json()
 {'status': 'OK', 'data': {'id': 251, 'persistentId': 'doi:10.5072/FK2/UTGITX'}}
 
+Check out :ref:`User Guide - Basic Usage <user_basic-usage>` and
+:ref:`User Guide - Use-Cases <user_use-cases>` for more.
 
 Features
 -----------------------------
 
-- Comprehensive API wrapper for all API’s and nearly all endpoints
-- Python objects for each Dataverse data type: Dataverse, Dataset and Datafile
+- Comprehensive API wrapper for all API’s and most of their endpoints
+- Data models for each of Dataverses data types: Dataverse, Dataset and Datafile
 - Data conversion to and from Dataverses own API JSON format
-- Easy mass imports and exports via pyDataverse’s own CSV format
-- Helper functions to handle Dataverse metadata and data
+- Easy mass imports and exports with pyDataverses own CSV templates
+- Utils with conveniant helper functions
 - Custom exceptions
 - Tests on `Travis CI <https://travis-ci.com/AUSSDA/pyDataverse>`_ (`pytest <https://docs.pytest.org/en/latest/>`_ + `tox <http://tox.readthedocs.io/>`_)
 - Open Source (`MIT <https://opensource.org/licenses/MIT>`_)
@@ -125,8 +130,8 @@ User Guide
 
    user/installation
    user/basic-usage
-   user/advanced-usage
    user/use-cases
+   user/csv-templates
    user/faq
    user/resources
 
@@ -153,7 +158,6 @@ pyDataverse ecosystem and community.
    :maxdepth: 1
 
    community/contact
-   community/media
    community/releases
 
 
@@ -163,7 +167,8 @@ Contributor Guide
 .. toctree::
    :maxdepth: 1
 
-   contributor/index
+    contributing/contributing
+    contributing/development
 
 
 Thanks!

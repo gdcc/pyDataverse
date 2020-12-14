@@ -1,0 +1,2 @@
+"org.datafile_id","org.dataset_id","org.filename","org.to_upload","org.is_uploaded","org.to_delete","org.is_deleted","org.to_update","org.is_updated","dv.datafile_id","dv.description","dv.categories","dv.restrict","dv.label","dv.directoryLabel","alma.title","alma.pages","alma.year"
+1,1,"datafile.txt","TRUE","TRUE","TRUE","TRUE","TRUE","TRUE",634,"My description bbb.","[""Data""]","FALSE","Text Report","data/subdir1","Text Report",23,1997
