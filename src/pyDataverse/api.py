@@ -2129,7 +2129,7 @@ class NativeApi(Api):
         if parent_type == "dataverse":
             # check for dataverses and datasets as children and get their ID
             parent_alias = parent
-            resp = self.get_dataverse_contents(parent_alias)
+            resp = self.get_dataverse_contents(parent_alias, auth=True)
             if "data" in resp.json():
                 contents = resp.json()["data"]
                 for content in contents:
