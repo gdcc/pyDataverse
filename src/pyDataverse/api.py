@@ -889,7 +889,7 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}/roles".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def get_dataverse_contents(self, identifier, auth=False):
+    def get_dataverse_contents(self, identifier, auth=True):
         """Gets contents of Dataverse.
 
         Parameters
