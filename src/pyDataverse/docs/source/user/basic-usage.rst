@@ -8,9 +8,7 @@ To get started, we will import metadata from JSON-files, create data objects
 
 The data for this tutorial can be found inside ``tests/data/basic-usage/``.
 
-.. warning::
-  Do not execute the example code on your Dataverse production instance,
-  unless 100% sure!
+.. include:: ../snippets/warning_production.rst
 
 In addition to this tutorial, you can find specific examples at
 :ref:`User Guide - Use-Cases <user_use-cases>`.
