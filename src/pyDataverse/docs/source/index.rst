@@ -51,7 +51,7 @@ some API calls - **pyDataverse helps you with Dataverse!**
 Install
 -----------------------------
 
-To install pyDataverse, simply run this simple command in your terminal of choice:
+To install pyDataverse, simply run this command in your terminal of choice:
 
 .. code-block:: shell
 
@@ -73,8 +73,7 @@ Python packages:
 Quickstart
 -----------------------------
 
-.. warning::
-  Do not execute the examples code on your production instance!
+.. include:: ../snippets/warning_production.rst
 
 **Import Dataset metadata**
 
@@ -107,7 +106,7 @@ Dataset with pid 'doi:10.5072/FK2/UTGITX' created.
 {'status': 'OK', 'data': {'id': 251, 'persistentId': 'doi:10.5072/FK2/UTGITX'}}
 
 Check out :ref:`User Guide - Basic Usage <user_basic-usage>` and
-:ref:`User Guide - Use-Cases <user_use-cases>` for more.
+:ref:`User Guide - Advanced Usage <user_advanced-usage>` for more.
 
 Features
 -----------------------------
@@ -130,6 +129,7 @@ User Guide
 
    user/installation
    user/basic-usage
+   user/advanced-usage
    user/use-cases
    user/csv-templates
    user/faq

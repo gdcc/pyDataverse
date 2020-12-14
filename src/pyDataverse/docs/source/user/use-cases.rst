@@ -6,9 +6,6 @@ Use-Cases
 For a basic introduction to pyDataverse, have a look at
 :ref:`User Guide - Basic Usage <user_basic-usage>`.
 
-.. _use-cases data-migrations:
-
-
 
 .. _use-cases data-migration:
 
