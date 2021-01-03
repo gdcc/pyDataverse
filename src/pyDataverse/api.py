@@ -1706,7 +1706,7 @@ class NativeApi(Api):
         if file_object is None:
             files = {"file": (file_name, open(file_name, "rb"))}
         else:
-            files = {"file", (file_name, file_object)}
+            files = {"file": (file_name, file_object)}
         return self.post_request(
             url, data={"jsonData": json_str}, files=files, auth=True
         )
