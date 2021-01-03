@@ -1,0 +1,6 @@
+# Requirements for tests (pytest)
+-r common.txt
+pytest
+pytest-cov
+tox
+selenium==3.141.0

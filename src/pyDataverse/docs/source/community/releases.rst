@@ -1,7 +1,6 @@
-.. _releases:
-
+.. _community_history:
 
 Release and Version History
 ===========================
 
-.. include:: ../../../../../HISTORY.md
+.. include:: ../../../../../HISTORY.rst

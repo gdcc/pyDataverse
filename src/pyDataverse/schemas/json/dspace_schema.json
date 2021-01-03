@@ -1,0 +1,344 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "responseHeader": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer"
+        },
+        "QTime": {
+          "type": "integer"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "q": {
+              "type": "string"
+            },
+            "indent": {
+              "type": "string"
+            },
+            "wt": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "numFound": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "integer"
+        },
+        "docs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ZANo": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "AccessClass": {
+                "type": "string"
+              },
+              "NumberOfUnits": {
+                "type": "string"
+              },
+              "src": {
+                "type": "string"
+              },
+              "Studynumber": {
+                "type": "string"
+              },
+              "AnalysisSystem": {
+                "type": "string"
+              },
+              "NumberOfVariables": {
+                "type": "string"
+              },
+              "SDC": {
+                "type": "string"
+              },
+              "Universe": {
+                "type": "string"
+              },
+              "max": {
+                "type": "string"
+              },
+              "min": {
+                "type": "string"
+              },
+              "Abstract": {
+                "type": "string"
+              },
+              "CollectionMethod": {
+                "type": "string"
+              },
+              "Title": {
+                "type": "string"
+              },
+              "SelectionMethod": {
+                "type": "string"
+              },
+              "Remarks": {
+                "type": "string"
+              },
+              "DatCollector": {
+                "type": "string"
+              },
+              "EAbstract": {
+                "type": "string"
+              },
+              "EUniverse": {
+                "type": "string"
+              },
+              "ECollectionMethod": {
+                "type": "string"
+              },
+              "ETitle": {
+                "type": "string"
+              },
+              "ESelectionMethod": {
+                "type": "string"
+              },
+              "EDatCollector": {
+                "type": "string"
+              },
+              "PriInvestigator": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Institution": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EGeogFree": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "GeogISO": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EGeogName": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "GeogFree": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "GeogName": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "CategoryNo": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ECategory": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Category": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "TopicNo": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ETopic": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Topic": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "VersionYear": {
+                "type": "string"
+              },
+              "EVersionName": {
+                "type": "string"
+              },
+              "PublicationYear": {
+                "type": "string"
+              },
+              "VersionDate": {
+                "type": "string"
+              },
+              "DOInumber": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "VersionNumber": {
+                "type": "string"
+              },
+              "VersionName": {
+                "type": "string"
+              },
+              "DOI": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "CollDateMin": {
+                "type": "string"
+              },
+              "CollDateMax": {
+                "type": "string"
+              },
+              "GroupNo": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EGroupName": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "GroupName": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "DatasetFile": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "DatasetSize": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "DatasetDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Dataset": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EDatasetDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "QuestionnaireSize": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EQuestionnaireDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "QuestionnaireFile": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Questionnaire": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "QuestionnaireDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "CodebookSize": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Codebook": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ECodebookDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "CodebookDescription": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "CodebookFile": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

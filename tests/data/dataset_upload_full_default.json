@@ -3,6 +3,10 @@
     "license": "CC0",
     "termsOfUse": "CC0 Waiver",
     "termsOfAccess": "Terms of Access",
+    "fileAccessRequest": true,
+    "protocol": "doi",
+    "authority": "10.11587",
+    "identifier": "6AQBYW",
     "metadataBlocks": {
       "citation": {
         "displayName": "Citation Metadata",
@@ -430,6 +434,14 @@
             "value": [
               "KindOfData1",
               "KindOfData2"
+            ]
+          },
+          {
+            "typeName": "language",
+            "multiple": true,
+            "typeClass": "controlledVocabulary",
+            "value": [
+              "German"
             ]
           },
           {

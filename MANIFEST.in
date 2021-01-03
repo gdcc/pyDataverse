@@ -1,0 +1,2 @@
+recursive-include src/pyDataverse/schemas *
+recursive-include src/pyDataverse/templates *

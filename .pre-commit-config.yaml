@@ -1,0 +1,29 @@
+default_language_version:
+    python: python3
+exclude: ^migrations/
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    exclude: _pytest/(debugging|hookspec).py
+    hooks:
+    -   id: check-added-large-files
+    -   id: check-case-conflict
+    -   id: check-docstring-first
+    -   id: check-json
+    -   id: check-symlinks
+    -   id: check-xml
+    -   id: check-yaml
+    -   id: detect-private-key
+    -   id: end-of-file-fixer
+    -   id: pretty-format-json
+        args: [--autofix,--no-sort-keys]
+-   repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+    -   id: black
+        language_version: python3.6
+-   repo: https://github.com/asottile/blacken-docs
+    rev: v1.7.0
+    hooks:
+    -   id: blacken-docs
+        additional_dependencies: [black==19.10b0]
