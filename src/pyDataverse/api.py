@@ -1034,8 +1034,7 @@ class Api(object):
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
             query_str, filename)
-        shell_command += ' -F \'jsonData={"description":"'+description
-            +'","directoryLabel":"'+directory+'"}\''
+        shell_command += ' -F \'jsonData={"description":"'+description+'","directoryLabel":"'+directory+'"}\''
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
