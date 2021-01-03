@@ -1703,7 +1703,7 @@ class NativeApi(Api):
             url += "/datasets/:persistentId/add?persistentId={0}".format(identifier)
         else:
             url += "/datasets/{0}/add".format(identifier)
-        if file_object is None
+        if file_object is None:
             files = {"file": (file_name, open(file_name, "rb"))}
         else:
             files = {"file", (file_name, file_object)}
