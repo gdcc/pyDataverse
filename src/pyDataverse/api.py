@@ -989,7 +989,7 @@ class Api(object):
         data = self.get_request(query_str)
         return data
 
-    def upload_file(self, identifier, filename, is_pid=True):
+    def upload_file(self, identifier, filename, description="", directory="", is_pid=True):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1010,6 +1010,10 @@ class Api(object):
             Identifier of the dataset.
         filename : string
             Full filename with path.
+        description : string
+            Optional file description
+        directory : string
+            Optional file path for treeview on dataverse
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
 
@@ -1030,6 +1034,8 @@ class Api(object):
             self.api_token)
         shell_command += ' -X POST {0} -F file=@{1}'.format(
             query_str, filename)
+        shell_command += ' -F \'jsonData={"description":"'+description
+            +'","directoryLabel":"'+directory+'"}\''
         # TODO(Shell): is shell=True necessary?
         result = sp.run(shell_command, shell=True, stdout=sp.PIPE)
         resp = json.loads(result.stdout)
