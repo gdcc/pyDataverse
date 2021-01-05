@@ -1684,13 +1684,16 @@ class NativeApi(Api):
         ----------
         identifier : str
             Identifier of the dataset.
-        file_or_name : str
-            File object open in binary read mode, or file Full filename with path.
+        file_name : str
+            File name and path. If file_object is ``None``, a file in this path is opened in
+            read binary mode for upload
         json_str : str
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
-
+        file_object : file
+            Defaults to ``None``. Otherwise, it is expected to be a file object which will be uploaded.
+            In this case, the filename is treated as text and passed on to dataverse
         Returns
         -------
         dict
@@ -1704,7 +1707,7 @@ class NativeApi(Api):
         else:
             url += "/datasets/{0}/add".format(identifier)
         if file_object is None:
-            files = {"file": (file_name, open(file_name, "rb"))}
+            files = {"file": open(file_name, "rb")}
         else:
             files = {"file": (file_name, file_object)}
         return self.post_request(
