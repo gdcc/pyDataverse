@@ -10,8 +10,8 @@ there are several options:
 GitHub
 ------
 
-The best way to track the development of pyDataverse is through
-`the GitHub repo <https://github.com/GDCC/pyDataverse>`_.
+The best way to track the development of pyDataverse is through the
+`GitHub repo <https://github.com/GDCC/pyDataverse>`_.
 
 
 Email

@@ -3,15 +3,17 @@ Reference / API
 
 .. module:: pyDataverse
 
-This part of the documentation covers all the interfaces of pyDataverse. For
-parts where pyDataverse depends on external libraries, we document the most
-important right here and provide links to the canonical documentation.
+This part of the documentation covers all the interfaces / API's of the pyDataverse modules.
 
 
-Api Interface
+Where pyDataverse depends on external libraries, we document the most
+important right here and provide links to the canonical documentation outside of scope.
+
+
+API Interface
 -----------------------------
 
-All Dataverse API's can be accessed with this module.
+Access all of Dataverse API's.
 
 .. automodule:: pyDataverse.api
    :members:
@@ -20,9 +22,8 @@ All Dataverse API's can be accessed with this module.
 Models Interface
 -----------------------------
 
-All the metadata models for the Dataverses data-types `Dataverse`, `Dataset`
-and `Datafile` can be controlled by this module. This includes the import,
-manipulation and export.
+Use all metadata models of the Dataverse data-types (`Dataverse`, `Dataset`
+and `Datafile`). This includes import, export and manipulation.
 
 .. automodule:: pyDataverse.models
   :inherited-members:
@@ -39,6 +40,8 @@ Helper functions.
 
 Exceptions
 -----------------------------
+
+Custom exceptions.
 
 .. automodule:: pyDataverse.exceptions
   :members:

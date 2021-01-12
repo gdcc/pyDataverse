@@ -8,16 +8,15 @@ on your prefered tools and what you want to do with it. The easiest
 way is in most cases to use `pip <https://pypi.org/project/pip/>`_.
 
 
+.. _user_installation_requirements:
+
 Requirements
 -----------------------------
 
-pyDataverse officially supports Python 3.4–3.7.
+.. include:: ../snippets/requirements.rst
 
-Python packages:
 
-- `requests <https://requests.readthedocs.io/en/master/>`_>=2.12.0
-- `jsonschema <https://github.com/Julian/jsonschema>`_>=3.2.0
-
+.. _user_installation_pip:
 
 Pip
 -----------------------------
@@ -29,6 +28,8 @@ To install pyDataverse, simply run this simple
 
     pip install -U pyDataverse
 
+
+.. _user_installation_source-code:
 
 Source Code
 -----------------------------
@@ -82,6 +83,8 @@ any dependencies declared with “install_requires” and any scripts declared
 with “console_scripts”. Dependencies will be installed in the usual,
 non-editable mode.
 
+.. _user_installation_pipenv:
+
 Pipenv
 -----------------------------
 
@@ -92,6 +95,8 @@ Pipenv
     pipenv install pyDataverse
 
 
+.. _user_installation_test:
+
 Test if installed properly
 -----------------------------
 
@@ -100,6 +105,8 @@ Enter Python and look if the installation was done properly:
 >>> import pyDataverse as pdv
 >>> pdv.__name__
 'pyDataverse'
+
+.. _user_installation_next:
 
 Next
 -----------------------------
