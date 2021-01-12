@@ -33,7 +33,9 @@ class Api:
 
     """
 
-    def __init__(self, base_url: str, api_token=None, api_version="latest"):
+    def __init__(
+        self, base_url: str, api_token: str = None, api_version: str = "latest"
+    ):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -53,12 +55,8 @@ class Api:
             >>> from pyDataverse.api import Api
             >>> base_url = 'http://demo.dataverse.org'
             >>> api = Api(base_url)
-            >>> api.status
-            'OK'
 
         """
-        if not isinstance(base_url, str):
-            raise ApiUrlError("base_url {0} is not a string.".format(base_url))
         self.base_url = base_url
 
         if not isinstance(api_version, ("".__class__, "".__class__)):
@@ -2196,7 +2194,7 @@ class NativeApi(Api):
     def get_user(self):
         """Get details of the current authenticated user.
 
-        Auth must be ``true`` for this to work.
+        Auth must be ``true`` for this to work. API endpoint is available for Dataverse >= 5.3.
 
         https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
         """
@@ -2394,16 +2392,16 @@ class SwordApi(Api):
 
     Parameters
     ----------
-    sword_api_version : type
-        Description of parameter `sword_api_version` (the default is 'v1.1').
+    sword_api_version : str
+        SWORD API version. Defaults to 'v1.1'.
 
     Attributes
     ----------
-    base_url_api_sword : type
+    base_url_api_sword : str
         Description of attribute `base_url_api_sword`.
-    base_url : type
+    base_url : str
         Description of attribute `base_url`.
-    native_api_version : type
+    native_api_version : str
         Description of attribute `native_api_version`.
     sword_api_version
 
@@ -2412,7 +2410,7 @@ class SwordApi(Api):
     def __init__(
         self, base_url, api_version="v1.1", api_token=None, sword_api_version="v1.1"
     ):
-        """Init an SwordApi() class.
+        """Init a :class:`SwordApi <pyDataverse.api.SwordApi>` instance.
 
         Parameters
         ----------
@@ -2436,7 +2434,7 @@ class SwordApi(Api):
             self.base_url_api_sword = base_url
 
     def __str__(self):
-        """Return name of Api() class for users.
+        """Return name of :class:Api() class for users.
 
         Returns
         -------

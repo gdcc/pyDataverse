@@ -1,6 +1,13 @@
 .. _history:
 
-0.2.0 - (2019-06-17) - Ida Pfeiffer
+
+0.2.1 - (2019-06-19)
+----------------------------------------------------------
+
+`Release <https://github.com/gdcc/pyDataverse/releases/tag/v0.2.1>`_
+
+
+0.2.0 - (2019-06-18) - Ida Pfeiffer
 ----------------------------------------------------------
 
 `Release <https://github.com/GDCC/pyDataverse/releases/tag/v0.2.0>`_
@@ -12,7 +19,7 @@
 `Release <https://github.com/GDCC/pyDataverse/releases/tag/v0.1.1>`_
 
 
-0.1.0 - (2019-05-20) - Marietta Blau
+0.1.0 - (2019-05-22) - Marietta Blau
 ----------------------------------------------------------
 
 `Release <https://github.com/GDCC/pyDataverse/releases/tag/v0.1.0>`_
