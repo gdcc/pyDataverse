@@ -1,4 +1,4 @@
-pyDataverse officially supports Python 3.4–3.7.
+pyDataverse officially supports Python 3.6–3.8
 
 Python packages:
 
