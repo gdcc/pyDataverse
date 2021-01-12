@@ -57,6 +57,9 @@ class Api:
             >>> api = Api(base_url)
 
         """
+        if not isinstance(base_url, str):
+            raise ApiUrlError("base_url {0} is not a string.".format(base_url))
+
         self.base_url = base_url
 
         if not isinstance(api_version, ("".__class__, "".__class__)):
