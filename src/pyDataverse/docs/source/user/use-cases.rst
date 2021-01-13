@@ -4,10 +4,11 @@ Use-Cases
 =================
 
 For a basic introduction to pyDataverse, have a look at
-:ref:`User Guide - Basic Usage <user_basic-usage>`.
+:ref:`User Guide - Basic Usage <user_basic-usage>`, for advanced
+stuff at :ref:`User Guide - Advanced Usage <user_advanced-usage>`.
 
 
-.. _use-cases data-migration:
+.. _use-cases_data-migration:
 
 Data Migration
 -----------------------------
@@ -16,10 +17,13 @@ Importing lots of data from data sources outside dataverse can be done
 with the help of the CSV templates. Add your data to the CSV files, and
 then import them into pyDataverse for the API upload at the end.
 
+- CSV 2 Dataverse (:ref:`Tutorial <advanced-usage_data-migration>`)
+- Dataverse 2 Dataverse (one mapping missing)
+- DSpace 2 Dataverse (one mapping missing)
+- NESSTAR 2 Dataverse (one mapping missing)
 
-There is a tutorial, how you can do mass imports with the help of pyDataverses
-CSV templates. Look at :ref:`User Guide - Advanced Usage <user_advanced-usage>`.
 
+.. _use-cases_testing:
 
 Testing
 -----------------------------
@@ -32,9 +36,9 @@ can be used to do data integrity tests and look for data completeness
 after an upgrade or Dataverse migration. They easily integrate into the
 `aussda_tests <https://github.com/AUSSDA/aussda_tests/>`_ for Jenkins.
 
-* Collect a data tree with all Dataverses, Datasets and Datafiles (`get_children()`)
-* Extract Dataverses, Datasets and Datafiles from the tree (`dataverse_tree_walker()`)
-* Save extracted data (`save_dataverse_tree()`)
+- Collect a data tree with all Dataverses, Datasets and Datafiles (:meth:`get_children() <pyDataverse.api.NativeApi.get_children>`)
+- Extract Dataverses, Datasets and Datafiles from the tree (:func:`dataverse_tree_walker() <pyDataverse.utils.dataverse_tree_walker>`)
+- Save extracted data (:func:`save_dataverse_tree() <pyDataverse.utils.save_dataverse_tree>`)
 
 **Mass removal of data in Dataverse (DevOps)**
 
@@ -43,19 +47,20 @@ with Datasets and Datafiles within in a tree structure. It can be
 tricky to remove them automatically, but with the functions mentioned
 above, you can collect the data first, needed for the removal later.
 
-* Collect a data tree with all Dataverses and Datasets (`get_children()`)
-* Extract Dataverses and Datasets from the tree (`dataverse_tree_walker()`)
-* Save extracted data (`save_dataverse_tree()`)
-* Iterate over Datasets and delete/destroy them (`delete_dataset()`, `destroy_dataset`)
-* Iterate over Dataverses and delete them (`delete_dataverse()`)
+- Collect a data tree with all Dataverses and Datasets (:meth:`get_children() <pyDataverse.api.NativeApi.get_children>`)
+- Extract Dataverses and Datasets from the tree (:func:`dataverse_tree_walker() <pyDataverse.utils.dataverse_tree_walker>`)
+- Save extracted data (:func:`save_dataverse_tree() <pyDataverse.utils.save_dataverse_tree>`)
+- Iterate over Datasets and delete/destroy them (`destroy_dataset`:meth:`delete_dataset() <pyDataverse.api.NativeApi.delete_dataset>`, :meth:`destroy_dataset() <pyDataverse.api.NativeApi.destroy_dataset>`)
+- Iterate over Dataverses and delete them (:meth:`delete_dataverse() <pyDataverse.api.NativeApi.delete_dataverse>`)
 
-This functionality is not so far in pyDataverse, but you can find it in
+This functionality is so far not fully implemented in pyDataverse,
+but you can find it in
 `aussda_tests <https://github.com/AUSSDA/aussda_tests/>`_.
 
 
-.. _use-cases data-science:
+.. _use-cases_data-science:
 
-Data Science pipeline integration
+Data Science Pipeline
 ------------------------------------
 
 Use data and/or metadata from a Dataverse instance, and get the data
@@ -64,10 +69,10 @@ it to your Dataset. PyDataverse connects your Data Science pipeline
 with your Dataverse instance.
 
 
-.. _use-cases microservices:
+.. _use-cases_microservices:
 
 Web-Applications / Microservices
------------------------------
+------------------------------------------
 
 As it is a direct and easy way to access Dataverses API's and
 to manipulate its data models, it integrates really well into

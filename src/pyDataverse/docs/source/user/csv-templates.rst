@@ -5,14 +5,17 @@ CSV templates
 
 .. _user_csv-templates_description:
 
-Description
+General
 -----------------------------
 
 The CSV templates offer a **pre-structured data format**, which can be used to
 import to and export from pyDataverse.
 They support all three Dataverse data-types: Dataverses, Datasets and Datafiles.
 
-The CSV templates and the mentioned workflow below, can be used for
+CSV is great for humans as for machines. It can be opened with your Spreadsheet
+application and edited manually, or used by your favoured programming language.
+
+The CSV templates and the mentioned workflow below, can be used especially for:
 
 - **Mass imports of data into your Dataverse instance:** The data to be imported could ether be collected manually (e. g. digitization of paper works), or created by machines.
 - **Data exchange:** share pyDataverse data with any other system in an open, machine-readable format
@@ -22,7 +25,7 @@ The CSV template files are licensed under `CC BY 4.0 <https://creativecommons.or
 
 .. _user_csv-templates_data-format:
 
-The templates data format
+Data format
 -----------------------------
 
 **CSV specific:**
@@ -55,7 +58,8 @@ own data and get started.
 Usage
 -----------------------------
 
-The CSV templates can be found inside ``src/pyDataverse/templates/``:
+The CSV templates can be found inside ``src/pyDataverse/templates/``
+(`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/src/pyDataverse/templates>`_):
 
 - `dataverses.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/src/pyDataverse/templates/dataverses.csv>`_
 - `datasets.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/src/pyDataverse/templates/datasets.csv>`_
@@ -64,30 +68,48 @@ The CSV templates can be found inside ``src/pyDataverse/templates/``:
 To use the CSV templates, we propose following steps as best-practice.
 The workflow is the same for Dataverses, Datasets and Datafiles.
 
+There is also a more detailed tutorial, on how to use the CSV templates
+for mass imports at
+:ref:`User Guide - Advanced <advanced-usage_data-migration>`.
+
+
+.. _user_csv-templates_usage_create-csv:
+
+Create CSV files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 #. Open a template file and save it: The easiest and most intuitive way to work with the templates, is, to first open the template and save it somewhere new under a descriptive filename (e.g. ``20200117_datasets.csv``).
 #. Adapt columns: The pre-defined columns (attributes) are only a suggestion by us. You can remove columns, which you don't need, or add new ones as you want.
 #. Add rows: Start to enter new data entries in the first empty row. Each row is one entry (e. g. one Dataset). If you use JSON, pay attention to escape the quotation character in the JSON string (read above). You can keep the 2nd and 3rd row for this as long as you need the information inside to create proper data entries and as long as you don't use the file with pyDataverse.
 #. Remove supporting rows: Once you are used to the workflow with the data-structure, you can delete the supportive rows 2 to 6. This must be done before you use the template for pyDataverse.
-#. Save and use: Once you are finished with editing, save your CSV-file and use it. 
+#. Save and use: Once you are finished with editing, save your CSV-file and use it.
 
 
-.. _user_csv-templates_pydataverse:
+.. _user_csv-templates_usage_import-csv:
 
-Interaction with pyDataverse
------------------------------
+Import into pyDataverse
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To use the CSV templates with pyDataverse
 
 Import your CSV-files into pyDataverse:
 
-- Import the data with :func:`read_csv_as_dicts() <pyDataverse.utils.read_csv_as_dicts>` to get a dictionary. 
-- Pass the dictionary to the `set()` function related to your data-type (:meth:`Dataverse.set() <pyDataverse.models.Dataverse.set>`, :meth:`Dataset.set() <pyDataverse.models.Dataset.set>` or :meth:`Datafile.set() <pyDataverse.models.Datafile.set>`)
+#. Import the data with :func:`read_csv_as_dicts() <pyDataverse.utils.read_csv_as_dicts>` to get a dictionary. 
+#. Pass the dictionary to the ``set()`` function related to your data-type (:meth:`Dataverse.set() <pyDataverse.models.Dataverse.set>`, :meth:`Dataset.set() <pyDataverse.models.Dataset.set>` or :meth:`Datafile.set() <pyDataverse.models.Datafile.set>`)
+#. Use the pyDataverse object, e. g. to upload it through the API.
 
+.. _user_csv-templates_usage_export-csv:
 
-Export pyDataverse model objects as CSV-files:
+Export from pyDataverse
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Get your models data as dictionaries (:meth:`Dataverse.get() <pyDataverse.models.Dataverse.get>`, :meth:`Dataset.get() <pyDataverse.models.Dataset.get>` or :meth:`Datafile.get() <pyDataverse.models.Datafile.get>`).
-- Pass the dict to :func:`write_dicts_as_csv() <pyDataverse.utils.write_dicts_as_csv>`
+Export pyDataverse objects (
+:class:`Dataverse <pyDataverse.models.Dataverse>`,
+:class:`Dataset <pyDataverse.models.Dataset>`,
+:class:`Datafile <pyDataverse.models.Datafile>`) as CSV files:
 
-There is also a more extensive tutorial, on how to use the CSV-templates for mass imports at the :ref:`User Guide - Advanced <advanced-usage_data-migration>`.
+#. Get your data from the pyDataverse object as :class:`dict <dict>` (:meth:`Dataverse.get() <pyDataverse.models.Dataverse.get>`, :meth:`Dataset.get() <pyDataverse.models.Dataset.get>` or :meth:`Datafile.get() <pyDataverse.models.Datafile.get>`).
+#. Pass the :class:`dict <dict>` to :func:`write_dicts_as_csv() <pyDataverse.utils.write_dicts_as_csv>`. Hint: Use the internal attribute lists from pyDataverse.models to get a complete fieldnames list for each data model (e. g. ``Dataset.__attr_import_dv_up_citation_fields_values``).
 
 
 .. _user_csv-templates_resources:

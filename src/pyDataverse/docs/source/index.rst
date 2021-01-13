@@ -61,7 +61,7 @@ To install pyDataverse, simply run this command in your terminal of choice:
     pip install pyDataverse
 
 
-You can find more options at :ref:`user_installation`.
+See more options at :ref:`user_installation`.
 
 **Requirements**
 
@@ -134,7 +134,7 @@ User Guide
 -----------------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
    user/installation
    user/basic-usage
@@ -181,7 +181,7 @@ Contributor Guide
 -----------------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    contributing/contributing
 
@@ -192,7 +192,7 @@ Developer Guide
 -----------------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    development/development
 
