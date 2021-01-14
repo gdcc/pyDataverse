@@ -960,7 +960,7 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}/facets".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def dataverse_id2alias(self, dataverse_id):
+    def dataverse_id2alias(self, dataverse_id, auth=False):
         """Converts a Dataverse ID to an alias.
 
         Parameters
@@ -974,7 +974,7 @@ class NativeApi(Api):
             Dataverse alias
 
         """
-        resp = self.get_dataverse(dataverse_id)
+        resp = self.get_dataverse(dataverse_id, auth=auth)
         if "data" in resp.json():
             if "alias" in resp.json()["data"]:
                 return resp.json()["data"]["alias"]
@@ -2051,7 +2051,7 @@ class NativeApi(Api):
         return self.delete_request(url)
 
     def get_children(
-        self, parent=":root", parent_type="dataverse", children_types=None
+        self, parent=":root", parent_type="dataverse", children_types=None, auth=True
     ):
         """Walk through children of parent element in Dataverse tree.
 
@@ -2090,6 +2090,8 @@ class NativeApi(Api):
             Description of parameter `parent_type`.
         children_types : list
             Types of children to be collected. 'dataverses', 'datasets' and 'datafiles' are valid list items.
+        auth : bool
+            Authentication needed
 
         Returns
         -------
@@ -2130,7 +2132,7 @@ class NativeApi(Api):
         if parent_type == "dataverse":
             # check for dataverses and datasets as children and get their ID
             parent_alias = parent
-            resp = self.get_dataverse_contents(parent_alias, auth=True)
+            resp = self.get_dataverse_contents(parent_alias, auth=auth)
             if "data" in resp.json():
                 contents = resp.json()["data"]
                 for content in contents:
@@ -2139,7 +2141,7 @@ class NativeApi(Api):
                         and "dataverses" in children_types
                     ):
                         dataverse_id = content["id"]
-                        child_alias = self.dataverse_id2alias(dataverse_id)
+                        child_alias = self.dataverse_id2alias(dataverse_id, auth=auth)
                         children.append(
                             {
                                 "dataverse_id": dataverse_id,
@@ -2150,6 +2152,7 @@ class NativeApi(Api):
                                     parent=child_alias,
                                     parent_type="dataverse",
                                     children_types=children_types,
+                                    auth=auth,
                                 ),
                             }
                         )
@@ -2170,6 +2173,7 @@ class NativeApi(Api):
                                     parent=pid,
                                     parent_type="dataset",
                                     children_types=children_types,
+                                    auth=auth,
                                 ),
                             }
                         )
