@@ -3,109 +3,114 @@
 Advanced Usage
 =================
 
-The advanced usage tutorials should give you a deeper understanding of the
-usage of pyDataverse through more specific use-cases.
+.. contents:: Table of Contents
+  :local:
 
-For your first steps, please have a look at
+In addition to these tutorials, you can find more basic examples at
 :ref:`User Guide - Basic Usage <user_advanced-usage>`.
+and use-cases
+:ref:`User Guide - Use-Cases <user_use-cases>`.
 
-More use-cases can be found at :ref:`User Guide - Use-Cases <user_use-cases>`.
-
-**Information**
-
-Attention: API responses may vary cause of differing Dataverse instance
-
-.. include:: ../snippets/warning_production.rst
 
 .. _advanced-usage_data-migration:
 
-1. CSV 2 Dataverse data migration
+Import CSV to Dataverse
 -----------------------------------------------
 
-Importing lots of data from data sources outside dataverse can be done
-with the help of the :ref:`CSV templates <user_csv-templates>`.
+This tutorial will show you how to mass-import metadata from pyDataverse's own
+CSV format (see :ref:`CSV templates <user_csv-templates>`), create
+pyDataverse objects from it (Datasets and Datafiles)
+and upload the data and metadata through the API.
 
-Add your data to the CSV files, no matter where the data comes from (humans or machines).
-The CSV format can be used as a bridge from another source origin (e.g. programming
-language, data format) or filled directly by humans who collect the data manually.
-
-Once you have the data, import it into pyDataverse and upload it via the Dataverse API.
+The CSV format in this case can work as an exchange format or kind of a bridge
+between all kind of data formats and programming language.
+Besides machine-usage, it can also be filled directly by humans
+who collect the data manually (e. g. digitization projects).
 
 **Requirements**
 
-- pyDataverse installed (see :ref:`install <user_installation>`)
+- pyDataverse installed (see :ref:`user_installation`)
 
 **Information**
 
 - Follow the order of code execution
 - Dataverse Docker 4.18.1 used
-- pyDataverse 0.2.1 used
+- pyDataverse 0.3.0 used
+- API responses may vary by each request and Dataverse instance!
+
+.. include:: ../snippets/warning_production.rst
 
 **Additional Resources**
 
 - CSV templates from ``src/pyDataverse/templates/`` used (see :ref:`CSV templates <user_csv-templates>`)
-- Additional data from ``tests/data/user-guide/`` used (`GitHub repo <https://github.com/gdcc/pyDataverse/tree/develop/tests/data/user-guide>`_)
+- Data from ``tests/data/user-guide/`` used (`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/tests/data/user-guide>`_)
 
 
 .. _advanced-usage_data-migration_adapt-csv-templates:
 
-1.1 Adapt CSV-templates
+Adapt CSV template
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Copy the CSV templates from ``src/pyDataverse/templates/`` and place them
-in the root directory. Then adapt their structure to your needs (e. g. add
-or remove columns). Find out more about how the CSV templates work at
-:ref:`CSV templates <user_csv-templates>`.
+See :ref:`CSV templates - Adapt CSV template(s) <user_csv-templates_usage_create-csv>`.
 
 
 .. _advanced-usage_data-migration_fill-csv-templates:
 
-1.2 Add metadata to the CSV templates
+Add metadata to the CSV files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Collect data and add them in the pre-structured CSV files
-(manually or programmatically), until all data needed is in.
+After preparing the CSV files, comes the metadata collection
+(manually or programmatically).
+From whatever origin in whatever format it comes from,
+each row must contain one entity (Dataverse, Dataset or Datafile).
 
-Attention: Some columns must be entered in a JSON format!
+As mentioned in "Additional Resources", in the tutorial we use prepared data
+and place it in the root directory. You can ether use our
+files or fill in your own metadata with your own datafiles.
+
+No matter what you choose, you have to have properly formated CSV files
+(``datasets.csv`` and ``datafiles.csv``) before moving on.
+
+Don't forget: Some columns must be entered in a JSON format!
+
+
+.. _advanced-usage_data-migration_add-datafiles:
+
+Add datafiles
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add the files you have filled in the ``org.filename`` cell in ``datafiles.csv``
+and then place them in the root directory (or any other specified directory).
 
 
 .. _advanced-usage_data-migration_import-csv-templates:
 
-1.3 Add datafiles
+Import CSV files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Add the files for the import mentioned in datafiles.csv to your root directory.
-
-
-.. _advanced-usage_data-migration_import-csv-templates:
-
-1.4 Import CSV templates
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Import the CSV templates into pyDataverse
-
-First, import the CSV templates into as :class:`dict`s with
+Import the CSV files with
 :meth:`read_csv_as_dicts() <pyDataverse.utils.read_csv_as_dicts>`.
-This automatically removes the ``dv.`` prefix from the attributes,
-converts boolean values and loads the JSON columns properly.
-
-For this tutorial, the files mentioned in "Additional Resources" were used and
-placed in the root directory.
+This creates a list of :class:`dict`'s, automatically imports
+Dataverse's own metadata attribute (``dv.`` prefix),
+converts boolean values and loads JSON cells properly.
 
 ::
 
     >>> import os
     >>> from pyDataverse.utils import read_csv_as_dicts
-    >>> from pyDataverse.api import NativeApi
     >>> csv_datasets_filename = "datasets.csv"
     >>> ds_data = read_csv_as_dicts(csv_datasets_filename)
     >>> csv_datafiles_filename = "datafiles.csv"
     >>> df_data = read_csv_as_dicts(csv_datafiles_filename)
 
-Second, loop over each entry, which is a Dataset. Each time, instantiate an empty
-:class:`Dataset <pyDataverse.models.Dataset>`, add the data with
-:meth:`set() <pyDataverse.models.Dataset.set>` and append the object to
-a :class:`list`.
+Once we have the data in Python, we can easily import them into
+pyDataverse.
+
+For this, loop over each Dataset :class:`dict`, to: 
+
+#. Instantiate an empty :class:`Dataset <pyDataverse.models.Dataset>`
+#. add the data with :meth:`set() <pyDataverse.models.Dataset.set>` and 
+#. append the instance to a :class:`list`.
 
 ::
 
@@ -116,8 +121,10 @@ a :class:`list`.
     >>>     ds_obj.set(ds)
     >>>     ds_lst.append(ds_obj)
 
-Same for :class:`Datafile <pyDataverse.models.Datafile>`s with
-:meth:`set() <pyDataverse.models.Datafile.set>`).
+To import the :class:`Datafile <pyDataverse.models.Datafile>`'s do
+the same with ``df_data``:
+:meth:`set() <pyDataverse.models.Datafile.set>` the Datafile metadata and
+append it.
 
 ::
 
@@ -131,28 +138,28 @@ Same for :class:`Datafile <pyDataverse.models.Datafile>`s with
 
 .. _advanced-usage_data-migration_upload-data:
 
-1.5 Upload data via API
+Upload data via API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Before we can upload data, we must create an instance of
+Before we can upload metadata and data, we need to create an instance of
 :class:`NativeApi <pyDataverse.api.NativeApi>`.
-Replace ``{BASE_URL}`` (without trailing slash) and
-``{API_TOKEN}`` with your instance specific values. Pay attention, that the
-API-Token related user has proper rights. For this tutorial a Dataverse Docker
-instance was used, running locally.
+Replace following variables with your own instance data
+before executing the lines:
+
+- BASE_URL: Base URL of your Dataverse instance, without trailing slash (e. g. ``https://data.aussda.at``))
+- API_TOKEN: API token of a Dataverse user with proper rights to create a Dataset and upload Datafiles
 
 ::
 
-    >>> base_url = "{BASE_URL}"  # e.g. https://demo.dataverse.org
-    >>> api_token = "{API_TOKEN}"
-    >>> api = NativeApi(base_url, api_token)
+    >>> from pyDataverse.api import NativeApi
+    >>> api = NativeApi(BASE_URL, API_TOKEN)
 
-Loop over the :class:`list <list>` of :class:`Dataset <pyDataverse.models.Dataset>`s,
+Loop over the :class:`list <list>` of :class:`Dataset <pyDataverse.models.Dataset>`'s,
 upload the metadata with
 :meth:`create_dataset() <pyDataverse.api.NativeApi.create_dataset>` and collect
-all ``dataset_id``s and ``pid``s in ``dataset_id_2_pid`` for further use later on.
+all ``dataset_id``'s and ``pid``'s in ``dataset_id_2_pid``.
 
-Attention: The Dataverse assigned to ``dv_alias`` must be published, to attach a Dataset to it.
+Note: The Dataverse assigned to ``dv_alias`` must be published, to add a Dataset to it.
 
 ::
 
@@ -163,9 +170,15 @@ Attention: The Dataverse assigned to ``dv_alias`` must be published, to attach a
     >>>     dataset_id_2_pid[ds.get()["org.dataset_id"]] = resp.json()["data"]["persistentId"]
     Dataset with pid 'doi:10.5072/FK2/WVMDFE' created.
 
-Same for the :class:`list <list>` of :class:`Datafile <pyDataverse.models.Datafile>`s with
+The API requests always return a
+:class:`requests.Response <requests.Response>` object, which can then be used
+to extract the data.
+
+Next, the same for the :class:`list <list>` of
+:class:`Datafile <pyDataverse.models.Datafile>`'s with
 :meth:`upload_datafile() <pyDataverse.api.NativeApi.upload_datafile>`.
-Next to the metadata, the ``PID`` and the ``filename`` must be passed.
+In addition to the metadata, the ``PID`` (Persistent Identifier, which is
+mostly the DOI) and the ``filename`` must be passed.
 
 ::
 
@@ -175,13 +188,17 @@ Next to the metadata, the ``PID`` and the ``filename`` must be passed.
     >>>     df.set({"pid": pid, "filename": filename})
     >>>     resp = api.upload_datafile(pid, filename, df.json())
 
+Now we have created all Datasets, which we added to ``datasets.csv``, and uploaded
+all Datafiles, which we placed in the root directory, to the Dataverse instance.
+
 
 .. _advanced-usage_data-migration_publish-dataset:
 
-1.6 Publish Datasets via API
+Publish Datasets via API
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Finally, publish all Datasets with :meth:`publish_dataset() <pyDataverse.api.NativeApi.publish_dataset>`.
+Finally, we iterate over all Datasets and publish them with
+:meth:`publish_dataset() <pyDataverse.api.NativeApi.publish_dataset>`.
 
 ::
 
@@ -190,3 +207,9 @@ Finally, publish all Datasets with :meth:`publish_dataset() <pyDataverse.api.Nat
     >>>     resp.json()
     Dataset doi:10.5072/FK2/WVMDFE published
     {'status': 'OK', 'data': {'id': 444, 'identifier': 'FK2/WVMDFE', 'persistentUrl': 'https://doi.org/10.5072/FK2/WVMDFE', 'protocol': 'doi', 'authority': '10.5072', 'publisher': 'Root', 'publicationDate': '2021-01-13', 'storageIdentifier': 'file://10.5072/FK2/WVMDFE'}}
+
+
+The Advanced Usage tutorial is now finished, but maybe you want to
+have a look at more basic examples at
+:ref:`User Guide - Basic Usage <user_basic-usage>` and
+:ref:`User Guide - Use-Cases <user_use-cases>`.
