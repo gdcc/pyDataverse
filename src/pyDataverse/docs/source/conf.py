@@ -25,7 +25,7 @@ project = "pyDataverse"
 author = "Stefan Kasberger"
 author_affiliation = "AUSSDA - The Austrian Social Science Data Archive"
 copyright = "{0}, {1}".format(date.today().strftime("%Y"), author)
-description = "pyDataverse helps to easily work with Dataverses API's and data types."
+description = "pyDataverse helps with the Dataverse API's and data types (Dataverse, Dataset, Datafile)."
 
 # The short X.Y version
 version = pyDataverse.__version__
@@ -98,7 +98,7 @@ html_theme_options = {
     "description": description,
     "show_powered_by": False,
     "github_button": True,
-    "github_user": "aussda",
+    "github_user": "gdcc",
     "github_repo": "pyDataverse",
     "github_banner": False,
     "travis_button": True,

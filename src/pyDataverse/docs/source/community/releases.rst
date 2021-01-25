@@ -1,6 +1,6 @@
 .. _community_history:
 
-Release and Version History
+Release History
 ===========================
 
 .. include:: ../../../../../HISTORY.rst

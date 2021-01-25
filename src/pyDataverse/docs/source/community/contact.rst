@@ -11,13 +11,21 @@ GitHub
 ------
 
 The best way to track the development of pyDataverse is through the
-`GitHub repo <https://github.com/GDCC/pyDataverse>`_.
+`GitHub repo <https://github.com/gdcc/pyDataverse>`_.
+
+
+Gitter
+-------
+
+The easiest and fastest way to get directly in touch with us, is our
+chat-channel on `Gitter <https://gitter.im/gdcc/pyDataverse>`_.
 
 
 Email
 -------
 
-The author of pyDataverse, Stefan Kasberger, can be contacted directly via Email.
+The author of pyDataverse, Stefan Kasberger, can also be contacted
+directly via Email.
 
 - stefan.kasberger@univie.ac.at
 
