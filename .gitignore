@@ -153,4 +153,7 @@ devel.py
 test_manual.py
 /docs
 src/pyDataverse/docs/build
+src/pyDataverse/docs/source/_build
 src/pyDataverse/docs/Makefile
+env-config/
+wiki/
