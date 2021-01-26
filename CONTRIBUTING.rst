@@ -46,8 +46,8 @@ unacceptable behaviour (see :ref:`community_contact`).
 
 .. _contributing_create-issues:
 
-Bug reports and enhancement requests
------------------------------------------
+Bug reports, enhancement requests and other issues
+----------------------------------------------------
 
 Bug reports are an important part of making pyDataverse more stable. Having
 a complete bug report will allow others to reproduce the bug and provide

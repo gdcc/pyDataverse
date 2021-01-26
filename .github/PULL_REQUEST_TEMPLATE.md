@@ -1,5 +1,6 @@
 <!--- Provide a general summary of your changes in the Title above -->
-<!-- You can erase any parts of this template not applicable to your Issue. -->
+<!-- You can erase any parts of this template not applicable to your Pull Request. -->
+<!-- Show that you have done a step, by checking the checkboxes and/or adding the requested information. -->
 
 <!--- This project only accepts pull requests related to open issues -->
 <!--- If suggesting a new feature or change, please discuss it in an issue first -->
@@ -8,56 +9,66 @@
 
 *Any change needs to be discussed before proceeding. Failure to do so may result in the rejection of the pull request.*
 
-<!-- You can skip this if you're fixing a typo or adding an app to the Showcase. -->
+<!-- You can skip this if you're fixing a typo. -->
 
-Thanks for submitting a pull request! It's great, that you want contribute to pyDataverse. Please provide enough information so that others can review it
+Thanks for submitting a pull request! It's great, that you want contribute to pyDataverse. Please provide enough information so that others can review it.
+
+First, start always by reading the [Contribution Guide](https://pydataverse.readthedocs.io/en/master/contributing/contributing.html). There you can find all information needed, to create good pull requests.
 
 ### All Submissions
 
 **Describe your environment**
 
-* [ ] OS: name, version, 64/32bit (e. g. Linux, Ubuntu 18.04, 64bit)
-* [ ] pyDataverse version (e. g. 0.2.1)
-* [ ] Python version (e. g. 3.6.9)
-* [ ] Dataverse version (if used) (e. g. 4.18.1)
+* [ ] OS: NAME, VERSION, 64/32bit <!-- (e. g. Linux, Ubuntu 18.04, 64bit) -->
+* [ ] pyDataverse: VERSION <!-- (e. g. 0.2.1) -->
+* [ ] Python: VERSION <!-- (e. g. 3.6.9) -->
+* [ ] Dataverse: VERSION <!-- (optional, e. g. 4.18.1) -->
 
 **Follow best practices**
 
-* [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/GDCC/pyDataverse/pulls) for the same update/change?
-* [ ] Have you followed the guidelines in our [Contribution Guide](https://pydataverse.readthedocs.io/)?
-* [ ] Have you used pre-commit?
+* [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/gdcc/pyDataverse/pulls) for the same update/change?
+* [ ] Have you followed the guidelines in our [Contribution Guide](https://pydataverse.readthedocs.io/en/master/contributing/contributing.html)?
+* [ ] Have you read the [Code of Conduct](https://github.com/gdcc/pyDataverse/blob/master/CODE_OF_CONDUCT.md)?
+* [ ] Do your changes in a seperate branch. Branches MUST have descriptive names.
+* [ ] Have you merged the latest changes from upstream to your branch?
 
 **Describe the PR**
 
-* [ ] What kind of change does this PR introduce? (Bug fix, feature, improvement, docs)
+* [ ] What kind of change does this PR introduce?
+  * TEXT <!-- (Bug fix, feature, improvement, docs) -->
 * [ ] Why is this change required? What problem does it solve?
-* [ ] Do your changes in a seperate branch. Branches MUST have descriptive names that start with either the `fix/` or `feature/` prefixes. Good examples are: `fix/login-issue` or `feature/user-api`.
+  * TEXT
 * [ ] Screenshots (if appropriate)
-* [ ] Put `Closes #ISSUE_NUMBER` to the end of this pull request (replace ISSUE_NUMBER with the actual PR issue number).
+* [ ] Put `Closes #ISSUE_NUMBER` to the end of this pull request <!-- (e. g. Closes #1234) -->
 
 **Testing**
 
-* [ ] Have you used tox and/or pytest for testing?
-* [ ] Which tests did you execute?
-* [ ] Have you run all the tests successfully?
+* [ ] Have you used tox and/or pytest for testing the changes?
+* [ ] Did the local testing ran successfully?
+* [ ] Did the Continous Integration testing (Travis-CI) ran successfully?
 
-**Commit**
+**Commits**
 
-* [ ] Have a descriptive commit message with a short title (first line).
-* [ ] Put `closes #XXXX` in your commit message to auto-close the issue that your PR fixes (if such).
+* [ ] Have descriptive commit messages with a short title (first line).
+* [ ] Use the [commit message template](https://github.com/gdcc/pyDataverse/blob/master/.github/.gitmessage.txt)
+* [ ] Put `Closes #ISSUE_NUMBER` in your commit messages to auto-close the issue that it fixes (if such).
 
-### New Feature Submissions
+**Others**
 
-If you have implemented a whole new feature, please follow the steps from "All Submissions", plus the ones following:
-
-* [ ] Have you written new tests for your core changes, as applicable?
-* [ ] Have you successfully ran tests with your changes locally?
-* [ ] Does your submission pass tests on Travis?
-* [ ] Have you lint your code locally prior to submission?
-* [ ] Have you formatted your code with black locally prior to submission (e. g. via pre-commit)?
-* [ ] Have you documented your update (Docstrings and/or Docs)?
-* [ ] Do changes requires a change to the documentation?
 * [ ] Is there anything you need from someone else?
-* [ ] 
+
+### Documentation contribution
+
+* [ ] Have you followed NumPy Docstring standard?
+
+### Code contribution
+
+* [ ] Have you used pre-commit?
+* [ ] Have you formatted your code with black prior to submission (e. g. via pre-commit)?
+* [ ] Have you written new tests for your changes?
+* [ ] Have you ran mypy on your changes successfully?
+* [ ] Have you documented your update (Docstrings and/or Docs)?
+* [ ] Do your changes require additional changes to the documentation?
+
 
 Closes #ISSUE_NUMBER
