@@ -114,15 +114,8 @@ class Api:
         """
         params = {}
         params["User-Agent"] = "pydataverse"
-        if auth:
-            if self.api_token:
-                params["key"] = str(self.api_token)
-            else:
-                raise ApiAuthorizationError(
-                    "ERROR: GET - Api token not passed to `get_request` {0}.".format(
-                        url
-                    )
-                )
+        if self.api_token:
+            params["key"] = str(self.api_token)
 
         try:
             resp = get(url, params=params)
@@ -174,11 +167,8 @@ class Api:
         """
         params = {}
         params["User-Agent"] = "pydataverse"
-        if auth:
-            if self.api_token:
-                params["key"] = self.api_token
-            else:
-                raise ApiAuthorizationError("ERROR: POST - Api token not available.")
+        if self.api_token:
+            params["key"] = self.api_token
 
         try:
             resp = post(url, data=data, params=params, files=files)
@@ -218,15 +208,8 @@ class Api:
         """
         params = {}
         params["User-Agent"] = "pydataverse"
-        if auth:
-            if self.api_token:
-                params["key"] = self.api_token
-            else:
-                raise ApiAuthorizationError(
-                    "ERROR: PUT - Api token not passed to `put_request` {0}.".format(
-                        url
-                    )
-                )
+        if self.api_token:
+            params["key"] = self.api_token
 
         try:
             resp = put(url, data=data, params=params)
@@ -264,15 +247,8 @@ class Api:
         """
         params = {}
         params["User-Agent"] = "pydataverse"
-        if auth:
-            if self.api_token:
-                params["key"] = self.api_token
-            else:
-                raise ApiAuthorizationError(
-                    "ERROR: DELETE - Api token not passed to `delete_request` {0}.".format(
-                        url
-                    )
-                )
+        if self.api_token:
+            params["key"] = self.api_token
 
         try:
             return delete(url, params=params)
