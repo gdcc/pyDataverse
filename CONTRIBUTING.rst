@@ -495,6 +495,23 @@ the ``result``.
 Running the test suite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+**Setup testing**
+
+Before you can run the tests, you have to define following
+environment variables:
+
+- BASE_URL: Base URL of your Dataverse instance, without trailing slash (e. g. ``https://data.aussda.at``))
+- API_TOKEN_: API token of Dataverse users with proper rights
+
+  - API_TOKEN_SUPERUSER: Dataverse Superuser
+  - API_TOKEN_TEST_NO_RIGHTS: New user with no assigned rights (default rights)
+
+.. code-block:: shell
+
+  export API_TOKEN_SUPERUSER=**SECRET**
+  export API_TOKEN_TEST_NO_RIGHTS=**SECRET**
+  export BASE_URL=https://data.aussda.at
+
 **Using pytest**
 
 The tests can then be run  directly with `pytest <https://docs.pytest.org/>`_

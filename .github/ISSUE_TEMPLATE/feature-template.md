@@ -12,7 +12,7 @@ Thank you for your contribution!
 
 It's great, that you want contribute to pyDataverse.
 
-First, start by reading the [Bug reports, enhancement requests and other issues](https://pydataverse.readthedocs.io/en/develop/contributing/contributing.html) section.
+First, start by reading the [Bug reports, enhancement requests and other issues](https://pydataverse.readthedocs.io/en/master/contributing/contributing.html) section.
 
 ### Before we can start
 
