@@ -83,7 +83,7 @@ to the pyDataverse community and be open to comments/ideas from others.
 Besides creating an issue, you also can contribute in many other ways by
 
 * sharing your knowledge in Issues and pull Requests
-* reviewing `pull requests <https://github.com/AUSSDA/pyDataverse/pulls>`_
+* reviewing `pull requests <https://github.com/gdcc/pyDataverse/pulls>`_
 * doing the talk about pyDataverse and sharing it with others
 
 
@@ -871,7 +871,7 @@ You can find the full release history at :ref:`community_history` and on
 
 **Versioning**
 
-For pyDataverse, `Semantic versioninng <https://semver.org/>`_ is used for releases.
+For pyDataverse, `Semantic versioning <https://semver.org/>`_ is used for releases.
 
 
 .. _contributing_resources:
