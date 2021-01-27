@@ -3,9 +3,6 @@
 Basic Usage
 =================
 
-.. contents:: Table of Contents
-  :local:
-
 This tutorial will show you how to import metadata from Dataverse's own
 JSON format, create pyDataverse objects from it (Dataverse, Dataset
 and Datafile), upload it via the API and clean up at the end.
@@ -13,6 +10,12 @@ and Datafile), upload it via the API and clean up at the end.
 In addition to this tutorial, you can find more advanced examples at
 :ref:`User Guide - Advanced Usage <user_advanced-usage>` and
 :ref:`User Guide - Use-Cases <user_use-cases>`.
+
+
+.. _user_basic-usage_prepare:
+
+Prepare
+------------------------------------------
 
 **Requirements**
 
@@ -30,6 +33,7 @@ In addition to this tutorial, you can find more advanced examples at
 **Additional Resources**
 
 - Data from ``tests/data/user-guide/`` used (`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/tests/data/user-guide>`_)
+
 
 .. _user_basic-usage_api-connection:
 

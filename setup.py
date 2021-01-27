@@ -80,11 +80,11 @@ setup(
     author_email="stefan.kasberger@univie.ac.at",
     name="pyDataverse",
     version=find_version("src", "pyDataverse", "__init__.py"),
-    description="A Python module for Dataverses API's and its data types",
+    description="A Python module for the Dataverse API's and its data-types",
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
     license="MIT",
-    url="https://github.com/GDCC/pyDataverse",
+    url="https://github.com/gdcc/pyDataverse",
     python_requires=">=3.6",
     platforms=["OS Independent"],
     classifiers=CLASSIFIERS,
@@ -99,7 +99,7 @@ setup(
     zip_safe=False,
     project_urls={
         "Documentation": "https://pydataverse.readthedocs.io/",
-        "Issue Tracker": "https://github.com/GDCC/pyDataverse/issues",
+        "Issue Tracker": "https://github.com/gdcc/pyDataverse/issues",
         "Changelog": "https://pydataverse.readthedocs.io/en/latest/community/releases.html",
     },
 )

@@ -3,9 +3,6 @@
 Use-Cases
 =================
 
-.. contents:: Table of Contents
-  :local:
-
 For a basic introduction to pyDataverse, have a look at
 :ref:`User Guide - Basic Usage <user_basic-usage>`, for advanced
 at :ref:`User Guide - Advanced Usage <user_advanced-usage>`.

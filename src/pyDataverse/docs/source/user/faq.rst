@@ -9,14 +9,14 @@ A: Dataverse has two meanings. 1. Dataverse is the name of the
 data repository software. 2. It's the top-level data-type in
 Dataverse, the data repository software.
 
-**Q: What is a Dataset?**
+**Q: What is a "Dataset"?**
 
 A: The term dataset differs from the usual use for a structured set of data.
 A Dataset in Dataverse is a data-type typically representative for all content of one study.
 The Dataset itself contains only metadata, but it relates to other data-types:
 Datafiles are attached to it and a Dataset is always part of a Dataverse.
 
-**Q: What is a Datafile?**
+**Q: What is a "Datafile"?**
 
 A: A Datafile is a Dataverse data-type. It consists of the file itself and
 it's metadata. A Datafile is always part of a Dataset.

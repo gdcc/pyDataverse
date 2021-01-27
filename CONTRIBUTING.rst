@@ -501,7 +501,7 @@ Before you can run the tests, you have to define following
 environment variables:
 
 - BASE_URL: Base URL of your Dataverse instance, without trailing slash (e. g. ``https://data.aussda.at``))
-- API_TOKEN_: API token of Dataverse users with proper rights
+- API_TOKEN_<USER>: API token of Dataverse users with proper rights
 
   - API_TOKEN_SUPERUSER: Dataverse Superuser
   - API_TOKEN_TEST_NO_RIGHTS: New user with no assigned rights (default rights)

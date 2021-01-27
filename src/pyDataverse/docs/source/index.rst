@@ -26,7 +26,7 @@ Release v\ |version|.
 .. image:: https://coveralls.io/repos/github/gdcc/pyDataverse/badge.svg
     :target: https://coveralls.io/github/gdcc/pyDataverse
 
-.. image:: https://img.shields.io/github/license/aussda/pydataverse.svg
+.. image:: https://img.shields.io/github/license/gdcc/pydataverse.svg
     :target: https://opensource.org/licenses/MIT
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg

@@ -3,9 +3,6 @@
 Advanced Usage
 =================
 
-.. contents:: Table of Contents
-  :local:
-
 In addition to these tutorials, you can find more basic examples at
 :ref:`User Guide - Basic Usage <user_advanced-usage>`.
 and use-cases
@@ -26,6 +23,12 @@ The CSV format in this case can work as an exchange format or kind of a bridge
 between all kind of data formats and programming language.
 Besides machine-usage, it can also be filled directly by humans
 who collect the data manually (e. g. digitization projects).
+
+
+.. _advanced-usage_prepare:
+
+Prepare
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Requirements**
 
