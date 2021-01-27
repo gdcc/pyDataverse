@@ -1,0 +1,105 @@
+[
+  {
+    "dataverse_alias": "parent_dv_1",
+    "type": "dataverse",
+    "dataverse_id": 1,
+    "children": [
+      {
+        "dataverse_alias": "parent_dv_1_sub_dv_1",
+        "type": "dataverse",
+        "dataverse_id": 3
+      },
+      {
+        "dataset_id": "1AB23C",
+        "pid": "doi:12.34567/1AB23C",
+        "type": "dataset",
+        "children": [
+          {
+            "datafile_id": 1,
+            "filename": "appendix.pdf",
+            "label": "appendix.pdf",
+            "pid": "doi:12.34567/1AB23C/ABC123",
+            "type": "datafile"
+          },
+          {
+            "datafile_id": 2,
+            "filename": "survey.zsav",
+            "label": "survey.zsav",
+            "pid": "doi:12.34567/1AB23C/DEF456",
+            "type": "datafile"
+          }
+        ]
+      },
+      {
+        "dataset_id": "4DE56F",
+        "pid": "doi:12.34567/4DE56F",
+        "type": "dataset",
+        "children": [
+          {
+            "datafile_id": 3,
+            "filename": "manual.pdf",
+            "label": "manual.pdf",
+            "pid": "doi:12.34567/4DE56F/GHI789",
+            "type": "datafile"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "dataverse_alias": "parent_dv_2",
+    "type": "dataverse",
+    "dataverse_id": 2,
+    "children": [
+      {
+        "dataset_id": "7GH89I",
+        "pid": "doi:12.34567/7GH89I",
+        "type": "dataset",
+        "children": [
+          {
+            "datafile_id": 4,
+            "filename": "study.zsav",
+            "label": "study.zsav",
+            "pid": "doi:12.34567/7GH89I/JKL012",
+            "type": "datafile"
+          }
+        ]
+      },
+      {
+        "dataset_id": "0JK1LM",
+        "pid": "doi:12.34567/0JK1LM",
+        "type": "dataset",
+        "children": [
+          {
+            "datafile_id": 5,
+            "filename": "documentation.pdf",
+            "label": "documentation.pdf",
+            "pid": "doi:12.34567/0JK1LM/MNO345",
+            "type": "datafile"
+          },
+          {
+            "datafile_id": 6,
+            "filename": "data.R",
+            "label": "data.R",
+            "pid": "doi:12.34567/0JK1LM/PQR678",
+            "type": "datafile"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "dataset_id": "2NO34P",
+    "pid": "doi:12.34567/2NO34P",
+    "type": "dataset",
+    "children": [
+      {
+        "datafile_id": 7,
+        "filename": "summary.md",
+        "label": "summary.md",
+        "pid": "doi:12.34567/2NO34P/STU901",
+        "type": "datafile"
+      }
+    ]
+  }
+]

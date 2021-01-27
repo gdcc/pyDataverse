@@ -1,16 +1,82 @@
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""Find out more at https://github.com/AUSSDA/pyDataverse."""
-import json
+"""Find out more at https://github.com/GDCC/pyDataverse."""
 import os
-from pyDataverse.api import Api
 import pytest
+from pyDataverse.api import NativeApi
+from pyDataverse.utils import read_json
 
-TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+
+def test_config():
+    test_dir = os.path.dirname(os.path.realpath(__file__))
+    root_dir = os.path.dirname(test_dir)
+    test_data_dir = os.path.join(test_dir, "data")
+    json_schemas_dir = os.path.join(root_dir, "src/pyDataverse/schemas/json")
+    test_data_output_dir = os.path.join(test_data_dir, "output")
+    invalid_filename_strings = ["wrong", ""]
+    invalid_filename_types = [(), [], 12, 12.12, set(), True, False]
+
+    return {
+        "root_dir": root_dir,
+        "test_dir": test_dir,
+        "test_data_dir": test_data_dir,
+        "json_schemas_dir": json_schemas_dir,
+        "test_data_output_dir": test_data_output_dir,
+        "dataverse_upload_min_filename": os.path.join(
+            test_data_dir, "dataverse_upload_min.json"
+        ),
+        "dataverse_upload_full_filename": os.path.join(
+            test_data_dir, "dataverse_upload_full.json"
+        ),
+        "dataverse_upload_schema_filename": os.path.join(
+            json_schemas_dir, "dataverse_upload_schema.json"
+        ),
+        "dataverse_json_output_filename": os.path.join(
+            test_data_output_dir, "dataverse_pytest.json"
+        ),
+        "dataset_upload_min_filename": os.path.join(
+            test_data_dir, "dataset_upload_min_default.json"
+        ),
+        "dataset_upload_full_filename": os.path.join(
+            test_data_dir, "dataset_upload_full_default.json"
+        ),
+        "dataset_upload_schema_filename": os.path.join(
+            json_schemas_dir, "dataset_upload_default_schema.json"
+        ),
+        "dataset_json_output_filename": os.path.join(
+            test_data_output_dir, "dataset_pytest.json"
+        ),
+        "datafile_upload_min_filename": os.path.join(
+            test_data_dir, "datafile_upload_min.json"
+        ),
+        "datafile_upload_full_filename": os.path.join(
+            test_data_dir, "datafile_upload_full.json"
+        ),
+        "datafile_upload_schema_filename": os.path.join(
+            json_schemas_dir, "datafile_upload_schema.json"
+        ),
+        "datafile_json_output_filename": os.path.join(
+            test_data_output_dir, "datafile_pytest.json"
+        ),
+        "tree_filename": os.path.join(test_data_dir, "tree.json"),
+        "invalid_filename_strings": ["wrong", ""],
+        "invalid_filename_types": [(), [], 12, 12.12, set(), True, False],
+        "invalid_validate_types": [None, "wrong", {}, []],
+        "invalid_json_data_types": [[], (), 12, set(), True, False, None],
+        "invalid_set_types": invalid_filename_types + ["", "wrong"],
+        "invalid_json_strings": invalid_filename_strings,
+        "invalid_data_format_types": invalid_filename_types,
+        "invalid_data_format_strings": invalid_filename_strings,
+        "base_url": os.getenv("BASE_URL"),
+        "api_token": os.getenv("API_TOKEN"),
+        "travis": os.getenv("TRAVIS") or False,
+        "wait_time": 1,
+    }
 
 
-@pytest.fixture(scope='module')
-def api_connection():
+test_config = test_config()
+
+
+@pytest.fixture()
+def native_api(monkeypatch):
     """Fixture, so set up an Api connection.
 
     Returns
@@ -19,111 +85,10 @@ def api_connection():
         Api object.
 
     """
-    api_token = os.environ['API_TOKEN']
-    base_url = os.environ['BASE_URL']
-    return Api(base_url, api_token)
+    monkeypatch.setenv("BASE_URL", "https://demo.dataverse.org")
+    return NativeApi(os.getenv("BASE_URL"))
 
 
-def read_json(filename):
-    """Read in json file.
-
-    Parameters
-    ----------
-    filename : string
-        Filename with full path.
-
-    Returns
-    -------
-    dict
-        File content as dict.
-
-    """
-    return j2d(read_file(filename))
-
-
-def read_file(filename):
-    """Read in file.
-
-    Parameters
-    ----------
-    filename : string
-        Filename with full path.
-
-    Returns
-    -------
-    string
-        File content as string.
-
-    """
-    with open(filename, 'r') as f:
-        data = f.read()
-    return data
-
-
-def write_file(filename, data):
-    """Write data to file.
-
-    Parameters
-    ----------
-    filename : string
-        Filename with full path.
-    data : string
-        File content as string.
-
-    """
-    with open(filename, 'w') as f:
-        f.write(data)
-
-
-def write_json(filename, data):
-    """Write data to json file.
-
-    Parameters
-    ----------
-    filename : string
-        Filename with full path.
-    data : dict
-        File content as dict.
-
-    """
-    write_file(filename, d2j(data))
-
-
-def j2d(data):
-    """Convert json to dict.
-
-    Parameters
-    ----------
-    data : string
-        JSON-formatted string.
-
-    Returns
-    -------
-    dict
-        Data as dict.
-
-    """
-    return json.loads(data)
-
-
-def d2j(data):
-    """Coinvert dict 2 json.
-
-    Parameters
-    ----------
-    data : dict
-        Data as dict.
-
-    Returns
-    -------
-    string
-        JSON-formatted string.
-
-    """
-    return json.dumps(data, ensure_ascii=False, indent=2)
-
-
-@pytest.fixture
 def import_dataverse_min_dict():
     """Import minimum Dataverse dict.
 
@@ -133,10 +98,13 @@ def import_dataverse_min_dict():
         Minimum Dataverse metadata.
 
     """
-    return read_json(TEST_DIR + '/data/dataverse_min.json')
+    return {
+        "alias": "test-pyDataverse",
+        "name": "Test pyDataverse",
+        "dataverseContacts": [{"contactEmail": "info@aussda.at"}],
+    }
 
 
-@pytest.fixture
 def import_dataset_min_dict():
     """Import dataset dict.
 
@@ -146,17 +114,15 @@ def import_dataset_min_dict():
         Dataset metadata.
 
     """
-    data = {
-        'license': 'CC0',
-        'termsOfUse': 'CC0 Waiver',
-        'termsOfAccess': 'Terms of Access',
-        'citation_displayName': 'Citation Metadata',
-        'title': 'Replication Data for: Title'
+    return {
+        "license": "CC0",
+        "termsOfUse": "CC0 Waiver",
+        "termsOfAccess": "Terms of Access",
+        "citation_displayName": "Citation Metadata",
+        "title": "Replication Data for: Title",
     }
-    return data
 
 
-@pytest.fixture
 def import_datafile_min_dict():
     """Import minimum Datafile dict.
 
@@ -166,14 +132,9 @@ def import_datafile_min_dict():
         Minimum Datafile metadata.
 
     """
-    data = {
-        'pid': 'doi:10.11587/EVMUHP',
-        'filename': 'tests/data/datafile.txt'
-    }
-    return data
+    return {"pid": "doi:10.11587/EVMUHP", "filename": "tests/data/datafile.txt"}
 
 
-@pytest.fixture
 def import_datafile_full_dict():
     """Import full Datafile dict.
 
@@ -183,10 +144,9 @@ def import_datafile_full_dict():
         Full Datafile metadata.
 
     """
-    data = {
-        'pid': 'doi:10.11587/EVMUHP',
-        'filename': 'tests/data/datafile.txt',
-        'description': 'Test datafile',
-        'restrict': False
+    return {
+        "pid": "doi:10.11587/EVMUHP",
+        "filename": "tests/data/datafile.txt",
+        "description": "Test datafile",
+        "restrict": False,
     }
-    return data

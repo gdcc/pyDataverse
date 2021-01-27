@@ -1,0 +1,2 @@
+# Requirements for packaging test (tox)
+twine

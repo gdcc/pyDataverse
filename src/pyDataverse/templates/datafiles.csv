@@ -1,0 +1,8 @@
+"attribute","org.datafile_id","org.dataset_id","org.filename","org.to_upload","org.is_uploaded","org.to_delete","org.is_deleted","org.to_update","org.is_updated","dv.datafile_id","dv.description","dv.categories","dv.restrict","dv.label","dv.directoryLabel","alma.title","alma.pages","alma.year"
+"description","Unique identifier for a Datafile from the organizational perspective.","Unique identifier for a Dataset from the organizational perspective. Relates to the column in datasets.csv.","Filename without path.","Datafile is to be uploaded.","Datafile is uploaded.","Datafile is to be deleted.","Datafile is deleted.","Datafile Metadata is to be updated.","Datafile Metadata is updated.","Datafile ID in Dataverse.","Description for the file","Categories for the file.","File restriction.","Title","Directory, the file should be stored in.","Title for Alma.","Number of pages of work.",
+"type","serial","numeric","string","boolean","boolean","boolean","boolean","boolean","boolean","string","string","String,
+JSON object [""VALUE"", ""VALUE""]
+Labels: ""Documentation"", ""Data"", ""Code""","boolean","string","string","string","string","string"
+"example",1,1,"01035_en_q.pdf","TRUE","TRUE","TRUE","TRUE","TRUE","TRUE",634,"My description bbb.","[""Data""]","FALSE","Text Report","data/subdir1","Text Report",23,1997
+"multiple",,,,,,,,,,,,,,,,,,
+"sub_keys",,,,,,,,,,,,,,,,,,

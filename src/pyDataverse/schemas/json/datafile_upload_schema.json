@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://github.com/GDCC/pyDataverse/schemas/json/datafile_upload_schema.json",
+  "type": "object",
+  "title": "Datafile JSON upload schema",
+  "description": "Describes the full Datafile metadata JSON file structure for a Dataverse API upload.",
+  "default": {},
+  "required": [
+    "pid",
+    "filename"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "$id": "#/properties/description",
+      "type": "string"
+    },
+    "categories": {
+      "$id": "#/properties/categories",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "anyOf": [
+          {
+            "$id": "#/properties/categories/items/anyOf/0",
+            "type": "string"
+          }
+        ],
+        "$id": "#/properties/categories/items"
+      }
+    },
+    "restrict": {
+      "$id": "#/properties/restrict",
+      "type": "boolean"
+    },
+    "pid": {
+      "$id": "#/properties/pid",
+      "type": "string"
+    },
+    "filename": {
+      "$id": "#/properties/filename",
+      "type": "string"
+    },
+    "label": {
+      "$id": "#/properties/label",
+      "type": "string"
+    },
+    "directoryLabel": {
+      "$id": "#/properties/directoryLabel",
+      "type": "string"
+    }
+  }
+}

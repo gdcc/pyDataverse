@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://github.com/GDCC/pyDataverse/schemas/json/dataverse_upload_schema.json",
+  "type": "object",
+  "title": "Dataverse JSON upload schema",
+  "description": "Describes the full Dataverse metadata JSON file structure for a Dataverse API upload.",
+  "required": [
+    "name",
+    "alias",
+    "dataverseContacts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string"
+    },
+    "alias": {
+      "$id": "#/properties/alias",
+      "type": "string"
+    },
+    "dataverseContacts": {
+      "$id": "#/properties/dataverseContacts",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "anyOf": [
+          {
+            "$id": "#/properties/dataverseContacts/items/anyOf/0",
+            "type": "object",
+            "required": [
+              "contactEmail"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "contactEmail": {
+                "$id": "#/properties/dataverseContacts/items/anyOf/0/properties/contactEmail",
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "$id": "#/properties/dataverseContacts/items"
+      }
+    },
+    "affiliation": {
+      "$id": "#/properties/affiliation",
+      "type": "string"
+    },
+    "description": {
+      "$id": "#/properties/description",
+      "type": "string"
+    },
+    "dataverseType": {
+      "$id": "#/properties/dataverseType",
+      "type": "string"
+    }
+  }
+}

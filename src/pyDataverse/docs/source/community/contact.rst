@@ -1,3 +1,5 @@
+.. _community_contact:
+
 Contact
 =================
 
@@ -8,14 +10,15 @@ there are several options:
 GitHub
 ------
 
-The best way to track the development of pyDataverse is through
-`the GitHub repo <https://github.com/aussda/pyDataverse>`_.
+The best way to track the development of pyDataverse is through the
+`GitHub repo <https://github.com/gdcc/pyDataverse>`_.
 
 
 Email
 -------
 
-The author of pyDataverse, Stefan Kasberger, can be contacted directly via Email.
+The author of pyDataverse, Stefan Kasberger, can also be contacted
+directly via Email.
 
 - stefan.kasberger@univie.ac.at
 

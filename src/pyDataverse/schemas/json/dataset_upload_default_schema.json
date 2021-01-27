@@ -1,0 +1,440 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "properties": {
+    "datasetVersion": {
+      "$id": "#/properties/datasetVersion",
+      "type": "object",
+      "properties": {
+        "license": {
+          "$id": "#/properties/datasetVersion/properties/license",
+          "type": "string"
+        },
+        "termsOfUse": {
+          "$id": "#/properties/datasetVersion/properties/termsOfUse",
+          "type": "string"
+        },
+        "termsOfAccess": {
+          "$id": "#/properties/datasetVersion/properties/termsOfAccess",
+          "type": "string"
+        },
+        "metadataBlocks": {
+          "$id": "#/properties/datasetVersion/properties/metadataBlocks",
+          "type": "object",
+          "properties": {
+            "citation": {
+              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation",
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/displayName",
+                  "type": "string"
+                },
+                "fields": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0",
+                        "type": "object",
+                        "properties": {
+                          "typeName": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/typeName",
+                            "type": "string"
+                          },
+                          "multiple": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/multiple",
+                            "type": "boolean"
+                          },
+                          "typeClass": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/typeClass",
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/0",
+                                "type": "array"
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/1",
+                                "type": "string"
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items/anyOf/0/properties/value/anyOf/2",
+                                "type": "object"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/citation/properties/fields/items"
+                  }
+                }
+              }
+            },
+            "geospatial": {
+              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial",
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/displayName",
+                  "type": "string"
+                },
+                "fields": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0",
+                        "type": "object",
+                        "properties": {
+                          "typeName": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/typeName",
+                            "type": "string"
+                          },
+                          "multiple": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/multiple",
+                            "type": "boolean"
+                          },
+                          "typeClass": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/typeClass",
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                "type": "array"
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/1",
+                                "type": "object",
+                                "properties": {
+                                  "country": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/country/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "state": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/state/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "city": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/city/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "otherGeographicCoverage": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/otherGeographicCoverage/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ],
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items/anyOf/0/properties/value/items"
+                          }
+                        }
+                      }
+                    ],
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/geospatial/properties/fields/items"
+                  }
+                }
+              }
+            },
+            "socialscience": {
+              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience",
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/displayName",
+                  "type": "string"
+                },
+                "fields": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0",
+                        "type": "object",
+                        "properties": {
+                          "typeName": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/typeName",
+                            "type": "string"
+                          },
+                          "multiple": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/multiple",
+                            "type": "boolean"
+                          },
+                          "typeClass": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/typeClass",
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                      "type": "string"
+                                    }
+                                  ],
+                                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value/items"
+                                }
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                "type": "string"
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items/anyOf/0/properties/value",
+                                "type": "object",
+                                "properties": {
+                                  "targetSampleActualSize": {
+                                    "type": "object"
+                                  },
+                                  "targetSampleSizeFormula": {
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/socialscience/properties/fields/items"
+                  }
+                }
+              }
+            },
+            "journal": {
+              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal",
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/displayName",
+                  "type": "string"
+                },
+                "fields": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0",
+                        "type": "object",
+                        "properties": {
+                          "typeName": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/typeName",
+                            "type": "string"
+                          },
+                          "multiple": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/multiple",
+                            "type": "boolean"
+                          },
+                          "typeClass": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/typeClass",
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value",
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                      "type": "object",
+                                      "properties": {
+                                        "journalVolume": {
+                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume",
+                                          "type": "object",
+                                          "properties": {
+                                            "typeName": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/typeName",
+                                              "type": "string"
+                                            },
+                                            "multiple": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/multiple",
+                                              "type": "boolean"
+                                            },
+                                            "typeClass": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/typeClass",
+                                              "type": "string"
+                                            },
+                                            "value": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalVolume/properties/value",
+                                              "type": "string"
+                                            }
+                                          }
+                                        },
+                                        "journalIssue": {
+                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue",
+                                          "type": "object",
+                                          "properties": {
+                                            "typeName": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/typeName",
+                                              "type": "string"
+                                            },
+                                            "multiple": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/multiple",
+                                              "type": "boolean"
+                                            },
+                                            "typeClass": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/typeClass",
+                                              "type": "string"
+                                            },
+                                            "value": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalIssue/properties/value",
+                                              "type": "string"
+                                            }
+                                          }
+                                        },
+                                        "journalPubDate": {
+                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate",
+                                          "type": "object",
+                                          "properties": {
+                                            "typeName": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/typeName",
+                                              "type": "string"
+                                            },
+                                            "multiple": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/multiple",
+                                              "type": "boolean"
+                                            },
+                                            "typeClass": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/typeClass",
+                                              "type": "string"
+                                            },
+                                            "value": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/journalPubDate/properties/value",
+                                              "type": "string"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value",
+                                "type": "string"
+                              }
+                            ],
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items/anyOf/0/properties/value/items"
+                          }
+                        }
+                      }
+                    ],
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/journal/properties/fields/items"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
