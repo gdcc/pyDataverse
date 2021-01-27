@@ -1,7 +1,7 @@
 .. _history:
 
 
-0.3.0 - (2021-01-26)
+0.3.0 - (2021-01-26) - Ruth Wodak
 ----------------------------------------------------------
 
 `Release <https://github.com/gdcc/pyDataverse/releases/tag/v0.3.0>`_
