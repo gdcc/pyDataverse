@@ -157,3 +157,4 @@ src/pyDataverse/docs/source/_build
 src/pyDataverse/docs/Makefile
 env-config/
 wiki/
+tests/data/vcr_cassettes

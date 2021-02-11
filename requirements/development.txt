@@ -4,5 +4,5 @@
 -r docs.txt
 -r tests.txt
 wheel
-pre-commit
-twine
+pre-commit==2.9.2
+twine==3.2.0
