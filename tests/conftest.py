@@ -13,6 +13,7 @@ from pyDataverse.utils import read_file
 from vcr import VCR
 
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 BASE_URL = os.getenv("BASE_URL")
 
 vcr = VCR(

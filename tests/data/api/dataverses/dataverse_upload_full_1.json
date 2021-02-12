@@ -8,16 +8,5 @@
   ],
   "affiliation": "Scientific Research University",
   "description": "We do all the science.",
-  "dataverseType": "RESEARCH_GROUP",
-  "theme": {
-    "backgroundColor": "gray",
-    "linkColor": "red",
-    "linkUrl": "http://www.cnn.com",
-    "logo": "lion",
-    "logoAlignment": "center",
-    "logoBackgroundColor": "navy",
-    "logoFormat": "square",
-    "tagline": "The Real Thing",
-    "textColor": "black"
-  }
+  "dataverseType": "RESEARCH_GROUP"
 }
