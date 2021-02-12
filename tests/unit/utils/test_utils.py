@@ -1,5 +1,5 @@
 from pyDataverse.utils import read_json, save_tree_data, dataverse_tree_walker
-from ..conftest import test_config
+from .conftest import test_config
 
 
 class TestUtilsSaveTreeData:
