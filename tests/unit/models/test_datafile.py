@@ -4,10 +4,9 @@ import jsonschema
 import os
 import platform
 import pytest
-
 from pyDataverse.models import Datafile
 from pyDataverse.utils import read_file, write_json
-from ..conftest import test_config
+from .conftest import test_config
 
 
 def data_object():
@@ -154,7 +153,7 @@ def json_upload_min():
         JSON string.
 
     """
-    return read_file(test_config["datafile_upload_min_filename"])
+    return read_file("tests/data/api/datafiles/datafile_upload_min_old.json")
 
 
 def json_upload_full():
@@ -166,7 +165,7 @@ def json_upload_full():
         JSON string.
 
     """
-    return read_file(test_config["datafile_upload_full_filename"])
+    return read_file("tests/data/api/datafiles/datafile_upload_full_old.json")
 
 
 def json_dataverse_upload_attr():
@@ -503,51 +502,3 @@ class TestDatafileSpecific(object):
         for data in ["invalid_set_types"]:
             with pytest.raises(AssertionError):
                 pdv.set(data)
-
-
-if not os.environ.get("TRAVIS"):
-
-    class TestDatafileGenericTravisNot(object):
-        """Generic tests for Datafile(), not running on Travis (no file-write permissions)."""
-
-        def test_dataverse_from_json_to_json_valid(self):
-            """Test Dataverse to JSON from JSON with valid data."""
-            data = [
-                ({json_upload_min()}, {}),
-                ({json_upload_full()}, {}),
-                ({json_upload_min()}, {"data_format": "dataverse_upload"}),
-                ({json_upload_min()}, {"validate": False}),
-                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
-                (
-                    {json_upload_min()},
-                    {
-                        "filename_schema": test_config[
-                            "datafile_upload_schema_filename"
-                        ],
-                        "validate": True,
-                    },
-                ),
-                ({"{}"}, {"validate": False}),
-            ]
-
-            for args_from, kwargs_from in data:
-                pdv_start = data_object()
-                args = args_from
-                kwargs = kwargs_from
-                pdv_start.from_json(*args, **kwargs)
-                if "validate" in kwargs:
-                    if not kwargs["validate"]:
-                        kwargs = {"validate": False}
-                write_json(
-                    test_config["datafile_json_output_filename"],
-                    json.loads(pdv_start.json(**kwargs)),
-                )
-                pdv_end = data_object()
-                kwargs = kwargs_from
-                pdv_end.from_json(
-                    read_file(test_config["datafile_json_output_filename"]), **kwargs
-                )
-
-                for key, val in pdv_end.get().items():
-                    assert getattr(pdv_start, key) == getattr(pdv_end, key)
-                assert len(pdv_start.__dict__) == len(pdv_end.__dict__,)

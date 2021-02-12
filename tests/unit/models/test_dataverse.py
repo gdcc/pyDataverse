@@ -5,7 +5,8 @@ import os
 import platform
 import pytest
 from pyDataverse.models import Dataverse
-from ..conftest import test_config
+from .conftest import test_config
+from ..conftest import ROOT_DIR
 
 
 def read_file(filename, mode="r"):
@@ -207,7 +208,7 @@ def json_upload_min():
         JSON string.
 
     """
-    return read_file(test_config["dataverse_upload_min_filename"])
+    return read_file("tests/data/api/dataverses/dataverse_upload_min_old.json")
 
 
 def json_upload_full():
@@ -219,7 +220,7 @@ def json_upload_full():
         JSON string.
 
     """
-    return read_file(test_config["dataverse_upload_full_filename"])
+    return read_file("tests/data/api/dataverses/dataverse_upload_full_old.json")
 
 
 def json_dataverse_upload_attr():
@@ -412,9 +413,10 @@ class TestDataverseGeneric(object):
                 (
                     dict_flat_set_min(),
                     {
-                        "filename_schema": test_config[
-                            "dataverse_upload_schema_filename"
-                        ],
+                        "filename_schema": os.path.join(
+                            ROOT_DIR,
+                            "src/pyDataverse/schemas/json/dataverse_upload_schema.json",
+                        ),
                         "validate": True,
                     },
                 ),
@@ -556,8 +558,6 @@ class TestDataverseSpecific(object):
 
         for pdv, data_eval in data:
             for key, val in data_eval.items():
-                print(getattr(pdv, key))
-                print(data_eval[key])
                 assert getattr(pdv, key) == data_eval[key]
             assert len(pdv.__dict__) - len(object_data_init()) == len(data_eval)
 
@@ -569,49 +569,3 @@ class TestDataverseSpecific(object):
         for data in test_config["invalid_set_types"]:
             with pytest.raises(AssertionError):
                 pdv.set(data)
-
-
-if not os.environ.get("TRAVIS"):
-
-    class TestDataverseGenericTravisNot(object):
-        """Generic tests for Dataverse(), not running on Travis (no file-write permissions)."""
-
-        def test_dataverse_from_json_to_json_valid(self):
-            """Test Dataverse to JSON from JSON with valid data."""
-            data = [
-                ({json_upload_min()}, {}),
-                ({json_upload_full()}, {}),
-                ({json_upload_min()}, {"data_format": "dataverse_upload"}),
-                ({json_upload_min()}, {"validate": False}),
-                ({json_upload_min()}, {"filename_schema": "", "validate": False},),
-                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
-                (
-                    {json_upload_min()},
-                    {
-                        "filename_schema": test_config[
-                            "dataverse_upload_schema_filename"
-                        ],
-                        "validate": True,
-                    },
-                ),
-                ({"{}"}, {"validate": False}),
-            ]
-
-            for args_from, kwargs_from in data:
-                pdv_start = data_object()
-                args = args_from
-                kwargs = kwargs_from
-                pdv_start.from_json(*args, **kwargs)
-                if "validate" in kwargs:
-                    if not kwargs["validate"]:
-                        kwargs = {"validate": False}
-                data_out = json.loads(pdv_start.json(**kwargs))
-                write_json(test_config["dataverse_json_output_filename"], data_out)
-                data_in = read_file(test_config["dataverse_json_output_filename"])
-                pdv_end = data_object()
-                kwargs = kwargs_from
-                pdv_end.from_json(data_in, **kwargs)
-
-                for key, val in pdv_end.get().items():
-                    assert getattr(pdv_start, key) == getattr(pdv_end, key)
-                assert len(pdv_start.__dict__) == len(pdv_end.__dict__,)

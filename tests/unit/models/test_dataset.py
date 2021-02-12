@@ -4,7 +4,7 @@ import os
 import platform
 import pytest
 from pyDataverse.models import Dataset
-from ..conftest import test_config
+from .conftest import test_config
 
 
 def read_file(filename, mode="r"):
@@ -755,7 +755,7 @@ def json_upload_min():
         JSON string.
 
     """
-    return read_file(test_config["dataset_upload_min_filename"])
+    return read_file("tests/data/api/datasets/dataset_upload_default_min_old.json")
 
 
 def json_upload_full():
@@ -767,7 +767,7 @@ def json_upload_full():
         JSON string.
 
     """
-    return read_file(test_config["dataset_upload_full_filename"])
+    return read_file("tests/data/api/datasets/dataset_upload_default_full_old.json")
 
 
 def json_dataverse_upload_attr():
@@ -1150,51 +1150,3 @@ class TestDatasetSpecific(object):
                 pdv = data_object()
                 pdv.set(dict_flat_set_min())
                 pdv.validate_json(filename_schema=filename_schema)
-
-
-if not os.environ.get("TRAVIS"):
-
-    class TestDatasetSpecificTravisNot(object):
-        """Generic tests for Dataset(), not running on Travis (no file-write permissions)."""
-
-        def test_dataset_to_json_from_json_valid(self):
-            """Test Dataset to JSON from JSON with valid data."""
-            data = [
-                (dict_flat_set_min(), {}),
-                (dict_flat_set_full(), {}),
-                (dict_flat_set_min(), {"data_format": "dataverse_upload"}),
-                (dict_flat_set_min(), {"validate": False}),
-                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
-                (
-                    dict_flat_set_min(),
-                    {
-                        "filename_schema": test_config[
-                            "dataset_upload_schema_filename"
-                        ],
-                        "validate": True,
-                    },
-                ),
-            ]
-
-            for data_set, kwargs_from in data:
-
-                kwargs = {}
-                pdv_start = data_object()
-                pdv_start.set(data_set)
-                if "validate" in kwargs_from:
-                    if not kwargs_from["validate"]:
-                        kwargs = {"validate": False}
-                write_json(
-                    test_config["dataset_json_output_filename"],
-                    json.loads(pdv_start.json(**kwargs)),
-                )
-
-                pdv_end = data_object()
-                kwargs = kwargs_from
-                pdv_end.from_json(
-                    read_file(test_config["dataset_json_output_filename"]), **kwargs
-                )
-
-                for key, val in pdv_end.get().items():
-                    assert getattr(pdv_start, key) == getattr(pdv_end, key)
-                assert len(pdv_start.__dict__) == len(pdv_end.__dict__,)
