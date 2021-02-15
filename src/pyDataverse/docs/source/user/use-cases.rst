@@ -14,15 +14,17 @@ Data Migration
 
 Importing lots of data from data sources outside a Dataverse installation can be done
 with the help of the :ref:`CSV templates <user_csv-templates>`.
-Simply dd your data to the CSV files, import the files into pyDataverse, and then
+Simply add your data to the CSV files, import the files into pyDataverse, and then
 upload the data and metadata via the API.
 
 The following mappings currently exist:
 
-- CSV 2 Dataverse (:ref:`Tutorial <advanced-usage_data-migration>`)
-- Dataverse 2 Dataverse (mapping from Dataverse 2 pyDataverse missing)
-- DSpace 2 Dataverse (mapping from DSpace 2 pyDataverse missing)
-- NESSTAR 2 Dataverse (mapping from NESSTAR 2 pyDataverse missing)
+- CSV
+  - CSV 2 pyDataverse (:ref:`Tutorial <advanced-usage_data-migration>`)
+  - pyDataverse 2 CSV (:ref:`Tutorial <advanced-usage_data-migration>`)
+- Dataverse Upload JSON
+    - JSON 2 pyDataverse
+    - pyDataverse to JSON
 
 If you would like to add an additional mapping, we welcome
 :ref:`contributions <contributing_contributing>`!
@@ -80,7 +82,7 @@ but you can find it in
 Data Science Pipeline
 ------------------------------------
 
-Using APIs, you can access data and/or metadata from a Dataverse installation. You can also use pyDataverse to automatically add data and metadata to your Dataset. PyDataverse connects your Data Science pipeline with your Dataverse instance.
+Using APIs, you can access data and/or metadata from a Dataverse installation. You can also use pyDataverse to automatically add data and metadata to your Dataset. PyDataverse connects your Data Science pipeline with your Dataverse installation.
 
 
 .. _use-cases_microservices:
