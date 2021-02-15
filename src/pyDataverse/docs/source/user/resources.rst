@@ -10,13 +10,13 @@ Resources
 Presentations / Workshops
 -----------------------------
 
--   `Slides <https://zenodo.org/record/3265128>`_: from talk at Dataverse Community Conference 2019
--   `Jupyter Notebook Demo <https://github.com/AUSSDA/pyDataverse_demo_tromso>`_: at European Dataverse Workshop Tromso 2020
+-   `Slides <https://zenodo.org/record/3265128>`_: from talk at Dataverse Community Meeting 2019
+-   `Jupyter Notebook Demo <https://github.com/AUSSDA/pyDataverse_demo_tromso>`_: at European Dataverse Community Workshop Tromso 2020
 
 
 .. _user_resources_dataverse:
 
-Dataverse
+Dataverse Project
 -----------------------------
 
 - `Dataverse <https://dataverse.org/>`_

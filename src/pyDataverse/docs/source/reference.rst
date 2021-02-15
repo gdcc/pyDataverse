@@ -3,7 +3,7 @@ Reference / API
 
 .. module:: pyDataverse
 
-This part of the documentation covers all the interfaces / API's of the pyDataverse modules.
+This part of the documentation covers all the interfaces / APIs of the pyDataverse modules.
 
 
 Where pyDataverse depends on external libraries, we document the most
@@ -13,7 +13,7 @@ important right here and provide links to the canonical documentation outside of
 API Interface
 -----------------------------
 
-Access all of Dataverse API's.
+Access all of Dataverse APIs.
 
 .. automodule:: pyDataverse.api
    :members:

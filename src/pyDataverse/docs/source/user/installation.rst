@@ -60,14 +60,14 @@ You can either clone the public repository:
 
     git clone git://github.com/gdcc/pyDataverse.git
 
-Or, download the archive of the ``master`` branch as zip:
+Or download the archive of the ``master`` branch as a zip:
 
 .. code-block:: shell
 
     curl -OL https://github.com/gdcc/pyDataverse/archive/master.zip
 
 Once you have a copy of the source, you can embed it in your own Python
-package.
+package:
 
 .. code-block:: shell
 
@@ -80,5 +80,5 @@ package.
 Development
 -----------------------------
 
-To setup your development environment, see
+To set up your development environment, see
 :ref:`contributing_working-with-code_development-environment`.
