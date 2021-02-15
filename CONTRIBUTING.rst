@@ -6,11 +6,11 @@ Contributor Guide
 
 .. _contributing_get-started:
 
-Where to start?
+Where to Start?
 -----------------------------
 
 All contributions, bug reports, bug fixes, documentation improvements,
-enhancements, and ideas are welcome.
+enhancements, and ideas are welcome!
 
 If you are new to open-source development or pyDataverse, we recommend going
 through the `GitHub issues <https://github.com/gdcc/pyDataverse/issues>`_,
@@ -19,19 +19,19 @@ to find issues that interest you. There are a number of issues listed under
 `docs <https://github.com/gdcc/pyDataverse/labels/module%3Adocs>`_,
 `good first issue <https://github.com/gdcc/pyDataverse/labels/info%3Agood%20first%20issue>`_
 and `unassigned issues <https://github.com/gdcc/pyDataverse/issues?q=is%3Aopen++no%3Aassignee+>`_.
-where you could start from.
+where you could start.
 Once you've found an interesting issue, you can return here to
 get your development environment setup.
 
 When you start working on an issue, it’s a good idea to assign the issue
-to yourself, so nobody else duplicates the work on it. GitHub restricts
+to yourself so that nobody else duplicates the work on it. GitHub restricts
 assigning issues to maintainers of the project only. To let us know, please
-add a comment to the issue, so that everyone knows, that you are working
+add a comment to the issue so that everyone knows that you are working
 on the issue.
 
 If for whatever reason you
-are not able to continue working with the issue, please try to unassign it, so
-other people know it’s available again. You can check the list of assigned issues,
+are not able to continue working with the issue, please try to unassign it so that
+other people know it’s available again. You can periodically check the list of assigned issues,
 since people may not be working in them anymore. If you want to work on one that
 is assigned, feel free to kindly ask the current assignee if you can take it
 (please allow at least a week of inactivity before considering work in the issue
@@ -51,7 +51,7 @@ Bug reports, enhancement requests and other issues
 
 Bug reports are an important part of making pyDataverse more stable. Having
 a complete bug report will allow others to reproduce the bug and provide
-insight into fixing.
+insight into fixing the issue.
 
 Trying the bug-producing code out on the ``master`` branch is often a
 worthwhile exercise to confirm the bug still exists. It is also worth
@@ -60,9 +60,9 @@ has already been reported and/or fixed.
 
 Other reasons to create an issue could be:
 
-* by suggesting new features
-* by sharing an idea
-* or giving feedback
+* suggesting new features
+* sharing an idea
+* giving feedback
 
 Please check some things before creating an issue:
 
@@ -76,15 +76,15 @@ you have to choose one of the issue templates:
 * Feature request (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/feature-template.md>`_)
 * Issue: all other issues, except bug reports and feature requests (`template  <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/issue-template.md>`_)
 
-After selection the right one, you will see some explainatory text. Follow it
+After selection the appropriate template, you will see some explanatory text. Follow it
 step-by-step. After clicking `Submit new issue`, the issue will then show up
 to the pyDataverse community and be open to comments/ideas from others.
 
-Besides creating an issue, you also can contribute in many other ways by
+Besides creating an issue, you also can contribute in many other ways by:
 
-* sharing your knowledge in Issues and pull Requests
+* sharing your knowledge in Issues and Pull Requests
 * reviewing `pull requests <https://github.com/gdcc/pyDataverse/pulls>`_
-* doing the talk about pyDataverse and sharing it with others
+* talking about pyDataverse and sharing it with others
 
 
 .. _contributing_working-with-code:
@@ -113,9 +113,9 @@ to sign up for a `free GitHub account <https://github.com/signup/free>`_.
 We use `Git <https://git-scm.com/>`_ for version control to allow many people to
 work together on the project.
 
-A great resources for learning Git: the `GitHub help pages <https://help.github.com/>`_
+A great resource for learning Git: the `GitHub help pages <https://help.github.com/>`_
 
-There are many ways, how to work with git and Github. Our workflow is inspired by the
+There are many ways to work with git and Github. Our workflow is inspired by the
 `GitHub flow <https://guides.github.com/introduction/flow/>`_ and
 `Git flow <https://nvie.com/posts/a-successful-git-branching-model/>`_ approaches.
 
@@ -214,7 +214,7 @@ descriptive branch name and replace `BRANCH_NAME` with it, e. g.
 This changes your working directory to the `BRANCH_NAME` branch.
 Keep any changes in this branch specific to one bug or feature so it is
 clear what the branch brings to pyDataverse. You can have many
-branches and switch in between them using the git checkout command.
+branches and switch between them using the git checkout command.
 
 When creating this branch, make sure your ``develop`` branch is up to date
 with the latest upstream ``develop`` version. To update your local ``develop``
@@ -259,9 +259,9 @@ About the pyDataverse documentation
 The documentation is written in **reStructuredText**, which is almost
 like writing in plain English, and built using
 `Sphinx <https://www.sphinx-doc.org>`_.
-The Sphinx Documentation has an
+The Sphinx Documentation provides an
 `excellent introduction to reST <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_.
-Review the Sphinx docs to perform more complex changes to the documentation as well.
+Review the Sphinx docs to learn how to perform more complex changes to the documentation as well.
 
 Some other important things to know about the docs:
 
@@ -270,7 +270,7 @@ Some other important things to know about the docs:
   - the docstrings in the code itself and
   - the docs in the folder ``src/pyDataverse/doc/``
 
-- The docstrings provide a clear explanation of the usage of the individual functions, while the documentation consists of tutorial-like overviews per topic together with some other information (what’s new, installation, this page you view right now, etc).
+- The docstrings provide a clear explanation of the usage of the individual functions, while the documentation consists of tutorial-like overviews per topic together with some other information (what’s new, installation, this page you're viewing right now, etc).
 - The docstrings follow the `Numpy Docstring Standard <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
 
 
@@ -500,10 +500,10 @@ Running the test suite
 Before you can run the tests, you have to define following
 environment variables:
 
-- BASE_URL: Base URL of your Dataverse instance, without trailing slash (e. g. ``https://data.aussda.at``))
-- API_TOKEN_<USER>: API token of Dataverse users with proper rights
+- BASE_URL: Base URL of your Dataverse installation, without trailing slash (e. g. ``https://data.aussda.at``))
+- API_TOKEN_<USER>: API token of Dataverse installation user with proper rights
 
-  - API_TOKEN_SUPERUSER: Dataverse Superuser
+  - API_TOKEN_SUPERUSER: Dataverse installation Superuser
   - API_TOKEN_TEST_NO_RIGHTS: New user with no assigned rights (default rights)
 
 .. code-block:: shell
@@ -543,12 +543,12 @@ test all tests available.
 You can find the tox environments defined in the
 `tox.ini <https://github.com/gdcc/pyDataverse/blob/master/tox.ini>`_.
 
-Some tox tests/builds are also used for the continous integration tests at Travis-CI
+Some tox tests/builds are also used for the continuous integration tests at Travis-CI
 (see :ref:`contributing_code_testing-with-ci`).
 
 **Using Coverage**
 
-pyDataverse supports the usage of code coverage to check, how much of the code base
+pyDataverse supports the usage of code coverage to check how much of the code base
 is covered by tests. For this,
 `pytest-cov <https://github.com/pytest-dev/pytest-cov>`_ (using
 `coverage <https://coverage.readthedocs.io/>`_) and
@@ -579,7 +579,7 @@ Contributing your changes to pyDataverse
 Committing your code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Before commiting your changes, make clear:
+Before committing your changes, make clear:
 
 - You are on the right branch
 - All tests for your change ran successful
@@ -829,9 +829,9 @@ Once a new issue is created, a maintainer adds
 `labels <https://github.com/gdcc/pyDataverse/labels>`_
 , an assignee and a
 `milestone <https://github.com/gdcc/pyDataverse/milestones>`_
-to it. Labels are used to seperate between issue types and the
+to it. Labels are used to separate between issue types and the
 status of it, show effected module(s) and to prioritize tasks.
-Also at least one responsbile person for the next steps is assigned
+Also at least one responsible person for the next steps is assigned
 , and often a milestone too.
 
 The next steps may consist of requests from the assigned person(s)
@@ -850,7 +850,7 @@ Create a release
 
 First, to plan a release, the maintainers:
 
-- define, which issues are part of it and the verison number
+- define, which issues are part of it and the version number
 - create a new milestone for the release (named after the version number)
 - and assign all selected issues to the milestone
 
