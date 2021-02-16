@@ -361,6 +361,51 @@ Dataset) attached to it.
 
 Now the Dataverse instance is as it was once before we started.
 
+.. _user_basic-usage_download-data:
+
+Download and save a dataset to disk
+----------------------------------------
+
+You may want to download and explore an existing dataset from Dataverse. The following code snippet will show how to retrieve and save a dataset to your machine.
+
+Note that if the dataset is public, you don't need to have an API_TOKEN. Furthermore, you don't even need to have a Dataverse account to use this functionality. The code would therefore look as follows:
+
+::
+
+    >>> from pyDataverse.api import NativeApi, DataAccessApi
+    >>> from pyDataverse.models import Dataverse
+
+    >>> base_url = 'https://dataverse.harvard.edu/'
+
+    >>> api = NativeApi(base_url)
+    >>> data_api = DataAccessApi(base_url)
+
+However, you need to know the DOI of the dataset that you want to download. In this example, we use ``doi:10.7910/DVN/KBHLOD``, which is hosted on Harvard's Dataverse instance that we specified as ``base_url``. The code looks as follows:
+
+::
+
+    >>> DOI = "doi:10.7910/DVN/KBHLOD"
+    >>> dataset = api.get_dataset(DOI)
+
+As previously mentioned, every dataset comprises of datafiles, therefore, we need to get the list of datafiles by ID and save them on disk. That is done in the following code snippet:
+
+::
+
+    >>> files_list = dataset.json()['data']['latestVersion']['files']
+
+    >>> for file in files_list:
+    >>>     filename = file["dataFile"]["filename"]
+    >>>     file_id = file["dataFile"]["id"]
+    >>>     print("File name {}, id {}".format(filename, file_id))
+
+    >>>     response = data_api.get_datafile(file_id)
+    >>>     with open(filename, "wb") as f:
+    >>>         f.write(response.content)
+    File name cat.jpg, id 2456195
+
+Please note that in this example, the dataset will be saved in the execution directory. You could change that by adding a desired path in the ``open()`` function above.
+
+
 The Basic Usage tutorial is now finished, but maybe you want to
 have a look at more advanced examples at
 :ref:`User Guide - Advanced Usage <user_advanced-usage>` and at
