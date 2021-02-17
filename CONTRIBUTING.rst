@@ -76,7 +76,7 @@ you have to choose one of the issue templates:
 * Feature request (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/feature-template.md>`_)
 * Issue: all other issues, except bug reports and feature requests (`template  <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/issue-template.md>`_)
 
-After selection the appropriate template, you will see some explanatory text. Follow it
+After selecting the appropriate template, you will see some explanatory text. Follow it
 step-by-step. After clicking `Submit new issue`, the issue will then show up
 to the pyDataverse community and be open to comments/ideas from others.
 
@@ -298,8 +298,8 @@ to ``upstream/develop``, so you have to branch-off from it too.
 
 
 There is one exception: If you
-want to suggest a change the the docs in the folder
-``src/pyDataverse/doc/`` (e. g. fix a typo in
+want to suggest a change to the docs in the folder
+``src/pyDataverse/docs/`` (e. g. fix a typo in
 :ref:`User Guide - Basic Usage <user_basic-usage>`),
 you can also pull to ``upstream/master``. This means, you have also to
 branch-off from the ``master`` branch.
