@@ -1026,7 +1026,180 @@ class Dataset(DVObject):
                     # TODO: Exception
                     pass
         elif data_format == "dataverse_download":
-            print("INFO: Not implemented yet.")
+            for key, val in json_dict["latestVersion"].items():
+                if not key == "metadataBlocks":
+                    if key in self.__attr_import_dv_up_datasetVersion_values:
+                        data[key] = val
+                    else:
+                        print(
+                            "Attribute {0} not valid for import (format={1}).".format(
+                                key, data_format
+                            )
+                        )
+
+            if "metadataBlocks" in json_dict["latestVersion"]:
+
+                # citation
+                if "citation" in json_dict["latestVersion"]["metadataBlocks"]:
+                    citation = json_dict["latestVersion"]["metadataBlocks"]["citation"]
+                    if "displayName" in citation:
+                        data["citation_displayName"] = citation["displayName"]
+
+                    for field in citation["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_citation_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_citation_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_citation_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
+                        elif field["typeName"] == "series":
+                            data["series"] = {}
+                            if "seriesName" in field["value"]:
+                                data["series"]["seriesName"] = field["value"][
+                                    "seriesName"
+                                ]["value"]
+                            if "seriesInformation" in field["value"]:
+                                data["series"]["seriesInformation"] = field["value"][
+                                    "seriesInformation"
+                                ]["value"]
+                        else:
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
+                else:
+                    # TODO: Exception
+                    pass
+
+                # geospatial
+                if "geospatial" in json_dict["latestVersion"]["metadataBlocks"]:
+                    geospatial = json_dict["latestVersion"]["metadataBlocks"][
+                        "geospatial"
+                    ]
+                    if "displayName" in geospatial:
+                        self.__setattr__(
+                            "geospatial_displayName", geospatial["displayName"]
+                        )
+
+                    for field in geospatial["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_geospatial_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_geospatial_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_geospatial_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
+                        else:
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
+                else:
+                    # TODO: Exception
+                    pass
+
+                # socialscience
+                if "socialscience" in json_dict["latestVersion"]["metadataBlocks"]:
+                    socialscience = json_dict["latestVersion"]["metadataBlocks"][
+                        "socialscience"
+                    ]
+
+                    if "displayName" in socialscience:
+                        self.__setattr__(
+                            "socialscience_displayName", socialscience["displayName"],
+                        )
+
+                    for field in socialscience["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_socialscience_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif field["typeName"] == "targetSampleSize":
+                            data["targetSampleSize"] = {}
+                            if "targetSampleActualSize" in field["value"]:
+                                data["targetSampleSize"][
+                                    "targetSampleActualSize"
+                                ] = field["value"]["targetSampleActualSize"]["value"]
+                            if "targetSampleSizeFormula" in field["value"]:
+                                data["targetSampleSize"][
+                                    "targetSampleSizeFormula"
+                                ] = field["value"]["targetSampleSizeFormula"]["value"]
+                        elif field["typeName"] == "socialScienceNotes":
+                            data["socialScienceNotes"] = {}
+                            if "socialScienceNotesType" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesType"
+                                ] = field["value"]["socialScienceNotesType"]["value"]
+                            if "socialScienceNotesSubject" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesSubject"
+                                ] = field["value"]["socialScienceNotesSubject"]["value"]
+                            if "socialScienceNotesText" in field["value"]:
+                                data["socialScienceNotes"][
+                                    "socialScienceNotesText"
+                                ] = field["value"]["socialScienceNotesText"]["value"]
+                        else:
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
+                else:
+                    # TODO: Exception
+                    pass
+
+                # journal
+                if "journal" in json_dict["latestVersion"]["metadataBlocks"]:
+                    journal = json_dict["latestVersion"]["metadataBlocks"]["journal"]
+
+                    if "displayName" in journal:
+                        self.__setattr__("journal_displayName", journal["displayName"])
+
+                    for field in journal["fields"]:
+                        if (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_journal_fields_values
+                        ):
+                            data[field["typeName"]] = field["value"]
+                        elif (
+                            field["typeName"]
+                            in self.__attr_import_dv_up_journal_fields_arrays
+                        ):
+                            data[field["typeName"]] = self.__parse_field_array(
+                                field["value"],
+                                self.__attr_import_dv_up_journal_fields_arrays[
+                                    field["typeName"]
+                                ],
+                            )
+                        else:
+                            print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                    field["typeName"]
+                                )
+                            )
+                else:
+                    # TODO: Exception
+                    pass
         elif data_format == "dspace":
             print("INFO: Not implemented yet.")
         elif data_format == "custom":

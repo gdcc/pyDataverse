@@ -556,9 +556,19 @@ def create_datafile_url(base_url, identifier, is_filepid):
 
 def dataverse_tree_walker(
     data: list,
-    dv_keys: list = ["dataverse_id", "dataverse_alias"],
-    ds_keys: list = ["dataset_id", "pid"],
-    df_keys: list = ["datafile_id", "filename", "pid", "label"],
+    dv_keys: list = ["dataverse_id", "dataverse_alias", "title"],
+    ds_keys: list = ["dataset_id", "pid", "persistentUrl"],
+    df_keys: list = [
+        "datafile_id",
+        "filename",
+        "pid",
+        "label",
+        "contentType",
+        "md5",
+        "restricted",
+        "version",
+        "datasetVersionId",
+    ],
 ) -> tuple:
     """Walk through a Dataverse tree by get_children().
 

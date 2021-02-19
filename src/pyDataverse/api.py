@@ -1,7 +1,8 @@
 """Dataverse API wrapper for all it's API's."""
 import json
 import subprocess as sp
-
+import aiohttp
+import asyncio
 from requests import ConnectionError, Response, delete, get, post, put
 
 from pyDataverse.exceptions import (
@@ -93,7 +94,7 @@ class Api:
         """
         return "API: {0}".format(self.base_url_api)
 
-    def get_request(self, url, params=None, auth=False):
+    async def get_request(self, url, params=None, auth=False):
         """Make a GET request.
 
         Parameters
@@ -118,27 +119,12 @@ class Api:
             params["key"] = str(self.api_token)
 
         try:
-            resp = get(url, params=params)
-            if resp.status_code == 401:
-                error_msg = resp.json()["message"]
-                raise ApiAuthorizationError(
-                    "ERROR: GET - Authorization invalid {0}. MSG: {1}.".format(
-                        url, error_msg
-                    )
-                )
-            elif resp.status_code >= 300:
-                if resp.text:
-                    error_msg = resp.text
-                    raise OperationFailedError(
-                        "ERROR: GET HTTP {0} - {1}. MSG: {2}".format(
-                            resp.status_code, url, error_msg
-                        )
-                    )
-            return resp
-        except ConnectionError:
-            raise ConnectionError(
-                "ERROR: GET - Could not establish connection to api {0}.".format(url)
-            )
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=url, params=params) as response:
+                    return await response.json()
+        except Exception as e:
+            # print(f"ERROR: {url}")
+            pass
 
     def post_request(self, url, data=None, auth=False, params=None, files=None):
         """Make a POST request.
@@ -645,7 +631,7 @@ class NativeApi(Api):
         """
         return "Native API: {0}".format(self.base_url_api_native)
 
-    def get_dataverse(self, identifier, auth=False):
+    async def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
 
         View metadata about a dataverse.
@@ -667,7 +653,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
-        return self.get_request(url, auth=auth)
+        return await self.get_request(url, auth=auth)
 
     def create_dataverse(
         self, parent: str, metadata: str, auth: bool = True
@@ -866,7 +852,7 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}/roles".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def get_dataverse_contents(self, identifier, auth=True):
+    async def get_dataverse_contents(self, identifier, auth=True):
         """Gets contents of Dataverse.
 
         Parameters
@@ -884,7 +870,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/dataverses/{1}/contents".format(self.base_url_api_native, identifier)
-        return self.get_request(url, auth=auth)
+        return await self.get_request(url, auth=auth)
 
     def get_dataverse_assignments(self, identifier, auth=False):
         """Get dataverse assignments by alias or id.
@@ -936,7 +922,7 @@ class NativeApi(Api):
         url = "{0}/dataverses/{1}/facets".format(self.base_url_api_native, identifier)
         return self.get_request(url, auth=auth)
 
-    def dataverse_id2alias(self, dataverse_id, auth=False):
+    async def dataverse_id2alias(self, dataverse_id, auth=False):
         """Converts a Dataverse ID to an alias.
 
         Parameters
@@ -950,12 +936,8 @@ class NativeApi(Api):
             Dataverse alias
 
         """
-        resp = self.get_dataverse(dataverse_id, auth=auth)
-        if "data" in resp.json():
-            if "alias" in resp.json()["data"]:
-                return resp.json()["data"]["alias"]
-        print("ERROR: Can not resolve Dataverse ID to alias.")
-        return False
+        resp = await self.get_dataverse(dataverse_id, auth=auth)
+        return resp["data"]["alias"]
 
     def get_dataset(self, identifier, version=":latest", auth=True, is_pid=True):
         """Get metadata of a Dataset.
@@ -1046,6 +1028,13 @@ class NativeApi(Api):
 
     def get_dataset_version(self, identifier, version, auth=True, is_pid=True):
         """Get version of a Dataset.
+
+        :draft the draft version, if any
+        :latest either a draft (if exists) or the latest published version.
+        :latest-published the latest published version
+        x.y a specific version, where x is the major version number and y is the minor version number.
+        x same as x.0
+
 
         With Dataverse identifier:
 
@@ -1585,7 +1574,7 @@ class NativeApi(Api):
             print("Dataset {0} destroyed".format(resp.json()))
         return resp
 
-    def get_datafiles_metadata(self, pid, version=":latest", auth=True):
+    async def get_datafiles_metadata(self, pid, version=":latest", auth=True):
         """List metadata of all datafiles of a dataset.
 
         `Documentation <http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset>`_
@@ -1613,9 +1602,9 @@ class NativeApi(Api):
             self.base_url_api_native
         )
         url = base_str + "{0}/files?persistentId={1}".format(version, pid)
-        return self.get_request(url, auth=auth)
+        return await self.get_request(url, auth=auth)
 
-    def get_datafile_metadata(
+    async def get_datafile_metadata(
         self, identifier, is_filepid=False, is_draft=False, auth=True
     ):
         """
@@ -1637,7 +1626,18 @@ class NativeApi(Api):
             if is_draft:
                 url += "/draft"
             # CHECK: Its not really clear, if the version query can also be done via ID.
-        return self.get_request(url, auth=auth)
+        params = {}
+        params["User-Agent"] = "pydataverse"
+        if self.api_token:
+            params["key"] = str(self.api_token)
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=url, params=params) as response:
+                    return await response.read()
+        except Exception as e:
+            # print(f"ERROR: {url}")
+            pass
 
     def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
@@ -1794,7 +1794,7 @@ class NativeApi(Api):
             url += "/files/{0}/replace".format(identifier)
         return self.post_request(url, data=data, files=files, auth=True)
 
-    def get_info_version(self, auth=False):
+    async def get_info_version(self, auth=False):
         """Get the Dataverse version and build number.
 
         The response contains the version and build numbers. Requires no api
@@ -1813,7 +1813,7 @@ class NativeApi(Api):
 
         """
         url = "{0}/info/version".format(self.base_url_api_native)
-        return self.get_request(url, auth=auth)
+        return await self.get_request(url, auth=auth)
 
     def get_info_server(self, auth=False):
         """Get dataverse server name.
@@ -2026,7 +2026,7 @@ class NativeApi(Api):
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
         return self.delete_request(url)
 
-    def get_children(
+    async def get_children(
         self, parent=":root", parent_type="dataverse", children_types=None, auth=True
     ):
         """Walk through children of parent element in Dataverse tree.
@@ -2108,70 +2108,69 @@ class NativeApi(Api):
         if parent_type == "dataverse":
             # check for dataverses and datasets as children and get their ID
             parent_alias = parent
-            resp = self.get_dataverse_contents(parent_alias, auth=auth)
-            if "data" in resp.json():
-                contents = resp.json()["data"]
-                for content in contents:
-                    if (
-                        content["type"] == "dataverse"
-                        and "dataverses" in children_types
-                    ):
-                        dataverse_id = content["id"]
-                        child_alias = self.dataverse_id2alias(dataverse_id, auth=auth)
-                        children.append(
-                            {
-                                "dataverse_id": dataverse_id,
-                                "title": content["title"],
-                                "dataverse_alias": child_alias,
-                                "type": "dataverse",
-                                "children": self.get_children(
-                                    parent=child_alias,
-                                    parent_type="dataverse",
-                                    children_types=children_types,
-                                    auth=auth,
-                                ),
-                            }
-                        )
-                    elif content["type"] == "dataset" and "datasets" in children_types:
-                        pid = (
-                            content["protocol"]
-                            + ":"
-                            + content["authority"]
-                            + "/"
-                            + content["identifier"]
-                        )
-                        children.append(
-                            {
-                                "dataset_id": content["id"],
-                                "pid": pid,
-                                "type": "dataset",
-                                "children": self.get_children(
-                                    parent=pid,
-                                    parent_type="dataset",
-                                    children_types=children_types,
-                                    auth=auth,
-                                ),
-                            }
-                        )
-            else:
-                print("ERROR: 'get_dataverse_contents()' API request not working.")
+            resp = await self.get_dataverse_contents(parent_alias, auth=auth)
+            contents = resp["data"]
+            for content in contents:
+                if content["type"] == "dataverse" and "dataverses" in children_types:
+                    dataverse_id = content["id"]
+                    child_alias = await self.dataverse_id2alias(dataverse_id, auth=auth)
+                    children.append(
+                        {
+                            "dataverse_id": dataverse_id,
+                            "title": content["title"],
+                            "dataverse_alias": child_alias,
+                            "type": "dataverse",
+                            "children": await self.get_children(
+                                parent=child_alias,
+                                parent_type="dataverse",
+                                children_types=children_types,
+                                auth=auth,
+                            ),
+                        }
+                    )
+                elif content["type"] == "dataset" and "datasets" in children_types:
+                    pid = (
+                        content["protocol"]
+                        + ":"
+                        + content["authority"]
+                        + "/"
+                        + content["identifier"]
+                    )
+                    children.append(
+                        {
+                            "dataset_id": content["id"],
+                            "pid": pid,
+                            "persistentUrl": content["persistentUrl"],
+                            "type": "dataset",
+                            "children": await self.get_children(
+                                parent=pid,
+                                parent_type="dataset",
+                                children_types=children_types,
+                                auth=auth,
+                            ),
+                        }
+                    )
         elif parent_type == "dataset" and "datafiles" in children_types:
             # check for datafiles as children and get their ID
             pid = parent
-            resp = self.get_datafiles_metadata(parent, version=":latest")
-            if "data" in resp.json():
-                for datafile in resp.json()["data"]:
+            resp = await self.get_datafiles_metadata(parent, version=":latest")
+            if resp["status"] == "OK":
+                for datafile in resp["data"]:
                     children.append(
                         {
                             "datafile_id": datafile["dataFile"]["id"],
                             "filename": datafile["dataFile"]["filename"],
                             "label": datafile["label"],
                             "pid": datafile["dataFile"]["persistentId"],
+                            "contentType": datafile["dataFile"]["contentType"],
+                            # "originalFileFormat": datafile["dataFile"]["originalFileFormat"],
+                            # "md5": datafile["dataFile"]["md5"],
+                            "restricted": datafile["restricted"],
+                            "version": datafile["version"],
+                            "datasetVersionId": datafile["datasetVersionId"],
                             "type": "datafile",
                         }
                     )
-            else:
-                print("ERROR: 'get_datafiles()' API request not working.")
         return children
 
     def get_user(self):
