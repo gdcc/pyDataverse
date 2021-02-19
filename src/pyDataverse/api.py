@@ -2203,12 +2203,14 @@ class NativeApi(Api):
         return children
 
     def get_user(self):
+        """Get details of the current authenticated user.
+
+        Auth must be ``true`` for this to work. API endpoint is available for Dataverse >= 5.3.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
         """
-        Get details of the current authenticated user.
-        Note that auth must be True for this to work.
-        """
-        dv_url = '/users/:me'
-        return self.get_request(dv_url, auth=True)
+        url = f"{self.base_url_api_native}/users/:me"
+        return self.get_request(url, auth=True)
 
 
 class SearchApi(Api):
