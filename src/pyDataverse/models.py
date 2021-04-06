@@ -402,7 +402,11 @@ class Dataset(DVObject):
         ],
         "software": ["softwareName", "softwareVersion"],
         "timePeriodCovered": ["timePeriodCoveredStart", "timePeriodCoveredEnd"],
-        "topicClassification": ["topicClassValue", "topicClassVocab"],
+        "topicClassification": [
+            "topicClassValue",
+            "topicClassVocab",
+            "topicClassVocabURI",
+        ],
     }
     __attr_import_dv_up_geospatial_fields_values = ["geographicUnit"]
     __attr_import_dv_up_geospatial_fields_arrays = {
