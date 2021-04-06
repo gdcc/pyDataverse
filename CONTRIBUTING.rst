@@ -16,8 +16,7 @@ If you are new to open-source development or pyDataverse, we recommend going
 through the `GitHub issues <https://github.com/gdcc/pyDataverse/issues>`_,
 to find issues that interest you. There are a number of issues listed under
 `beginner <https://github.com/gdcc/pyDataverse/labels/info%3Abeginner>`_,
-`docs <https://github.com/gdcc/pyDataverse/labels/module%3Adocs>`_,
-`good first issue <https://github.com/gdcc/pyDataverse/labels/info%3Agood%20first%20issue>`_
+`docs <https://github.com/gdcc/pyDataverse/labels/pkg%3Adocs>`_
 and `unassigned issues <https://github.com/gdcc/pyDataverse/issues?q=is%3Aopen++no%3Aassignee+>`_.
 where you could start.
 Once you've found an interesting issue, you can return here to
@@ -248,7 +247,7 @@ doesn’t make sense to you, updating the relevant section after you figure
 it out is a great way to ensure it will help the next person.
 
 To find ways to contribute to the documentation, start looking the
-`docs issues <https://github.com/gdcc/pyDataverse/labels/module%3Adocs>`_.
+`docs issues <https://github.com/gdcc/pyDataverse/labels/pkg%3Adocs>`_.
 
 
 .. _contributing_documentation_about:
@@ -475,7 +474,7 @@ Like many packages, pyDataverse uses `pytest <https://docs.pytest.org/>`_ and
 `tox <https://tox.readthedocs.io/>`_ as test frameworks.
 
 To find open tasks around tests, look at open
-`test issues <https://github.com/gdcc/pyDataverse/labels/module%3Atests>`_.
+`testing issues <https://github.com/gdcc/pyDataverse/labels/pkg%3Atesting>`_.
 
 **Writing tests**
 
