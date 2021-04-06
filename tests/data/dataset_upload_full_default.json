@@ -192,6 +192,12 @@
                   "multiple": false,
                   "typeClass": "primitive",
                   "value": "Topic Classification Vocabulary"
+                },
+                "topicClassVocabURI": {
+                  "typeName": "topicClassVocabURI",
+                  "multiple": false,
+                  "typeClass": "primitive",
+                  "value": "https://topic.class/vocab/uri"
                 }
               }
             ]
