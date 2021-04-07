@@ -1,6 +1,12 @@
 [run]
-source=pyDataverse
+source=wheel
+omit = .tox/*
+
+[report]
+show_missing = true
+
 [html]
 directory = docs/coverage/html
+
 [xml]
 output = coverage.xml

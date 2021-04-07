@@ -3,3 +3,4 @@
 pytest
 pytest-cov
 selenium==3.141.0
+codecov
