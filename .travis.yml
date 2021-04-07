@@ -12,8 +12,6 @@ matrix:
       env:       TOXENV=py38
     - python:    3.6
       env:       TOXENV=docs
-    - python:    3.6
-      env:       TOXENV=coverage
 
 branches:
   only:
@@ -26,7 +24,6 @@ before_install:
 install:
   - pip install --upgrade pip
   - pip install tox-travis
-  - pip install coverage
   - pip install codecov
   - virtualenv --version
   - easy_install --version
