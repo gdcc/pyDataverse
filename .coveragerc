@@ -1,6 +1,5 @@
 [run]
 source=pyDataverse
-omit = .tox/*
 
 [report]
 show_missing = true
