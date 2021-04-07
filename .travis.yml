@@ -34,7 +34,7 @@ script:
   - tox
 
 after_success:
-  - codecov -F
+  - codecov
 
 notifications:
   email:
