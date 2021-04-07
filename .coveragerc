@@ -1,5 +1,5 @@
 [run]
-source=wheel
+source=pyDataverse
 omit = .tox/*
 
 [report]
