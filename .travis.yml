@@ -15,6 +15,8 @@ matrix:
     - python:    3.6
       env:       TOXENV=coverage
     - python:    3.6
+      env:       TOXENV=codecov
+    - python:    3.6
       env:       TOXENV=coveralls
 
 branches:
@@ -26,8 +28,10 @@ before_install:
   - echo $TRAVIS_PYTHON_VERSION
 
 install:
+  - pip install --upgrade pip
   - pip install tox-travis
   - pip install coverage
+  - pip install codecov
   - pip install coveralls
   - virtualenv --version
   - easy_install --version
@@ -39,6 +43,8 @@ script:
 
 after_success:
   - coveralls
+  - bash <(curl -s https://codecov.io/bash)
+  - codecov
 
 notifications:
   email:

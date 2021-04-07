@@ -1,2 +1,6 @@
+[run]
+source=pyDataverse
 [html]
-directory = docs/coverage_htlm
+directory = docs/coverage/html
+[xml]
+output = coverage.xml

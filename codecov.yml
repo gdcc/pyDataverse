@@ -1,0 +1,15 @@
+codecov:
+  branch: master
+
+flags:
+  library:
+    paths:
+    - src/pyDataverse/
+  docs:
+    paths:
+    - src/pyDataverse/docs/
+    - HISTORY.rst
+    - CONTRIBUTING.rst
+    - "*.md"
+    - "*.rst"
+    - "*.txt"
