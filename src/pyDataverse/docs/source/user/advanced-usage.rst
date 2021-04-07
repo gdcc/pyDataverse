@@ -101,10 +101,10 @@ converts boolean values, and loads JSON cells properly.
 Once we have the data in Python, we can easily import the data into
 pyDataverse.
 
-For this, loop over each Dataset :class:`dict`, to: 
+For this, loop over each Dataset :class:`dict`, to:
 
 #. Instantiate an empty :class:`Dataset <pyDataverse.models.Dataset>`
-#. add the data with :meth:`set() <pyDataverse.models.Dataset.set>` and 
+#. add the data with :meth:`set() <pyDataverse.models.Dataset.set>` and
 #. append the instance to a :class:`list`.
 
 ::

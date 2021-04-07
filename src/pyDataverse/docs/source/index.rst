@@ -39,7 +39,7 @@ Release v\ |version|.
 
 .. _homepage_description:
 
-**pyDataverse** is a Python module for `Dataverse <http://dataverse.org>`_ you can use for:  
+**pyDataverse** is a Python module for `Dataverse <http://dataverse.org>`_ you can use for:
 
 - accessing the Dataverse `API's <http://guides.dataverse.org/en/latest/api/index.html>`_
 - manipulating and using the Dataverse (meta)data - Dataverses, Datasets, Datafiles

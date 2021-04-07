@@ -2,16 +2,19 @@
 import json
 import subprocess as sp
 
-from requests import ConnectionError, Response, delete, get, post, put
+from requests import ConnectionError
+from requests import delete
+from requests import get
+from requests import post
+from requests import put
+from requests import Response
 
-from pyDataverse.exceptions import (
-    ApiAuthorizationError,
-    ApiUrlError,
-    DatasetNotFoundError,
-    DataverseNotEmptyError,
-    DataverseNotFoundError,
-    OperationFailedError,
-)
+from pyDataverse.exceptions import ApiAuthorizationError
+from pyDataverse.exceptions import ApiUrlError
+from pyDataverse.exceptions import DatasetNotFoundError
+from pyDataverse.exceptions import DataverseNotEmptyError
+from pyDataverse.exceptions import DataverseNotFoundError
+from pyDataverse.exceptions import OperationFailedError
 
 
 class Api:
@@ -2083,6 +2086,7 @@ class NativeApi(Api):
         - Unify tree and models
 
         """
+        # print(self.base_url_api)
         children = []
 
         if children_types is None:

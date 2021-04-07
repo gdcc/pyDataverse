@@ -1,16 +1,20 @@
-from datetime import datetime
 import json
 import os
+from datetime import datetime
+from time import sleep
+
 import pytest
 from requests import Response
-from time import sleep
+
+from ..conftest import import_dataset_min_dict
+from ..conftest import import_dataverse_min_dict
+from ..conftest import test_config
 from pyDataverse.api import NativeApi
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.models import Dataset
 from pyDataverse.utils import read_file
-from ..conftest import test_config, import_dataverse_min_dict, import_dataset_min_dict
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
