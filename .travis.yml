@@ -26,8 +26,6 @@ before_install:
 install:
   - pip install --upgrade pip
   - pip install tox-travis
-  - pip install coverage
-  - pip install codecov
   - virtualenv --version
   - easy_install --version
   - pip --version
@@ -37,7 +35,7 @@ script:
   - tox
 
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
   email:
