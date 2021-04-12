@@ -50,6 +50,8 @@ class Tox(TestCommand):
 INSTALL_REQUIREMENTS = [
     # A string or list of strings specifying what other distributions need to
     # be installed when this one is.
+    "aiohttp==3.7.3",
+    "asyncio==3.4.3",
     "requests>=2.12.0",
     "jsonschema>=3.2.0",
 ]
