@@ -148,6 +148,7 @@ def dict_flat_set_full():
             {
                 "topicClassValue": "Topic Class Value1",
                 "topicClassVocab": "Topic Classification Vocabulary",
+                "topicClassVocabURI": "https://topic.class/vocab/uri",
             }
         ],
         "publication": [
@@ -395,6 +396,7 @@ def object_data_full():
             {
                 "topicClassValue": "Topic Class Value1",
                 "topicClassVocab": "Topic Classification Vocabulary",
+                "topicClassVocabURI": "https://topic.class/vocab/uri",
             }
         ],
         "publication": [
@@ -615,6 +617,7 @@ def dict_flat_get_full():
             {
                 "topicClassValue": "Topic Class Value1",
                 "topicClassVocab": "Topic Classification Vocabulary",
+                "topicClassVocabURI": "https://topic.class/vocab/uri",
             }
         ],
         "publication": [
