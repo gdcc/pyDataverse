@@ -1,4 +1,3 @@
--r common.txt
 git+https://github.com/pypa/pypa-docs-theme.git#egg=pypa-docs-theme
 git+https://github.com/python/python-docs-theme.git#egg=python-docs-theme
 pydocstyle
