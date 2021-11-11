@@ -297,6 +297,8 @@ always leads to a major version change:
     >>> resp = api.publish_dataset(ds_pid, release_type="major")
     Dataset doi:10.5072/FK2/EO7BNB published
 
+Note that the version release needs to be ``major`` if any files were added or modified. 
+A ``minor`` release will work for metadata changes, but it will return an error if there are changes in the dataset content. 
 
 .. _user_basic-usage_download-data:
 
