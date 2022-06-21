@@ -124,7 +124,7 @@ class Api:
                 )
 
         try:
-            resp = get(url, params=params)
+            resp = get(url, params=params, stream=True)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -180,7 +180,8 @@ class Api:
                 raise ApiAuthorizationError("ERROR: POST - Api token not available.")
 
         try:
-            resp = post(url, data=data, params=params, files=files)
+            resp = post(url, data=data, params=params, files=files,
+                        stream=True)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
