@@ -1252,7 +1252,7 @@ class NativeApi(Api):
         For these edits your JSON file need only include those dataset fields
         which you would like to edit. A sample JSON file may be downloaded
         here: `dataset-edit-metadata-sample.json
-        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
+        <https://guides.dataverse.org/en/latest/_downloads/cb0fae993277527ea354dc15bc5db864/dataset-edit-metadata-sample.json>`_
 
         Parameters
         ----------
@@ -1277,8 +1277,8 @@ class NativeApi(Api):
         -------
         Get dataset metadata::
 
-            >>> data = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
-            >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
+            >>> metadata = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
+            >>> resp = api.edit_dataset_metadata(doi, metadata, replace=True, auth=True)
             >>> resp.status_code
             200: metadata updated
 
