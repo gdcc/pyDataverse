@@ -51,6 +51,10 @@ basic API calls:
 
 pyDataverse is fully Open Source and can be used by everybody.
 
+<a href="https://www.repostatus.org/#unsupported"><img src="https://www.repostatus.org/badges/latest/unsupported.svg" alt="Project Status: Unsupported – The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired." /></a>
+
+pyDataverse is not supported right now. A new maintainer or funding is desired. Please contact the author <a href="https://www.stefankasberger.at"></a>, if you want to contribute in some way.
+
 .. _homepage_install:
 
 Install
