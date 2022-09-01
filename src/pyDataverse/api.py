@@ -1768,7 +1768,7 @@ class NativeApi(Api):
         Parameters
         ----------
         identifier : str
-            Identifier of the dataset.
+            Identifier of the to be replaced file.
         filename : str
             Full filename with path.
         json_str : str
