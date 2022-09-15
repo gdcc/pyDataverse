@@ -1249,7 +1249,7 @@ class NativeApi(Api):
         For these edits your JSON file need only include those dataset fields
         which you would like to edit. A sample JSON file may be downloaded
         here: `dataset-edit-metadata-sample.json
-        <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
+        <https://guides.dataverse.org/en/5.11/_downloads/cb0fae993277527ea354dc15bc5db864/dataset-edit-metadata-sample.json>`_
 
         Parameters
         ----------
