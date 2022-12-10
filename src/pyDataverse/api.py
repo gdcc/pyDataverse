@@ -1101,7 +1101,8 @@ class NativeApi(Api):
             Persistent identifier of the dataset. (e.g. ``doi:10.11587/8H3N93``).
         export_format : str
             Export format as a string. Formats: ``ddi``, ``oai_ddi``,
-            ``dcterms``, ``oai_dc``, ``schema.org``, ``dataverse_json``.
+            ``dcterms``, ``oai_dc``, ``schema.org``, ``OAI_ORE``,
+            ``Datacite``, ``oai_datacite``, ``dataverse_json``.
 
         Returns
         -------
