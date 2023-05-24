@@ -68,6 +68,11 @@ To install pyDataverse, simply run this command in your terminal of choice:
 
     pip install pyDataverse
 
+Or run this command to install using conda:
+
+.. code-block:: shell
+
+    conda install pydataverse -c conda-forge
 
 Find more options at :ref:`user_installation`.
 
