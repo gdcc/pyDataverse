@@ -485,7 +485,7 @@ many current examples of tests, and we suggest looking to these for inspiration.
 Name your tests with a descriptive filename (with prefix ``test_``) and put it
 in an appropriate place in the ``tests/`` structure.
 
-Follow the typical pattern of constructing an ``expected`` and comparing versus
+Follow the typical pattern of constructing an ``expected`` and comparing versushttps://pypi.org
 the ``result``.
 
 
@@ -863,7 +863,7 @@ related to release activities), the release can be created. This includes:
 - update version number
 - merge ``develop`` to ``master``
 - tag release name to commit (e. g. ``v0.3.0``), push branch and create pull request
-- upload to `PyPI <https://pypi.org/>`_
+- upload to `PyPI <https://pypi.org/>`_ and `conda-forge <https://conda-forge.org/>`_
 
 You can find the full release history at :ref:`community_history` and on
 `GitHub <https://github.com/gdcc/pyDataverse/releases>`_.
