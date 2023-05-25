@@ -485,8 +485,7 @@ many current examples of tests, and we suggest looking to these for inspiration.
 Name your tests with a descriptive filename (with prefix ``test_``) and put it
 in an appropriate place in the ``tests/`` structure.
 
-Follow the typical pattern of constructing an ``expected`` and comparing versushttps://pypi.org
-the ``result``.
+Follow the typical pattern of constructing an ``expected`` and comparing versus the ``result``.
 
 
 .. _contributing_code_run-test-suite:
