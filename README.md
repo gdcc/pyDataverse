@@ -15,7 +15,7 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 - [x] .../settings
 - [x] .../settings/$name
 - [ ] .../bannerMessage
-- [ ] .../authenticationProviderFactories
+- [x] .../authenticationProviderFactories
 - [ ] .../authenticationProviders
 - [ ] .../authenticationProviders/$id/
 - [ ] .../authenticationProviders/$id/enabled

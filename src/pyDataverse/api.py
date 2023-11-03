@@ -2289,7 +2289,7 @@ class NativeApi(Api):
 
         https://guides.dataverse.org/en/latest/api/native-api.html#list-all-database-settings
 
-        Parameters:
+        Parameters
         ----------
         None.
 
@@ -2306,7 +2306,7 @@ class NativeApi(Api):
     def get_setting(self, setting):
         """Get a named setting.
 
-        Parameters:
+        Parameters
         ----------
         setting: str
             Name of a setting to retrieve.
@@ -2318,6 +2318,22 @@ class NativeApi(Api):
         """
         url = f"{self.base_url}api/admin/settings/{setting}"
         return self.get_request(url)
+
+    def list_auth_provider_factories(self):
+        """List the authentication provider factories.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/authenticationProviderFactories"
+        return self.get_request(url)
+
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
