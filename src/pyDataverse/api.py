@@ -2301,7 +2301,7 @@ class NativeApi(Api):
         """
 
         url = f"{self.base_url}api/admin/settings"
-        return self.get_request(url, auth=True)
+        return self.get_request(url)
 
     def get_setting(self, setting):
         """Get a named setting.
@@ -2317,7 +2317,7 @@ class NativeApi(Api):
             Response object of requests library.
         """
         url = f"{self.base_url}api/admin/settings/{setting}"
-        return self.get_request(url, auth=True)
+        return self.get_request(url)
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
