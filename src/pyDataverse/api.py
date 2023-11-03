@@ -2284,6 +2284,40 @@ class NativeApi(Api):
             url = f"{self.base_url_api_native}/files/{identifier}/restrict"
         return self.put_request(url, auth=True)
 
+    def get_settings(self):
+        """Get Dataverse settings.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-all-database-settings
+
+        Parameters:
+        ----------
+        None.
+
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+
+        url = f"{self.base_url}api/admin/settings"
+        return self.get_request(url, auth=True)
+
+    def get_setting(self, setting):
+        """Get a named setting.
+
+        Parameters:
+        ----------
+        setting: str
+            Name of a setting to retrieve.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return self.get_request(url, auth=True)
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
@@ -2291,7 +2325,7 @@ class SearchApi(Api):
     Examples
     -------
     Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
+    should illustrate how to use the function/c@lass.
     >>>
 
     Attributes
