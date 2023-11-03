@@ -12,8 +12,8 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 -----
 
 /api/admin endpoints:
-- [ ] .../settings
-- [ ] .../settings/$name
+- [x] .../settings
+- [x] .../settings/$name
 - [ ] .../bannerMessage
 - [ ] .../authenticationProviderFactories
 - [ ] .../authenticationProviders
