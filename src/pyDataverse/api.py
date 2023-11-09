@@ -2319,6 +2319,22 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/settings/{setting}"
         return self.get_request(url)
 
+    def delete_setting(self, setting):
+        """Delete a named setting
+        Parameters
+        ----------
+        setting: str
+            Name of a setting to delete.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return delete_request(url)
+
+
     def list_auth_provider_factories(self):
         """List the authentication provider factories.
 
@@ -2333,6 +2349,19 @@ class NativeApi(Api):
         """
         url = f"{self.base_url}api/admin/authenticationProviderFactories"
         return self.get_request(url)
+
+    def list_users(self, searchTerm, itemsPerPage, selectedPage, sortKey):
+        """List the users.
+
+        Parameters
+        ----------
+        searchTerm
+
+        itemsPerPage
+        selectedPage
+        sortKey
+        """
+        url = f"{self.base_url}"
 
 
 class SearchApi(Api):
