@@ -2368,6 +2368,25 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/authenticationProviderFactories"
         return self.get_request(url)
 
+
+    def list_user(self, identifier):
+        """List the user passed in.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-single-user
+
+        Parameters
+        ----------
+        identifier: str
+            Identifier of the user.
+
+        Returns
+        -------
+        requests.Response object
+        """
+        url = f"{self.base_url}api/admin/authenticatedUsers/{identifier}"
+        return self.get_request(url)
+
+
     def list_users(self, searchTerm, itemsPerPage, selectedPage, sortKey):
         """List the users.
 
@@ -2379,7 +2398,7 @@ class NativeApi(Api):
         selectedPage
         sortKey
         """
-        url = f"{self.base_url}"
+
 
 
 class SearchApi(Api):
