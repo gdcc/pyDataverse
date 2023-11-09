@@ -2320,7 +2320,8 @@ class NativeApi(Api):
         return self.get_request(url)
 
     def delete_setting(self, setting):
-        """Delete a named setting
+        """Delete a named setting.
+
         Parameters
         ----------
         setting: str
@@ -2334,6 +2335,23 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/settings/{setting}"
         return delete_request(url)
 
+    def list_role_assignments(self, identifier):
+        """List role assignments of an assignee
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-role-assignments-of-a-role-assignee
+
+        Parameters
+        ----------
+        identifier: str
+            Identifier of an assignee.  May contain slashes (&ip/localhost-users)
+
+        Returns
+        -------
+        requests.Response
+            Response object of a requests library.
+        """
+        url = f"{self.base_url}api/admin/assignee/{assignee}"
+        return get_request(url)
 
     def list_auth_provider_factories(self):
         """List the authentication provider factories.
