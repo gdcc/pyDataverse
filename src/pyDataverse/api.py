@@ -2338,6 +2338,8 @@ class NativeApi(Api):
     def list_auth_provider_factories(self):
         """List the authentication provider factories.
 
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-authentication-provider-factories
+
         Parameters
         ----------
         None.
