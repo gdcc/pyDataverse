@@ -2335,6 +2335,21 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/settings/{setting}"
         return delete_request(url)
 
+    def list_auth_provider_factories(self):
+        """List the authentication provider factories.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/authenticationProviderFactories"
+        return self.get_request(url)
+
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 
@@ -2392,20 +2407,6 @@ class NativeApi(Api):
 
 
 
-    def list_auth_provider_factories(self):
-        """List the authentication provider factories.
-
-        Parameters
-        ----------
-        None.
-
-        Returns
-        -------
-        requests.Response
-            Response object of requests library.
-        """
-        url = f"{self.base_url}api/admin/authenticationProviderFactories"
-        return self.get_request(url)
 
 
     def list_user(self, identifier):
