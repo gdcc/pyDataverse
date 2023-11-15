@@ -2336,10 +2336,25 @@ class NativeApi(Api):
         return delete_request(url)
 
     def list_role_assignments(self, identifier):
-        """List role assignments of an assignee
+        """List all role assignments of an assignee (i.e. user or group)
 
-        https://guides.dataverse.org/en/latest/api/native-api.html#list-role-assignments-of-a-role-assignee
+        Parameters
+        ----------
+        identifier: str
+            Identifier of a role assignee.
 
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{self.base_url}api/admin/assignments/assignees/{identifier}"
+        return get_request(url)
+
+    def show_role_assignee(self, identifier):
+        """List a role assignee.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-role-assignee
         Parameters
         ----------
         identifier: str
@@ -2348,10 +2363,12 @@ class NativeApi(Api):
         Returns
         -------
         requests.Response
-            Response object of a requests library.
+            Response object of the requests library.
         """
-        url = f"{self.base_url}api/admin/assignee/{assignee}"
+        url = f"{self.base_url}api/admin/assignee/{identifier}"
         return get_request(url)
+
+
 
     def list_auth_provider_factories(self):
         """List the authentication provider factories.
@@ -2398,7 +2415,8 @@ class NativeApi(Api):
         selectedPage
         sortKey
         """
-
+        url = f"{self.base_url}api/admin/<C-F2>"
+        return self.get_request(url)
 
 
 class SearchApi(Api):

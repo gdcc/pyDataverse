@@ -35,9 +35,9 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 - [ ] .../authenticatedUsers/$USERNAME/deactivate
 - [ ] GET /api/users/$USERNAME/traces
 - [ ] POST /api/users/$USERNAME/removeRoles
-- [ ] .../assignments/assignees/$identifier
+- [x] .../assignments/assignees/$identifier
 - [ ] .../permissions/$identifier
-- [ ] .../assignee/$identifier
+- [x] .../assignee/$identifier
 - [ ] .../savedsearches
 - [ ] .../savedsearches/makelinks
 - [ ] .../datasets/integrity
