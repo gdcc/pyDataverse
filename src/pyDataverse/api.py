@@ -2338,6 +2338,8 @@ class NativeApi(Api):
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-role-assignments-of-a-role-assignee
+
         Parameters
         ----------
         identifier: str
@@ -2351,10 +2353,30 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/assignments/assignees/{identifier}"
         return get_request(url)
 
+    def list_permissions(self, identifier)
+        """List Permissions a User Has on a Dataverse Collection or
+        Dataset.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-permissions-a-user-has-on-a-dataverse-collection-or-dataset
+
+        Parameters
+        ----------
+        identifier: str
+            collection alias, database id, dataset persistent ID, or database id. 
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{self.base_url}api/admin/permissions/{identifier}"
+        return get_request(url)
+        
     def show_role_assignee(self, identifier):
         """List a role assignee.
 
         https://guides.dataverse.org/en/latest/api/native-api.html#show-role-assignee
+
         Parameters
         ----------
         identifier: str

@@ -36,7 +36,7 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 - [ ] GET /api/users/$USERNAME/traces
 - [ ] POST /api/users/$USERNAME/removeRoles
 - [x] .../assignments/assignees/$identifier
-- [ ] .../permissions/$identifier
+- [x] .../permissions/$identifier
 - [x] .../assignee/$identifier
 - [ ] .../savedsearches
 - [ ] .../savedsearches/makelinks
