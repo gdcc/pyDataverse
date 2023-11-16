@@ -32,8 +32,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] show_auth_provider(identifier)
     - [ ] enable_auth_provider(id)
     - [ ] disable_auth_provider(id)
-    - [ ] check_auth_provider_enabled(id)
-    - [ ] delete_auth_provider
+    - [x] check_auth_provider_enabled(id)
+    - [x] delete_auth_provider
 - [x] .../roles
     - [x] list_global_roles()
     - [x] create_global_role(roles_JSON)

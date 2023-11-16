@@ -2427,6 +2427,43 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/authenticationProvider/{identifier}"
         return get_request(url)
 
+    def check_auth_provider_enabled(self, identifier):
+        """Check if an authentication provider is enabled.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#check-if-an-authentication-provider-is-enabled
+
+        Parameters
+        ----------
+        identifier: str
+            Authentication provider to check if enabled.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders/{id}/enabled"
+        get_request(url)
+
+    def delete_auth_provider(self, identifier):
+        """Deletes an authentication provider from the system.  Always
+        succeeds.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-an-authentication-provider
+
+        Paramters
+        ---------
+        identifier: str
+            Identifier of the authentication provider.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles/{identifier}"
+        return delete_request(url)
+
     # description of roles:
     # https://guides.dataverse.org/en/latest/api/native-api.html#json-representation-of-a-role
     def list_global_roles(self):
