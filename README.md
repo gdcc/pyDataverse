@@ -34,7 +34,7 @@ Implementated methods for /api/admin:
     - [ ] check_auth_provider_enabled(id)
     - [ ] delete_auth_provider
 - [ ] .../roles
-    - [ ] list_global_roles()
+    - [x] list_global_roles()
     - [ ] create_global_role(roles_JSON)
     - [ ] delete_global_role(id)
 - [ ] .../list-users
