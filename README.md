@@ -12,37 +12,47 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 -----
 
 /api/admin endpoints:
-- [x] .../settings
+- [ ] .../settings, .../settings/$name
     - [x] get_settings()
     - [x] get_setting(setting)
     - [x] delete_setting(setting)
-- [x] .../settings/$name
+    - [ ] configure_setting(name, value)
 - [ ] .../bannerMessage
+    - [ ] add_banner_message(messages_JSON)
+    - [ ] show_banner_messages()
+    - [ ] delete_banner_message(id)
+    - [ ] deactive_banner_message(id)
 - [x] .../authenticationProviderFactories
     - [x] list_auth_provider_factories()
 - [ ] .../authenticationProviders
     - [x] list_auth_providers()
     - [x] add_auth_provider(authProviderJSON)
-- [ ] .../authenticationProviders/$id/
     - [x] show_auth_provider(identifier)
-- [ ] .../authenticationProviders/$id/enabled
+    - [ ] enable_auth_provider(id)
+    - [ ] disable_auth_provider(id)
+    - [ ] check_auth_provider_enabled(id)
+    - [ ] delete_auth_provider
 - [ ] .../roles
-- [ ] .../roles/$id
+    - [ ] list_global_roles()
+    - [ ] create_global_role(roles_JSON)
+    - [ ] delete_global_role(id)
 - [ ] .../list-users
-    - [ ] searchTerm
-    - [ ] itemsPerPage
-    - [ ] selectedPage
-    - [ ] sortKey
-- [ ] .../authenticatedUsers/$identifier
-    - [x] list_user(identifier)
+    - [ ] list_users(searchTerm, itemsPerPage, selectedPage, sortKey)
 - [ ] .../authenticatedUsers
+    - [x] list_user(identifier)
+    - [ ] create_user(userJSON)
+    - [ ] delete_user(id)
+    - [ ] deactivate_user(id)
 - [ ] merge user accounts
+    - [ ] merge_users(user_merged_into, user_to_merge_and_delete)
 - [ ] change user identifier
+    - [ ] change_user_identifier(oldId, newId)
 - [ ] .../superuser/$identifier
-- [ ] .../authenticatedUsers/$identifier
-- [ ] .../authenticatedUsers/$USERNAME/deactivate
+    - [ ] superuser_toggle(userId)
 - [ ] GET /api/users/$USERNAME/traces
+    - [ ] show_user_traces(username)
 - [ ] POST /api/users/$USERNAME/removeRoles
+    - [ ] remove_all_roles(username)
 - [x] .../assignments/assignees/$identifier
     - [x] list_role_assignments(identifier)
 - [x] .../permissions/$identifier
@@ -50,15 +60,48 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 - [x] .../assignee/$identifier
     - [x] show_role_assignee(identifier)
 - [ ] .../savedsearches
-- [ ] .../savedsearches/makelinks
+    - [ ] list_searches()
+    - [ ] list_search(id)
+    - [ ] execute_search(id)
 - [ ] .../datasets/integrity
+    - [ ] calculate_unf(datasetVerId)
 - [ ] .../computeDataFileHashValue
+    - [ ] calculate_datafile_checksum(fileId)
+    - [ ] validate_current_datafile_checksum(fileId)
 - [ ] .../validate/dataset/files/{datasetId}
-- [ ] .../validate/datasets
+    - [ ] validate_dataset_files(datasetId)
+- [ ] .../updateHashValues(algorithm, batch_size)
+    - [ ] update_dataset_hashes(datasetId)
 - [ ] .../workflows
-- [ ] .../workflows/$id
-- [ ] .../workflows/default
-- [ ] .../workflows/ip-whitelist
+    - [ ] list_workflows()
+    - [ ] show_workflow(id)
+    - [ ] add_workflow(workflowJSON)
+    - [ ] delete_workflow(id)
+    - [ ] list_default_workflow()
+    - [ ] set_default_workflow(workflow_id, workflow_trigger)
+    - [ ] unset_default_workflow(trigger_type)
+    - [ ] set_workflow_allowed_ip(allowed_list)
+    - [ ] get_workflow_allowed_ip()
+    - [ ] restore_workflow_default_allowed_ip()
 - [ ] .../clearMetricsCache
+    - [ ] clear_cached_metrics()
+    - [ ] clear_metric_cache(metric_db_name)
 - [ ] .../dataverse/{dataverse alias}/addRoleAssignmentsToChildren
+    - [ ] inherit_role_assignments(datavserse)
 - [ ] /api/licenses
+    - [ ] view_licenses_available()
+    - [ ] view_dataset_license(id)
+    - [ ] add_dataset_license(licenseJSON)
+    - [ ] set_dataset_license()
+    - [ ] delete_dataset_license(id)
+    - [ ] set_dataset_license_sort(id, sort_order)
+- [ ] .../templates
+    - [ ] list_templates()
+    - [ ] list_templates(id)
+    - [ ] delete_template(id)
+- [ ] .../requestSignedUrl
+    - [ ] request_signed_url(url, timeout, http_method, user)
+- [ ] .../feedback
+    - [ ] send_feedback(feedbackJSON)
+- [ ] .../mydata
+    - [ ] list_data(role_id, dv_object_type, published_states, per_page)
