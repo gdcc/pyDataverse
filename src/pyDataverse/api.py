@@ -2427,7 +2427,6 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/authenticationProvider/{identifier}"
         return get_request(url)
 
-
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 
@@ -2504,16 +2503,25 @@ class NativeApi(Api):
     def list_users(self, searchTerm, itemsPerPage, selectedPage, sortKey):
         """List the users.
 
+        Output is paginated by default, in this implementation.
+
         Parameters
         ----------
-        searchTerm
-
-        itemsPerPage
-        selectedPage
-        sortKey
+        searchTerm: str
+            String describing the search.
+        itemsPerPage: int
+            Number of items to display for each page.
+        selectedPage: int
+            Page number of results to show.
+        sortKey: str
+            How to sort results, before pagination
         """
-        url = f"{self.base_url}api/admin/<C-F2>"
-        return self.get_request(url)
+        # TODO - XXXX
+        # construct query URL using urllib
+        #
+        #url = f"{self.base_url}api/admin/list-users/"
+        #return self.get_request(url)
+        pass
 
 
 class SearchApi(Api):
