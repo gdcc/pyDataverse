@@ -2352,6 +2352,59 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/authenticationProviderFactories"
         return self.get_request(url)
 
+    def list_auth_providers(self):
+        """List the authentication providers.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-authentication-providers
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders"
+        return get_request(url)
+
+    def add_auth_provider(self, authProviderJSON):
+        """Add an authentication provider.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#add-authentication-provider
+        Parameters
+        ----------
+        jsonData: str
+            JSON object describing an authentication provider
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders"
+        return post_request(url, data=authProviderJSON)
+
+    def show_auth_provider(self, identifier):
+        """Show information about an authentication provider.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-authentication-provider
+
+        Parameters
+        ----------
+        identifier: str
+            An authentication provider
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProvider/{identifier}"
+        return get_request(url)
+
+
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 
