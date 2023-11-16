@@ -2427,6 +2427,8 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/authenticationProvider/{identifier}"
         return get_request(url)
 
+    # description of roles:
+    # https://guides.dataverse.org/en/latest/api/native-api.html#json-representation-of-a-role
     def list_global_roles(self):
         """List all global roles in the system.
 

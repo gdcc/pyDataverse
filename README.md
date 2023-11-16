@@ -36,7 +36,7 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [ ] delete_auth_provider
 - [ ] .../roles
     - [x] list_global_roles()
-    - [ ] create_global_role(roles_JSON)
+    - [x] create_global_role(roles_JSON)
     - [ ] delete_global_role(id)
 - [ ] .../list-users
     - [ ] list_users(searchTerm, itemsPerPage, selectedPage, sortKey)
