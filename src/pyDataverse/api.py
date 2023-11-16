@@ -2321,6 +2321,25 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/settings/{setting}"
         return self.get_request(url)
 
+    def configure_setting(self, setting, value):
+        """Configure a setting.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#configure-database-setting
+        Parameters
+        ----------
+        setting: str
+            Name of a setting to change.
+        value: str
+            Value the setting should have after the change.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """ 
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return self.put_request(url, value)
+
     def delete_setting(self, setting):
         """Delete a named setting.
 

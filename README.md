@@ -10,13 +10,14 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 **Find out more: [pyDataverse Documentation](https://pydataverse.readthedocs.io/en/latest/)**
 
 -----
+Implementated methods for /api/admin:
 
 /api/admin endpoints:
-- [ ] .../settings, .../settings/$name
+- [x] .../settings, .../settings/$name
     - [x] get_settings()
     - [x] get_setting(setting)
+    - [x] configure_setting(name, value)
     - [x] delete_setting(setting)
-    - [ ] configure_setting(name, value)
 - [ ] .../bannerMessage
     - [ ] add_banner_message(messages_JSON)
     - [ ] show_banner_messages()
