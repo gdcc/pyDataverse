@@ -13,11 +13,18 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 
 /api/admin endpoints:
 - [x] .../settings
+    - [x] get_settings()
+    - [x] get_setting(setting)
+    - [x] delete_setting(setting)
 - [x] .../settings/$name
 - [ ] .../bannerMessage
 - [x] .../authenticationProviderFactories
+    - [x] list_auth_provider_factories()
 - [ ] .../authenticationProviders
+    - [x] list_auth_providers()
+    - [x] add_auth_provider(authProviderJSON)
 - [ ] .../authenticationProviders/$id/
+    - [x] show_auth_provider(identifier)
 - [ ] .../authenticationProviders/$id/enabled
 - [ ] .../roles
 - [ ] .../roles/$id
@@ -27,6 +34,7 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
     - [ ] selectedPage
     - [ ] sortKey
 - [ ] .../authenticatedUsers/$identifier
+    - [x] list_user(identifier)
 - [ ] .../authenticatedUsers
 - [ ] merge user accounts
 - [ ] change user identifier
@@ -36,8 +44,11 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 - [ ] GET /api/users/$USERNAME/traces
 - [ ] POST /api/users/$USERNAME/removeRoles
 - [x] .../assignments/assignees/$identifier
+    - [x] list_role_assignments(identifier)
 - [x] .../permissions/$identifier
+    - [x] list_permissions(identifier)
 - [x] .../assignee/$identifier
+    - [x] show_role_assignee(identifier)
 - [ ] .../savedsearches
 - [ ] .../savedsearches/makelinks
 - [ ] .../datasets/integrity
