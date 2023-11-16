@@ -2306,6 +2306,8 @@ class NativeApi(Api):
     def get_setting(self, setting):
         """Get a named setting.
 
+        https://guides.dataverse.org/en/latest/api/native-api.html#get-single-database-setting
+
         Parameters
         ----------
         setting: str
@@ -2321,6 +2323,8 @@ class NativeApi(Api):
 
     def delete_setting(self, setting):
         """Delete a named setting.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-database-setting
 
         Parameters
         ----------
@@ -2460,10 +2464,6 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/assignee/{identifier}"
         return get_request(url)
 
-
-
-
-
     def list_user(self, identifier):
         """List the user passed in.
 
@@ -2481,7 +2481,7 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/authenticatedUsers/{identifier}"
         return self.get_request(url)
 
-
+    # XXX - TODO
     def list_users(self, searchTerm, itemsPerPage, selectedPage, sortKey):
         """List the users.
 
