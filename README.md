@@ -42,7 +42,7 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [ ] list_users(searchTerm, itemsPerPage, selectedPage, sortKey)
 - [ ] .../authenticatedUsers
     - [x] list_user(identifier)
-    - [ ] create_user(userJSON)
+    - [x] create_user(userJSON)
     - [ ] delete_user(id)
     - [ ] deactivate_user(id)
 - [ ] merge user accounts

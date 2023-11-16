@@ -2579,6 +2579,23 @@ class NativeApi(Api):
         #return self.get_request(url)
         pass
 
+    def create_user(self, user_json):
+        """Create an authenticated user.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#create-an-authenticated-user
+
+        Parameters
+        ----------
+        user_json: str
+            JSON object describing the new user.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticatedUsers"
+        return post_request(url, user_json)
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
