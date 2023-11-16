@@ -34,10 +34,10 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [ ] disable_auth_provider(id)
     - [ ] check_auth_provider_enabled(id)
     - [ ] delete_auth_provider
-- [ ] .../roles
+- [x] .../roles
     - [x] list_global_roles()
     - [x] create_global_role(roles_JSON)
-    - [ ] delete_global_role(id)
+    - [x] delete_global_role(id)
 - [ ] .../list-users
     - [ ] list_users(searchTerm, itemsPerPage, selectedPage, sortKey)
 - [ ] .../authenticatedUsers
