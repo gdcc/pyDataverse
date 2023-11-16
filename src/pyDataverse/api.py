@@ -2464,6 +2464,25 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/roles"
         return post_request(url, roles_json)
 
+    def delete_global_role(self, role):
+        """Delete a global role.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-global-role
+
+        Parameters
+        ----------
+        role: str
+            Global role to be deleted.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles/{role}"
+        return delete_request(url)
+
+
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 
