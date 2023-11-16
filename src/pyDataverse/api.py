@@ -2444,6 +2444,24 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/roles"
         return get_request(url)
 
+    def create_global_role(self, roles_json):
+        """Create a global role.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#create-global-role
+
+        Parameters
+        ----------
+        roles_json: str
+            JSON object describing the role.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles"
+        return post_request(url, roles_json)
+
     def list_role_assignments(self, identifier):
         """List all role assignments of an assignee (i.e. user or group)
 

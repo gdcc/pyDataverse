@@ -10,7 +10,8 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 **Find out more: [pyDataverse Documentation](https://pydataverse.readthedocs.io/en/latest/)**
 
 -----
-Implementated methods for /api/admin:
+Implementated methods for /api/admin.  These methods are implemented.  They
+do not validate input (such as JSON objects), and do not yet have testcases.
 
 /api/admin endpoints:
 - [x] .../settings, .../settings/$name
