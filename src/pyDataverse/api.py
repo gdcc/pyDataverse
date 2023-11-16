@@ -2472,7 +2472,7 @@ class NativeApi(Api):
         Parameters
         ----------
         role: str
-            Global role to be deleted.
+            Identifier of the global role to be deleted.
 
         Returns
         -------
