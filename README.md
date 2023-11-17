@@ -53,8 +53,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] superuser_toggle(userId)
 - [ ] GET /api/users/$USERNAME/traces
     - [ ] show_user_traces(username)
-- [ ] POST /api/users/$USERNAME/removeRoles
-    - [ ] remove_all_roles(username)
+- [x] POST /api/users/$USERNAME/removeRoles
+    - [x] remove_all_roles(username)
 - [x] .../assignments/assignees/$identifier
     - [x] list_role_assignments(identifier)
 - [x] .../permissions/$identifier

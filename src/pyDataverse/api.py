@@ -2575,6 +2575,24 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/assignee/{identifier}"
         return get_request(url)
 
+    def remove_user_roles(self, identifier):
+        """Removes all roles from the user. 
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#remove-all-roles-from-a-user
+
+        Parameters
+        ----------
+        identifer: str
+            Account to have roles removed.
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{base_url}api/users/{identifier}/removeRoles"
+        return post_request(url)
+
     def list_user(self, identifier):
         """List the user passed in.
 
