@@ -2575,6 +2575,24 @@ class NativeApi(Api):
         url = f"{self.base_url}api/admin/assignee/{identifier}"
         return get_request(url)
 
+    def show_user_traces(self, identifier):
+        """Show the traces that the user has left in the system, such as datasets created, guestbooks filled out, etc. This can be useful for understanding why a user cannot be deleted. A superuser API token is required.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-user-traces
+
+        Parameters
+        ----------
+        identifier: str
+            User that is queried to see their traces.
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{base_url}api/users/{identifier}/traces"
+        return get_request(url)
+
     def remove_user_roles(self, identifier):
         """Removes all roles from the user. 
 

@@ -51,8 +51,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] change_user_identifier(old_identifier, new_identifier)
 - [x] .../superuser/$identifier
     - [x] superuser_toggle(userId)
-- [ ] GET /api/users/$USERNAME/traces
-    - [ ] show_user_traces(username)
+- [x] GET /api/users/$USERNAME/traces
+    - [x] show_user_traces(username)
 - [x] POST /api/users/$USERNAME/removeRoles
     - [x] remove_all_roles(username)
 - [x] .../assignments/assignees/$identifier
