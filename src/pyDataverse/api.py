@@ -2677,9 +2677,25 @@ class NativeApi(Api):
         requests.Response object
             Response object of requests library.
         """
-        url =
-        f"{base_url}api/users/{old_identifier}changeIdentifier/{new_identifier}"
+        url = f"{base_url}api/users/{old_identifier}changeIdentifier/{new_identifier}"
         post_request(url)
+
+    def superuser_toggle(self, identifier):
+        """Toggles superuser mode on the AuthenticatedUser whose identifier (without the @ sign) is passed.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#make-user-a-superuser
+
+        Parameters
+        ----------
+        identifier: str
+            Account that will have superuser privileges added or revoked.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/superuser/{identifier}"
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.

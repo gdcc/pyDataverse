@@ -49,8 +49,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] merge_users(dest_acct, source_acct)
 - [x] change user identifier
     - [x] change_user_identifier(old_identifier, new_identifier)
-- [ ] .../superuser/$identifier
-    - [ ] superuser_toggle(userId)
+- [x] .../superuser/$identifier
+    - [x] superuser_toggle(userId)
 - [ ] GET /api/users/$USERNAME/traces
     - [ ] show_user_traces(username)
 - [ ] POST /api/users/$USERNAME/removeRoles
