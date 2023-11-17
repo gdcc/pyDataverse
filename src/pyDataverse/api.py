@@ -3,6 +3,7 @@ import json
 import subprocess as sp
 
 from requests import ConnectionError, Response, delete, get, post, put
+from requests.auth import HTTPBasicAuth
 
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
@@ -112,13 +113,13 @@ class Api:
             Response object of requests library.
 
         """
-        params = {}
-        params["User-Agent"] = "pydataverse"
+        params = {"User-Agent": "pydataverse"}
         if self.api_token:
-            params["key"] = str(self.api_token)
-
+            params["key"] = self.api_token
         try:
-            resp = get(url, params=params)
+            resp = get(url,
+                       params=params,
+                       auth=HTTPBasicAuth(self.api_token, '') if self.api_token else None)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -171,7 +172,11 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = post(url, data=data, params=params, files=files)
+            resp = post(url,
+                        data=data,
+                        params=params,
+                        files=files,
+                        auth=HTTPBasicAuth(self.api_token, '') if self.api_token else None)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
