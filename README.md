@@ -44,7 +44,7 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] list_user(identifier)
     - [x] create_user(userJSON)
     - [ ] delete_user(id)
-    - [ ] deactivate_user(id)
+    - [x] deactivate_user(id)
 - [x] merge user accounts
     - [x] merge_users(dest_acct, source_acct)
 - [x] change user identifier

@@ -2697,6 +2697,28 @@ class NativeApi(Api):
         """
         url = f"{base_url}api/admin/superuser/{identifier}"
 
+    def deactivate_user(self, identifier):
+        """Deactivates a user. A superuser API token is not required but
+        the command will operate using the first superuser it finds.  This
+        irreversible.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#deactivate-a-user
+       
+        Please see the guide, for descriptions of deactivation.
+
+        Parameters
+        ----------
+        identifier: str
+            Account to deactivate.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticatedUsers/{identifier}/deactivate"
+        post_request(url)
+
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
 
