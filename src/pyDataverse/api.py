@@ -2634,6 +2634,31 @@ class NativeApi(Api):
         url = f"{base_url}api/admin/authenticatedUsers"
         return post_request(url, user_json)
 
+    def merge_users(self, dest_acct, source_acct):
+        """Merge a source account into a destination account, and then delete the 
+        source account.  Accounts are only merged if both are active or
+        both are deactivated.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#merge-user-accounts
+
+        Parameters
+        ----------
+        dest_acct: str
+            Account to be preserved.  Contains the data from both accounts,
+            post-merge
+        source_acct: str
+            Account that will be merged into the other account.  Deleted
+            after the merge.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/users/{source_acct}/mergeIntoUser/{dest_acct}"
+        post_request(url)
+
+
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
 

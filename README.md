@@ -45,8 +45,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [x] create_user(userJSON)
     - [ ] delete_user(id)
     - [ ] deactivate_user(id)
-- [ ] merge user accounts
-    - [ ] merge_users(user_merged_into, user_to_merge_and_delete)
+- [x] merge user accounts
+    - [x] merge_users(dest_acct, source_acct)
 - [ ] change user identifier
     - [ ] change_user_identifier(oldId, newId)
 - [ ] .../superuser/$identifier
