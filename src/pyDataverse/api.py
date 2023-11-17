@@ -2658,6 +2658,28 @@ class NativeApi(Api):
         url = f"{base_url}api/users/{source_acct}/mergeIntoUser/{dest_acct}"
         post_request(url)
 
+    def change_user_identifier(self, new_identifier, old_identifier):
+        """Changes identifier for user in AuthenticatedUser, BuiltinUser, 
+        AuthenticatedUserLookup & RoleAssignment. Allows them to log in with the new 
+        identifier. Only accessible to superusers.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#change-user-identifier
+
+        Parameters
+        ----------
+        new_identifier: str
+            New identifier, that the user can user for login.
+        old_identifier: str
+            Old identifier, that user previously used for login.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url =
+        f"{base_url}api/users/{old_identifier}changeIdentifier/{new_identifier}"
+        post_request(url)
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.

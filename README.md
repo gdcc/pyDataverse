@@ -47,8 +47,8 @@ do not validate input (such as JSON objects), and do not yet have testcases.
     - [ ] deactivate_user(id)
 - [x] merge user accounts
     - [x] merge_users(dest_acct, source_acct)
-- [ ] change user identifier
-    - [ ] change_user_identifier(oldId, newId)
+- [x] change user identifier
+    - [x] change_user_identifier(old_identifier, new_identifier)
 - [ ] .../superuser/$identifier
     - [ ] superuser_toggle(userId)
 - [ ] GET /api/users/$USERNAME/traces
