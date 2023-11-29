@@ -8,3 +8,7 @@ pyDataverse is a Python module for [Dataverse](http://dataverse.org).
 It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/api/index.html) and manipulate, validate, import and export all Dataverse data-types (Dataverse, Dataset, Datafile).
 
 **Find out more: [Read the Docs](https://pydataverse.readthedocs.io/en/latest/)**
+
+## Chat with us!
+
+If you are interested in the development of pyDataverse, we invite you to join us for a chat on our [Zulip Channel](https://dataverse.zulipchat.com/#narrow/stream/377090-python). This is the perfect place to discuss and exchange ideas about the development of pyDataverse. Whether you need help or have ideas to share, feel free to join us!
