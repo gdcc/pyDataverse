@@ -1,5 +1,7 @@
-from pyDataverse.utils import read_json, save_tree_data, dataverse_tree_walker
 from ..conftest import test_config
+from pyDataverse.utils import dataverse_tree_walker
+from pyDataverse.utils import read_json
+from pyDataverse.utils import save_tree_data
 
 
 class TestUtilsSaveTreeData:

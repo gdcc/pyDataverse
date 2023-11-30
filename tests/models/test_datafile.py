@@ -1,13 +1,15 @@
 """Datafile data model tests."""
 import json
-import jsonschema
 import os
 import platform
+
+import jsonschema
 import pytest
 
-from pyDataverse.models import Datafile
-from pyDataverse.utils import read_file, write_json
 from ..conftest import test_config
+from pyDataverse.models import Datafile
+from pyDataverse.utils import read_file
+from pyDataverse.utils import write_json
 
 
 def data_object():

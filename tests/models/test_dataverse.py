@@ -1,11 +1,13 @@
 """Dataverse data model tests."""
 import json
-import jsonschema
 import os
 import platform
+
+import jsonschema
 import pytest
-from pyDataverse.models import Dataverse
+
 from ..conftest import test_config
+from pyDataverse.models import Dataverse
 
 
 def read_file(filename, mode="r"):

@@ -10,6 +10,8 @@ Where pyDataverse depends on external libraries, we document the most
 important right here and provide links to the canonical documentation outside of scope.
 
 
+.. _reference_api:
+
 API Interface
 -----------------------------
 
@@ -18,6 +20,8 @@ Access all of Dataverse APIs.
 .. automodule:: pyDataverse.api
    :members:
 
+
+.. _reference_models:
 
 Models Interface
 -----------------------------
@@ -29,6 +33,8 @@ and `Datafile`). This includes import, export and manipulation.
   :inherited-members:
 
 
+.. _reference_utils:
+
 Utils Interface
 -----------------------------
 
@@ -37,6 +43,8 @@ Helper functions.
 .. automodule:: pyDataverse.utils
   :members:
 
+
+.. _reference_exceptions:
 
 Exceptions
 -----------------------------

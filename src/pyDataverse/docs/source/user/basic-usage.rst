@@ -72,8 +72,8 @@ can then be used (e. g. :meth:`json() <requests.Response.json>`).
 Create Dataverse Collection
 -----------------------------
 
-The top-level data-type in the Dataverse software is called a Dataverse collection, so we will start with that. 
-Take a look at the figure below to better understand the relationship between a Dataverse collection, a dataset, and a datafile. 
+The top-level data-type in the Dataverse software is called a Dataverse collection, so we will start with that.
+Take a look at the figure below to better understand the relationship between a Dataverse collection, a dataset, and a datafile.
 
 .. figure:: ../_images/collection_dataset.png
    :align: center
@@ -81,9 +81,9 @@ Take a look at the figure below to better understand the relationship between a 
 
 A dataverse collection (also known as a :class:`Dataverse <pyDataverse.models.Dataverse>`) acts as a container for your :class:`Datasets<pyDataverse.models.Dataverse>`.
 It can also store other collections (:class:`Dataverses <pyDataverse.models.Dataverse>`).
-You could create your own Dataverse collections, but it is not a requirement. 
-A Dataset is a container for :class:`Datafiles<pyDataverse.models.Datafile>`, such as data, documentation, code, metadata, etc. 
-You need to create a Dataset to deposit your files. All Datasets are uniquely identified with a DOI at Dataverse. 
+You could create your own Dataverse collections, but it is not a requirement.
+A Dataset is a container for :class:`Datafiles<pyDataverse.models.Datafile>`, such as data, documentation, code, metadata, etc.
+You need to create a Dataset to deposit your files. All Datasets are uniquely identified with a DOI at Dataverse.
 For more detailed explanations, check out `the Dataverse User Guide <https://guides.dataverse.org/en/latest/user/dataset-management.html>`_.
 
 Going back to the example, first, instantiate a :class:`Dataverse <pyDataverse.models.Dataverse>`

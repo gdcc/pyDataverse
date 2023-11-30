@@ -2,9 +2,11 @@
 import json
 import os
 import platform
+
 import pytest
-from pyDataverse.models import Dataset
+
 from ..conftest import test_config
+from pyDataverse.models import Dataset
 
 
 def read_file(filename, mode="r"):

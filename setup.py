@@ -2,10 +2,11 @@
 import codecs
 import os
 import re
-from setuptools.command.test import test as TestCommand
+import sys
+
 from setuptools import find_packages
 from setuptools import setup
-import sys
+from setuptools.command.test import test as TestCommand
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))

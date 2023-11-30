@@ -1,6 +1,8 @@
 """Find out more at https://github.com/GDCC/pyDataverse."""
 import os
+
 import pytest
+
 from pyDataverse.api import NativeApi
 from pyDataverse.utils import read_json
 

@@ -229,7 +229,7 @@ you created the branch, check the section on
 :ref:`updating a PR <contributing_changes_update-pull-request>`.
 
 
-From here, you now can move forward to 
+From here, you now can move forward to
 
 - contribute to the documentation (see below)
 - contribute to the :ref:`code base <contributing_code>`
@@ -267,7 +267,7 @@ Some other important things to know about the docs:
 - The pyDataverse documentation consists of two parts:
 
   - the docstrings in the code itself and
-  - the docs in the folder ``src/pyDataverse/doc/``
+  - the docs in the folder ``src/pyDataverse/docs/``
 
 - The docstrings provide a clear explanation of the usage of the individual functions, while the documentation consists of tutorial-like overviews per topic together with some other information (what’s new, installation, this page you're viewing right now, etc).
 - The docstrings follow the `Numpy Docstring Standard <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
@@ -871,6 +871,3 @@ You can find the full release history at :ref:`community_history` and on
 **Versioning**
 
 For pyDataverse, `Semantic versioning <https://semver.org/>`_ is used for releases.
-
-
-.. _contributing_resources:
