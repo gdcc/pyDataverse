@@ -85,8 +85,11 @@ def native_api(monkeypatch):
         Api object.
 
     """
-    monkeypatch.setenv("BASE_URL", "https://demo.dataverse.org")
-    return NativeApi(os.getenv("BASE_URL"))
+
+    BASE_URL = os.getenv("BASE_URL")
+
+    monkeypatch.setenv("BASE_URL", BASE_URL)
+    return NativeApi(BASE_URL)
 
 
 def import_dataverse_min_dict():
@@ -132,7 +135,10 @@ def import_datafile_min_dict():
         Minimum Datafile metadata.
 
     """
-    return {"pid": "doi:10.11587/EVMUHP", "filename": "tests/data/datafile.txt"}
+    return {
+        "pid": "doi:10.11587/EVMUHP",
+        "filename": "tests/data/datafile.txt",
+    }
 
 
 def import_datafile_full_dict():
