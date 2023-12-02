@@ -1,0 +1,29 @@
+name: Test PyDataverse
+on: [push]
+
+jobs:
+  custom_test:
+    runs-on: ubuntu-latest
+    name: Test Dataverse Action
+    env:
+      PORT: 8080
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+      - name: Run Dataverse Action
+        id: dataverse
+        uses: gdcc/dataverse-action@test-action
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install Python Dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r ./requirements/tests.txt
+      - name: Run tests
+        env:
+          API_TOKEN: ${{ steps.dataverse.outputs.api_token }}
+          BASE_URL: ${{ steps.dataverse.outputs.base_url }}
+        run: |
+          python3 -m pytest
