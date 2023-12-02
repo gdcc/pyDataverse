@@ -24,6 +24,7 @@ jobs:
           pip install -e .
       - name: Run tests
         env:
+          API_TOKEN_SUPERUSER: ${{ steps.dataverse.outputs.api_token }}
           API_TOKEN: ${{ steps.dataverse.outputs.api_token }}
           BASE_URL: ${{ steps.dataverse.outputs.base_url }}
         run: |
