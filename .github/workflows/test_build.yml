@@ -27,5 +27,6 @@ jobs:
           API_TOKEN_SUPERUSER: ${{ steps.dataverse.outputs.api_token }}
           API_TOKEN: ${{ steps.dataverse.outputs.api_token }}
           BASE_URL: ${{ steps.dataverse.outputs.base_url }}
+          DV_VERSION: "6.0"
         run: |
           python3 -m pytest
