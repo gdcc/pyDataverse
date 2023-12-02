@@ -1,10 +1,10 @@
-name: Test PyDataverse
+name: Unit tests
 on: [push]
 
 jobs:
   custom_test:
     runs-on: ubuntu-latest
-    name: Test Dataverse Action
+    name: Test PyDtaverse
     env:
       PORT: 8080
     steps:
@@ -21,6 +21,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install -r ./requirements/tests.txt
+          pip install -e .
       - name: Run tests
         env:
           API_TOKEN: ${{ steps.dataverse.outputs.api_token }}
