@@ -1,6 +1,7 @@
 """Dataverse API wrapper for all it's API's."""
 import json
 import subprocess as sp
+from urllib.parse import urljoin
 
 from requests import ConnectionError, Response, delete, get, post, put
 
@@ -118,6 +119,7 @@ class Api:
             params["key"] = str(self.api_token)
 
         try:
+            url = urljoin(self.base_url_api, url)
             resp = get(url, params=params)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
