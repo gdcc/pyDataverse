@@ -4,6 +4,15 @@ on: [push]
 jobs:
   custom_test:
     runs-on: ubuntu-latest
+    strategy:
+       matrix:
+        python-version: [
+            "3.7",
+            "3.8",
+            "3.9",
+            "3.10",
+            "3.11"
+        ]
     name: Test pyDataverse
     env:
       PORT: 8080
@@ -16,7 +25,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
       - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
