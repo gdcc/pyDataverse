@@ -21,7 +21,7 @@ jobs:
         uses: "actions/checkout@v4"
       - name: Run Dataverse Action
         id: dataverse
-        uses: gdcc/dataverse-action@test-action
+        uses: gdcc/dataverse-action@main
       - name: Setup Python
         uses: actions/setup-python@v3
         with:
