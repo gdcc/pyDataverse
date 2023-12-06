@@ -65,7 +65,7 @@ def test_config():
         "invalid_json_strings": invalid_filename_strings,
         "invalid_data_format_types": invalid_filename_types,
         "invalid_data_format_strings": invalid_filename_strings,
-        "base_url": os.getenv("BASE_URL"),
+        "base_url": os.getenv("BASE_URL").rstrip("/"),
         "api_token": os.getenv("API_TOKEN"),
         "travis": os.getenv("TRAVIS") or False,
         "wait_time": 1,
@@ -85,8 +85,11 @@ def native_api(monkeypatch):
         Api object.
 
     """
-    monkeypatch.setenv("BASE_URL", "https://demo.dataverse.org")
-    return NativeApi(os.getenv("BASE_URL"))
+
+    BASE_URL = os.getenv("BASE_URL").rstrip("/")
+
+    monkeypatch.setenv("BASE_URL", BASE_URL)
+    return NativeApi(BASE_URL)
 
 
 def import_dataverse_min_dict():
@@ -132,7 +135,10 @@ def import_datafile_min_dict():
         Minimum Datafile metadata.
 
     """
-    return {"pid": "doi:10.11587/EVMUHP", "filename": "tests/data/datafile.txt"}
+    return {
+        "pid": "doi:10.11587/EVMUHP",
+        "filename": "tests/data/datafile.txt",
+    }
 
 
 def import_datafile_full_dict():

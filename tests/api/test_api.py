@@ -25,9 +25,9 @@ class TestApiConnect(object):
         assert isinstance(native_api, NativeApi)
         assert not native_api.api_token
         assert native_api.api_version == "v1"
-        assert native_api.base_url == os.getenv("BASE_URL")
+        assert native_api.base_url == os.getenv("BASE_URL").rstrip("/")
         assert native_api.base_url_api_native == "{0}/api/{1}".format(
-            os.getenv("BASE_URL"), native_api.api_version
+            os.getenv("BASE_URL").rstrip("/"), native_api.api_version
         )
 
     def test_api_connect_base_url_wrong(self):
@@ -51,7 +51,7 @@ class TestApiRequests(object):
     def test_get_request(self, native_api):
         """Test successfull `.get_request()` request."""
         # TODO: test params und auth default
-        base_url = os.getenv("BASE_URL")
+        base_url = os.getenv("BASE_URL").rstrip("/")
         query_str = base_url + "/api/v1/info/server"
         resp = native_api.get_request(query_str)
         sleep(test_config["wait_time"])
@@ -72,11 +72,11 @@ if not os.environ.get("TRAVIS"):
         """Test user rights."""
 
         def test_token_missing(self):
-            BASE_URL = os.getenv("BASE_URL")
+            BASE_URL = os.getenv("BASE_URL").rstrip("/")
             api = NativeApi(BASE_URL)
             resp = api.get_info_version()
-            assert resp.json()["data"]["version"] == "4.18.1"
-            assert resp.json()["data"]["build"] == "267-a91d370"
+            assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
+            # assert resp.json()["data"]["build"] == "267-a91d370"
 
             with pytest.raises(ApiAuthorizationError):
                 ds = Dataset()
@@ -90,11 +90,11 @@ if not os.environ.get("TRAVIS"):
                 api.create_dataset(":root", ds.json())
 
         def test_token_empty_string(self):
-            BASE_URL = os.getenv("BASE_URL")
+            BASE_URL = os.getenv("BASE_URL").rstrip("/")
             api = NativeApi(BASE_URL, "")
             resp = api.get_info_version()
-            assert resp.json()["data"]["version"] == "4.18.1"
-            assert resp.json()["data"]["build"] == "267-a91d370"
+            assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
+            # assert resp.json()["data"]["build"] == "267-a91d370"
 
             with pytest.raises(ApiAuthorizationError):
                 ds = Dataset()
@@ -112,7 +112,7 @@ if not os.environ.get("TRAVIS"):
         #     API_TOKEN = os.getenv("API_TOKEN_NO_RIGHTS")
         #     api = NativeApi(BASE_URL, API_TOKEN)
         #     resp = api.get_info_version()
-        #     assert resp.json()["data"]["version"] == "4.18.1"
+        #     assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
         #     assert resp.json()["data"]["build"] == "267-a91d370"
 
         #     with pytest.raises(ApiAuthorizationError):
@@ -127,15 +127,15 @@ if not os.environ.get("TRAVIS"):
         #         api.create_dataset(":root", ds.json())
 
         def test_token_right_create_dataset_rights(self):
-            BASE_URL = os.getenv("BASE_URL")
+            BASE_URL = os.getenv("BASE_URL").rstrip("/")
             api_su = NativeApi(BASE_URL, os.getenv("API_TOKEN_SUPERUSER"))
             api_nru = NativeApi(BASE_URL, os.getenv("API_TOKEN_TEST_NO_RIGHTS"))
 
             resp = api_su.get_info_version()
-            assert resp.json()["data"]["version"] == "4.18.1"
-            assert resp.json()["data"]["build"] == "267-a91d370"
+            assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
+            # assert resp.json()["data"]["build"] == "267-a91d370"
             # resp = api_nru.get_info_version()
-            # assert resp.json()["data"]["version"] == "4.18.1"
+            # assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
             # assert resp.json()["data"]["build"] == "267-a91d370"
 
             ds = Dataset()
