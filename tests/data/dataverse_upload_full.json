@@ -1,15 +1,23 @@
 {
-  "name": "Scientific Research",
-  "alias": "science",
+  "name": "Dataverse Default",
+  "alias": "default",
   "dataverseContacts": [
     {
-      "contactEmail": "pi@example.edu"
-    },
-    {
-      "contactEmail": "student@example.edu"
+      "contactEmail": "default@dataverse.org"
     }
   ],
   "affiliation": "Scientific Research University",
   "description": "We do all the science.",
-  "dataverseType": "LABORATORY"
+  "dataverseType": "RESEARCH_GROUP",
+  "theme": {
+    "backgroundColor": "gray",
+    "linkColor": "red",
+    "linkUrl": "http://www.cnn.com",
+    "logo": "lion",
+    "logoAlignment": "center",
+    "logoBackgroundColor": "navy",
+    "logoFormat": "square",
+    "tagline": "The Real Thing",
+    "textColor": "black"
+  }
 }

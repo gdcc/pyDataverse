@@ -145,8 +145,9 @@ setup.sh
 data/
 !tests/data
 tests/data/output/
+tests/data/vcr_cassettes
 dev/
-internal
+project
 *.code-workspace
 .python-version
 devel.py
@@ -157,3 +158,6 @@ src/pyDataverse/docs/source/_build
 src/pyDataverse/docs/Makefile
 env-config/
 wiki/
+credentials.json
+get-package-info.py
+tree.json
