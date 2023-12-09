@@ -2084,6 +2084,7 @@ class NativeApi(Api):
         - util function to read out all datasets into a list
         - util function to read out all datafiles into a list
         - Unify tree and models
+        - generate metadata in JSON file (number of dataversers, datasets and datafiles)
 
         """
         # print(self.base_url_api)

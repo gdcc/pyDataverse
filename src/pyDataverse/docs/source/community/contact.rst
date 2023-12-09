@@ -7,12 +7,16 @@ If you'd like to get in touch with the community and development of pyDataverse,
 there are several options:
 
 
+.. _contact github:
+
 GitHub
 ------
 
 The best way to track the development of pyDataverse is through the
 `GitHub repo <https://github.com/gdcc/pyDataverse>`_.
 
+
+.. _contact email:
 
 Email
 -------
@@ -22,6 +26,8 @@ directly via Email.
 
 - stefan.kasberger@univie.ac.at
 
+
+.. _contact twitter:
 
 Twitter
 -------
