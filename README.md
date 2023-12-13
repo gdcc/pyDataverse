@@ -12,3 +12,7 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 ## Chat with us!
 
 If you are interested in the development of pyDataverse, we invite you to join us for a chat on our [Zulip Channel](https://dataverse.zulipchat.com/#narrow/stream/377090-python). This is the perfect place to discuss and exchange ideas about the development of pyDataverse. Whether you need help or have ideas to share, feel free to join us!
+
+## PyDataverse Working Group
+
+We have formed a working group to exchange ideas and collaborate on pyDataverse. There is a bi-weekly meeting planned for this purpose, and you are welcome to join us by clicking the following [WebEx meeting link](https://unistuttgart.webex.com/unistuttgart/j.php?MTID=m322473ae7c744792437ce854422e52a3). For a list of all the scheduled dates, please refer to the [Dataverse Community calendar](https://calendar.google.com/calendar/u/1?cid=Y191ZG40dG9ubTQwMWtnampyZTRqbDRqYTBjc0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t).
