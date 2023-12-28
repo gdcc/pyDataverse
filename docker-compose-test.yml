@@ -22,7 +22,7 @@ services:
         python3 -m pip install --upgrade pip
         python3 -m pip install -r ./requirements/tests.txt
         python3 -m pip install -e .
-        python3 -m pytest
+        python3 -m pytest > /dv/unit-tests.log
     depends_on:
       bootstrap:
         condition: service_completed_successfully
