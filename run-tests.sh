@@ -58,9 +58,20 @@ while [ -n "$(docker ps -f "name=unit-tests" -f "status=running" -q)" ]; do
     sleep 5
 done
 
-# Print logs of "unit-tests" container
-docker logs unit-tests
+# Check if "unit-test" container has failed
+if [ "$(docker inspect -f '{{.State.ExitCode}}' unit-tests)" -ne 0 ]; then
+    printf "\n❌ Unit tests failed. Printing logs...\n"
+    docker logs unit-tests
+    printf "\n   Stopping containers\n"
+    docker compose -f ./docker-compose-test.yml --env-file local-test.env down
+    exit 1
+fi
+
+# Print test results
+printf "\n"
+cat dv/unit-tests.log
+printf "\n\n✅ Unit tests passed\n\n"
 
 # Stop all containers
 docker compose -f ./docker-compose-test.yml --env-file local-test.env down
-printf "\n✅ Done\n\n"
+printf "\n🎉 Done\n\n"
