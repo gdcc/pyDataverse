@@ -2289,6 +2289,476 @@ class NativeApi(Api):
             url = f"{self.base_url_api_native}/files/{identifier}/restrict"
         return self.put_request(url, auth=True)
 
+    def get_settings(self):
+        """Get Dataverse settings.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-all-database-settings
+
+        Parameters
+        ----------
+        None.
+
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+
+        url = f"{self.base_url}api/admin/settings"
+        return self.get_request(url)
+
+    def get_setting(self, setting):
+        """Get a named setting.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#get-single-database-setting
+
+        Parameters
+        ----------
+        setting: str
+            Name of a setting to retrieve.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return self.get_request(url)
+
+    def configure_setting(self, setting, value):
+        """Configure a setting.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#configure-database-setting
+        Parameters
+        ----------
+        setting: str
+            Name of a setting to change.
+        value: str
+            Value the setting should have after the change.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """ 
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return self.put_request(url, value)
+
+    def delete_setting(self, setting):
+        """Delete a named setting.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-database-setting
+
+        Parameters
+        ----------
+        setting: str
+            Name of a setting to delete.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/settings/{setting}"
+        return delete_request(url)
+
+    def list_auth_provider_factories(self):
+        """List the authentication provider factories.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-authentication-provider-factories
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{self.base_url}api/admin/authenticationProviderFactories"
+        return self.get_request(url)
+
+    def list_auth_providers(self):
+        """List the authentication providers.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-authentication-providers
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders"
+        return get_request(url)
+
+    def add_auth_provider(self, authProviderJSON):
+        """Add an authentication provider.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#add-authentication-provider
+        Parameters
+        ----------
+        jsonData: str
+            JSON object describing an authentication provider
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders"
+        return post_request(url, data=authProviderJSON)
+
+    def show_auth_provider(self, identifier):
+        """Show information about an authentication provider.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-authentication-provider
+
+        Parameters
+        ----------
+        identifier: str
+            An authentication provider
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProvider/{identifier}"
+        return get_request(url)
+
+    def check_auth_provider_enabled(self, identifier):
+        """Check if an authentication provider is enabled.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#check-if-an-authentication-provider-is-enabled
+
+        Parameters
+        ----------
+        identifier: str
+            Authentication provider to check if enabled.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticationProviders/{id}/enabled"
+        get_request(url)
+
+    def delete_auth_provider(self, identifier):
+        """Deletes an authentication provider from the system.  Always
+        succeeds.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-an-authentication-provider
+
+        Paramters
+        ---------
+        identifier: str
+            Identifier of the authentication provider.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles/{identifier}"
+        return delete_request(url)
+
+    # description of roles:
+    # https://guides.dataverse.org/en/latest/api/native-api.html#json-representation-of-a-role
+    def list_global_roles(self):
+        """List all global roles in the system.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-global-roles
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles"
+        return get_request(url)
+
+    def create_global_role(self, roles_json):
+        """Create a global role.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#create-global-role
+
+        Parameters
+        ----------
+        roles_json: str
+            JSON object describing the role.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles"
+        return post_request(url, roles_json)
+
+    def delete_global_role(self, role):
+        """Delete a global role.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#delete-global-role
+
+        Parameters
+        ----------
+        role: str
+            Identifier of the global role to be deleted.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/roles/{role}"
+        return delete_request(url)
+
+
+    def list_role_assignments(self, identifier):
+        """List all role assignments of an assignee (i.e. user or group)
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-role-assignments-of-a-role-assignee
+
+        Parameters
+        ----------
+        identifier: str
+            Identifier of a role assignee.
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{self.base_url}api/admin/assignments/assignees/{identifier}"
+        return get_request(url)
+
+    def list_permissions(self, identifier)
+        """List Permissions a User Has on a Dataverse Collection or
+        Dataset.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-permissions-a-user-has-on-a-dataverse-collection-or-dataset
+
+        Parameters
+        ----------
+        identifier: str
+            collection alias, database id, dataset persistent ID, or database id. 
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{self.base_url}api/admin/permissions/{identifier}"
+        return get_request(url)
+        
+    def show_role_assignee(self, identifier):
+        """List a role assignee.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-role-assignee
+
+        Parameters
+        ----------
+        identifier: str
+            Identifier of an assignee.  May contain slashes (&ip/localhost-users)
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{self.base_url}api/admin/assignee/{identifier}"
+        return get_request(url)
+
+    def show_user_traces(self, identifier):
+        """Show the traces that the user has left in the system, such as datasets created, guestbooks filled out, etc. This can be useful for understanding why a user cannot be deleted. A superuser API token is required.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#show-user-traces
+
+        Parameters
+        ----------
+        identifier: str
+            User that is queried to see their traces.
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{base_url}api/users/{identifier}/traces"
+        return get_request(url)
+
+    def remove_user_roles(self, identifier):
+        """Removes all roles from the user. 
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#remove-all-roles-from-a-user
+
+        Parameters
+        ----------
+        identifer: str
+            Account to have roles removed.
+
+        Returns
+        -------
+        requests.Response
+            Response object of the requests library.
+        """
+        url = f"{base_url}api/users/{identifier}/removeRoles"
+        return post_request(url)
+
+    def list_user(self, identifier):
+        """List the user passed in.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#list-single-user
+
+        Parameters
+        ----------
+        identifier: str
+            Identifier of the user.
+
+        Returns
+        -------
+        requests.Response object
+        """
+        url = f"{self.base_url}api/admin/authenticatedUsers/{identifier}"
+        return self.get_request(url)
+
+    # XXX - TODO
+    def list_users(self, searchTerm, itemsPerPage, selectedPage, sortKey):
+        """List the users.
+
+        Output is paginated by default, in this implementation.
+
+        Parameters
+        ----------
+        searchTerm: str
+            String describing the search.
+        itemsPerPage: int
+            Number of items to display for each page.
+        selectedPage: int
+            Page number of results to show.
+        sortKey: str
+            How to sort results, before pagination
+        """
+        # TODO - XXXX
+        # construct query URL using urllib
+        #
+        #url = f"{self.base_url}api/admin/list-users/"
+        #return self.get_request(url)
+        pass
+
+    def create_user(self, user_json):
+        """Create an authenticated user.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#create-an-authenticated-user
+
+        Parameters
+        ----------
+        user_json: str
+            JSON object describing the new user.
+
+        Returns
+        -------
+        requests.Response
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticatedUsers"
+        return post_request(url, user_json)
+
+    def merge_users(self, dest_acct, source_acct):
+        """Merge a source account into a destination account, and then delete the 
+        source account.  Accounts are only merged if both are active or
+        both are deactivated.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#merge-user-accounts
+
+        Parameters
+        ----------
+        dest_acct: str
+            Account to be preserved.  Contains the data from both accounts,
+            post-merge
+        source_acct: str
+            Account that will be merged into the other account.  Deleted
+            after the merge.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/users/{source_acct}/mergeIntoUser/{dest_acct}"
+        post_request(url)
+
+    def change_user_identifier(self, new_identifier, old_identifier):
+        """Changes identifier for user in AuthenticatedUser, BuiltinUser, 
+        AuthenticatedUserLookup & RoleAssignment. Allows them to log in with the new 
+        identifier. Only accessible to superusers.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#change-user-identifier
+
+        Parameters
+        ----------
+        new_identifier: str
+            New identifier, that the user can user for login.
+        old_identifier: str
+            Old identifier, that user previously used for login.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/users/{old_identifier}changeIdentifier/{new_identifier}"
+        post_request(url)
+
+    def superuser_toggle(self, identifier):
+        """Toggles superuser mode on the AuthenticatedUser whose identifier (without the @ sign) is passed.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#make-user-a-superuser
+
+        Parameters
+        ----------
+        identifier: str
+            Account that will have superuser privileges added or revoked.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/superuser/{identifier}"
+
+    def deactivate_user(self, identifier):
+        """Deactivates a user. A superuser API token is not required but
+        the command will operate using the first superuser it finds.  This
+        irreversible.
+
+        https://guides.dataverse.org/en/latest/api/native-api.html#deactivate-a-user
+       
+        Please see the guide, for descriptions of deactivation.
+
+        Parameters
+        ----------
+        identifier: str
+            Account to deactivate.
+
+        Returns
+        -------
+        requests.Response object
+            Response object of requests library.
+        """
+        url = f"{base_url}api/admin/authenticatedUsers/{identifier}/deactivate"
+        post_request(url)
 
 class SearchApi(Api):
     """Class to access Dataverse's Search API.
@@ -2296,7 +2766,7 @@ class SearchApi(Api):
     Examples
     -------
     Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
+    should illustrate how to use the function/c@lass.
     >>>
 
     Attributes
