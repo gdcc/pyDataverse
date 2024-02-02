@@ -1,6 +1,11 @@
 """Dataverse API wrapper for all it's API's."""
+
+from io import IOBase
 import json
+import mimetypes
+import os
 import subprocess as sp
+from typing import IO, Dict, Tuple, Union
 from urllib.parse import urljoin
 
 from requests import ConnectionError, Response, delete, get, post, put
@@ -172,6 +177,9 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
+        if files is not None:
+            files = self._extract_mimetypes(files)
+
         try:
             resp = post(url, data=data, params=params, files=files)
             if resp.status_code == 401:
@@ -186,6 +194,51 @@ class Api:
             raise ConnectionError(
                 "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
+
+    def _extract_mimetypes(
+        self,
+        files: Dict[str, Union[IO, Tuple[str, IO, str]]],
+    ) -> Dict[str, Union[IO, Tuple[str, IO, str]]]:
+        """
+        Prepare files for upload to the server by adding the filename, file object, and mimetype.
+
+        Args:
+            files (dict): A dictionary containing the files to be prepared
+
+        Returns:
+            dict: A dictionary containing the prepared files
+        """
+
+        assert isinstance(files, dict), "Files must be a dictionary"
+
+        for key, file in files.items():
+            files[key] = self._extract_mimetype(file)
+
+        return files
+
+    def _extract_mimetype(self, file: IOBase) -> Union[IO, Tuple[str, IO, str]]:
+        """
+        Prepare files for upload to the server
+
+        Args:
+            file (IOBase): The file to be prepared for upload.
+
+        Returns:
+            tuple: A tuple containing the filename, file object, and mimetype.
+
+        Raises:
+            AssertionError: If the file is not a file-like object.
+        """
+
+        assert isinstance(file, IOBase), "File must be a file-like object"
+
+        fname = os.path.basename(file.name)
+        mimetype, _ = mimetypes.guess_type(file.name)
+
+        if mimetype is None:
+            return file
+
+        return (fname, file, mimetype)
 
     def put_request(self, url, data=None, auth=False, params=None):
         """Make a PUT request.
