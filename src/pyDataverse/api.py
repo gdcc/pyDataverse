@@ -5,7 +5,7 @@ import httpx
 import subprocess as sp
 from urllib.parse import urljoin
 
-from requests import ConnectionError, Response, delete, get, post, put
+from httpx import ConnectError, Response
 
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
@@ -139,8 +139,8 @@ class Api:
                         )
                     )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
@@ -184,8 +184,8 @@ class Api:
                     )
                 )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
 
@@ -225,8 +225,8 @@ class Api:
                     )
                 )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: PUT - Could not establish connection to api '{0}'.".format(url)
             )
 
@@ -256,8 +256,8 @@ class Api:
 
         try:
             return httpx.delete(url, params=params)
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: DELETE could not establish connection to api {}.".format(url)
             )
 
