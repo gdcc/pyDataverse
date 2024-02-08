@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import os
 import pytest
-from requests import Response
+from httpx import Response
 from time import sleep
 from pyDataverse.api import NativeApi
 from pyDataverse.exceptions import ApiAuthorizationError
