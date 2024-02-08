@@ -1,4 +1,5 @@
 """Find out more at https://github.com/GDCC/pyDataverse."""
+
 import codecs
 import os
 import re
@@ -21,7 +22,9 @@ def find_version(*file_paths):
     """Find package version from file."""
     version_file = read_file(*file_paths)
     version_match = re.search(
-        r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M,
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        version_file,
+        re.M,
     )
     if version_match:
         return version_match.group(1)
@@ -50,7 +53,7 @@ class Tox(TestCommand):
 INSTALL_REQUIREMENTS = [
     # A string or list of strings specifying what other distributions need to
     # be installed when this one is.
-    "requests>=2.12.0",
+    "httpx>=0.26.0",
     "jsonschema>=3.2.0",
 ]
 

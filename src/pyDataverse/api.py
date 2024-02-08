@@ -1,5 +1,7 @@
 """Dataverse API wrapper for all it's API's."""
+
 import json
+import httpx
 import subprocess as sp
 from urllib.parse import urljoin
 
@@ -120,7 +122,7 @@ class Api:
 
         try:
             url = urljoin(self.base_url_api, url)
-            resp = get(url, params=params)
+            resp = httpx.get(url, params=params)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -173,7 +175,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = post(url, data=data, params=params, files=files)
+            resp = httpx.post(url, data=data, params=params, files=files)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -214,7 +216,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = put(url, data=data, params=params)
+            resp = httpx.put(url, data=data, params=params)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -253,7 +255,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            return delete(url, params=params)
+            return httpx.delete(url, params=params)
         except ConnectionError:
             raise ConnectionError(
                 "ERROR: DELETE could not establish connection to api {}.".format(url)
