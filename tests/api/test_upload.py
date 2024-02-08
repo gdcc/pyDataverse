@@ -55,11 +55,8 @@ class TestFileUpload:
         2. Upload a datafile to the dataset.
         3. Replace the uploaded datafile with a mutated version.
         4. Verify that the file replacement was successful and the content matches the expected content.
-
         """
-        # Rest of the code...
-
-    def test_file_replacement(self):
+        
         # Arrange
         BASE_URL = os.getenv("BASE_URL").rstrip("/")
         API_TOKEN = os.getenv("API_TOKEN")
