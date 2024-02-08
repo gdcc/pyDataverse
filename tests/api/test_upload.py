@@ -47,6 +47,19 @@ class TestFileUpload:
         assert response.status_code == 200, "File upload failed."
 
     def test_file_replacement(self):
+        """
+        Test case for replacing a file in a dataset.
+
+        Steps:
+        1. Create a dataset using the provided metadata.
+        2. Upload a datafile to the dataset.
+        3. Replace the uploaded datafile with a mutated version.
+        4. Verify that the file replacement was successful and the content matches the expected content.
+
+        """
+        # Rest of the code...
+
+    def test_file_replacement(self):
         # Arrange
         BASE_URL = os.getenv("BASE_URL").rstrip("/")
         API_TOKEN = os.getenv("API_TOKEN")
