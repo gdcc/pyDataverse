@@ -4,9 +4,10 @@ Copyright 2019 Stefan Kasberger
 
 Licensed under the MIT License.
 """
+
 from __future__ import absolute_import
 
-from requests.packages import urllib3
+import urllib3
 
 urllib3.disable_warnings()  # noqa
 

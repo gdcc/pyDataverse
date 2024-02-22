@@ -1,9 +1,11 @@
 """Dataverse API wrapper for all it's API's."""
+
 import json
+import httpx
 import subprocess as sp
 from urllib.parse import urljoin
 
-from requests import ConnectionError, Response, delete, get, post, put
+from httpx import ConnectError, Response
 
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
@@ -120,7 +122,7 @@ class Api:
 
         try:
             url = urljoin(self.base_url_api, url)
-            resp = get(url, params=params)
+            resp = httpx.get(url, params=params)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -137,8 +139,8 @@ class Api:
                         )
                     )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
@@ -173,7 +175,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = post(url, data=data, params=params, files=files)
+            resp = httpx.post(url, data=data, params=params, files=files)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -182,8 +184,8 @@ class Api:
                     )
                 )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
 
@@ -214,7 +216,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = put(url, data=data, params=params)
+            resp = httpx.put(url, data=data, params=params)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -223,8 +225,8 @@ class Api:
                     )
                 )
             return resp
-        except ConnectionError:
-            raise ConnectionError(
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: PUT - Could not establish connection to api '{0}'.".format(url)
             )
 
@@ -253,9 +255,9 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            return delete(url, params=params)
-        except ConnectionError:
-            raise ConnectionError(
+            return httpx.delete(url, params=params)
+        except ConnectError:
+            raise ConnectError(
                 "ERROR: DELETE could not establish connection to api {}.".format(url)
             )
 
