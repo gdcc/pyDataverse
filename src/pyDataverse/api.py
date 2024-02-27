@@ -1642,7 +1642,7 @@ class NativeApi(Api):
             # CHECK: Its not really clear, if the version query can also be done via ID.
         return self.get_request(url, auth=auth)
 
-    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
+    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True, content_type='application/octet-stream'):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1669,6 +1669,8 @@ class NativeApi(Api):
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
+        content_type : str
+            MIME type. Defaults to ``application/octet-stream``; this will prompt Dataverse to attempt to identify the MIME type of the file more accurately. 
 
         Returns
         -------
@@ -1683,7 +1685,7 @@ class NativeApi(Api):
         else:
             url += "/datasets/{0}/add".format(identifier)
 
-        files = {"file": open(filename, "rb")}
+        files = {"file": (filename, open(filename, "rb"), content_type)}
         return self.post_request(
             url, data={"jsonData": json_str}, files=files, auth=True
         )
