@@ -268,9 +268,23 @@ class Api:
         method,
         **kwargs,
     ):
+        """
+        Sends a synchronous request to the specified URL using the specified HTTP method.
+
+        Args:
+            method (function): The HTTP method to use for the request.
+            **kwargs: Additional keyword arguments to be passed to the method.
+
+        Returns:
+            requests.Response: The response object returned by the request.
+
+        Raises:
+            ApiAuthorizationError: If the response status code is 401 (Authorization error).
+            ConnectError: If a connection to the API cannot be established.
+        """
         assert "url" in kwargs, "URL is required for a request."
 
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        kwargs = self._filter_kwargs(kwargs)
 
         try:
             resp = method(**kwargs)
@@ -297,7 +311,57 @@ class Api:
         method,
         **kwargs,
     ):
-        return await method(**kwargs)
+        """
+        Sends an asynchronous request to the specified URL using the specified HTTP method.
+
+        Args:
+            method (callable): The HTTP method to use for the request.
+            **kwargs: Additional keyword arguments to be passed to the method.
+
+        Raises:
+            ApiAuthorizationError: If the response status code is 401 (Authorization error).
+            ConnectError: If a connection to the API cannot be established.
+
+        Returns:
+            The response object.
+
+        """
+        assert "url" in kwargs, "URL is required for a request."
+
+        kwargs = self._filter_kwargs(kwargs)
+
+        try:
+            resp = await method(**kwargs)
+
+            if resp.status_code == 401:
+                error_msg = resp.json()["message"]
+                raise ApiAuthorizationError(
+                    "ERROR: HTTP 401 - Authorization error {0}. MSG: {1}".format(
+                        kwargs["url"], error_msg
+                    )
+                )
+
+            return resp
+
+        except ConnectError:
+            raise ConnectError(
+                "ERROR - Could not establish connection to api '{0}'.".format(
+                    kwargs["url"]
+                )
+            )
+
+    @staticmethod
+    def _filter_kwargs(kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Filters out any keyword arguments that are `None` from the specified dictionary.
+
+        Args:
+            kwargs (Dict[str, Any]): The dictionary to filter.
+
+        Returns:
+            Dict[str, Any]: The filtered dictionary.
+        """
+        return {k: v for k, v in kwargs.items() if v is not None}
 
     async def __aenter__(self):
         """
