@@ -1,8 +1,6 @@
 import asyncio
 import pytest
 
-from pyDataverse.api import NativeApi
-
 
 class TestAsyncAPI:
 
