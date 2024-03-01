@@ -9,6 +9,20 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 
 **Find out more: [Read the Docs](https://pydataverse.readthedocs.io/en/latest/)**
 
+## Running the tests
+
+To run pyDataverse's tests locally, you need to install docker and docker-compose. This will spin up a local Dataverse instance and run the tests against it. You can run the tests with:
+
+```bash
+sh run_tests.sh
+```
+
+By default local tests are using the python `3.11` slim image. However, you can change the python version by providing a valid version via the `-p` keyword argument. For example, to run the tests with python `3.9`:
+
+```bash
+sh run_tests.sh -p 3.9
+```
+
 ## Chat with us!
 
 If you are interested in the development of pyDataverse, we invite you to join us for a chat on our [Zulip Channel](https://dataverse.zulipchat.com/#narrow/stream/377090-python). This is the perfect place to discuss and exchange ideas about the development of pyDataverse. Whether you need help or have ideas to share, feel free to join us!
