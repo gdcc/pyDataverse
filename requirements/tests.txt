@@ -2,5 +2,6 @@
 -r common.txt
 pytest
 pytest-cov
+pytest-asyncio
 tox
 selenium==3.141.0
