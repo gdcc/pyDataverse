@@ -80,8 +80,8 @@ class TestFileUpload:
         # Act
         with tempfile.TemporaryDirectory() as tempdir:
 
-            orginal = open("tests/data/replace.xyz").read()
-            mutated = "Z" + orginal[1::]
+            original = open("tests/data/replace.xyz").read()
+            mutated = "Z" + original[1::]
             mutated_path = os.path.join(tempdir, "replace.xyz")
 
             with open(mutated_path, "w") as f:

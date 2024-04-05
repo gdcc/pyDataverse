@@ -628,9 +628,9 @@ def save_tree_data(
     filename_df: str = "datafiles.json",
     filename_md: str = "metadata.json",
 ) -> None:
-    """Save lists from data returend by ``dv_tree_walker``.
+    """Save lists from data returned by ``dv_tree_walker``.
 
-    Collect lists of Dataverses, Datasets and Datafiles and save them in seperated JSON files.
+    Collect lists of Dataverses, Datasets and Datafiles and save them in separated JSON files.
 
     Parameters
     ----------

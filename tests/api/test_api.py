@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__fil
 
 
 class TestApiConnect(object):
-    """Test the NativeApi() class initalization."""
+    """Test the NativeApi() class initialization."""
 
     def test_api_connect(self, native_api):
         sleep(test_config["wait_time"])
@@ -49,7 +49,7 @@ class TestApiRequests(object):
         cls.dataset_id = None
 
     def test_get_request(self, native_api):
-        """Test successfull `.get_request()` request."""
+        """Test successful `.get_request()` request."""
         # TODO: test params und auth default
         base_url = os.getenv("BASE_URL").rstrip("/")
         query_str = base_url + "/api/v1/info/server"
@@ -59,7 +59,7 @@ class TestApiRequests(object):
         assert isinstance(resp, Response)
 
     def test_get_dataverse(self, native_api):
-        """Test successfull `.get_dataverse()` request`."""
+        """Test successful `.get_dataverse()` request`."""
         resp = native_api.get_dataverse(":root")
         sleep(test_config["wait_time"])
 
