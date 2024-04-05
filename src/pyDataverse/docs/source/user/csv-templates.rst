@@ -32,7 +32,7 @@ The CSV templates are licensed under `CC BY 4.0 <https://creativecommons.org/lic
 Data format
 -----------------------------
 
-- Seperator: ``,``
+- Separator: ``,``
 - Encoding: ``utf-8``
 - Quotation: ``"``. Note: In JSON strings, you have to escape with ``\`` before a quotation mark (e. g. adapt ``"`` to ``\"``).
 - Boolean: we recommend using ``TRUE`` and ``FALSE`` as boolean values. Note: They can be modified, when you open it with your preferred spreadsheet software (e. g. Libre Office), depending on the software or your operating systems settings.

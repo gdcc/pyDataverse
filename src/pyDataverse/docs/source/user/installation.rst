@@ -7,7 +7,7 @@ Installation
   :local:
 
 There are different options on how to install a Python package, mostly depending
-on your prefered tools and what you want to do with it. The easiest
+on your preferred tools and what you want to do with it. The easiest
 way is in most cases to use pip (see :ref:`below <user_installation_pip>`).
 
 

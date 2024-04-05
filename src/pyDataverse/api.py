@@ -26,7 +26,7 @@ class Api:
             Base URL of Dataverse instance. Without trailing `/` at the end.
             e.g. `http://demo.dataverse.org`
         api_token : str
-            Authenication token for the api.
+            Authentication token for the api.
 
     Attributes
     ----------
