@@ -189,7 +189,7 @@ class Api:
                 "ERROR: POST - Could not establish connection to API: {0}".format(url)
             )
 
-    def put_request(self, url, data=None, auth=False, params=None):
+    def put_request(self, url, data=None, auth=False, params={}):
         """Make a PUT request.
 
         Parameters
@@ -202,7 +202,7 @@ class Api:
             Should an api token be sent in the request. Defaults to `False`.
         params : dict
             Dictionary of parameters to be passed with the request.
-            Defaults to `None`.
+            Defaults to `{}`.
 
         Returns
         -------
@@ -210,7 +210,6 @@ class Api:
             Response object of requests library.
 
         """
-        params = {}
         params["User-Agent"] = "pydataverse"
         if self.api_token:
             params["key"] = self.api_token
@@ -1279,7 +1278,7 @@ class NativeApi(Api):
         Get dataset metadata::
 
             >>> data = api.get_dataset(doi).json()["data"]["latestVersion"]["metadataBlocks"]["citation"]
-            >>> resp = api.edit_dataset_metadata(doi, data, is_replace=True, auth=True)
+            >>> resp = api.edit_dataset_metadata(doi, data, replace=True, auth=True)
             >>> resp.status_code
             200: metadata updated
 
@@ -1292,7 +1291,7 @@ class NativeApi(Api):
             url = "{0}/datasets/editMetadata/{1}".format(
                 self.base_url_api_native, identifier
             )
-        params = {"replace": True} if replace else {}
+        params = {"replace": "true"} if replace else {}
         resp = self.put_request(url, metadata, auth, params)
 
         if resp.status_code == 401:
@@ -1308,7 +1307,7 @@ class NativeApi(Api):
             else:
                 print(
                     "You may not add data to a field that already has data and does not"
-                    " allow multiples. Use is_replace=true to replace existing data."
+                    " allow multiples. Use replace=True to replace existing data."
                 )
         elif resp.status_code == 200:
             print("Dataset '{0}' updated".format(identifier))
