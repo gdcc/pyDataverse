@@ -5,13 +5,8 @@ jobs:
   custom_test:
     runs-on: ubuntu-latest
     strategy:
-       matrix:
-        python-version: [
-            "3.8",
-            "3.9",
-            "3.10",
-            "3.11"
-        ]
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     name: Test pyDataverse
     env:
       PORT: 8080
@@ -28,8 +23,10 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install -r ./requirements/tests.txt
-          pip install -e .
+          python3 -m pip install poetry
+
+          poetry install --with tests
+
       - name: Run tests
         env:
           API_TOKEN_SUPERUSER: ${{ steps.dataverse.outputs.api_token }}
