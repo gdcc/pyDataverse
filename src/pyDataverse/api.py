@@ -40,7 +40,7 @@ class Api:
     def __init__(
         self,
         base_url: str,
-        api_token: str = None,
+        api_token: Optional[str] = None,
         api_version: str = "latest",
     ):
         """Init an Api() class.
