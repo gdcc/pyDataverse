@@ -1,11 +1,12 @@
 [tool.poetry]
-name = "pydataverse"
+name = "pyDataverse"
 version = "0.3.2"
 description = "A Python module for Dataverse."
 authors = ["Stephan Kasberger <stefan.kasberger@univie.ac.at>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/gdcc/pyDataverse"
+packages = [{ include = "pyDataverse", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
