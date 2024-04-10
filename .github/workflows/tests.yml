@@ -34,4 +34,4 @@ jobs:
           BASE_URL: ${{ steps.dataverse.outputs.base_url }}
           DV_VERSION: ${{ steps.dataverse.outputs.dv_version }}
         run: |
-          python3 -m pytest
+          python3 -m poetry run pytest
