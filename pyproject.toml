@@ -81,7 +81,6 @@ autopep8 = "^2.1.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-backend-path = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
