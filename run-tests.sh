@@ -45,7 +45,9 @@ printf "\n🚀 Preparing containers\n"
 printf "   Using PYTHON_VERSION=${p}\n\n"
 
 # Run all containers
-docker compose -f ./docker-compose-test.yml \
+docker compose \
+    -f docker/docker-compose-base.yml \
+    -f ./docker/docker-compose-test-all.yml \
     --env-file local-test.env \
     up -d
 
@@ -63,7 +65,11 @@ if [ "$(docker inspect -f '{{.State.ExitCode}}' unit-tests)" -ne 0 ]; then
     printf "\n❌ Unit tests failed. Printing logs...\n"
     docker logs unit-tests
     printf "\n   Stopping containers\n"
-    docker compose -f ./docker-compose-test.yml --env-file local-test.env down
+    docker compose \
+        -f docker/docker-compose-base.yml \
+        -f ./docker/docker-compose-test-all.yml \
+        --env-file local-test.env \
+        down
     exit 1
 fi
 
@@ -73,5 +79,9 @@ cat dv/unit-tests.log
 printf "\n\n✅ Unit tests passed\n\n"
 
 # Stop all containers
-docker compose -f ./docker-compose-test.yml --env-file local-test.env down
+docker compose \
+    -f docker/docker-compose-base.yml \
+    -f ./docker/docker-compose-test-all.yml \
+    --env-file local-test.env \
+    down
 printf "\n🎉 Done\n\n"
