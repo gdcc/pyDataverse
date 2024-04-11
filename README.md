@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/pyDataverse.svg)](https://pypi.org/project/pyDataverse/) ![Build Status](https://github.com/gdcc/pyDataverse/actions/workflows/test_build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/gdcc/pyDataverse/badge.svg)](https://coveralls.io/github/gdcc/pyDataverse) [![Documentation Status](https://readthedocs.org/projects/pydataverse/badge/?version=latest)](https://pydataverse.readthedocs.io/en/latest) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pydataverse.svg) [![GitHub](https://img.shields.io/github/license/gdcc/pydataverse.svg)](https://opensource.org/licenses/MIT) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4664557.svg)](https://doi.org/10.5281/zenodo.4664557)
+[![PyPI](https://img.shields.io/pypi/v/pyDataverse.svg)](https://pypi.org/project/pyDataverse/) ![Build Status](https://github.com/gdcc/pyDataverse/actions/workflows/test_build.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/gdcc/pyDataverse/badge.svg)](https://coveralls.io/github/gdcc/pyDataverse) [![Documentation Status](https://readthedocs.org/projects/pydataverse/badge/?version=latest)](https://pydataverse.readthedocs.io/en/latest) <img src="https://img.shields.io/badge/python-3.8 | 3.9 | 3.10 | 3.11-blue.svg" alt="PyPI - Python Version"> [![GitHub](https://img.shields.io/github/license/gdcc/pydataverse.svg)](https://opensource.org/licenses/MIT) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4664557.svg)](https://doi.org/10.5281/zenodo.4664557)
 
 # pyDataverse
 
@@ -9,18 +9,46 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 
 **Find out more: [Read the Docs](https://pydataverse.readthedocs.io/en/latest/)**
 
-## Running the tests
+# Running tests
 
-To run pyDataverse's tests locally, you need to install docker and docker-compose. This will spin up a local Dataverse instance and run the tests against it. You can run the tests with:
+In order to run the tests, you need to have a Dataverse instance running. We have prepared a shell script that will start a Dataverse instance using Docker that runs all tests in a clean environment. To run the tests, execute the following command:
 
 ```bash
-sh run_tests.sh
+# Defaults to Python 3.11
+./run_tests.sh
+
+# To run the tests with a specific Python version
+./run_tests.sh -p 3.8
 ```
 
-By default local tests are using the python `3.11` slim image. However, you can change the python version by providing a valid version via the `-p` keyword argument. For example, to run the tests with python `3.9`:
+Once finished, you can find the test results in the `dv/unit-tests.log` file and in the terminal.
+
+## Manual setup
+
+If you want to run single tests you need to manually set up the environment and set up the necessary environment variables. Please follow the instructions below.
+
+## 1. Start the Dataverse instance
 
 ```bash
-sh run_tests.sh -p 3.9
+docker compose \
+    -f ./docker/docker-compose-base.yml \
+    --env-file local-test.env \
+    up -d
+```
+
+## 2. Set up the environment variables
+
+```bash
+export BASE_URL=http://localhost:8080
+export DV_VERSION=6.2 # or any other version
+export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
+export API_TOKEN_SUPERUSER=$API_TOKEN
+```
+
+## 3. Run the test(s) with pytest
+
+```bash
+python -m pytest -v
 ```
 
 ## Chat with us!
