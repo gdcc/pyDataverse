@@ -27,7 +27,7 @@ Once finished, you can find the test results in the `dv/unit-tests.log` file and
 
 If you want to run single tests you need to manually set up the environment and set up the necessary environment variables. Please follow the instructions below.
 
-## 1. Start the Dataverse instance
+**1. Start the Dataverse instance**
 
 ```bash
 docker compose \
@@ -36,7 +36,7 @@ docker compose \
     up -d
 ```
 
-## 2. Set up the environment variables
+**2. Set up the environment variables**
 
 ```bash
 export BASE_URL=http://localhost:8080
@@ -45,7 +45,7 @@ export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
 export API_TOKEN_SUPERUSER=$API_TOKEN
 ```
 
-## 3. Run the test(s) with pytest
+**3. Run the test(s) with pytest**
 
 ```bash
 python -m pytest -v
