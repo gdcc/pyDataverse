@@ -122,7 +122,7 @@ class Api:
 
         try:
             url = urljoin(self.base_url_api, url)
-            resp = httpx.get(url, params=params)
+            resp = httpx.get(url, params=params, follow_redirects=True)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -175,7 +175,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = httpx.post(url, data=data, params=params, files=files)
+            resp = httpx.post(url, data=data, params=params, files=files, follow_redirects=True)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -216,7 +216,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            resp = httpx.put(url, data=data, params=params)
+            resp = httpx.put(url, data=data, params=params, follow_redirects=True)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -255,7 +255,7 @@ class Api:
             params["key"] = self.api_token
 
         try:
-            return httpx.delete(url, params=params)
+            return httpx.delete(url, params=params, follow_redirects=True)
         except ConnectError:
             raise ConnectError(
                 "ERROR: DELETE could not establish connection to api {}.".format(url)
