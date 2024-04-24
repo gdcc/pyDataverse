@@ -1,0 +1,31 @@
+version: "2.4"
+services:
+  unit-tests:
+    container_name: unit-tests
+    image: python:${PYTHON_VERSION}-slim
+    environment:
+      BASE_URL: http://dataverse:8080
+      DV_VERSION: 6.2
+    networks:
+      - dataverse
+    volumes:
+      - ${PWD}:/pydataverse
+      - ../dv:/dv
+    command:
+      - sh
+      - -c
+      - |
+        # Fetch the API Token from the local file
+        export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
+        export API_TOKEN_SUPERUSER=$$API_TOKEN
+        cd /pydataverse
+
+        # Run the unit tests
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pytest pytest-cov
+        python3 -m pip install -e .
+        python3 -m pytest > /dv/unit-tests.log
+
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully

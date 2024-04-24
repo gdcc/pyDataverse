@@ -9,6 +9,48 @@ It helps to access the Dataverse [API's](http://guides.dataverse.org/en/latest/a
 
 **Find out more: [Read the Docs](https://pydataverse.readthedocs.io/en/latest/)**
 
+# Running tests
+
+In order to run the tests, you need to have a Dataverse instance running. We have prepared a shell script that will start a Dataverse instance using Docker that runs all tests in a clean environment. To run the tests, execute the following command:
+
+```bash
+# Defaults to Python 3.11
+./run_tests.sh
+
+# To run the tests with a specific Python version
+./run_tests.sh -p 3.8
+```
+
+Once finished, you can find the test results in the `dv/unit-tests.log` file and in the terminal.
+
+## Manual setup
+
+If you want to run single tests you need to manually set up the environment and set up the necessary environment variables. Please follow the instructions below.
+
+**1. Start the Dataverse instance**
+
+```bash
+docker compose \
+    -f ./docker/docker-compose-base.yml \
+    --env-file local-test.env \
+    up -d
+```
+
+**2. Set up the environment variables**
+
+```bash
+export BASE_URL=http://localhost:8080
+export DV_VERSION=6.2 # or any other version
+export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
+export API_TOKEN_SUPERUSER=$API_TOKEN
+```
+
+**3. Run the test(s) with pytest**
+
+```bash
+python -m pytest -v
+```
+
 ## Chat with us!
 
 If you are interested in the development of pyDataverse, we invite you to join us for a chat on our [Zulip Channel](https://dataverse.zulipchat.com/#narrow/stream/377090-python). This is the perfect place to discuss and exchange ideas about the development of pyDataverse. Whether you need help or have ideas to share, feel free to join us!
