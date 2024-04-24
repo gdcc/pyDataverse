@@ -287,7 +287,7 @@ class Api:
         kwargs = self._filter_kwargs(kwargs)
 
         try:
-            resp = method(**kwargs)
+            resp = method(**kwargs, follow_redirects=True)
 
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
@@ -462,13 +462,13 @@ class DataAccessApi(Api):
         """
         is_first_param = True
         if is_pid:
-            url = "{0}/datafile/{1}".format(self.base_url_api_data_access, identifier)
-            if data_format or no_var_header or image_thumb:
-                url += "?"
-        else:
             url = "{0}/datafile/:persistentId/?persistentId={1}".format(
                 self.base_url_api_data_access, identifier
             )
+        else:
+            url = "{0}/datafile/{1}".format(self.base_url_api_data_access, identifier)
+            if data_format or no_var_header or image_thumb:
+                url += "?"
         if data_format:
             url += "format={0}".format(data_format)
             is_first_param = False
