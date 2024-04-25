@@ -7,3 +7,9 @@ pydocstyle
 restructuredtext_lint
 pygments
 rstcheck
+
+# New deps for mkdocs
+mkdocs-material
+mkdocs-literate-nav
+mkdocstrings
+pymdown-extensions

@@ -1,0 +1,55 @@
+site_name: PyDataverse
+repo_url: https://github.com/gdcc/pyDataverse
+edit_uri: edit/master/docs/
+theme:
+  font:
+    text: Open Sans
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - content.action.edit
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: pink
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: pink
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+nav:
+  - Home: index.md
+  - Code Reference: reference/
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
