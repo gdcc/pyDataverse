@@ -126,7 +126,7 @@ if not os.environ.get("TRAVIS"):
         def test_token_right_create_dataset_rights(self):
             BASE_URL = os.getenv("BASE_URL").rstrip("/")
             api_su = NativeApi(BASE_URL, os.getenv("API_TOKEN_SUPERUSER"))
-            api_nru = NativeApi(BASE_URL, os.getenv("API_TOKEN_TEST_NO_RIGHTS"))
+            # api_nru = NativeApi(BASE_URL, os.getenv("API_TOKEN_TEST_NO_RIGHTS"))
 
             resp = api_su.get_info_version()
             assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")
