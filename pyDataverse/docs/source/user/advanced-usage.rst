@@ -42,7 +42,7 @@ Prepare
 
 **Additional Resources**
 
-- CSV templates from ``src/pyDataverse/templates/`` are used (see :ref:`CSV templates <user_csv-templates>`)
+- CSV templates from ``pyDataverse/templates/`` are used (see :ref:`CSV templates <user_csv-templates>`)
 - Data from ``tests/data/user-guide/`` is used (`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/tests/data/user-guide>`_)
 
 
@@ -101,10 +101,10 @@ converts boolean values, and loads JSON cells properly.
 Once we have the data in Python, we can easily import the data into
 pyDataverse.
 
-For this, loop over each Dataset :class:`dict`, to: 
+For this, loop over each Dataset :class:`dict`, to:
 
 #. Instantiate an empty :class:`Dataset <pyDataverse.models.Dataset>`
-#. add the data with :meth:`set() <pyDataverse.models.Dataset.set>` and 
+#. add the data with :meth:`set() <pyDataverse.models.Dataset.set>` and
 #. append the instance to a :class:`list`.
 
 ::
