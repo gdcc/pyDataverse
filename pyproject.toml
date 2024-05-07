@@ -2,17 +2,19 @@
 name = "pyDataverse"
 version = "0.3.2"
 description = "A Python module for Dataverse."
-authors = ["Stephan Kasberger <stefan.kasberger@univie.ac.at>"]
+authors = [
+    "Stephan Kasberger <stefan.kasberger@univie.ac.at>",
+    "Jan Range <jan.range@simtech.uni-stuttgart.de>",
+]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/gdcc/pyDataverse"
-packages = [{ include = "pyDataverse", from = "src" }]
+packages = [{ include = "pyDataverse" }]
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
 httpx = "^0.27.0"
 jsonschema = "^4.21.1"
-urllib3 = "^2.2.1"
 
 [tool.poetry.group.dev]
 optional = true

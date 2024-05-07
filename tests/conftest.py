@@ -1,4 +1,5 @@
 """Find out more at https://github.com/GDCC/pyDataverse."""
+
 import os
 import pytest
 from pyDataverse.api import NativeApi
@@ -9,7 +10,7 @@ def test_config():
     test_dir = os.path.dirname(os.path.realpath(__file__))
     root_dir = os.path.dirname(test_dir)
     test_data_dir = os.path.join(test_dir, "data")
-    json_schemas_dir = os.path.join(root_dir, "src/pyDataverse/schemas/json")
+    json_schemas_dir = os.path.join(root_dir, "pyDataverse/schemas/json")
     test_data_output_dir = os.path.join(test_data_dir, "output")
     invalid_filename_strings = ["wrong", ""]
     invalid_filename_types = [(), [], 12, 12.12, set(), True, False]
