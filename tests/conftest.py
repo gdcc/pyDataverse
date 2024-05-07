@@ -3,7 +3,6 @@
 import os
 import pytest
 from pyDataverse.api import NativeApi
-from pyDataverse.utils import read_json
 
 
 def test_config():
