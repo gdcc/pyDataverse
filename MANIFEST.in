@@ -1,1 +1,1 @@
-recursive-include src/pyDataverse/schemas *
+recursive-include pyDataverse/schemas *

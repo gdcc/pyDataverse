@@ -1,4 +1,5 @@
 """Dataverse data-types data model."""
+
 from __future__ import absolute_import
 
 import json
@@ -103,7 +104,9 @@ class DVObject:
         assert isinstance(filename_schema, str)
 
         return validate_data(
-            json.loads(self.json(validate=False)), filename_schema, file_format="json",
+            json.loads(self.json(validate=False)),
+            filename_schema,
+            file_format="json",
         )
 
     def from_json(
@@ -867,7 +870,6 @@ class Dataset(DVObject):
                         )
 
             if "metadataBlocks" in json_dict["datasetVersion"]:
-
                 # citation
                 if "citation" in json_dict["datasetVersion"]["metadataBlocks"]:
                     citation = json_dict["datasetVersion"]["metadataBlocks"]["citation"]
@@ -954,7 +956,8 @@ class Dataset(DVObject):
 
                     if "displayName" in socialscience:
                         self.__setattr__(
-                            "socialscience_displayName", socialscience["displayName"],
+                            "socialscience_displayName",
+                            socialscience["displayName"],
                         )
 
                     for field in socialscience["fields"]:
@@ -966,27 +969,27 @@ class Dataset(DVObject):
                         elif field["typeName"] == "targetSampleSize":
                             data["targetSampleSize"] = {}
                             if "targetSampleActualSize" in field["value"]:
-                                data["targetSampleSize"][
-                                    "targetSampleActualSize"
-                                ] = field["value"]["targetSampleActualSize"]["value"]
+                                data["targetSampleSize"]["targetSampleActualSize"] = (
+                                    field["value"]["targetSampleActualSize"]["value"]
+                                )
                             if "targetSampleSizeFormula" in field["value"]:
-                                data["targetSampleSize"][
-                                    "targetSampleSizeFormula"
-                                ] = field["value"]["targetSampleSizeFormula"]["value"]
+                                data["targetSampleSize"]["targetSampleSizeFormula"] = (
+                                    field["value"]["targetSampleSizeFormula"]["value"]
+                                )
                         elif field["typeName"] == "socialScienceNotes":
                             data["socialScienceNotes"] = {}
                             if "socialScienceNotesType" in field["value"]:
-                                data["socialScienceNotes"][
-                                    "socialScienceNotesType"
-                                ] = field["value"]["socialScienceNotesType"]["value"]
+                                data["socialScienceNotes"]["socialScienceNotesType"] = (
+                                    field["value"]["socialScienceNotesType"]["value"]
+                                )
                             if "socialScienceNotesSubject" in field["value"]:
                                 data["socialScienceNotes"][
                                     "socialScienceNotesSubject"
                                 ] = field["value"]["socialScienceNotesSubject"]["value"]
                             if "socialScienceNotesText" in field["value"]:
-                                data["socialScienceNotes"][
-                                    "socialScienceNotesText"
-                                ] = field["value"]["socialScienceNotesText"]["value"]
+                                data["socialScienceNotes"]["socialScienceNotesText"] = (
+                                    field["value"]["socialScienceNotesText"]["value"]
+                                )
                         else:
                             print(
                                 "Attribute {0} not valid for import (dv_up).".format(
@@ -1200,7 +1203,10 @@ class Dataset(DVObject):
                     )
 
             # Generate fields attributes
-            for (key, val,) in self.__attr_import_dv_up_citation_fields_arrays.items():
+            for (
+                key,
+                val,
+            ) in self.__attr_import_dv_up_citation_fields_arrays.items():
                 if key in data_dict:
                     v = data_dict[key]
                     citation["fields"].append(
@@ -1341,25 +1347,25 @@ class Dataset(DVObject):
                 if "targetSampleActualSize" in target_sample_size:
                     if target_sample_size["targetSampleActualSize"] is not None:
                         tmp_dict["targetSampleActualSize"] = {}
-                        tmp_dict["targetSampleActualSize"][
-                            "typeName"
-                        ] = "targetSampleActualSize"
+                        tmp_dict["targetSampleActualSize"]["typeName"] = (
+                            "targetSampleActualSize"
+                        )
                         tmp_dict["targetSampleActualSize"]["multiple"] = False
                         tmp_dict["targetSampleActualSize"]["typeClass"] = "primitive"
-                        tmp_dict["targetSampleActualSize"][
-                            "value"
-                        ] = target_sample_size["targetSampleActualSize"]
+                        tmp_dict["targetSampleActualSize"]["value"] = (
+                            target_sample_size["targetSampleActualSize"]
+                        )
                 if "targetSampleSizeFormula" in target_sample_size:
                     if target_sample_size["targetSampleSizeFormula"] is not None:
                         tmp_dict["targetSampleSizeFormula"] = {}
-                        tmp_dict["targetSampleSizeFormula"][
-                            "typeName"
-                        ] = "targetSampleSizeFormula"
+                        tmp_dict["targetSampleSizeFormula"]["typeName"] = (
+                            "targetSampleSizeFormula"
+                        )
                         tmp_dict["targetSampleSizeFormula"]["multiple"] = False
                         tmp_dict["targetSampleSizeFormula"]["typeClass"] = "primitive"
-                        tmp_dict["targetSampleSizeFormula"][
-                            "value"
-                        ] = target_sample_size["targetSampleSizeFormula"]
+                        tmp_dict["targetSampleSizeFormula"]["value"] = (
+                            target_sample_size["targetSampleSizeFormula"]
+                        )
                 socialscience["fields"].append(
                     {
                         "typeName": "targetSampleSize",
@@ -1376,36 +1382,36 @@ class Dataset(DVObject):
                 if "socialScienceNotesType" in social_science_notes:
                     if social_science_notes["socialScienceNotesType"] is not None:
                         tmp_dict["socialScienceNotesType"] = {}
-                        tmp_dict["socialScienceNotesType"][
-                            "typeName"
-                        ] = "socialScienceNotesType"
+                        tmp_dict["socialScienceNotesType"]["typeName"] = (
+                            "socialScienceNotesType"
+                        )
                         tmp_dict["socialScienceNotesType"]["multiple"] = False
                         tmp_dict["socialScienceNotesType"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesType"][
-                            "value"
-                        ] = social_science_notes["socialScienceNotesType"]
+                        tmp_dict["socialScienceNotesType"]["value"] = (
+                            social_science_notes["socialScienceNotesType"]
+                        )
                 if "socialScienceNotesSubject" in social_science_notes:
                     if social_science_notes["socialScienceNotesSubject"] is not None:
                         tmp_dict["socialScienceNotesSubject"] = {}
-                        tmp_dict["socialScienceNotesSubject"][
-                            "typeName"
-                        ] = "socialScienceNotesSubject"
+                        tmp_dict["socialScienceNotesSubject"]["typeName"] = (
+                            "socialScienceNotesSubject"
+                        )
                         tmp_dict["socialScienceNotesSubject"]["multiple"] = False
                         tmp_dict["socialScienceNotesSubject"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesSubject"][
-                            "value"
-                        ] = social_science_notes["socialScienceNotesSubject"]
+                        tmp_dict["socialScienceNotesSubject"]["value"] = (
+                            social_science_notes["socialScienceNotesSubject"]
+                        )
                 if "socialScienceNotesText" in social_science_notes:
                     if social_science_notes["socialScienceNotesText"] is not None:
                         tmp_dict["socialScienceNotesText"] = {}
-                        tmp_dict["socialScienceNotesText"][
-                            "typeName"
-                        ] = "socialScienceNotesText"
+                        tmp_dict["socialScienceNotesText"]["typeName"] = (
+                            "socialScienceNotesText"
+                        )
                         tmp_dict["socialScienceNotesText"]["multiple"] = False
                         tmp_dict["socialScienceNotesText"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesText"][
-                            "value"
-                        ] = social_science_notes["socialScienceNotesText"]
+                        tmp_dict["socialScienceNotesText"]["value"] = (
+                            social_science_notes["socialScienceNotesText"]
+                        )
                 socialscience["fields"].append(
                     {
                         "typeName": "socialScienceNotes",
@@ -1456,7 +1462,10 @@ class Dataset(DVObject):
                     )
 
             # Generate fields attributes
-            for (key, val,) in self.__attr_import_dv_up_journal_fields_arrays.items():
+            for (
+                key,
+                val,
+            ) in self.__attr_import_dv_up_journal_fields_arrays.items():
                 if key in data_dict:
                     journal["fields"].append(
                         {
@@ -1469,9 +1478,9 @@ class Dataset(DVObject):
 
             data["datasetVersion"]["metadataBlocks"]["citation"] = citation
             if "socialscience" in locals():
-                data["datasetVersion"]["metadataBlocks"][
-                    "socialscience"
-                ] = socialscience
+                data["datasetVersion"]["metadataBlocks"]["socialscience"] = (
+                    socialscience
+                )
             if "geospatial" in locals():
                 data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
             if "journal" in locals():

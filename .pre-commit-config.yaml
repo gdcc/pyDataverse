@@ -1,35 +1,37 @@
 default_language_version:
-    python: python3
+  python: python3
 exclude: ^migrations/
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
-    exclude: _pytest/(debugging|hookspec).py
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
     hooks:
-    -   id: check-added-large-files
-    -   id: check-case-conflict
-    -   id: check-docstring-first
-    -   id: check-json
-    -   id: check-symlinks
-    -   id: check-xml
-    -   id: check-yaml
-    -   id: detect-private-key
-    -   id: end-of-file-fixer
-    -   id: pretty-format-json
-        args: [--autofix,--no-sort-keys]
--   repo: https://github.com/psf/black
-    rev: 19.10b0
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-symlinks
+      - id: check-xml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: pretty-format-json
+        args: [--autofix, --no-sort-keys]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
     hooks:
-    -   id: black
-        language_version: python3.6
--   repo: https://github.com/asottile/blacken-docs
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/asottile/blacken-docs
     rev: v1.7.0
     hooks:
-    -   id: blacken-docs
+      - id: blacken-docs
         additional_dependencies: [black==19.10b0]
 
-- repo: https://github.com/codespell-project/codespell
-  # Configuration for codespell is in setup.cfg
-  rev: v2.2.6
-  hooks:
-  - id: codespell
+  - repo: https://github.com/codespell-project/codespell
+    # Configuration for codespell is in setup.cfg
+    rev: v2.2.6
+    hooks:
+      - id: codespell

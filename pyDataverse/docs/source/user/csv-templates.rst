@@ -71,12 +71,12 @@ There is also a more detailed tutorial on how to use the CSV templates
 for mass imports in the
 :ref:`User Guide - Advanced <advanced-usage_data-migration>`.
 
-The CSV templates can be found in ``src/pyDataverse/templates/``
-(`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/src/pyDataverse/templates>`_):
+The CSV templates can be found in ``pyDataverse/templates/``
+(`GitHub repo <https://github.com/gdcc/pyDataverse/tree/master/pyDataverse/templates>`_):
 
-- `dataverses.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/src/pyDataverse/templates/dataverses.csv>`_
-- `datasets.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/src/pyDataverse/templates/datasets.csv>`_
-- `datafiles.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/src/pyDataverse/templates/datafiles.csv>`_
+- `dataverses.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/pyDataverse/templates/dataverses.csv>`_
+- `datasets.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/pyDataverse/templates/datasets.csv>`_
+- `datafiles.csv <https://raw.githubusercontent.com/gdcc/pyDataverse/master/pyDataverse/templates/datafiles.csv>`_
 
 
 .. _user_csv-templates_usage_create-csv:

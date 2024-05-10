@@ -1,4 +1,5 @@
 """Helper functions."""
+
 import csv
 import json
 import os
@@ -585,13 +586,13 @@ def dataverse_tree_walker(
     datasets = []
     datafiles = []
 
-    if type(data) == list:
+    if isinstance(data, list):
         for elem in data:
             dv, ds, df = dataverse_tree_walker(elem)
             dataverses += dv
             datasets += ds
             datafiles += df
-    elif type(data) == dict:
+    elif isinstance(data, dict):
         if data["type"] == "dataverse":
             dv_tmp = {}
             for key in dv_keys:

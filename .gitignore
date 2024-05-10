@@ -164,3 +164,9 @@ src/pyDataverse/docs/source/_build
 src/pyDataverse/docs/Makefile
 env-config/
 wiki/
+
+# Poetry lock
+poetry.lock
+
+# Ruff
+.ruff_cache/

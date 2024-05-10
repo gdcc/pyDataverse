@@ -1,16 +1,13 @@
-from datetime import datetime
-import json
 import os
 import pytest
 from httpx import Response
 from time import sleep
 from pyDataverse.api import NativeApi
 from pyDataverse.exceptions import ApiAuthorizationError
-from pyDataverse.exceptions import ApiResponseError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.models import Dataset
 from pyDataverse.utils import read_file
-from ..conftest import test_config, import_dataverse_min_dict, import_dataset_min_dict
+from ..conftest import test_config
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
@@ -129,7 +126,7 @@ if not os.environ.get("TRAVIS"):
         def test_token_right_create_dataset_rights(self):
             BASE_URL = os.getenv("BASE_URL").rstrip("/")
             api_su = NativeApi(BASE_URL, os.getenv("API_TOKEN_SUPERUSER"))
-            api_nru = NativeApi(BASE_URL, os.getenv("API_TOKEN_TEST_NO_RIGHTS"))
+            # api_nru = NativeApi(BASE_URL, os.getenv("API_TOKEN_TEST_NO_RIGHTS"))
 
             resp = api_su.get_info_version()
             assert resp.json()["data"]["version"] == os.getenv("DV_VERSION")

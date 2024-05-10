@@ -2,10 +2,10 @@ import os
 import json
 import httpx
 
-from pyDataverse.api import DataAccessApi, NativeApi
+from pyDataverse.api import DataAccessApi
+
 
 class TestDataAccess:
-
     def test_get_data_by_id(self):
         """Tests getting data file by id."""
 
@@ -103,7 +103,7 @@ class TestDataAccess:
             headers={
                 "X-Dataverse-key": API_TOKEN,
                 "Content-Type": "application/json",
-            }
+            },
         )
 
         response.raise_for_status()

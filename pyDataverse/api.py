@@ -4,7 +4,6 @@ import json
 from typing import Any, Dict, Optional
 import httpx
 import subprocess as sp
-from urllib.parse import urljoin
 
 from httpx import ConnectError, Response
 

@@ -229,7 +229,7 @@ you created the branch, check the section on
 :ref:`updating a PR <contributing_changes_update-pull-request>`.
 
 
-From here, you now can move forward to 
+From here, you now can move forward to
 
 - contribute to the documentation (see below)
 - contribute to the :ref:`code base <contributing_code>`
@@ -267,7 +267,7 @@ Some other important things to know about the docs:
 - The pyDataverse documentation consists of two parts:
 
   - the docstrings in the code itself and
-  - the docs in the folder ``src/pyDataverse/doc/``
+  - the docs in the folder ``pyDataverse/doc/``
 
 - The docstrings provide a clear explanation of the usage of the individual functions, while the documentation consists of tutorial-like overviews per topic together with some other information (what’s new, installation, this page you're viewing right now, etc).
 - The docstrings follow the `Numpy Docstring Standard <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
@@ -298,7 +298,7 @@ to ``upstream/develop``, so you have to branch-off from it too.
 
 There is one exception: If you
 want to suggest a change to the docs in the folder
-``src/pyDataverse/docs/`` (e. g. fix a typo in
+``pyDataverse/docs/`` (e. g. fix a typo in
 :ref:`User Guide - Basic Usage <user_basic-usage>`),
 you can also pull to ``upstream/master``. This means, you have also to
 branch-off from the ``master`` branch.
@@ -411,7 +411,7 @@ To run black alone, use
 
 .. code-block:: shell
 
-  black src/pyDataverse/file_changed.py
+  black pyDataverse/file_changed.py
 
 
 .. _contributing_code_type-hints:
@@ -430,7 +430,7 @@ type hints. After making any change you can ensure your type hints are correct b
 
 .. code-block:: shell
 
-  mypy src/pyDataverse/file_changed.py
+  mypy pyDataverse/file_changed.py
 
 
 .. _contributing_code_testing-with-ci:
