@@ -21,18 +21,6 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
-flake8 = "^7.0.0"
-flake8-docstrings = "^1.7.0"
-flake8-blind-except = "^0.2.1"
-flake8-builtins = "^2.5.0"
-flake8-bandit = "^4.1.1"
-flake8-breakpoint = "^1.1.0"
-flake8-bugbear = "^24.2.6"
-flake8-comprehensions = "^3.14.0"
-flake8-requirements = "^2.1.1"
-flake8-return = "^1.2.0"
-flake8-pytest-style = "^2.0.0"
-pylint = "^3.1.0"
 radon = "^6.0.1"
 mypy = "^1.9.0"
 autopep8 = "^2.1.0"
@@ -47,6 +35,7 @@ pre-commit = "3.5.0"
 sphinx = "7.1.2"
 restructuredtext-lint = "^1.4.0"
 rstcheck = "^6.2.1"
+ruff = "^0.4.4"
 
 
 [tool.poetry.group.tests]
@@ -73,22 +62,10 @@ optional = true
 
 [tool.poetry.group.lint.dependencies]
 black = "^24.3.0"
-flake8 = "^7.0.0"
-flake8-docstrings = "^1.7.0"
-flake8-rst-docstrings = "^0.3.0"
-flake8-blind-except = "^0.2.1"
-flake8-builtins = "^2.5.0"
-flake8-bandit = "^4.1.1"
-flake8-breakpoint = "^1.1.0"
-flake8-bugbear = "^24.2.6"
-flake8-comprehensions = "^3.14.0"
-flake8-requirements = "^2.1.1"
-flake8-return = "^1.2.0"
-flake8-pytest-style = "^2.0.0"
-pylint = "^3.1.0"
 radon = "^6.0.1"
 mypy = "^1.9.0"
 autopep8 = "^2.1.0"
+ruff = "^0.4.4"
 
 [build-system]
 requires = ["poetry-core"]
