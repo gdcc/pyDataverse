@@ -160,3 +160,6 @@ wiki/
 
 # Poetry lock
 poetry.lock
+
+# Ruff
+.ruff_cache/
