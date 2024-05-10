@@ -167,11 +167,14 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
+        if isinstance(data, str):
+            data = json.loads(data)
+
         if self.client is None:
             return self._sync_request(
                 method=httpx.post,
                 url=url,
-                data=data,
+                json=data,
                 params=params,
                 files=files,
             )
@@ -179,7 +182,7 @@ class Api:
             return self._async_request(
                 method=self.client.post,
                 url=url,
-                data=data,
+                json=data,
                 params=params,
                 files=files,
             )
@@ -210,18 +213,21 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
+        if isinstance(data, str):
+            data = json.loads(data)
+
         if self.client is None:
             return self._sync_request(
                 method=httpx.put,
                 url=url,
-                data=data,
+                json=data,
                 params=params,
             )
         else:
             return self._async_request(
                 method=self.client.put,
                 url=url,
-                data=data,
+                json=data,
                 params=params,
             )
 
@@ -287,7 +293,6 @@ class Api:
 
         try:
             resp = method(**kwargs, follow_redirects=True)
-
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
