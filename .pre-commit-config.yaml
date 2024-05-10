@@ -23,7 +23,6 @@ repos:
       - id: ruff
         args: [--fix]
       - id: ruff-format
-        args: [--fix]
 
   - repo: https://github.com/asottile/blacken-docs
     rev: v1.7.0
