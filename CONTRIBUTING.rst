@@ -863,7 +863,7 @@ related to release activities), the release can be created. This includes:
 - update version number
 - merge ``develop`` to ``master``
 - tag release name to commit (e. g. ``v0.3.0``), push branch and create pull request
-- upload to `PyPI <https://pypi.org/>`_
+- upload to `PyPI <https://pypi.org/>`_ and `conda-forge  <https://conda-fore.org/>`_
 
 You can find the full release history at :ref:`community_history` and on
 `GitHub <https://github.com/gdcc/pyDataverse/releases>`_.

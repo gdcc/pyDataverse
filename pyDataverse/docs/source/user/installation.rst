@@ -48,6 +48,17 @@ Pipenv
 
 .. _user_installation_source-code:
 
+
+Conda
+-----------------------------
+
+pyDataverse is also available through `conda-forge <https://conda-forge.org/>`_.
+
+.. code-block:: shell
+
+    conda install pyDataverse -c conda-forge
+
+
 Source Code
 -----------------------------
 

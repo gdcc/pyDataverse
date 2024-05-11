@@ -8,6 +8,9 @@ Release v\ |version|.
 .. image:: https://img.shields.io/github/v/release/gdcc/pyDataverse
     :target: https://github.com/gdcc/pyDataverse
 
+.. image:: https://img.shields.io/conda/vn/conda-forge/pydataverse.svg
+    :target: https://anaconda.org/conda-forge/pydataverse 
+    
 .. image:: https://travis-ci.com/gdcc/pyDataverse.svg?branch=master
     :target: https://travis-ci.com/gdcc/pyDataverse
 
@@ -68,6 +71,11 @@ To install pyDataverse, simply run this command in your terminal of choice:
 
     pip install pyDataverse
 
+Or run this command to install using conda:
+
+.. code-block:: shell
+
+    conda install pyDataverse -c conda-forge
 
 Find more options at :ref:`user_installation`.
 
