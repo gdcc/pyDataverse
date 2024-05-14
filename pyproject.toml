@@ -3,7 +3,7 @@ name = "pyDataverse"
 version = "0.3.2"
 description = "A Python module for Dataverse."
 authors = [
-    "Stephan Kasberger <stefan.kasberger@univie.ac.at>",
+    "Stefan Kasberger <stefan.kasberger@univie.ac.at>",
     "Jan Range <jan.range@simtech.uni-stuttgart.de>",
 ]
 license = "MIT"
