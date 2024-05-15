@@ -292,7 +292,7 @@ class Api:
         kwargs = self._filter_kwargs(kwargs)
 
         try:
-            resp = method(**kwargs, follow_redirects=True)
+            resp = method(**kwargs, follow_redirects=True, timeout=None)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
