@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyDataverse"
-version = "0.3.2"
+version = "0.3.3"
 description = "A Python module for Dataverse."
 authors = [
     "Stefan Kasberger <stefan.kasberger@univie.ac.at>",
