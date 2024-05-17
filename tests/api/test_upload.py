@@ -9,7 +9,6 @@ from pyDataverse.models import Datafile
 
 
 class TestFileUpload:
-
     def test_file_upload(self):
         """
         Test case for uploading a file to a dataset.
@@ -46,6 +45,58 @@ class TestFileUpload:
         # Assert
         assert response.status_code == 200, "File upload failed."
 
+    def test_bulk_file_upload(self, create_mock_file):
+        """
+        Test case for uploading bulk files to a dataset.
+
+        This test is meant to check the performance of the file upload feature
+        and that nothing breaks when uploading multiple files in line.
+
+        This test case performs the following steps:
+        0. Create 50 mock files.
+        1. Creates a dataset using the provided metadata.
+        2. Prepares a file for upload.
+        3. Uploads the file to the dataset.
+        4. Asserts that the file upload was successful.
+
+        Raises:
+            AssertionError: If the file upload fails.
+
+        """
+        # Arrange
+        BASE_URL = os.getenv("BASE_URL").rstrip("/")
+        API_TOKEN = os.getenv("API_TOKEN")
+
+        # Create dataset
+        metadata = json.load(open("tests/data/file_upload_ds_minimum.json"))
+        pid = self._create_dataset(BASE_URL, API_TOKEN, metadata)
+        api = NativeApi(BASE_URL, API_TOKEN)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Create mock files
+            mock_files = [
+                create_mock_file(
+                    filename=f"mock_file_{i}.txt",
+                    dir=tmp_dir,
+                    size=1024**2,  # 1MB
+                )
+                for i in range(50)
+            ]
+
+            for mock_file in mock_files:
+                # Prepare file upload
+                df = Datafile({"pid": pid, "filename": os.path.basename(mock_file)})
+
+                # Act
+                response = api.upload_datafile(
+                    identifier=pid,
+                    filename=mock_file,
+                    json_str=df.json(),
+                )
+
+                # Assert
+                assert response.status_code == 200, "File upload failed."
+
     def test_file_replacement(self):
         """
         Test case for replacing a file in a dataset.
@@ -56,7 +107,7 @@ class TestFileUpload:
         3. Replace the uploaded datafile with a mutated version.
         4. Verify that the file replacement was successful and the content matches the expected content.
         """
-        
+
         # Arrange
         BASE_URL = os.getenv("BASE_URL").rstrip("/")
         API_TOKEN = os.getenv("API_TOKEN")
@@ -79,7 +130,6 @@ class TestFileUpload:
 
         # Act
         with tempfile.TemporaryDirectory() as tempdir:
-
             original = open("tests/data/replace.xyz").read()
             mutated = "Z" + original[1::]
             mutated_path = os.path.join(tempdir, "replace.xyz")

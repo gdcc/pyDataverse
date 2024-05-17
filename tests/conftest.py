@@ -156,3 +156,27 @@ def import_datafile_full_dict():
         "description": "Test datafile",
         "restrict": False,
     }
+
+
+@pytest.fixture
+def create_mock_file():
+    """Returns a function that creates a mock file."""
+
+    def _create_mock_file(filename: str, dir: str, size: int):
+        """Create a mock file.
+
+        Args:
+            filename (str): Filename.
+            dir (str): Directory.
+            size (int): Size.
+
+        Returns:
+            str: Path to the file.
+        """
+        path = os.path.join(dir, filename)
+        with open(path, "wb") as f:
+            f.write(os.urandom(size))
+
+        return path
+
+    return _create_mock_file
