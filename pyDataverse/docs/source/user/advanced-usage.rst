@@ -166,7 +166,7 @@ Note: The Dataverse collection assigned to ``dv_alias`` must be published in ord
     Dataset with pid 'doi:10.5072/FK2/WVMDFE' created.
 
 The API requests always return a
-:class:`requests.Response <requests.Response>` object, which can then be used
+:class:`httpx.Response <httpx.Response>` object, which can then be used
 to extract the data.
 
 Next, we'll do the same for the :class:`list <list>` of

@@ -63,8 +63,8 @@ if the API connection works and to retrieve the version of your Dataverse instan
     >>> resp.status_code
     200
 
-All API requests return a :class:`requests.Response <requests.Response>` object, which
-can then be used (e. g. :meth:`json() <requests.Response.json>`).
+All API requests return a :class:`httpx.Response <httpx.Response>` object, which
+can then be used (e. g. :meth:`json() <httpx.Response.json>`).
 
 
 .. _user_basic-usage_create-dataverse:
