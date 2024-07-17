@@ -2,7 +2,7 @@ import os
 import pytest
 from httpx import Response
 from time import sleep
-from pyDataverse.api import NativeApi
+from pyDataverse.api import DataAccessApi, NativeApi
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.models import Dataset
@@ -150,3 +150,11 @@ if not os.environ.get("TRAVIS"):
 
             resp = api_su.delete_dataset(pid)
             assert resp.json()["status"] == "OK"
+
+        def test_token_should_not_be_exposed_on_error(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = DataAccessApi(BASE_URL, API_TOKEN)
+
+            result = api.get_datafile("does-not-exist").json()
+            assert API_TOKEN not in result["requestUrl"]
