@@ -17,6 +17,7 @@ Access all of Dataverse APIs.
 
 .. automodule:: pyDataverse.api
    :members:
+   :special-members:
 
 
 Models Interface

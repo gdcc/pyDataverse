@@ -3,6 +3,7 @@ import pytest
 from httpx import Response
 from time import sleep
 from pyDataverse.api import DataAccessApi, NativeApi
+from pyDataverse.auth import ApiTokenAuth
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.models import Dataset
@@ -32,6 +33,36 @@ class TestApiConnect(object):
         # None
         with pytest.raises(ApiUrlError):
             NativeApi(None)
+
+
+class TestApiTokenAndAuthBehavior:
+    def test_api_token_none_and_auth_none(self):
+        api = NativeApi("https://demo.dataverse.org")
+        assert api.api_token is None
+        assert api.auth is None
+
+    def test_api_token_none_and_auth(self):
+        auth = ApiTokenAuth("mytoken")
+        api = NativeApi("https://demo.dataverse.org", auth=auth)
+        assert api.api_token is None
+        assert api.auth is auth
+
+    def test_api_token_and_auth(self):
+        auth = ApiTokenAuth("mytoken")
+        # Only one, api_token or auth, should be specified
+        with pytest.warns(UserWarning):
+            api = NativeApi(
+                "https://demo.dataverse.org", api_token="sometoken", auth=auth
+            )
+        assert api.api_token is None
+        assert api.auth is auth
+
+    def test_api_token_and_auth_none(self):
+        api_token = "mytoken"
+        api = NativeApi("https://demo.dataverse.org", api_token)
+        assert api.api_token == api_token
+        assert isinstance(api.auth, ApiTokenAuth)
+        assert api.auth.api_token == api_token
 
 
 class TestApiRequests(object):

@@ -4,9 +4,11 @@ import json
 from typing import Any, Dict, Optional
 import httpx
 import subprocess as sp
+from warnings import warn
 
 from httpx import ConnectError, Response
 
+from pyDataverse.auth import ApiTokenAuth
 from pyDataverse.exceptions import (
     ApiAuthorizationError,
     ApiUrlError,
@@ -41,6 +43,8 @@ class Api:
         base_url: str,
         api_token: Optional[str] = None,
         api_version: str = "latest",
+        *,
+        auth: Optional[httpx.Auth] = None,
     ):
         """Init an Api() class.
 
@@ -52,15 +56,53 @@ class Api:
         base_url : str
             Base url for Dataverse api.
         api_token : str | None
-            Api token for Dataverse api.
+            API token for Dataverse API. If you provide an :code:`api_token`, we
+            assume it is an API token as retrieved via your Dataverse instance
+            user profile.
+            We recommend using the :code:`auth` argument instead.
+            To retain the current behaviour with the :code:`auth` argument, change
 
+            .. code-block:: python
+
+                Api("https://demo.dataverse.org", "my_token")
+
+            to
+
+            .. code-block:: python
+
+                from pyDataverse.auth import ApiTokenAuth
+
+                Api("https://demo.dataverse.org", auth=ApiTokenAuth("my_token"))
+
+            If you are using an OIDC/OAuth 2.0 Bearer token, please use the :code:`auth`
+            parameter with the :py:class:`.auth.BearerTokenAuth`.
+        api_version : str
+            The version string of the Dataverse API or :code:`latest`, e.g.,
+            :code:`v1`. Defaults to :code:`latest`, which drops the version from
+            the API urls.
+        auth : httpx.Auth | None
+            You can provide any authentication mechanism you like to connect to
+            your Dataverse instance.  The most common mechanisms are implemented
+            in :py:mod:`.auth`, but if one is missing, you can use your own
+            `httpx.Auth`-compatible class. For more information, have a look at
+            `httpx' Authentication docs
+            <https://www.python-httpx.org/advanced/authentication/>`_.
         Examples
         --------
         Create an Api connection::
 
+        .. code-block::
+
             >>> from pyDataverse.api import Api
             >>> base_url = 'http://demo.dataverse.org'
             >>> api = Api(base_url)
+
+        .. code-block::
+
+            >>> from pyDataverse.api import Api
+            >>> from pyDataverse.auth import ApiTokenAuth
+            >>> base_url = 'http://demo.dataverse.org'
+            >>> api = Api(base_url, ApiTokenAuth('my_api_token'))
 
         """
         if not isinstance(base_url, str):
@@ -73,10 +115,19 @@ class Api:
             raise ApiUrlError("api_version {0} is not a string.".format(api_version))
         self.api_version = api_version
 
-        if api_token:
-            if not isinstance(api_token, str):
-                raise ApiAuthorizationError("Api token passed is not a string.")
+        self.auth = auth
         self.api_token = api_token
+        if api_token is not None:
+            if auth is None:
+                self.auth = ApiTokenAuth(api_token)
+            else:
+                self.api_token = None
+                warn(
+                    UserWarning(
+                        "You provided both, an api_token and a custom auth "
+                        "method. We will only use the auth method."
+                    )
+                )
 
         if self.base_url:
             if self.api_version == "latest":
@@ -119,21 +170,21 @@ class Api:
             Response object of httpx library.
 
         """
-        params = {}
-        params["User-Agent"] = "pydataverse"
-        if self.api_token:
-            params["key"] = str(self.api_token)
+        headers = {}
+        headers["User-Agent"] = "pydataverse"
 
         if self.client is None:
             return self._sync_request(
                 method=httpx.get,
                 url=url,
+                headers=headers,
                 params=params,
             )
         else:
             return self._async_request(
                 method=self.client.get,
                 url=url,
+                headers=headers,
                 params=params,
             )
 
@@ -162,10 +213,8 @@ class Api:
             Response object of httpx library.
 
         """
-        params = {}
-        params["User-Agent"] = "pydataverse"
-        if self.api_token:
-            params["key"] = self.api_token
+        headers = {}
+        headers["User-Agent"] = "pydataverse"
 
         if isinstance(data, str):
             data = json.loads(data)
@@ -175,12 +224,19 @@ class Api:
 
         if self.client is None:
             return self._sync_request(
-                method=httpx.post, url=url, params=params, files=files, **request_params
+                method=httpx.post,
+                url=url,
+                json=data,
+                headers=headers,
+                params=params,
+                files=files,
             )
         else:
             return self._async_request(
                 method=self.client.post,
                 url=url,
+                json=data,
+                headers=headers,
                 params=params,
                 files=files,
                 **request_params,
@@ -207,10 +263,8 @@ class Api:
             Response object of httpx library.
 
         """
-        params = {}
-        params["User-Agent"] = "pydataverse"
-        if self.api_token:
-            params["key"] = self.api_token
+        headers = {}
+        headers["User-Agent"] = "pydataverse"
 
         if isinstance(data, str):
             data = json.loads(data)
@@ -222,6 +276,8 @@ class Api:
             return self._sync_request(
                 method=httpx.put,
                 url=url,
+                json=data,
+                headers=headers,
                 params=params,
                 **request_params,
             )
@@ -229,6 +285,8 @@ class Api:
             return self._async_request(
                 method=self.client.put,
                 url=url,
+                json=data,
+                headers=headers,
                 params=params,
                 **request_params,
             )
@@ -252,21 +310,21 @@ class Api:
             Response object of httpx library.
 
         """
-        params = {}
-        params["User-Agent"] = "pydataverse"
-        if self.api_token:
-            params["key"] = self.api_token
+        headers = {}
+        headers["User-Agent"] = "pydataverse"
 
         if self.client is None:
             return self._sync_request(
                 method=httpx.delete,
                 url=url,
+                headers=headers,
                 params=params,
             )
         else:
             return self._async_request(
                 method=self.client.delete,
                 url=url,
+                headers=headers,
                 params=params,
             )
 
@@ -321,7 +379,7 @@ class Api:
         kwargs = self._filter_kwargs(kwargs)
 
         try:
-            resp = method(**kwargs, follow_redirects=True, timeout=None)
+            resp = method(**kwargs, auth=self.auth, follow_redirects=True, timeout=None)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -364,7 +422,7 @@ class Api:
         kwargs = self._filter_kwargs(kwargs)
 
         try:
-            resp = await method(**kwargs)
+            resp = await method(**kwargs, auth=self.auth)
 
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
@@ -431,9 +489,9 @@ class DataAccessApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None):
+    def __init__(self, base_url, api_token=None, *, auth=None):
         """Init an DataAccessApi() class."""
-        super().__init__(base_url, api_token)
+        super().__init__(base_url, api_token, auth=auth)
         if base_url:
             self.base_url_api_data_access = "{0}/access".format(self.base_url_api)
         else:
@@ -651,9 +709,9 @@ class MetricsApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version="latest"):
+    def __init__(self, base_url, api_token=None, api_version="latest", *, auth=None):
         """Init an MetricsApi() class."""
-        super().__init__(base_url, api_token, api_version)
+        super().__init__(base_url, api_token, api_version, auth=auth)
         if base_url:
             self.base_url_api_metrics = "{0}/api/info/metrics".format(self.base_url)
         else:
@@ -752,7 +810,7 @@ class NativeApi(Api):
 
     """
 
-    def __init__(self, base_url: str, api_token=None, api_version="v1"):
+    def __init__(self, base_url: str, api_token=None, api_version="v1", *, auth=None):
         """Init an Api() class.
 
         Scheme, host and path combined create the base-url for the api.
@@ -764,7 +822,7 @@ class NativeApi(Api):
             Api version of Dataverse native api. Default is `v1`.
 
         """
-        super().__init__(base_url, api_token, api_version)
+        super().__init__(base_url, api_token, api_version, auth=auth)
         self.base_url_api_native = self.base_url_api
 
     def get_dataverse(self, identifier, auth=False):
@@ -2426,9 +2484,9 @@ class SearchApi(Api):
 
     """
 
-    def __init__(self, base_url, api_token=None, api_version="latest"):
+    def __init__(self, base_url, api_token=None, api_version="latest", *, auth=None):
         """Init an SearchApi() class."""
-        super().__init__(base_url, api_token, api_version)
+        super().__init__(base_url, api_token, api_version, auth=auth)
         if base_url:
             self.base_url_api_search = "{0}/search?q=".format(self.base_url_api)
         else:
@@ -2503,7 +2561,13 @@ class SwordApi(Api):
     """
 
     def __init__(
-        self, base_url, api_version="v1.1", api_token=None, sword_api_version="v1.1"
+        self,
+        base_url,
+        api_version="v1.1",
+        api_token=None,
+        sword_api_version="v1.1",
+        *,
+        auth=None,
     ):
         """Init a :class:`SwordApi <pyDataverse.api.SwordApi>` instance.
 
@@ -2513,7 +2577,7 @@ class SwordApi(Api):
             Api version of Dataverse SWORD API.
 
         """
-        super().__init__(base_url, api_token, api_version)
+        super().__init__(base_url, api_token, api_version, auth=auth)
         if not isinstance(sword_api_version, ("".__class__, "".__class__)):
             raise ApiUrlError(
                 "sword_api_version {0} is not a string.".format(sword_api_version)
