@@ -189,3 +189,24 @@ if not os.environ.get("TRAVIS"):
 
             result = api.get_datafile("does-not-exist").json()
             assert API_TOKEN not in result["requestUrl"]
+
+        @pytest.mark.parametrize(
+            "auth", (True, False, "api-token", ApiTokenAuth("some-token"))
+        )
+        def test_using_auth_on_individual_requests_is_deprecated(self, auth):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = DataAccessApi(BASE_URL, auth=ApiTokenAuth(API_TOKEN))
+            with pytest.warns(DeprecationWarning):
+                api.get_datafile("does-not-exist", auth=auth)
+
+        @pytest.mark.parametrize(
+            "auth", (True, False, "api-token", ApiTokenAuth("some-token"))
+        )
+        def test_using_auth_on_individual_requests_is_deprecated_unauthorized(
+            self, auth
+        ):
+            BASE_URL = os.getenv("BASE_URL")
+            no_auth_api = DataAccessApi(BASE_URL)
+            with pytest.warns(DeprecationWarning):
+                no_auth_api.get_datafile("does-not-exist", auth=auth)
