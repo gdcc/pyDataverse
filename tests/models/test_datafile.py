@@ -1,4 +1,5 @@
 """Datafile data model tests."""
+
 import json
 import jsonschema
 import os
@@ -244,7 +245,10 @@ class TestDatafileGeneric(object):
             ),
             (({json_upload_min()}, {"validate": False}), object_data_min()),
             (
-                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                (
+                    {json_upload_min()},
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 object_data_min(),
             ),
             (
@@ -345,7 +349,10 @@ class TestDatafileGeneric(object):
                 json.loads(json_upload_min()),
             ),
             (
-                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 json.loads(json_upload_min()),
             ),
             (
@@ -517,7 +524,10 @@ if not os.environ.get("TRAVIS"):
                 ({json_upload_full()}, {}),
                 ({json_upload_min()}, {"data_format": "dataverse_upload"}),
                 ({json_upload_min()}, {"validate": False}),
-                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                (
+                    {json_upload_min()},
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 (
                     {json_upload_min()},
                     {
@@ -550,4 +560,6 @@ if not os.environ.get("TRAVIS"):
 
                 for key, val in pdv_end.get().items():
                     assert getattr(pdv_start, key) == getattr(pdv_end, key)
-                assert len(pdv_start.__dict__) == len(pdv_end.__dict__,)
+                assert len(pdv_start.__dict__) == len(
+                    pdv_end.__dict__,
+                )

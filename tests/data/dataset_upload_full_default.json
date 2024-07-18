@@ -437,13 +437,18 @@
             "typeName": "kindOfData",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["KindOfData1", "KindOfData2"]
+            "value": [
+              "KindOfData1",
+              "KindOfData2"
+            ]
           },
           {
             "typeName": "language",
             "multiple": true,
             "typeClass": "controlledVocabulary",
-            "value": ["German"]
+            "value": [
+              "German"
+            ]
           },
           {
             "typeName": "series",
@@ -489,25 +494,37 @@
             "typeName": "relatedMaterial",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["RelatedMaterial1", "RelatedMaterial2"]
+            "value": [
+              "RelatedMaterial1",
+              "RelatedMaterial2"
+            ]
           },
           {
             "typeName": "relatedDatasets",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["RelatedDatasets1", "RelatedDatasets2"]
+            "value": [
+              "RelatedDatasets1",
+              "RelatedDatasets2"
+            ]
           },
           {
             "typeName": "otherReferences",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["OtherReferences1", "OtherReferences2"]
+            "value": [
+              "OtherReferences1",
+              "OtherReferences2"
+            ]
           },
           {
             "typeName": "dataSources",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["DataSources1", "DataSources2"]
+            "value": [
+              "DataSources1",
+              "DataSources2"
+            ]
           },
           {
             "typeName": "originOfSources",
@@ -569,7 +586,10 @@
             "typeName": "geographicUnit",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["GeographicUnit1", "GeographicUnit2"]
+            "value": [
+              "GeographicUnit1",
+              "GeographicUnit2"
+            ]
           },
           {
             "typeName": "geographicBoundingBox",
@@ -613,13 +633,19 @@
             "typeName": "unitOfAnalysis",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["UnitOfAnalysis1", "UnitOfAnalysis2"]
+            "value": [
+              "UnitOfAnalysis1",
+              "UnitOfAnalysis2"
+            ]
           },
           {
             "typeName": "universe",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["Universe1", "Universe2"]
+            "value": [
+              "Universe1",
+              "Universe2"
+            ]
           },
           {
             "typeName": "timeMethod",
@@ -776,25 +802,39 @@
             "typeName": "astroType",
             "multiple": true,
             "typeClass": "controlledVocabulary",
-            "value": ["Image", "Mosaic", "EventList", "Cube"]
+            "value": [
+              "Image",
+              "Mosaic",
+              "EventList",
+              "Cube"
+            ]
           },
           {
             "typeName": "astroFacility",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["Facility1", "Facility2"]
+            "value": [
+              "Facility1",
+              "Facility2"
+            ]
           },
           {
             "typeName": "astroInstrument",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["Instrument1", "Instrument2"]
+            "value": [
+              "Instrument1",
+              "Instrument2"
+            ]
           },
           {
             "typeName": "astroObject",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["Object1", "Object2"]
+            "value": [
+              "Object1",
+              "Object2"
+            ]
           },
           {
             "typeName": "resolution.Spatial",
@@ -818,13 +858,19 @@
             "typeName": "coverage.Spectral.Bandpass",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["Bandpass1", "Bandpass2"]
+            "value": [
+              "Bandpass1",
+              "Bandpass2"
+            ]
           },
           {
             "typeName": "coverage.Spectral.CentralWavelength",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["3001", "3002"]
+            "value": [
+              "3001",
+              "3002"
+            ]
           },
           {
             "typeName": "coverage.Spectral.Wavelength",
@@ -900,7 +946,10 @@
             "typeName": "coverage.Spatial",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["SkyCoverage1", "SkyCoverage2"]
+            "value": [
+              "SkyCoverage1",
+              "SkyCoverage2"
+            ]
           },
           {
             "typeName": "coverage.Depth",
@@ -1007,7 +1056,10 @@
             "typeName": "studyAssayOtherOrganism",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["OtherOrganism1", "OtherOrganism2"]
+            "value": [
+              "OtherOrganism1",
+              "OtherOrganism2"
+            ]
           },
           {
             "typeName": "studyAssayMeasurementType",
@@ -1024,7 +1076,10 @@
             "typeName": "studyAssayOtherMeasurmentType",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["OtherMeasurementType1", "OtherMeasurementType2"]
+            "value": [
+              "OtherMeasurementType1",
+              "OtherMeasurementType2"
+            ]
           },
           {
             "typeName": "studyAssayTechnologyType",
@@ -1052,7 +1107,10 @@
             "typeName": "studyAssayCellType",
             "multiple": true,
             "typeClass": "primitive",
-            "value": ["CellType1", "CellType2"]
+            "value": [
+              "CellType1",
+              "CellType2"
+            ]
           }
         ]
       },
