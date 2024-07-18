@@ -90,7 +90,7 @@ class Api:
         self.timeout = 500
 
     def __str__(self):
-        """Return name of Api() class for users.
+        """Return the class name and URL of the used API class.
 
         Returns
         -------
@@ -98,7 +98,7 @@ class Api:
             Naming of the API class.
 
         """
-        return "API: {0}".format(self.base_url_api)
+        return f"{self.__class__.__name__}: {self.base_url_api}"
 
     def get_request(self, url, params=None, auth=False):
         """Make a GET request.
@@ -439,17 +439,6 @@ class DataAccessApi(Api):
         else:
             self.base_url_api_data_access = self.base_url_api
 
-    def __str__(self):
-        """Return name of DataAccessApi() class for users.
-
-        Returns
-        -------
-        str
-            Naming of the DataAccess API class.
-
-        """
-        return "Data Access API: {0}".format(self.base_url_api_data_access)
-
     def get_datafile(
         self,
         identifier,
@@ -670,17 +659,6 @@ class MetricsApi(Api):
         else:
             self.base_url_api_metrics = None
 
-    def __str__(self):
-        """Return name of MetricsApi() class for users.
-
-        Returns
-        -------
-        str
-            Naming of the MetricsApi() class.
-
-        """
-        return "Metrics API: {0}".format(self.base_url_api_metrics)
-
     def total(self, data_type, date_str=None, auth=False):
         """
         GET https://$SERVER/api/info/metrics/$type
@@ -788,17 +766,6 @@ class NativeApi(Api):
         """
         super().__init__(base_url, api_token, api_version)
         self.base_url_api_native = self.base_url_api
-
-    def __str__(self):
-        """Return name of NativeApi() class for users.
-
-        Returns
-        -------
-        str
-            Naming of the NativeApi() class.
-
-        """
-        return "Native API: {0}".format(self.base_url_api_native)
 
     def get_dataverse(self, identifier, auth=False):
         """Get dataverse metadata by alias or id.
@@ -2467,17 +2434,6 @@ class SearchApi(Api):
         else:
             self.base_url_api_search = self.base_url_api
 
-    def __str__(self):
-        """Return name of SearchApi() class for users.
-
-        Returns
-        -------
-        str
-            Naming of the Search API class.
-
-        """
-        return "Search API: {0}".format(self.base_url_api_search)
-
     def search(
         self,
         q_str,
@@ -2571,17 +2527,6 @@ class SwordApi(Api):
             )
         else:
             self.base_url_api_sword = base_url
-
-    def __str__(self):
-        """Return name of :class:Api() class for users.
-
-        Returns
-        -------
-        str
-            Naming of the SWORD API class.
-
-        """
-        return "SWORD API: {0}".format(self.base_url_api_sword)
 
     def get_service_document(self):
         url = "{0}/swordv2/service-document".format(self.base_url_api_sword)
