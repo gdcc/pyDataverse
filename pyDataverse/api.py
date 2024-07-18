@@ -131,15 +131,11 @@ class Api:
                     )
                 )
 
-        if self.base_url:
-            if self.api_version == "latest":
-                self.base_url_api = "{0}/api".format(self.base_url)
-            else:
-                self.base_url_api = "{0}/api/{1}".format(
-                    self.base_url, self.api_version
-                )
+        if self.api_version == "latest":
+            self.base_url_api = "{0}/api".format(self.base_url)
         else:
-            self.base_url_api = None
+            self.base_url_api = "{0}/api/{1}".format(self.base_url, self.api_version)
+
         self.timeout = 500
 
     def __str__(self):
