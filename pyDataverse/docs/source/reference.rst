@@ -38,6 +38,13 @@ Helper functions.
   :members:
 
 
+Auth Helpers
+-----------------------------
+
+.. automodule:: pyDataverse.auth
+  :members:
+
+
 Exceptions
 -----------------------------
 
