@@ -1,8 +1,9 @@
 import os
+import httpx
 import pytest
 from httpx import Response
 from time import sleep
-from pyDataverse.api import DataAccessApi, NativeApi
+from pyDataverse.api import DataAccessApi, NativeApi, SwordApi
 from pyDataverse.auth import ApiTokenAuth
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiUrlError
@@ -210,3 +211,9 @@ if not os.environ.get("TRAVIS"):
             no_auth_api = DataAccessApi(BASE_URL)
             with pytest.warns(DeprecationWarning):
                 no_auth_api.get_datafile("does-not-exist", auth=auth)
+
+        def test_sword_api_requires_http_basic_auth(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = SwordApi(BASE_URL, api_token=API_TOKEN)
+            assert isinstance(api.auth, httpx.BasicAuth)

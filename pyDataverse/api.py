@@ -2647,8 +2647,26 @@ class SwordApi(Api):
         ----------
         sword_api_version : str
             Api version of Dataverse SWORD API.
+        api_token : str | None
+            An Api token as retrieved from your Dataverse instance.
+        auth : httpx.Auth
+            Note that the SWORD API uses a different authentication mechanism
+            than the native API, in particular it uses `HTTP Basic
+            Authentication
+            <https://guides.dataverse.org/en/latest/api/sword.html#sword-auth>`_.
+            Thus, if you pass an api_token, it will be used as the username in
+            the HTTP Basic Authentication. If you pass a custom :py:class:`httpx.Auth`, use
+            :py:class:`httpx.BasicAuth` with an empty password:
+
+            .. code-block:: python
+
+                sword_api = Api(
+                    "https://demo.dataverse.org", auth=httpx.BasicAuth(username="my_token", password="")
+                )
 
         """
+        if auth is None and api_token is not None:
+            auth = httpx.BasicAuth(api_token, "")
         super().__init__(base_url, api_token, api_version, auth=auth)
         if not isinstance(sword_api_version, ("".__class__, "".__class__)):
             raise ApiUrlError(
