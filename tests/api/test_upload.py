@@ -141,6 +141,7 @@ class TestFileUpload:
                 "description": "My description.",
                 "categories": ["Data"],
                 "forceReplace": False,
+                "directoryLabel": "some/other",
             }
 
             response = api.replace_datafile(
@@ -152,12 +153,17 @@ class TestFileUpload:
 
         # Assert
         replaced_id = self._get_file_id(BASE_URL, API_TOKEN, pid)
+        file_metadata = self._get_file_metadata(BASE_URL, API_TOKEN, replaced_id)
+        data_file = file_metadata["dataFile"]
         replaced_content = self._fetch_datafile_content(
             BASE_URL,
             API_TOKEN,
             replaced_id,
         )
 
+        assert data_file["description"] == "My description.", "Description does not match."
+        assert data_file["categories"] == ["Data"], "Categories do not match."
+        assert file_metadata["directoryLabel"] == "some/other", "Directory label does not match."
         assert response.status_code == 200, "File replacement failed."
         assert (
             replaced_content == mutated
@@ -246,3 +252,30 @@ class TestFileUpload:
         response.raise_for_status()
 
         return response.content.decode("utf-8")
+
+
+    @staticmethod
+    def _get_file_metadata(
+        BASE_URL: str,
+        API_TOKEN: str,
+        id: str,
+    ):
+        """
+        Retrieves the metadata for a file in Dataverse.
+
+        Args:
+            BASE_URL (str): The base URL of the Dataverse instance.
+            API_TOKEN (str): The API token for authentication.
+            id (str): The ID of the file.
+
+        Returns:
+            dict: The metadata for the file.
+        """
+        response = httpx.get(
+            url=f"{BASE_URL}/api/files/{id}",
+            headers={"X-Dataverse-key": API_TOKEN},
+        )
+
+        response.raise_for_status()
+
+        return response.json()["data"]

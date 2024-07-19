@@ -167,24 +167,28 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
+
         if isinstance(data, str):
             data = json.loads(data)
+
+        # Decide whether to use 'data' or 'json' args
+        request_params = self._check_json_data_form(data)
 
         if self.client is None:
             return self._sync_request(
                 method=httpx.post,
                 url=url,
-                json=data,
                 params=params,
                 files=files,
+                **request_params
             )
         else:
             return self._async_request(
                 method=self.client.post,
                 url=url,
-                json=data,
                 params=params,
                 files=files,
+                **request_params,
             )
 
     def put_request(self, url, data=None, auth=False, params=None):
@@ -216,19 +220,22 @@ class Api:
         if isinstance(data, str):
             data = json.loads(data)
 
+        # Decide whether to use 'data' or 'json' args
+        request_params = self._check_json_data_form(data)
+
         if self.client is None:
             return self._sync_request(
                 method=httpx.put,
                 url=url,
-                json=data,
                 params=params,
+                **request_params,
             )
         else:
             return self._async_request(
                 method=self.client.put,
                 url=url,
-                json=data,
                 params=params,
+                **request_params,
             )
 
     def delete_request(self, url, auth=False, params=None):
@@ -267,6 +274,33 @@ class Api:
                 url=url,
                 params=params,
             )
+
+    @staticmethod
+    def _check_json_data_form(data: Optional[Dict]):
+        """This method checks and distributes given payload to match Dataverse expectations.
+
+        In the case of the form-data keyed by "jsonData", Dataverse expects
+        the payload as a string in a form of a dictionary. This is not possible
+        using HTTPXs json parameter, so we need to handle this case separately.
+        """
+
+        if not data:
+            return {}
+        elif not isinstance(data, dict):
+            raise ValueError("Data must be a dictionary.")
+        elif "jsonData" not in data:
+            return {"json": data}
+
+        assert list(data.keys()) == ["jsonData"], (
+            "jsonData must be the only key in the dictionary."
+        )
+
+        # Content of JSON data should ideally be a string
+        content = data["jsonData"]
+        if not isinstance(content, str):
+            data["jsonData"] = json.dumps(content)
+
+        return {"data": data}
 
     def _sync_request(
         self,
