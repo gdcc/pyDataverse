@@ -71,9 +71,9 @@ Please check some things before creating an issue:
 Once you have clicked `New issue <https://github.com/gdcc/pyDataverse/issues>`_,
 you have to choose one of the issue templates:
 
-* Bug report (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/bug-template.md>`_)
-* Feature request (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/feature-template.md>`_)
-* Issue: all other issues, except bug reports and feature requests (`template  <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/issue-template.md>`_)
+* Bug report (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/bug-template.md>`__)
+* Feature request (`template <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/feature-template.md>`__)
+* Issue: all other issues, except bug reports and feature requests (`template  <https://github.com/gdcc/pyDataverse/blob/master/.github/ISSUE_TEMPLATE/issue-template.md>`__)
 
 After selecting the appropriate template, you will see some explanatory text. Follow it
 step-by-step. After clicking `Submit new issue`, the issue will then show up
@@ -107,7 +107,7 @@ sticking to the guidelines below will help keep the process straightforward
 and mostly trouble free. As always, if you are having difficulties please
 feel free to ask for help.
 
-The code is hosted on `GitHub <https://github.com/>`_. To contribute you will need
+The code is hosted on `GitHub <https://github.com/>`__. To contribute you will need
 to sign up for a `free GitHub account <https://github.com/signup/free>`_.
 We use `Git <https://git-scm.com/>`_ for version control to allow many people to
 work together on the project.
@@ -442,14 +442,14 @@ The pyDataverse test suite will run automatically on `Travis-CI <https://travis-
 continuous integration service, once your pull request is submitted. However,
 if you wish to run the test suite on a branch prior to submitting the pull request,
 then the continuous integration services need to be hooked to your GitHub repository.
-Instructions are `here <http://about.travis-ci.org/docs/user/getting-started/>`_.
+Instructions are `here <http://about.travis-ci.org/docs/user/getting-started/>`__.
 
 A pull-request will be considered for merging when you have an all ‘green’ build.
 If any tests are failing, then you will get a red ‘X’, where you can click through
 to see the individual failed tests.
 
 You can find the pyDataverse builds on Travis-CI
-`here <https://travis-ci.com/github/gdcc/pyDataverse>`_.
+`here <https://travis-ci.com/github/gdcc/pyDataverse>`__.
 
 
 .. _contributing_code_test-driven-development:
@@ -866,7 +866,7 @@ related to release activities), the release can be created. This includes:
 - upload to `PyPI <https://pypi.org/>`_ and `conda-forge  <https://conda-fore.org/>`_
 
 You can find the full release history at :ref:`community_history` and on
-`GitHub <https://github.com/gdcc/pyDataverse/releases>`_.
+`GitHub <https://github.com/gdcc/pyDataverse/releases>`__.
 
 **Versioning**
 
