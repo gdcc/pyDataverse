@@ -52,7 +52,7 @@ Bug reports are an important part of making pyDataverse more stable. Having
 a complete bug report will allow others to reproduce the bug and provide
 insight into fixing the issue.
 
-Trying the bug-producing code out on the ``master`` branch is often a
+Trying the bug-producing code out on the ``main`` branch is often a
 worthwhile exercise to confirm the bug still exists. It is also worth
 searching existing bug reports and pull requests to see if the issue
 has already been reported and/or fixed.
@@ -161,38 +161,38 @@ changes, you can skip to
 , but if you skip creating the development environment you won’t be
 able to build the documentation locally before pushing your changes.
 
-**Creating a Python environment**
-
-Create virtual environment.
-
-.. code-block:: shell
-
-  python3 -m venv .venv
-  source .venv/bin/activate
-
-Next, add the packages needed. Install at least the `development.txt`
-requirements.
+We use poetry to manage dependencies and the development environment.
+If you already have poetry on your system, you can set everything up
+by calling ``poetry install``:
 
 .. code-block:: shell
 
-  pip install -r requirements/development.txt
+  $ poetry install --with=dev
+  $ poetry run python3 -c "import pyDataverse; print(pyDataverse.__version__)"
+  0.3.3
 
-In addition, you can also install certain packages for specific activities,
-like ``linting``, ``testing``, ``documentation`` and ``packaging`` as you need.
-
-.. code-block:: shell
-
-  pip install -r requirements/lint.txt
-  pip install -r requirements/tests.txt
-  pip install -r requirements/docs.txt
-  pip install -r requirements/packaging.txt
-
-Now, build and install pyDataverse in editable mode.
+For most tasks, you can use poetry without activating the virtual environment,
+but sometimes you might want to use the virtual environment directly or save
+yourself from typing ``poetry run`` over and over again. For that, use the
+poetry shell:
 
 .. code-block:: shell
 
-  python setup.py sdist bdist_wheel
-  pip install -e .
+  $ poetry shell
+  pyDataverse $ python3 -c "import pyDataverse; print(pyDataverse.__version__)"
+  0.3.3
+  pyDataverse $ exit
+  $
+
+In addition to poetry, we use tox to manage common tasks, such as building the
+documentation or running the tests.
+
+.. code-block:: shell
+
+  $ poetry run tox -e docs
+
+You can find more information on how to build and view the docs :ref:`below
+<contributing_documentation_build>`.
 
 
 .. _contributing_working-with-code_create-branch:
@@ -200,14 +200,14 @@ Now, build and install pyDataverse in editable mode.
 Creating a branch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You want your ``develop`` branch to reflect only release-ready code,
+You want your ``main`` branch to reflect only release-ready code,
 so create a feature branch for making your changes. Use a
 descriptive branch name and replace `BRANCH_NAME` with it, e. g.
 ``shiny-new-feature``.
 
 .. code-block:: shell
 
-  git checkout develop
+  git checkout main
   git checkout -b BRANCH_NAME
 
 This changes your working directory to the `BRANCH_NAME` branch.
@@ -215,24 +215,25 @@ Keep any changes in this branch specific to one bug or feature so it is
 clear what the branch brings to pyDataverse. You can have many
 branches and switch between them using the git checkout command.
 
-When creating this branch, make sure your ``develop`` branch is up to date
-with the latest upstream ``develop`` version. To update your local ``develop``
+When creating this branch, make sure your ``main`` branch is up to date
+with the latest upstream ``main`` version. To update your local ``main``
 branch, you can do:
 
 .. code-block:: shell
 
-  git checkout develop
-  git pull upstream develop --ff-only
+  git checkout main
+  git pull --rebase upstream
 
-When you want to update the feature branch with changes in ``develop`` after
+When you want to update the feature branch with changes in ``main`` after
 you created the branch, check the section on
 :ref:`updating a PR <contributing_changes_update-pull-request>`.
 
 
 From here, you now can move forward to
 
-- contribute to the documentation (see below)
+- contribute to the :ref:`documentation <contributing_documentation>`
 - contribute to the :ref:`code base <contributing_code>`
+
 
 .. _contributing_documentation:
 
@@ -280,39 +281,32 @@ How to build the pyDataverse documentation
 
 **Requirements**
 
-First, you need to have a development environment to be able to build pyDataverse
-(see the docs on
+First, you need to have a development environment to be able to build the pyDataverse docs
+(see
 :ref:`creating a development environment <contributing_working-with-code_development-environment>`
-above). Note: The ``docs.txt`` requirements need to be installed.
+above).
 
-**Branching**
-
-Normally, you are only allowed to create pull requests
-to ``upstream/develop``, so you have to branch-off from it too.
-
-.. code-block:: shell
-
-  git checkout develop
-  git checkout -b BRANCH_NAME
-
-
-There is one exception: If you
-want to suggest a change to the docs in the folder
-``pyDataverse/docs/`` (e. g. fix a typo in
-:ref:`User Guide - Basic Usage <user_basic-usage>`),
-you can also pull to ``upstream/master``. This means, you have also to
-branch-off from the ``master`` branch.
 
 **Building the documentation**
 
-You can create the docs inside ``docs/build/`` by calling ``tox``.
+You can build the docs with ``tox``:
 
 .. code-block:: shell
 
-  tox -e docs
+  poetry run tox -e docs
 
-Open the file ``docs/build/html/index.html`` in a web browser to see
+This will create a new virtual environment just for building the docs, install
+the relevant dependencies into it, and build the documentation.
+You can find the output in docs/build/html and open the file
+``docs/build/html/index.html`` in a web browser to see
 the full documentation you just built.
+If you want to inspect them as if they came from a webserver, run:
+
+.. code-block:: shell
+
+  poetry run python3 -m http.server -d docs/build/html -b 127.1 8090
+
+Then open your browser at `http://127.0.0.1:8090 <http://127.0.0.1:8090/>`__.
 
 
 .. _contributing_documentation_pushing-changes:
@@ -320,21 +314,14 @@ the full documentation you just built.
 Pushing documentation changes to GitHub
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each time, a change in the ``develop`` or ``master`` branch is pushed to GitHub,
-the docs automatically get created by Read the Docs.
-
-You can find the rendered documentation at our
-`Read the Docs page <https://pydataverse.readthedocs.io/>`_
-, the branches at:
-
-- `master <https://pydataverse.readthedocs.io/en/master/>`_
-- `develop <https://pydataverse.readthedocs.io/en/develop/>`_
+Each time, a change in the ``main`` branch is pushed to GitHub,
+the docs are automatically built by Read the Docs.
 
 There is also a `latest <https://pydataverse.readthedocs.io/en/latest/>`_
-documentation, which is not a branch itself, only a forward to ``master``.
+documentation, which is not a branch itself, only a forward to ``main``.
 
 As you do not have the rights to commit directly to the
-``develop`` or ``master`` branch, you have to
+``main`` branch, you have to
 :ref:`create a pull request <contributing_changes_pull-request>`
 to make this happen.
 
@@ -362,8 +349,7 @@ Code standards
 
 pyDataverse follows the `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_
 standard and uses `Black <https://black.readthedocs.io/en/stable/>`_,
-`Flake8 <https://flake8.pycqa.org/en/latest/>`_ and
-`pylint <https://www.pylint.org/>`_  to ensure a consistent code format
+`ruff <https://www.pylint.org/>`_  to ensure a consistent code format
 throughout the project.
 
 **Imports**
@@ -376,8 +362,10 @@ the sections.
 
 **String formatting**
 
-pyDataverse uses f-strings formatting instead of ‘%’ and ‘.format()’
+pyDataverse uses f-strings formatting instead of ``%`` and ``.format()``
 string formatters.
+There is still some code around which uses other conventions, but new code
+should usually use f-strings.
 
 
 .. _contributing_code_pre-commit:
@@ -387,31 +375,19 @@ Pre-commit
 
 You can run many of the styling checks manually. However, we encourage
 you to use `pre-commit <https://pre-commit.com/>`_ hooks instead to
-automatically run ``black`` when you make a git commit.
+automatically run ``black`` and other tools when you make a git commit.
 
-This can be done by installing ``pre-commit`` (which should
-already be installed by ``development.txt``):
-
-.. code-block:: shell
-
-  pip install pre-commit
-
-and then running:
+With the ``poetry install --with=dev`` you already installed it, now
+you only need to set it up as a git-hook:
 
 .. code-block:: shell
 
-  pre-commit install
+  poetry run pre-commit install
 
 from the root of the pyDataverse repository. Now styling
 checks will be run each time you commit changes without your needing to
 run each one manually. In addition, using pre-commit will also allow you
 to more easily remain up-to-date with our code checks as they change.
-
-To run black alone, use
-
-.. code-block:: shell
-
-  black pyDataverse/file_changed.py
 
 
 .. _contributing_code_type-hints:
@@ -430,7 +406,7 @@ type hints. After making any change you can ensure your type hints are correct b
 
 .. code-block:: shell
 
-  mypy pyDataverse/file_changed.py
+  poetry run tox -e mypy
 
 
 .. _contributing_code_testing-with-ci:
@@ -494,31 +470,71 @@ the ``result``.
 Running the test suite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Setup testing**
-
-Before you can run the tests, you have to define following
-environment variables:
-
-- BASE_URL: Base URL of your Dataverse installation, without trailing slash (e. g. ``https://data.aussda.at``))
-- API_TOKEN_<USER>: API token of Dataverse installation user with proper rights
-
-  - API_TOKEN_SUPERUSER: Dataverse installation Superuser
-  - API_TOKEN_TEST_NO_RIGHTS: New user with no assigned rights (default rights)
+If you have docker available, by far the easiest way to run the tests is to use
+the ``run-tests.sh`` script.
+It will spin up a local docker setup with a Dataverse installation and run the
+tests with that installation.
 
 .. code-block:: shell
 
+  sh run-tests.sh
+
+
+**Setup manual testing**
+
+It is possible to run the tests against the live server you have or against
+demo.dataverse.org, but we recommend using a local docker-installation to avoid
+unnecessary traffic and load against live servers.
+
+Before you can run the tests manually, you have to define following
+environment variables:
+
+- BASE_URL: Base URL of your Dataverse installation, without trailing slash (e. g. ``https://data.aussda.at``)
+- API_TOKEN: API token of Dataverse installation user with proper rights
+- API_TOKEN_SUPERUSER: Dataverse installation Superuser
+- DV_VERSION: The version of the Dataverse instance you run, for example the one
+  used in the docker container from the ``run-tests.sh`` script.
+
+.. code-block:: shell
+
+  export API_TOKEN=**SECRET**
   export API_TOKEN_SUPERUSER=**SECRET**
-  export API_TOKEN_TEST_NO_RIGHTS=**SECRET**
-  export BASE_URL=https://data.aussda.at
+  export BASE_URL=http://localhost:8080
+  export DV_VERSION=6.3
+
+Instead of running export, you can also save them in a file called ``.env``:
+
+.. code-block::
+
+  API_TOKEN=**SECRET**
+  API_TOKEN_SUPERUSER=**SECRET**
+  BASE_URL=http://localhost:8080
+  DV_VERSION=6.3
+
+(Advanced) Note that if you aim to setup your tests in an IDE, you might want to
+add the variables defined in ``local-test.env``, as some IDEs only allow to
+specify a single env file.
+
 
 **Using pytest**
 
-The tests can then be run  directly with `pytest <https://docs.pytest.org/>`_
-inside your Git clone by typing:
+With poetry, tox, and the help of the .env and local-test.env files, we can no run the tests:
 
 .. code-block:: shell
 
-  pytest
+  poetry run env $(cat local-test.env .env | grep -v '^#' | xargs) tox -e py3
+
+Using ``-e py3`` will automatically select your default python version.
+If you have multiple versions available and want to test some of those, you can
+replace ``py3`` with, for example, ``py39`` for Python 3.9, ``py311`` for Python
+3.11 etc.
+
+The tests can also be run directly with `pytest <https://docs.pytest.org/>`_
+inside your Git clone with:
+
+.. code-block:: shell
+
+  poetry run env $(cat local-test.env .env | grep -v '^#' | xargs) pytest
 
 Often it is worth running only a subset of tests first around your changes
 before running the entire suite.
@@ -529,21 +545,6 @@ The easiest way to do this is with:
 
   pytest tests/path/to/test.py -k regex_matching_test_name
 
-**Using tox**
-
-`Tox <https://tox.readthedocs.io/>`_ can be used to execute pre-defined
-test suites, e. g. ``py36`` to use and create a Python 3.6 environment to
-test all tests available.
-
-.. code-block:: shell
-
-  tox -e py36
-
-You can find the tox environments defined in the
-`tox.ini <https://github.com/gdcc/pyDataverse/blob/master/tox.ini>`_.
-
-Some tox tests/builds are also used for the continuous integration tests at Travis-CI
-(see :ref:`contributing_code_testing-with-ci`).
 
 **Using Coverage**
 
@@ -559,13 +560,13 @@ call it by ``tox``. This creates the generated docs inside ``docs/coverage_html/
 
 .. code-block:: shell
 
-  tox -e coverage
+  poetry run tox -e coverage
 
 For coveralls, use
 
 .. code-block:: shell
 
-  tox -e coveralls
+  poetry run tox -e coveralls
 
 
 .. _contributing_changes:
@@ -603,7 +604,7 @@ Doing ``git status`` again should give something like:
 
   # On branch BRANCH_NAME
   #
-  #       modified:   /relative/path/to/file-you-added.py
+  #       modified:   relative/path/to/file-you-added.py
   #
 
 Finally, commit your changes to your local repository with an explanatory message.
@@ -672,7 +673,7 @@ the branch it was based on:
 
 - Navigate to your repository on GitHub – ``https://github.com/YOUR_USER_NAME/pyDataverse``
 - Click on the ``Compare & create pull request`` button for your `BRANCH_NAME`
-- Select the base and compare branches, if necessary. This will be ``develop`` and ``BRANCH_NAME``, respectively.
+- Select the base and compare branches, if necessary. This will be ``main`` and ``BRANCH_NAME``, respectively.
 
 
 .. _contributing_changes_pull-request:
@@ -683,9 +684,8 @@ Finally, make the pull request
 If everything looks good, you are ready to make a pull request. A
 pull request is how code from a local repository becomes available
 to the GitHub community and can be looked at and eventually merged
-into the ``develop`` version. This pull request and its associated changes
-will eventually be committed to the ``master`` branch and available in
-the next release. To submit a pull request:
+into the ``main`` version. This pull request and its associated changes
+will be available in the next release. To submit a pull request:
 
 - Navigate to your repository on GitHub
 - Click on the ``Pull Request`` button
@@ -861,7 +861,6 @@ related to release activities), the release can be created. This includes:
 - write release notes
 - write a release announcement
 - update version number
-- merge ``develop`` to ``master``
 - tag release name to commit (e. g. ``v0.3.0``), push branch and create pull request
 - upload to `PyPI <https://pypi.org/>`_ and `conda-forge  <https://conda-fore.org/>`_
 
