@@ -447,9 +447,14 @@ class Api:
         kwargs = self._filter_kwargs(kwargs)
 
         try:
-            resp = method(**kwargs, auth=self.auth, follow_redirects=True, timeout=None)
+            resp: httpx.Response = method(
+                **kwargs, auth=self.auth, follow_redirects=True, timeout=None
+            )
             if resp.status_code == 401:
-                error_msg = resp.json()["message"]
+                try:
+                    error_msg = resp.json()["message"]
+                except json.JSONDecodeError:
+                    error_msg = resp.reason_phrase
                 raise ApiAuthorizationError(
                     "ERROR: HTTP 401 - Authorization error {0}. MSG: {1}".format(
                         kwargs["url"], error_msg

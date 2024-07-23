@@ -217,3 +217,16 @@ if not os.environ.get("TRAVIS"):
             API_TOKEN = os.getenv("API_TOKEN")
             api = SwordApi(BASE_URL, api_token=API_TOKEN)
             assert isinstance(api.auth, httpx.BasicAuth)
+
+        def test_sword_api_can_authenticate(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = SwordApi(BASE_URL, api_token=API_TOKEN)
+            response = api.get_service_document()
+            assert response.status_code == 200
+
+        def test_sword_api_cannot_authenticate_without_token(self):
+            BASE_URL = os.getenv("BASE_URL")
+            api = SwordApi(BASE_URL)
+            with pytest.raises(ApiAuthorizationError):
+                api.get_service_document()
