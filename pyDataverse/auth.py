@@ -21,7 +21,7 @@ class ApiTokenAuth(Auth):
         Parameters
         ----------
         api_token : str
-            The API token retrieved from your dataverse instance user profile.
+            The API token retrieved from your Dataverse instance user profile.
 
         Examples
         --------
@@ -34,7 +34,7 @@ class ApiTokenAuth(Auth):
 
         """
         if not isinstance(api_token, str):
-            raise ApiAuthorizationError("Api token passed is not a string.")
+            raise ApiAuthorizationError("API token passed is not a string.")
         self.api_token = api_token
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
@@ -82,7 +82,7 @@ class BearerTokenAuth(Auth):
 
         """
         if not isinstance(bearer_token, str):
-            raise ApiAuthorizationError("Api token passed is not a string.")
+            raise ApiAuthorizationError("API token passed is not a string.")
         self.bearer_token = bearer_token
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
