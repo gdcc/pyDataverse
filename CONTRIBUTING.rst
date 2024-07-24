@@ -486,14 +486,37 @@ It is possible to run the tests against the live server you have or against
 demo.dataverse.org, but we recommend using a local docker-installation to avoid
 unnecessary traffic and load against live servers.
 
+**Docker compose service**
+
+If you have not used the ``run-tests.sh`` before, you have to create a
+directory ``dv`` and a file ``dv/bootstrap.exposed.env``:
+
+.. code-block:: shell
+
+  mkdir -p dv
+  touch dv/bootstrap.exposed.env
+
+After that, you can run the Dataverse server with docker:
+
+.. code-block:: shell
+
+  docker compose -f docker/docker-compose-base.yml --env-file local-test.env up
+
+
+**Setting up your environment**
+
 Before you can run the tests manually, you have to define following
 environment variables:
 
-- BASE_URL: Base URL of your Dataverse installation, without trailing slash (e. g. ``https://data.aussda.at``)
-- API_TOKEN: API token of Dataverse installation user with proper rights
-- API_TOKEN_SUPERUSER: Dataverse installation Superuser
+- BASE_URL: Base URL of your Dataverse installation, without trailing slash (e. g. ``http://localhost:8080``)
+- API_TOKEN: API token of Dataverse installation user with proper rights. You
+  find it in ``dv/bootstrap.exposed.env`` after you started docker compose and the
+  bootstrap process is done.
+- API_TOKEN_SUPERUSER: Dataverse installation Superuser, for docker setups use the same token as API_TOKEN.
 - DV_VERSION: The version of the Dataverse instance you run, for example the one
-  used in the docker container from the ``run-tests.sh`` script.
+  used in the docker container from the ``run-tests.sh`` script. Note that in
+  `issue #195 <https://github.com/gdcc/pyDataverse/issues/195>`__, there is a
+  Discussion if this should be changed in the future.
 
 .. code-block:: shell
 
@@ -511,14 +534,15 @@ Instead of running export, you can also save them in a file called ``.env``:
   BASE_URL=http://localhost:8080
   DV_VERSION=6.3
 
-(Advanced) Note that if you aim to setup your tests in an IDE, you might want to
-add the variables defined in ``local-test.env``, as some IDEs only allow to
-specify a single env file.
+(Advanced) Note that if you aim to setup your tests in an IDE, you might need to
+add the variables defined in ``local-test.env`` to your ``.env``, as some IDEs
+only allow to specify a single env file.
 
 
 **Using pytest**
 
-With poetry, tox, and the help of the .env and local-test.env files, we can no run the tests:
+With poetry, tox, and the help of the .env and local-test.env files, you can now
+run the tests:
 
 .. code-block:: shell
 
@@ -567,6 +591,36 @@ For coveralls, use
 .. code-block:: shell
 
   poetry run tox -e coveralls
+
+
+**Common issues with setting up IDEs**
+
+- *Problem:* Some IDEs can only specify one environment file
+
+  - Solution: Add the variables from local-test.env to your .env file.
+
+- *Problem:* Some IDEs can not make use of breakpoints during testing
+
+  - Explanation: We configured pytest to use pytest-cov, which interferes with breakpoints.
+
+  - Solution: Add ``PYTEST_ADDOPTS=--no-cov`` to your environment file or your IDE's environment definition.
+
+- *Problem:* VSCode cannot launch the debugger for a test
+
+  - Compare your launch.json entries with this or add this configuration:
+
+    .. code-block:: json
+
+        {
+            "name": "Debug Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": ["debug-test"],
+            "justMyCode": false,
+            "env": {"PYTEST_ADDOPTS": "--no-cov"},
+            "envFile": "${workspaceFolder}/.env"
+        }
 
 
 .. _contributing_changes:
