@@ -446,6 +446,32 @@ class Dataset(DVObject):
     __attr_import_dv_up_journal_fields_arrays = {
         "journalVolumeIssue": ["journalVolume", "journalIssue", "journalPubDate"]
     }
+
+    __attr_import_dv_up_astrophysics_fields_values = [
+        "astroType",
+        "astroFacility",
+        "astroInstrumnet",
+        "astroObject",
+        "resolution.Spatial", 
+        "resolution.Temporal",
+        "coverage.Spectral.Bandpass",
+        "coverage.Spectral.CentralWavelength",
+        "coverage.Spatial",
+        "coverage.Depth",
+        "coverage.ObjectDensity",
+        "coverage.ObjectCount",
+        "coverage.SkyFraction",
+        "coverage.Polarization",
+        "redshiftType",
+        "resolution.Redshift"
+    ]
+
+    __attr_import_dv_up_astrophysics_fields_arrays ={
+        "coverage.Spectral.Wavelength": ["coverage.Spectral.MinimumWavelength", "coverage.Spectral.MaximumWavelength"],
+        "coverage.Temporal": ["coverage.Temporal.StartTime", "coverage.Temporal.StopTime"],
+        "coverage.RedshiftValue": ["coverage.Redshift.MinimumValue", "coverage.Redshift.MaximumValue"]
+        
+    }
     __attr_dict_dv_up_required = [
         "author",
         "datasetContact",
@@ -461,9 +487,21 @@ class Dataset(DVObject):
             "authorAffiliation",
             "authorIdentifier",
             "authorName",
+            "astroType",
+            "astroFacility",
+            "astroInstrumnet",
+            "astroObject",
             "characteristicOfSources",
             "city",
             "contributorName",
+            "coverage.Spectral.Bandpass",
+            "coverage.Spectral.CentralWavelength",
+            "coverage.Spatial",
+            "coverage.Depth",
+            "coverage.ObjectDensity",
+            "coverage.ObjectCount",
+            "coverage.SkyFraction",
+            "coverage.Polarization",
             "dateOfDeposit",
             "dataSources",
             "depositor",
@@ -480,6 +518,10 @@ class Dataset(DVObject):
             "publicationURL",
             "relatedDatasets",
             "relatedMaterial",
+            "resolution.Spatial", 
+            "resolution.Temporal",
+            "redshiftType",
+            "resolution.Redshift"
             "seriesInformation",
             "seriesName",
             "state",
@@ -501,6 +543,9 @@ class Dataset(DVObject):
         + __attr_import_dv_up_geospatial_fields_arrays["geographicBoundingBox"]
         + __attr_import_dv_up_socialscience_fields_values
         + __attr_import_dv_up_journal_fields_arrays["journalVolumeIssue"]
+        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Temporal']
+        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Spectral']
+        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.RedshiftValue']
         + [
             "socialScienceNotesType",
             "socialScienceNotesSubject",
@@ -512,10 +557,12 @@ class Dataset(DVObject):
         list(__attr_import_dv_up_citation_fields_arrays.keys())
         + list(__attr_import_dv_up_geospatial_fields_arrays.keys())
         + list(__attr_import_dv_up_journal_fields_arrays.keys())
+        + list(__attr_import_dv_up_astrophysics_fields_arrays.keys())
         + ["series", "socialScienceNotes", "targetSampleSize"]
     )
     __attr_dict_dv_up_type_class_controlled_vocabulary = [
         "authorIdentifierScheme",
+        "astroType"
         "contributorType",
         "country",
         "journalArticleType",
@@ -529,6 +576,7 @@ class Dataset(DVObject):
         "geospatial_displayName",
         "socialscience_displayName",
         "journal_displayName",
+        "astrophysics_displayName"
     ]
 
     def __init__(self, data=None):
@@ -637,7 +685,27 @@ class Dataset(DVObject):
             "journal_displayName",
             "journalVolumeIssue",
             "journalArticleType",
-        ]
+            "astrophysics_displayName"
+            "astroType",
+            "astroFacility",
+            "astroInstrumnet",
+            "astroObject",
+            "resolution.Spatial", 
+            "resolution.Temporal",
+            "coverage.Spectral.Bandpass",
+            "coverage.Spectral.CentralWavelength",
+            "coverage.Spatial",
+            "coverage.Depth",
+            "coverage.ObjectDensity",
+            "coverage.ObjectCount",
+            "coverage.SkyFraction",
+            "coverage.Polarization",
+            "redshiftType",
+            "resolution.Redshift"
+            "coverage.Spectral.Wavelength",
+            "coverage.Temporal",
+            "coverage.RedshiftValue"
+            ]
 
     def validate_json(self, filename_schema=None):
         """Validate JSON formats of Dataset.
@@ -1032,6 +1100,40 @@ class Dataset(DVObject):
                 else:
                     # TODO: Exception
                     pass
+
+                #astrophysics
+                if "astrophysics" in json_dict["datasetVersion"]["metadataBlocks"]:
+                        astrophysics = json_dict["datasetVersion"]["metadataBlocks"]["astrophysics"]
+
+                        if "displayName" in astrophysics:
+                            self.__setattr__("astrophysics_displayName", astrophysics["displayName"])
+
+                        for field in astrophysics["fields"]:
+                            if (
+                                field["typeName"]
+                                in self.__attr_import_dv_up_astrophysics_fields_values
+                            ):
+                                data[field["typeName"]] = field["value"]
+                            elif (
+                                field["typeName"]
+                                in self.__attr_import_dv_up_astrophysics_fields_arrays
+                            ):
+                                data[field["typeName"]] = self.__parse_field_array(
+                                    field["value"],
+                                    self.__attr_import_dv_up_astrophysics_fields_arrays[
+                                        field["typeName"]
+                                    ],
+                                )
+                            else:
+                                print(
+                                    "Attribute {0} not valid for import (dv_up).".format(
+                                        field["typeName"]
+                                    )
+                                )
+                else:
+                    # TODO: Exception
+                    pass
+                
         elif data_format == "dataverse_download":
             print("INFO: Not implemented yet.")
         elif data_format == "dspace":
@@ -1475,6 +1577,61 @@ class Dataset(DVObject):
                             "value": self.__generate_field_arrays(key, val),
                         }
                     )
+            
+            # astrophysics
+            for attr in (
+                self.__attr_import_dv_up_astrophysics_fields_values
+                + list(self.__attr_import_dv_up_astrophysics_fields_arrays.keys())
+                + ["astrophysics_displayName"]
+            ):
+                if attr in data_dict:
+                    astrophysics = {}
+                    if attr != "astrophysics_displayName":
+                        astrophysics["fields"] = []
+                        break
+
+            if "astrophysics_displayName" in data_dict:
+                astrophysics["displayName"] = data_dict["astrophysics_displayName"]
+
+            # Generate first level attributes
+            for attr in self.__attr_import_dv_up_astrophysics_fields_values:
+                if attr in data_dict:
+                    v = data_dict[attr]
+                    if isinstance(v, list):
+                        multiple = True
+                    else:
+                        multiple = False
+                    if attr in self.__attr_dict_dv_up_type_class_primitive:
+                        type_class = "primitive"
+                    elif attr in self.__attr_dict_dv_up_type_class_compound:
+                        type_class = "compound"
+                    elif (
+                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
+                    ):
+                        type_class = "controlledVocabulary"
+                    astrophysics["fields"].append(
+                        {
+                            "typeName": attr,
+                            "multiple": multiple,
+                            "typeClass": type_class,
+                            "value": v,
+                        }
+                    )
+
+            # Generate fields attributes
+            for (
+                key,
+                val,
+            ) in self.__attr_import_dv_up_astrophysics_fields_arrays.items():
+                if key in data_dict:
+                    astrophysics["fields"].append(
+                        {
+                            "typeName": key,
+                            "multiple": True,
+                            "typeClass": "compound",
+                            "value": self.__generate_field_arrays(key, val),
+                        }
+                    )
 
             data["datasetVersion"]["metadataBlocks"]["citation"] = citation
             if "socialscience" in locals():
@@ -1485,6 +1642,8 @@ class Dataset(DVObject):
                 data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
             if "journal" in locals():
                 data["datasetVersion"]["metadataBlocks"]["journal"] = journal
+            if "astrophysics" in locals():
+                data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
         elif data_format == "dspace":
             data = None
             print("INFO: Not implemented yet.")
