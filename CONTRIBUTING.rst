@@ -502,6 +502,9 @@ After that, you can run the Dataverse server with docker:
 
   docker compose -f docker/docker-compose-base.yml --env-file local-test.env up
 
+If you want to login to the web interface, you can use the default username and
+password as found in the
+`container guide <https://guides.dataverse.org/en/latest/container/running/demo.html>`__.
 
 **Setting up your environment**
 
