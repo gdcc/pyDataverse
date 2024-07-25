@@ -466,11 +466,10 @@ class Dataset(DVObject):
         "resolution.Redshift"
     ]
 
-    __attr_import_dv_up_astrophysics_fields_arrays ={
+    __attr_import_dv_up_astrophysics_fields_arrays = {
         "coverage.Spectral.Wavelength": ["coverage.Spectral.MinimumWavelength", "coverage.Spectral.MaximumWavelength"],
         "coverage.Temporal": ["coverage.Temporal.StartTime", "coverage.Temporal.StopTime"],
         "coverage.RedshiftValue": ["coverage.Redshift.MinimumValue", "coverage.Redshift.MaximumValue"]
-        
     }
     __attr_dict_dv_up_required = [
         "author",
@@ -543,9 +542,9 @@ class Dataset(DVObject):
         + __attr_import_dv_up_geospatial_fields_arrays["geographicBoundingBox"]
         + __attr_import_dv_up_socialscience_fields_values
         + __attr_import_dv_up_journal_fields_arrays["journalVolumeIssue"]
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Temporal']
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Spectral']
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.RedshiftValue']
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.Temporal"]
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.Spectral.Wavelength"]
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.RedshiftValue"]
         + [
             "socialScienceNotesType",
             "socialScienceNotesSubject",
@@ -562,7 +561,7 @@ class Dataset(DVObject):
     )
     __attr_dict_dv_up_type_class_controlled_vocabulary = [
         "authorIdentifierScheme",
-        "astroType"
+        "astroType",
         "contributorType",
         "country",
         "journalArticleType",
@@ -685,7 +684,7 @@ class Dataset(DVObject):
             "journal_displayName",
             "journalVolumeIssue",
             "journalArticleType",
-            "astrophysics_displayName"
+            "astrophysics_displayName",
             "astroType",
             "astroFacility",
             "astroInstrumnet",
@@ -701,11 +700,11 @@ class Dataset(DVObject):
             "coverage.SkyFraction",
             "coverage.Polarization",
             "redshiftType",
-            "resolution.Redshift"
+            "resolution.Redshift",
             "coverage.Spectral.Wavelength",
             "coverage.Temporal",
             "coverage.RedshiftValue"
-            ]
+        ]
 
     def validate_json(self, filename_schema=None):
         """Validate JSON formats of Dataset.
@@ -1103,33 +1102,34 @@ class Dataset(DVObject):
 
                 #astrophysics
                 if "astrophysics" in json_dict["datasetVersion"]["metadataBlocks"]:
-                        astrophysics = json_dict["datasetVersion"]["metadataBlocks"]["astrophysics"]
-
-                        if "displayName" in astrophysics:
-                            self.__setattr__("astrophysics_displayName", astrophysics["displayName"])
-
+                    astrophysics = json_dict["datasetVersion"]["metadataBlocks"]["astrophysics"]
+                    
+                    if "displayName" in astrophysics:
+                        self.__setattr__("astrophysics_displayName", astrophysics["displayName"])
+                        
                         for field in astrophysics["fields"]:
                             if (
                                 field["typeName"]
                                 in self.__attr_import_dv_up_astrophysics_fields_values
-                            ):
+                                ):
                                 data[field["typeName"]] = field["value"]
-                            elif (
-                                field["typeName"]
-                                in self.__attr_import_dv_up_astrophysics_fields_arrays
-                            ):
+                                elif (
+                                    field["typeName"]
+                                    in self.__attr_import_dv_up_astrophysics_fields_arrays
+                                    ):
                                 data[field["typeName"]] = self.__parse_field_array(
                                     field["value"],
                                     self.__attr_import_dv_up_astrophysics_fields_arrays[
                                         field["typeName"]
-                                    ],
+                                        ],
                                 )
-                            else:
+                                else:
                                 print(
                                     "Attribute {0} not valid for import (dv_up).".format(
-                                        field["typeName"]
+                                    field["typeName"]
                                     )
                                 )
+                                
                 else:
                     # TODO: Exception
                     pass
