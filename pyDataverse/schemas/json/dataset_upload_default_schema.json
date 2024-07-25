@@ -431,6 +431,124 @@
                   }
                 }
               }
+            },
+            "astrophysics": {
+              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics",
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/displayName",
+                  "type": "string"
+                },
+                "fields": {
+                  "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields",
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0",
+                        "type": "object",
+                        "properties": {
+                          "typeName": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeName",
+                            "type": "string"
+                          },
+                          "multiple": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/multiple",
+                            "type": "boolean"
+                          },
+                          "typeClass": {
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/typeClass",
+                            "type": "string"
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value",
+                                "type": "array"
+                              },
+                              {
+                                "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0",
+                                "type": "object",
+                                "properties": {
+                                  "coverage.Spectral.Wavelength": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Spectral.Wavelength",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Spectral.Wavelength/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Spectral.Wavelength/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Spectral.Wavelength/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Spectral.Wavelength/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "coverage.Temporal": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Temporal",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Temporal/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Temporal/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Temporal/properties/typeClass",
+                                        "type": "string"
+                                        },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.Temporal/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "coverage.RedshiftValue": {
+                                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue",
+                                    "type": "object",
+                                    "properties": {
+                                      "typeName": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/typeName",
+                                        "type": "string"
+                                      },
+                                      "multiple": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/multiple",
+                                        "type": "boolean"
+                                      },
+                                      "typeClass": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/typeClass",
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/value",
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ],
+                            "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items"
+                          }
+                        }
+                      }
+                    ],
+                    "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items"
+                  }
+                }
+              }
             }
           }
         }
@@ -438,3 +556,8 @@
     }
   }
 }
+
+
+
+
+
