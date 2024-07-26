@@ -1847,9 +1847,10 @@ class NativeApi(Api):
             url += "/datasets/{0}/add".format(identifier)
 
         files = {"file": open(filename, "rb")}
-        return self.post_request(
-            url, data={"jsonData": json_str}, files=files, auth=True
-        )
+        metadata = {}
+        if json_str is not None:
+            metadata["jsonData"] = json_str
+        return self.post_request(url, data=metadata, files=files, auth=True)
 
     def update_datafile_metadata(self, identifier, json_str=None, is_filepid=False):
         """Update datafile metadata.
