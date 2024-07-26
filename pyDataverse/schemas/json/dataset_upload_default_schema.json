@@ -515,6 +515,28 @@
                                               "type": "string"
                                             }
                                           }
+                                        },
+                                        "coverage.RedshiftValue": {
+                                          "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue",
+                                          "type": "object",
+                                          "properties": {
+                                            "typeName": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/typeName",
+                                              "type": "string"
+                                            },
+                                            "multiple": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/multiple",
+                                              "type": "boolean"
+                                            },
+                                            "typeClass": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/typeClass",
+                                              "type": "string"
+                                            },
+                                            "value": {
+                                              "$id": "#/properties/datasetVersion/properties/metadataBlocks/properties/astrophysics/properties/fields/items/anyOf/0/properties/value/items/anyOf/0/properties/coverage.RedshiftValue/properties/value",
+                                              "type": "string"
+                                            }
+                                          }
                                         }
                                       }
                                     }
