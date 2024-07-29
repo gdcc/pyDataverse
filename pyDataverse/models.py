@@ -1116,22 +1116,22 @@ class Dataset(DVObject):
                                 in self.__attr_import_dv_up_astrophysics_fields_values
                                 ):
                                 data[field["typeName"]] = field["value"]
-                                elif(
-                                    field["typeName"]
-                                    in self.__attr_import_dv_up_astrophysics_fields_arrays
-                                    ):
+                            elif(
+                                field["typeName"]
+                                in self.__attr_import_dv_up_astrophysics_fields_arrays
+                                ):
                                 data[field["typeName"]] = self.__parse_field_array(
-                                    field["value"],
-                                    self.__attr_import_dv_up_astrophysics_fields_arrays[
-                                        field["typeName"]
-                                        ],
-                                )
-                                else:
-                                print(
-                                    "Attribute {0} not valid for import (dv_up).".format(
+                                field["value"],
+                                self.__attr_import_dv_up_astrophysics_fields_arrays[
                                     field["typeName"]
-                                    )
+                                    ],
+                            )
+                            else:
+                                print(
+                                "Attribute {0} not valid for import (dv_up).".format(
+                                field["typeName"]
                                 )
+                            )
                                 
                 else:
                     # TODO: Exception
@@ -1585,7 +1585,6 @@ class Dataset(DVObject):
             if geospatial is not None:
                 data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
             if journal is not None:
-            if "journal" in locals():
                 print("'Journal' matadata block exists in locals()")
                 data["datasetVersion"]["metadataBlocks"]["journal"] = journal
             if astrophysics is not None:
