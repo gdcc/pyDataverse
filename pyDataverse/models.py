@@ -1609,6 +1609,7 @@ class Dataset(DVObject):
                     )
 
             data["datasetVersion"]["metadataBlocks"]["citation"] = citation
+            data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
             if "socialscience" in locals():
                 data["datasetVersion"]["metadataBlocks"]["socialscience"] = (
                     socialscience
@@ -1618,9 +1619,9 @@ class Dataset(DVObject):
             if "journal" in locals():
                 print("'Journal' matadata added to dataset")
                 data["datasetVersion"]["metadataBlocks"]["journal"] = journal
-            if "astrophysics" in locals():
-                print("'Astrophysics' metadata added to dataset")
-                data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
+            #if "astrophysics" in locals():
+             #   print("'Astrophysics' metadata added to dataset")
+              #  data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
         elif data_format == "dspace":
             data = None
             print("INFO: Not implemented yet.")
