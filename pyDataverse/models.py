@@ -320,6 +320,12 @@ class Dataset(DVObject):
     __attr_import_dv_up_journal_fields_arrays : dict
         Attributes of Dataverse API Upload Dataset JSON metadata standard inside
         [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
+    __attr_import_dv_up_astrophysics_fields_values : list
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'astrophysics\'][\'fields\'].
+    __attr_import_dv_up_astrophysics_fields_arrays : dict
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'astrophysics\'][\'fields\'].
     __attr_dict_dv_up_required :list
         Required attributes for valid `dv_up` metadata dict creation.
     __attr_dict_dv_up_type_class_primitive : list
@@ -518,10 +524,6 @@ class Dataset(DVObject):
             "publicationURL",
             "relatedDatasets",
             "relatedMaterial",
-            "resolution.Spatial", 
-            "resolution.Temporal",
-            "redshiftType",
-            "resolution.Redshift"
             "seriesInformation",
             "seriesName",
             "state",
@@ -1642,9 +1644,11 @@ class Dataset(DVObject):
             if "geospatial" in locals():
                 data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
             if "journal" in locals():
+                print("'Journal' matadata block exists in locals()")
                 data["datasetVersion"]["metadataBlocks"]["journal"] = journal
             if "astrophysics" in locals():
                 data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
+                print("'Astrophysics' metadata block in locals()")
         elif data_format == "dspace":
             data = None
             print("INFO: Not implemented yet.")
