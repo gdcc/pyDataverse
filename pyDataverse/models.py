@@ -320,6 +320,12 @@ class Dataset(DVObject):
     __attr_import_dv_up_journal_fields_arrays : dict
         Attributes of Dataverse API Upload Dataset JSON metadata standard inside
         [\'datasetVersion\'][\'metadataBlocks\'][\'journal\'][\'fields\'].
+     __attr_import_dv_up_astrophysics_fields_values : list
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'astrophysics\'][\'fields\'].
+    __attr_import_dv_up_astrophysics_fields_arrays : dict
+        Attributes of Dataverse API Upload Dataset JSON metadata standard inside
+        [\'datasetVersion\'][\'metadataBlocks\'][\'astrophysics\'][\'fields\']
     __attr_dict_dv_up_required :list
         Required attributes for valid `dv_up` metadata dict creation.
     __attr_dict_dv_up_type_class_primitive : list
@@ -466,11 +472,10 @@ class Dataset(DVObject):
         "resolution.Redshift"
     ]
 
-    __attr_import_dv_up_astrophysics_fields_arrays ={
+    __attr_import_dv_up_astrophysics_fields_arrays = {
         "coverage.Spectral.Wavelength": ["coverage.Spectral.MinimumWavelength", "coverage.Spectral.MaximumWavelength"],
         "coverage.Temporal": ["coverage.Temporal.StartTime", "coverage.Temporal.StopTime"],
         "coverage.RedshiftValue": ["coverage.Redshift.MinimumValue", "coverage.Redshift.MaximumValue"]
-        
     }
     __attr_dict_dv_up_required = [
         "author",
@@ -563,7 +568,7 @@ class Dataset(DVObject):
     )
     __attr_dict_dv_up_type_class_controlled_vocabulary = [
         "authorIdentifierScheme",
-        "astroType"
+        "astroType",
         "contributorType",
         "country",
         "journalArticleType",
@@ -686,10 +691,10 @@ class Dataset(DVObject):
             "journal_displayName",
             "journalVolumeIssue",
             "journalArticleType",
-            "astrophysics_displayName"
+            "astrophysics_displayName",
             "astroType",
             "astroFacility",
-            "astroInstrumnet",
+            "astroInstrument",
             "astroObject",
             "resolution.Spatial", 
             "resolution.Temporal",
@@ -702,11 +707,11 @@ class Dataset(DVObject):
             "coverage.SkyFraction",
             "coverage.Polarization",
             "redshiftType",
-            "resolution.Redshift"
+            "resolution.Redshift",
             "coverage.Spectral.Wavelength",
             "coverage.Temporal",
             "coverage.RedshiftValue"
-            ]
+        ]
 
     def validate_json(self, filename_schema=None):
         """Validate JSON formats of Dataset.
@@ -1104,33 +1109,34 @@ class Dataset(DVObject):
 
                 #astrophysics
                 if "astrophysics" in json_dict["datasetVersion"]["metadataBlocks"]:
-                        astrophysics = json_dict["datasetVersion"]["metadataBlocks"]["astrophysics"]
-
-                        if "displayName" in astrophysics:
-                            self.__setattr__("astrophysics_displayName", astrophysics["displayName"])
-
+                    astrophysics = json_dict["datasetVersion"]["metadataBlocks"]["astrophysics"]
+                    
+                    if "displayName" in astrophysics:
+                        self.__setattr__("astrophysics_displayName", astrophysics["displayName"])
+                        
                         for field in astrophysics["fields"]:
                             if (
                                 field["typeName"]
                                 in self.__attr_import_dv_up_astrophysics_fields_values
-                            ):
+                                ):
                                 data[field["typeName"]] = field["value"]
-                            elif (
-                                field["typeName"]
-                                in self.__attr_import_dv_up_astrophysics_fields_arrays
-                            ):
+                                elif(
+                                    field["typeName"]
+                                    in self.__attr_import_dv_up_astrophysics_fields_arrays
+                                    ):
                                 data[field["typeName"]] = self.__parse_field_array(
                                     field["value"],
                                     self.__attr_import_dv_up_astrophysics_fields_arrays[
                                         field["typeName"]
-                                    ],
+                                        ],
                                 )
-                            else:
+                                else:
                                 print(
                                     "Attribute {0} not valid for import (dv_up).".format(
-                                        field["typeName"]
+                                    field["typeName"]
                                     )
                                 )
+                                
                 else:
                     # TODO: Exception
                     pass
@@ -1273,7 +1279,7 @@ class Dataset(DVObject):
             # dataset
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_datasetVersion_values:
-                if attr in data_dict:
+                if attr in data_dict and data_dict[attr] is not None:
                     data["datasetVersion"][attr] = data_dict[attr]
 
             # citation
@@ -1282,19 +1288,14 @@ class Dataset(DVObject):
 
             # Generate first level attributes
             for attr in self.__attr_import_dv_up_citation_fields_values:
-                if attr in data_dict:
+                if attr in data_dict and data_dict[attr] is not None:
                     v = data_dict[attr]
-                    if isinstance(v, list):
-                        multiple = True
-                    else:
-                        multiple = False
+                    multiple = isinstance(v, list)
                     if attr in self.__attr_dict_dv_up_type_class_primitive:
                         type_class = "primitive"
                     elif attr in self.__attr_dict_dv_up_type_class_compound:
                         type_class = "compound"
-                    elif (
-                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
-                    ):
+                    elif attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary:
                         type_class = "controlledVocabulary"
                     citation["fields"].append(
                         {
@@ -1306,12 +1307,8 @@ class Dataset(DVObject):
                     )
 
             # Generate fields attributes
-            for (
-                key,
-                val,
-            ) in self.__attr_import_dv_up_citation_fields_arrays.items():
-                if key in data_dict:
-                    v = data_dict[key]
+            for key, val in self.__attr_import_dv_up_citation_fields_arrays.items():
+                if key in data_dict and data_dict[key] is not None:
                     citation["fields"].append(
                         {
                             "typeName": key,
@@ -1325,325 +1322,275 @@ class Dataset(DVObject):
             if "series" in data_dict:
                 series = data_dict["series"]
                 tmp_dict = {}
-                if "seriesName" in series:
-                    if series["seriesName"] is not None:
-                        tmp_dict["seriesName"] = {}
-                        tmp_dict["seriesName"]["typeName"] = "seriesName"
-                        tmp_dict["seriesName"]["multiple"] = False
-                        tmp_dict["seriesName"]["typeClass"] = "primitive"
-                        tmp_dict["seriesName"]["value"] = series["seriesName"]
-                if "seriesInformation" in series:
-                    if series["seriesInformation"] is not None:
-                        tmp_dict["seriesInformation"] = {}
-                        tmp_dict["seriesInformation"]["typeName"] = "seriesInformation"
-                        tmp_dict["seriesInformation"]["multiple"] = False
-                        tmp_dict["seriesInformation"]["typeClass"] = "primitive"
-                        tmp_dict["seriesInformation"]["value"] = series[
-                            "seriesInformation"
-                        ]
-                citation["fields"].append(
-                    {
-                        "typeName": "series",
+                if "seriesName" in series and series["seriesName"] is not None:
+                    tmp_dict["seriesName"] = {
+                        "typeName": "seriesName",
                         "multiple": False,
-                        "typeClass": "compound",
-                        "value": tmp_dict,
+                        "typeClass": "primitive",
+                        "value": series["seriesName"],
                     }
-                )
+                if "seriesInformation" in series and series["seriesInformation"] is not None:
+                    tmp_dict["seriesInformation"] = {
+                        "typeName": "seriesInformation",
+                        "multiple": False,
+                        "typeClass": "primitive",
+                        "value": series["seriesInformation"],
+                    }
+                if tmp_dict:
+                    citation["fields"].append(
+                        {
+                            "typeName": "series",
+                            "multiple": False,
+                            "typeClass": "compound",
+                            "value": tmp_dict,
+                        }
+                    )
 
             # geospatial
+            geospatial = None
             for attr in (
                 self.__attr_import_dv_up_geospatial_fields_values
                 + list(self.__attr_import_dv_up_geospatial_fields_arrays.keys())
                 + ["geospatial_displayName"]
             ):
                 if attr in data_dict:
-                    geospatial = {}
-                    if attr != "geospatial_displayName":
-                        geospatial["fields"] = []
-                        break
+                    geospatial = {"fields": []}
+                    break
 
-            if "geospatial_displayName" in data_dict:
-                geospatial["displayName"] = data_dict["geospatial_displayName"]
+            if geospatial is not None:
+                if "geospatial_displayName" in data_dict:
+                    geospatial["displayName"] = data_dict["geospatial_displayName"]
 
-            # Generate first level attributes
-            for attr in self.__attr_import_dv_up_geospatial_fields_values:
-                if attr in data_dict:
-                    v = data_dict[attr]
-                    if isinstance(v, list):
-                        multiple = True
-                    else:
-                        multiple = False
-                    if attr in self.__attr_dict_dv_up_type_class_primitive:
-                        type_class = "primitive"
-                    elif attr in self.__attr_dict_dv_up_type_class_compound:
-                        type_class = "compound"
-                    elif (
-                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
-                    ):
-                        type_class = "controlledVocabulary"
-                    geospatial["fields"].append(
-                        {
-                            "typeName": attr,
-                            "multiple": multiple,
-                            "typeClass": type_class,
-                            "value": v,
-                        }
-                    )
+                # Generate first level attributes
+                for attr in self.__attr_import_dv_up_geospatial_fields_values:
+                    if attr in data_dict and data_dict[attr] is not None:
+                        v = data_dict[attr]
+                        multiple = isinstance(v, list)
+                        if attr in self.__attr_dict_dv_up_type_class_primitive:
+                            type_class = "primitive"
+                        elif attr in self.__attr_dict_dv_up_type_class_compound:
+                            type_class = "compound"
+                        elif attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary:
+                            type_class = "controlledVocabulary"
+                        geospatial["fields"].append(
+                            {
+                                "typeName": attr,
+                                "multiple": multiple,
+                                "typeClass": type_class,
+                                "value": v,
+                            }
+                        )
 
-            # Generate fields attributes
-            for (
-                key,
-                val,
-            ) in self.__attr_import_dv_up_geospatial_fields_arrays.items():
-                if key in data_dict:
-                    geospatial["fields"].append(
-                        {
-                            "typeName": key,
-                            "multiple": True,
-                            "typeClass": "compound",
-                            "value": self.__generate_field_arrays(key, val),
-                        }
-                    )
+                # Generate fields attributes
+                for key, val in self.__attr_import_dv_up_geospatial_fields_arrays.items():
+                    if key in data_dict and data_dict[key] is not None:
+                        geospatial["fields"].append(
+                            {
+                                "typeName": key,
+                                "multiple": True,
+                                "typeClass": "compound",
+                                "value": self.__generate_field_arrays(key, val),
+                            }
+                        )
 
             # socialscience
+            socialscience = None
             for attr in self.__attr_import_dv_up_socialscience_fields_values + [
                 "socialscience_displayName"
             ]:
                 if attr in data_dict:
-                    socialscience = {}
-                    if attr != "socialscience_displayName":
-                        socialscience["fields"] = []
-                        break
+                    socialscience = {"fields": []}
+                    break
 
-            if "socialscience_displayName" in data_dict:
-                socialscience["displayName"] = data_dict["socialscience_displayName"]
+            if socialscience is not None:
+                if "socialscience_displayName" in data_dict:
+                    socialscience["displayName"] = data_dict["socialscience_displayName"]
 
-            # Generate first level attributes
-            for attr in self.__attr_import_dv_up_socialscience_fields_values:
-                if attr in data_dict:
-                    v = data_dict[attr]
-                    if isinstance(v, list):
-                        multiple = True
-                    else:
-                        multiple = False
-                    if attr in self.__attr_dict_dv_up_type_class_primitive:
-                        type_class = "primitive"
-                    elif attr in self.__attr_dict_dv_up_type_class_compound:
-                        type_class = "compound"
-                    elif (
-                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
-                    ):
-                        type_class = "controlledVocabulary"
-                    socialscience["fields"].append(
-                        {
-                            "typeName": attr,
-                            "multiple": multiple,
-                            "typeClass": type_class,
-                            "value": v,
+                # Generate first level attributes
+                for attr in self.__attr_import_dv_up_socialscience_fields_values:
+                    if attr in data_dict and data_dict[attr] is not None:
+                        v = data_dict[attr]
+                        multiple = isinstance(v, list)
+                        if attr in self.__attr_dict_dv_up_type_class_primitive:
+                            type_class = "primitive"
+                        elif attr in self.__attr_dict_dv_up_type_class_compound:
+                            type_class = "compound"
+                        elif attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary:
+                            type_class = "controlledVocabulary"
+                        socialscience["fields"].append(
+                            {
+                                "typeName": attr,
+                                "multiple": multiple,
+                                "typeClass": type_class,
+                                "value": v,
+                            }
+                        )
+
+                # Generate targetSampleSize attributes
+                if "targetSampleSize" in data_dict:
+                    target_sample_size = data_dict["targetSampleSize"]
+                    tmp_dict = {}
+                    if "targetSampleActualSize" in target_sample_size and target_sample_size["targetSampleActualSize"] is not None:
+                        tmp_dict["targetSampleActualSize"] = {
+                            "typeName": "targetSampleActualSize",
+                            "multiple": False,
+                            "typeClass": "primitive",
+                            "value": target_sample_size["targetSampleActualSize"],
                         }
-                    )
+                    if "targetSampleSizeFormula" in target_sample_size and target_sample_size["targetSampleSizeFormula"] is not None:
+                        tmp_dict["targetSampleSizeFormula"] = {
+                            "typeName": "targetSampleSizeFormula",
+                            "multiple": False,
+                            "typeClass": "primitive",
+                            "value": target_sample_size["targetSampleSizeFormula"],
+                        }
+                    if tmp_dict:
+                        socialscience["fields"].append(
+                            {
+                                "typeName": "targetSampleSize",
+                                "multiple": False,
+                                "typeClass": "compound",
+                                "value": tmp_dict,
+                            }
+                        )
 
-            # Generate targetSampleSize attributes
-            if "targetSampleSize" in data_dict:
-                target_sample_size = data_dict["targetSampleSize"]
-                tmp_dict = {}
-                if "targetSampleActualSize" in target_sample_size:
-                    if target_sample_size["targetSampleActualSize"] is not None:
-                        tmp_dict["targetSampleActualSize"] = {}
-                        tmp_dict["targetSampleActualSize"]["typeName"] = (
-                            "targetSampleActualSize"
+                # Generate socialScienceNotes attributes
+                if "socialScienceNotes" in data_dict:
+                    social_science_notes = data_dict["socialScienceNotes"]
+                    tmp_dict = {}
+                    if "socialScienceNotesType" in social_science_notes and social_science_notes["socialScienceNotesType"] is not None:
+                        tmp_dict["socialScienceNotesType"] = {
+                            "typeName": "socialScienceNotesType",
+                            "multiple": False,
+                            "typeClass": "primitive",
+                            "value": social_science_notes["socialScienceNotesType"],
+                        }
+                    if "socialScienceNotesSubject" in social_science_notes and social_science_notes["socialScienceNotesSubject"] is not None:
+                        tmp_dict["socialScienceNotesSubject"] = {
+                            "typeName": "socialScienceNotesSubject",
+                            "multiple": False,
+                            "typeClass": "primitive",
+                            "value": social_science_notes["socialScienceNotesSubject"],
+                        }
+                    if "socialScienceNotesText" in social_science_notes and social_science_notes["socialScienceNotesText"] is not None:
+                        tmp_dict["socialScienceNotesText"] = {
+                            "typeName": "socialScienceNotesText",
+                            "multiple": False,
+                            "typeClass": "primitive",
+                            "value": social_science_notes["socialScienceNotesText"],
+                        }
+                    if tmp_dict:
+                        socialscience["fields"].append(
+                            {
+                                "typeName": "socialScienceNotes",
+                                "multiple": False,
+                                "typeClass": "compound",
+                                "value": tmp_dict,
+                            }
                         )
-                        tmp_dict["targetSampleActualSize"]["multiple"] = False
-                        tmp_dict["targetSampleActualSize"]["typeClass"] = "primitive"
-                        tmp_dict["targetSampleActualSize"]["value"] = (
-                            target_sample_size["targetSampleActualSize"]
-                        )
-                if "targetSampleSizeFormula" in target_sample_size:
-                    if target_sample_size["targetSampleSizeFormula"] is not None:
-                        tmp_dict["targetSampleSizeFormula"] = {}
-                        tmp_dict["targetSampleSizeFormula"]["typeName"] = (
-                            "targetSampleSizeFormula"
-                        )
-                        tmp_dict["targetSampleSizeFormula"]["multiple"] = False
-                        tmp_dict["targetSampleSizeFormula"]["typeClass"] = "primitive"
-                        tmp_dict["targetSampleSizeFormula"]["value"] = (
-                            target_sample_size["targetSampleSizeFormula"]
-                        )
-                socialscience["fields"].append(
-                    {
-                        "typeName": "targetSampleSize",
-                        "multiple": False,
-                        "typeClass": "compound",
-                        "value": tmp_dict,
-                    }
-                )
-
-            # Generate socialScienceNotes attributes
-            if "socialScienceNotes" in data_dict:
-                social_science_notes = data_dict["socialScienceNotes"]
-                tmp_dict = {}
-                if "socialScienceNotesType" in social_science_notes:
-                    if social_science_notes["socialScienceNotesType"] is not None:
-                        tmp_dict["socialScienceNotesType"] = {}
-                        tmp_dict["socialScienceNotesType"]["typeName"] = (
-                            "socialScienceNotesType"
-                        )
-                        tmp_dict["socialScienceNotesType"]["multiple"] = False
-                        tmp_dict["socialScienceNotesType"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesType"]["value"] = (
-                            social_science_notes["socialScienceNotesType"]
-                        )
-                if "socialScienceNotesSubject" in social_science_notes:
-                    if social_science_notes["socialScienceNotesSubject"] is not None:
-                        tmp_dict["socialScienceNotesSubject"] = {}
-                        tmp_dict["socialScienceNotesSubject"]["typeName"] = (
-                            "socialScienceNotesSubject"
-                        )
-                        tmp_dict["socialScienceNotesSubject"]["multiple"] = False
-                        tmp_dict["socialScienceNotesSubject"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesSubject"]["value"] = (
-                            social_science_notes["socialScienceNotesSubject"]
-                        )
-                if "socialScienceNotesText" in social_science_notes:
-                    if social_science_notes["socialScienceNotesText"] is not None:
-                        tmp_dict["socialScienceNotesText"] = {}
-                        tmp_dict["socialScienceNotesText"]["typeName"] = (
-                            "socialScienceNotesText"
-                        )
-                        tmp_dict["socialScienceNotesText"]["multiple"] = False
-                        tmp_dict["socialScienceNotesText"]["typeClass"] = "primitive"
-                        tmp_dict["socialScienceNotesText"]["value"] = (
-                            social_science_notes["socialScienceNotesText"]
-                        )
-                socialscience["fields"].append(
-                    {
-                        "typeName": "socialScienceNotes",
-                        "multiple": False,
-                        "typeClass": "compound",
-                        "value": tmp_dict,
-                    }
-                )
 
             # journal
+            journal = None
             for attr in (
                 self.__attr_import_dv_up_journal_fields_values
                 + list(self.__attr_import_dv_up_journal_fields_arrays.keys())
                 + ["journal_displayName"]
             ):
                 if attr in data_dict:
-                    journal = {}
-                    if attr != "journal_displayName":
-                        journal["fields"] = []
-                        break
+                    journal = {"fields": []}
+                    break
 
-            if "journal_displayName" in data_dict:
-                journal["displayName"] = data_dict["journal_displayName"]
+            if journal is not None:
+                if "journal_displayName" in data_dict:
+                    journal["displayName"] = data_dict["journal_displayName"]
 
-            # Generate first level attributes
-            for attr in self.__attr_import_dv_up_journal_fields_values:
-                if attr in data_dict:
-                    v = data_dict[attr]
-                    if isinstance(v, list):
-                        multiple = True
-                    else:
-                        multiple = False
-                    if attr in self.__attr_dict_dv_up_type_class_primitive:
-                        type_class = "primitive"
-                    elif attr in self.__attr_dict_dv_up_type_class_compound:
-                        type_class = "compound"
-                    elif (
-                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
-                    ):
-                        type_class = "controlledVocabulary"
-                    journal["fields"].append(
-                        {
-                            "typeName": attr,
-                            "multiple": multiple,
-                            "typeClass": type_class,
-                            "value": v,
-                        }
-                    )
+                # Generate first level attributes
+                for attr in self.__attr_import_dv_up_journal_fields_values:
+                    if attr in data_dict and data_dict[attr] is not None:
+                        v = data_dict[attr]
+                        multiple = isinstance(v, list)
+                        if attr in self.__attr_dict_dv_up_type_class_primitive:
+                            type_class = "primitive"
+                        elif attr in self.__attr_dict_dv_up_type_class_compound:
+                            type_class = "compound"
+                        elif attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary:
+                            type_class = "controlledVocabulary"
+                        journal["fields"].append(
+                            {
+                                "typeName": attr,
+                                "multiple": multiple,
+                                "typeClass": type_class,
+                                "value": v,
+                            }
+                        )
 
-            # Generate fields attributes
-            for (
-                key,
-                val,
-            ) in self.__attr_import_dv_up_journal_fields_arrays.items():
-                if key in data_dict:
-                    journal["fields"].append(
-                        {
-                            "typeName": key,
-                            "multiple": True,
-                            "typeClass": "compound",
-                            "value": self.__generate_field_arrays(key, val),
-                        }
-                    )
+                # Generate fields attributes
+                for key, val in self.__attr_import_dv_up_journal_fields_arrays.items():
+                    if key in data_dict and data_dict[key] is not None:
+                        journal["fields"].append(
+                            {
+                                "typeName": key,
+                                "multiple": True,
+                                "typeClass": "compound",
+                                "value": self.__generate_field_arrays(key, val),
+                            }
+                        )
             
             # astrophysics
+            astrophysics = None
             for attr in (
                 self.__attr_import_dv_up_astrophysics_fields_values
                 + list(self.__attr_import_dv_up_astrophysics_fields_arrays.keys())
                 + ["astrophysics_displayName"]
             ):
                 if attr in data_dict:
-                    astrophysics = {}
-                    if attr != "astrophysics_displayName":
-                        astrophysics["fields"] = []
-                        break
+                    astrophysics = {"fields": []}
+                    break
 
-            if "astrophysics_displayName" in data_dict:
-                astrophysics["displayName"] = data_dict["astrophysics_displayName"]
+            if astrophysics is not None:
+                if "astrophysics_displayName" in data_dict:
+                    astrophysics["displayName"] = data_dict["astrophysics_displayName"]
 
-            # Generate first level attributes
-            for attr in self.__attr_import_dv_up_astrophysics_fields_values:
-                if attr in data_dict:
-                    v = data_dict[attr]
-                    if isinstance(v, list):
-                        multiple = True
-                    else:
-                        multiple = False
-                    if attr in self.__attr_dict_dv_up_type_class_primitive:
-                        type_class = "primitive"
-                    elif attr in self.__attr_dict_dv_up_type_class_compound:
-                        type_class = "compound"
-                    elif (
-                        attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary
-                    ):
-                        type_class = "controlledVocabulary"
-                    astrophysics["fields"].append(
-                        {
-                            "typeName": attr,
-                            "multiple": multiple,
-                            "typeClass": type_class,
-                            "value": v,
-                        }
-                    )
+                # Generate first level attributes
+                for attr in self.__attr_import_dv_up_astrophysics_fields_values:
+                    if attr in data_dict and data_dict[attr] is not None:
+                        v = data_dict[attr]
+                        multiple = isinstance(v, list)
+                        if attr in self.__attr_dict_dv_up_type_class_primitive:
+                            type_class = "primitive"
+                        elif attr in self.__attr_dict_dv_up_type_class_compound:
+                            type_class = "compound"
+                        elif attr in self.__attr_dict_dv_up_type_class_controlled_vocabulary:
+                            type_class = "controlledVocabulary"
+                        astrophysics["fields"].append(
+                            {
+                                "typeName": attr,
+                                "multiple": multiple,
+                                "typeClass": type_class,
+                                "value": v,
+                            }
+                        )
 
-            # Generate fields attributes
-            for (
-                key,
-                val,
-            ) in self.__attr_import_dv_up_astrophysics_fields_arrays.items():
-                if key in data_dict:
-                    astrophysics["fields"].append(
-                        {
-                            "typeName": key,
-                            "multiple": True,
-                            "typeClass": "compound",
-                            "value": self.__generate_field_arrays(key, val),
-                        }
-                    )
+                # Generate fields attributes
+                for key, val in self.__attr_import_dv_up_astrophysics_fields_arrays.items():
+                    if key in data_dict and data_dict[key] is not None:
+                        astrophysics["fields"].append(
+                            {
+                                "typeName": key,
+                                "multiple": True,
+                                "typeClass": "compound",
+                                "value": self.__generate_field_arrays(key, val),
+                            }
+                        )
 
             data["datasetVersion"]["metadataBlocks"]["citation"] = citation
-            if "socialscience" in locals():
-                data["datasetVersion"]["metadataBlocks"]["socialscience"] = (
-                    socialscience
-                )
-            if "geospatial" in locals():
+            if socialscience is not None:
+                data["datasetVersion"]["metadataBlocks"]["socialscience"] = socialscience
+            if geospatial is not None:
                 data["datasetVersion"]["metadataBlocks"]["geospatial"] = geospatial
-            if "journal" in locals():
+            if journal is not None:
                 data["datasetVersion"]["metadataBlocks"]["journal"] = journal
-            if "astrophysics" in locals():
+            if astrophysics is not None:
                 data["datasetVersion"]["metadataBlocks"]["astrophysics"] = astrophysics
         elif data_format == "dspace":
             data = None
@@ -1657,6 +1604,7 @@ class Dataset(DVObject):
         json_str = json.dumps(data, indent=2)
         assert isinstance(json_str, str)
         return json_str
+
 
 
 class Datafile(DVObject):
