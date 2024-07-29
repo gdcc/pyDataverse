@@ -543,9 +543,10 @@ class Dataset(DVObject):
         + __attr_import_dv_up_geospatial_fields_arrays["geographicBoundingBox"]
         + __attr_import_dv_up_socialscience_fields_values
         + __attr_import_dv_up_journal_fields_arrays["journalVolumeIssue"]
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Temporal']
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.Spectral']
-        + __attr_import_dv_up_astrophysics_fields_arrays['coverage.RedshiftValue']
+        + __attr_import_dv_up_astrophysics_fields_values
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.Temporal"]
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.Spectral.Wavelength"]
+        + __attr_import_dv_up_astrophysics_fields_arrays["coverage.RedshiftValue"]
         + [
             "socialScienceNotesType",
             "socialScienceNotesSubject",
