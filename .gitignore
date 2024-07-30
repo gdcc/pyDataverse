@@ -170,3 +170,6 @@ poetry.lock
 
 # Ruff
 .ruff_cache/
+
+# JetBrains
+.idea/
