@@ -45,6 +45,41 @@ class TestFileUpload:
         # Assert
         assert response.status_code == 200, "File upload failed."
 
+    def test_file_upload_without_metadata(self):
+        """
+        Test case for uploading a file to a dataset without metadata.
+
+        --> json_str will be set as None
+
+        This test case performs the following steps:
+        1. Creates a dataset using the provided metadata.
+        2. Prepares a file for upload.
+        3. Uploads the file to the dataset.
+        4. Asserts that the file upload was successful.
+
+        Raises:
+            AssertionError: If the file upload fails.
+
+        """
+        # Arrange
+        BASE_URL = os.getenv("BASE_URL").rstrip("/")
+        API_TOKEN = os.getenv("API_TOKEN")
+
+        # Create dataset
+        metadata = json.load(open("tests/data/file_upload_ds_minimum.json"))
+        pid = self._create_dataset(BASE_URL, API_TOKEN, metadata)
+        api = NativeApi(BASE_URL, API_TOKEN)
+
+        # Act
+        response = api.upload_datafile(
+            identifier=pid,
+            filename="tests/data/datafile.txt",
+            json_str=None,
+        )
+
+        # Assert
+        assert response.status_code == 200, "File upload failed."
+
     def test_bulk_file_upload(self, create_mock_file):
         """
         Test case for uploading bulk files to a dataset.
@@ -161,9 +196,13 @@ class TestFileUpload:
             replaced_id,
         )
 
-        assert data_file["description"] == "My description.", "Description does not match."
+        assert (
+            data_file["description"] == "My description."
+        ), "Description does not match."
         assert data_file["categories"] == ["Data"], "Categories do not match."
-        assert file_metadata["directoryLabel"] == "some/other", "Directory label does not match."
+        assert (
+            file_metadata["directoryLabel"] == "some/other"
+        ), "Directory label does not match."
         assert response.status_code == 200, "File replacement failed."
         assert (
             replaced_content == mutated
@@ -252,7 +291,6 @@ class TestFileUpload:
         response.raise_for_status()
 
         return response.content.decode("utf-8")
-
 
     @staticmethod
     def _get_file_metadata(
