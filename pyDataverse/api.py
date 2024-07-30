@@ -167,7 +167,6 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
-
         if isinstance(data, str):
             data = json.loads(data)
 
@@ -176,11 +175,7 @@ class Api:
 
         if self.client is None:
             return self._sync_request(
-                method=httpx.post,
-                url=url,
-                params=params,
-                files=files,
-                **request_params
+                method=httpx.post, url=url, params=params, files=files, **request_params
             )
         else:
             return self._async_request(
@@ -291,9 +286,9 @@ class Api:
         elif "jsonData" not in data:
             return {"json": data}
 
-        assert list(data.keys()) == ["jsonData"], (
-            "jsonData must be the only key in the dictionary."
-        )
+        assert list(data.keys()) == [
+            "jsonData"
+        ], "jsonData must be the only key in the dictionary."
 
         # Content of JSON data should ideally be a string
         content = data["jsonData"]
