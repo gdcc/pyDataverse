@@ -4,7 +4,7 @@ import tempfile
 
 import httpx
 
-from pyDataverse.api import NativeApi
+from pyDataverse.api import DataAccessApi, NativeApi
 from pyDataverse.models import Datafile
 
 
@@ -132,9 +132,9 @@ class TestFileUpload:
                 # Assert
                 assert response.status_code == 200, "File upload failed."
 
-    def test_file_replacement(self):
+    def test_file_replacement_wo_metadata(self):
         """
-        Test case for replacing a file in a dataset.
+        Test case for replacing a file in a dataset without metadata.
 
         Steps:
         1. Create a dataset using the provided metadata.
@@ -151,6 +151,7 @@ class TestFileUpload:
         metadata = json.load(open("tests/data/file_upload_ds_minimum.json"))
         pid = self._create_dataset(BASE_URL, API_TOKEN, metadata)
         api = NativeApi(BASE_URL, API_TOKEN)
+        data_api = DataAccessApi(BASE_URL, API_TOKEN)
 
         # Perform file upload
         df = Datafile({"pid": pid, "filename": "datafile.txt"})
@@ -161,7 +162,64 @@ class TestFileUpload:
         )
 
         # Retrieve file ID
-        file_id = self._get_file_id(BASE_URL, API_TOKEN, pid)
+        file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
+
+        # Act
+        with tempfile.TemporaryDirectory() as tempdir:
+            original = open("tests/data/replace.xyz").read()
+            mutated = "Z" + original[1::]
+            mutated_path = os.path.join(tempdir, "replace.xyz")
+
+            with open(mutated_path, "w") as f:
+                f.write(mutated)
+
+            json_data = {}
+
+            response = api.replace_datafile(
+                identifier=file_id,
+                filename=mutated_path,
+                json_str=json.dumps(json_data),
+                is_filepid=False,
+            )
+
+        # Assert
+        file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
+        content = data_api.get_datafile(file_id, is_pid=False).text
+
+        assert response.status_code == 200, "File replacement failed."
+        assert content == mutated, "File content does not match the expected content."
+
+    def test_file_replacement_w_metadata(self):
+        """
+        Test case for replacing a file in a dataset with metadata.
+
+        Steps:
+        1. Create a dataset using the provided metadata.
+        2. Upload a datafile to the dataset.
+        3. Replace the uploaded datafile with a mutated version.
+        4. Verify that the file replacement was successful and the content matches the expected content.
+        """
+
+        # Arrange
+        BASE_URL = os.getenv("BASE_URL").rstrip("/")
+        API_TOKEN = os.getenv("API_TOKEN")
+
+        # Create dataset
+        metadata = json.load(open("tests/data/file_upload_ds_minimum.json"))
+        pid = self._create_dataset(BASE_URL, API_TOKEN, metadata)
+        api = NativeApi(BASE_URL, API_TOKEN)
+        data_api = DataAccessApi(BASE_URL, API_TOKEN)
+
+        # Perform file upload
+        df = Datafile({"pid": pid, "filename": "datafile.txt"})
+        response = api.upload_datafile(
+            identifier=pid,
+            filename="tests/data/replace.xyz",
+            json_str=df.json(),
+        )
+
+        # Retrieve file ID
+        file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
 
         # Act
         with tempfile.TemporaryDirectory() as tempdir:
@@ -187,26 +245,19 @@ class TestFileUpload:
             )
 
         # Assert
-        replaced_id = self._get_file_id(BASE_URL, API_TOKEN, pid)
-        file_metadata = self._get_file_metadata(BASE_URL, API_TOKEN, replaced_id)
-        data_file = file_metadata["dataFile"]
-        replaced_content = self._fetch_datafile_content(
-            BASE_URL,
-            API_TOKEN,
-            replaced_id,
-        )
+        file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
+        data_file = api.get_dataset(pid).json()["data"]["latestVersion"]["files"][0]
+        content = data_api.get_datafile(file_id, is_pid=False).text
 
         assert (
             data_file["description"] == "My description."
         ), "Description does not match."
         assert data_file["categories"] == ["Data"], "Categories do not match."
         assert (
-            file_metadata["directoryLabel"] == "some/other"
+            data_file["directoryLabel"] == "some/other"
         ), "Directory label does not match."
         assert response.status_code == 200, "File replacement failed."
-        assert (
-            replaced_content == mutated
-        ), "File content does not match the expected content."
+        assert content == mutated, "File content does not match the expected content."
 
     @staticmethod
     def _create_dataset(
@@ -238,82 +289,3 @@ class TestFileUpload:
         response.raise_for_status()
 
         return response.json()["data"]["persistentId"]
-
-    @staticmethod
-    def _get_file_id(
-        BASE_URL: str,
-        API_TOKEN: str,
-        pid: str,
-    ):
-        """
-        Retrieves the file ID for a given persistent identifier (PID) in Dataverse.
-
-        Args:
-            BASE_URL (str): The base URL of the Dataverse instance.
-            API_TOKEN (str): The API token for authentication.
-            pid (str): The persistent identifier (PID) of the dataset.
-
-        Returns:
-            str: The file ID of the latest version of the dataset.
-
-        Raises:
-            HTTPError: If the HTTP request to retrieve the file ID fails.
-        """
-        response = httpx.get(
-            url=f"{BASE_URL}/api/datasets/:persistentId/?persistentId={pid}",
-            headers={"X-Dataverse-key": API_TOKEN},
-        )
-
-        response.raise_for_status()
-
-        return response.json()["data"]["latestVersion"]["files"][0]["dataFile"]["id"]
-
-    @staticmethod
-    def _fetch_datafile_content(
-        BASE_URL: str,
-        API_TOKEN: str,
-        id: str,
-    ):
-        """
-        Fetches the content of a datafile from the specified BASE_URL using the provided API_TOKEN.
-
-        Args:
-            BASE_URL (str): The base URL of the Dataverse instance.
-            API_TOKEN (str): The API token for authentication.
-            id (str): The ID of the datafile.
-
-        Returns:
-            str: The content of the datafile as a decoded UTF-8 string.
-        """
-        url = f"{BASE_URL}/api/access/datafile/{id}"
-        headers = {"X-Dataverse-key": API_TOKEN}
-        response = httpx.get(url, headers=headers)
-        response.raise_for_status()
-
-        return response.content.decode("utf-8")
-
-    @staticmethod
-    def _get_file_metadata(
-        BASE_URL: str,
-        API_TOKEN: str,
-        id: str,
-    ):
-        """
-        Retrieves the metadata for a file in Dataverse.
-
-        Args:
-            BASE_URL (str): The base URL of the Dataverse instance.
-            API_TOKEN (str): The API token for authentication.
-            id (str): The ID of the file.
-
-        Returns:
-            dict: The metadata for the file.
-        """
-        response = httpx.get(
-            url=f"{BASE_URL}/api/files/{id}",
-            headers={"X-Dataverse-key": API_TOKEN},
-        )
-
-        response.raise_for_status()
-
-        return response.json()["data"]
