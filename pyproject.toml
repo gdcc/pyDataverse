@@ -82,18 +82,3 @@ show_missing = true
 
 [tool.radon]
 cc_min = "B"
-
-[tool.flake8]
-max-line-length = 88
-ignore = ["E129", "E203", "E501", "W503", "S101"]
-exclude = [".tox", ".egg", "conf.py", "conftest.py"]
-
-[tool.pylint]
-max-line-length = 88
-
-[tool.pylama.pycodestyle]
-max_line_length = 88
-
-[tool.pylama.pylint]
-max_line_length = 88
-disable = "R"
