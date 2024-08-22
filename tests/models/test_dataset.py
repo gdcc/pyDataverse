@@ -1,4 +1,5 @@
 """Dataset data model tests."""
+
 import json
 import os
 import platform
@@ -950,11 +951,17 @@ class TestDatasetSpecific(object):
             ),
             (({json_upload_min()}, {"validate": False}), object_data_min()),
             (
-                ({json_upload_min()}, {"filename_schema": "", "validate": False},),
+                (
+                    {json_upload_min()},
+                    {"filename_schema": "", "validate": False},
+                ),
                 object_data_min(),
             ),
             (
-                ({json_upload_min()}, {"filename_schema": "wrong", "validate": False},),
+                (
+                    {json_upload_min()},
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 object_data_min(),
             ),
             (
@@ -995,11 +1002,17 @@ class TestDatasetSpecific(object):
                 json.loads(json_upload_min()),
             ),
             (
-                (dict_flat_set_min(), {"filename_schema": "", "validate": False},),
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": "", "validate": False},
+                ),
                 json.loads(json_upload_min()),
             ),
             (
-                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 json.loads(json_upload_min()),
             ),
             (
@@ -1167,7 +1180,10 @@ if not os.environ.get("TRAVIS"):
                 (dict_flat_set_full(), {}),
                 (dict_flat_set_min(), {"data_format": "dataverse_upload"}),
                 (dict_flat_set_min(), {"validate": False}),
-                (dict_flat_set_min(), {"filename_schema": "wrong", "validate": False},),
+                (
+                    dict_flat_set_min(),
+                    {"filename_schema": "wrong", "validate": False},
+                ),
                 (
                     dict_flat_set_min(),
                     {
@@ -1180,7 +1196,6 @@ if not os.environ.get("TRAVIS"):
             ]
 
             for data_set, kwargs_from in data:
-
                 kwargs = {}
                 pdv_start = data_object()
                 pdv_start.set(data_set)
@@ -1200,4 +1215,6 @@ if not os.environ.get("TRAVIS"):
 
                 for key, val in pdv_end.get().items():
                     assert getattr(pdv_start, key) == getattr(pdv_end, key)
-                assert len(pdv_start.__dict__) == len(pdv_end.__dict__,)
+                assert len(pdv_start.__dict__) == len(
+                    pdv_end.__dict__,
+                )

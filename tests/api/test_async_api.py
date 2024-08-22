@@ -3,10 +3,8 @@ import pytest
 
 
 class TestAsyncAPI:
-
     @pytest.mark.asyncio
     async def test_async_api(self, native_api):
-
         async with native_api:
             tasks = [native_api.get_info_version() for _ in range(10)]
             responses = await asyncio.gather(*tasks)

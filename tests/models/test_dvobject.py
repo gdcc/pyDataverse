@@ -1,4 +1,5 @@
 """Dataverse data model tests."""
+
 from pyDataverse.models import DVObject
 
 

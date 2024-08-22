@@ -29,7 +29,7 @@ First, start always by reading the [Contribution Guide](https://pydataverse.read
 * [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/gdcc/pyDataverse/pulls) for the same update/change?
 * [ ] Have you followed the guidelines in our [Contribution Guide](https://pydataverse.readthedocs.io/en/master/contributing/contributing.html)?
 * [ ] Have you read the [Code of Conduct](https://github.com/gdcc/pyDataverse/blob/master/CODE_OF_CONDUCT.md)?
-* [ ] Do your changes in a seperate branch. Branches MUST have descriptive names.
+* [ ] Do your changes in a separate branch. Branches MUST have descriptive names.
 * [ ] Have you merged the latest changes from upstream to your branch?
 
 **Describe the PR**
@@ -45,7 +45,7 @@ First, start always by reading the [Contribution Guide](https://pydataverse.read
 
 * [ ] Have you used tox and/or pytest for testing the changes?
 * [ ] Did the local testing ran successfully?
-* [ ] Did the Continous Integration testing (Travis-CI) ran successfully?
+* [ ] Did the Continuous Integration testing (Travis-CI) ran successfully?
 
 **Commits**
 
