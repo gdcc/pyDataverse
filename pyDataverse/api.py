@@ -1894,14 +1894,14 @@ class NativeApi(Api):
         Parameters
         ----------
         identifier : str
-            Identifier of the dataset.
+            Identifier of the file to be replaced.
         filename : str
             Full filename with path.
         json_str : str
             Metadata as JSON string.
         is_filepid : bool
-            ``True`` to use persistent identifier for datafile. ``False``, if
-            not.
+            ``True`` if ``identifier`` is a persistent identifier for the datafile.
+            ``False``, if not.
 
         Returns
         -------
