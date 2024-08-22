@@ -121,7 +121,7 @@ Dataset through the API with
 :meth:`create_dataset() <pyDataverse.api.NativeApi.create_dataset>`.
 
 This returns, as all API functions do, a
-:class:`requests.Response <requests.Response>` object, with the
+:class:`httpx.Response <httpx.Response>` object, with the
 DOI inside ``data``.
 
 Replace following variables with your own instance data

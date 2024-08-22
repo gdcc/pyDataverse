@@ -51,11 +51,11 @@ class Api:
         ----------
         base_url : str
             Base url for Dataverse api.
-        api_token : str
+        api_token : str | None
             Api token for Dataverse api.
 
         Examples
-        -------
+        --------
         Create an Api connection::
 
             >>> from pyDataverse.api import Api
@@ -115,8 +115,8 @@ class Api:
 
         Returns
         -------
-        class:`requests.Response`
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         params = {}
@@ -150,16 +150,16 @@ class Api:
             Metadata as a json-formatted string. Defaults to `None`.
         auth : bool
             Should an api token be sent in the request. Defaults to `False`.
-        files: dict
-            e. g. files = {'file': open('sample_file.txt','rb')}
+        files : dict
+            e.g. :code:`files={'file': open('sample_file.txt','rb')}`
         params : dict
             Dictionary of parameters to be passed with the request.
-            Defaults to `None`.
+            Defaults to :code:`None`.
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         params = {}
@@ -204,8 +204,8 @@ class Api:
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         params = {}
@@ -246,8 +246,8 @@ class Api:
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         params = {}
@@ -281,7 +281,7 @@ class Api:
             **kwargs: Additional keyword arguments to be passed to the method.
 
         Returns:
-            requests.Response: The response object returned by the request.
+            httpx.Response: The response object returned by the request.
 
         Raises:
             ApiAuthorizationError: If the response status code is 401 (Authorization error).
@@ -393,12 +393,6 @@ class Api:
 class DataAccessApi(Api):
     """Class to access Dataverse's Data Access API.
 
-    Examples
-    -------
-    Examples should be written in doctest format, and
-    should illustrate how to use the function/class.
-    >>>
-
     Attributes
     ----------
     base_url_api_data_access : type
@@ -460,8 +454,8 @@ class DataAccessApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         is_first_param = True
@@ -506,8 +500,8 @@ class DataAccessApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/datafiles/{1}".format(self.base_url_api_data_access, identifier)
@@ -547,8 +541,8 @@ class DataAccessApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/datafile/bundle/{1}".format(
@@ -794,8 +788,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
@@ -835,8 +829,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         metadata_dict = json.loads(metadata)
@@ -887,8 +881,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}/actions/:publish".format(
@@ -935,8 +929,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}".format(self.base_url_api_native, identifier)
@@ -991,8 +985,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}/roles".format(self.base_url_api_native, identifier)
@@ -1011,8 +1005,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}/contents".format(self.base_url_api_native, identifier)
@@ -1035,8 +1029,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}/assignments".format(
@@ -1061,8 +1055,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/dataverses/{1}/facets".format(self.base_url_api_native, identifier)
@@ -1123,8 +1117,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         if is_pid:
@@ -1162,8 +1156,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         if is_pid:
@@ -1203,8 +1197,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         if is_pid:
@@ -1237,8 +1231,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/datasets/export?exporter={1}&persistentId={2}".format(
@@ -1311,8 +1305,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         if pid:
@@ -1399,8 +1393,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         Examples
         -------
@@ -1561,8 +1555,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/datasets/:persistentId/actions/:publish".format(
@@ -1601,8 +1595,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/datasets/:persistentId/locks/?persistentId={1}".format(
@@ -1645,8 +1639,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         if is_pid:
@@ -1737,8 +1731,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         base_str = "{0}/datasets/:persistentId/versions/".format(
@@ -1940,8 +1934,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/info/version".format(self.base_url_api_native)
@@ -1961,8 +1955,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/info/server".format(self.base_url_api_native)
@@ -1982,8 +1976,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/info/apiTermsOfUse".format(self.base_url_api_native)
@@ -2002,8 +1996,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/metadatablocks".format(self.base_url_api_native)
@@ -2028,8 +2022,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/metadatablocks/{1}".format(self.base_url_api_native, identifier)
@@ -2046,8 +2040,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/users/token".format(self.base_url_api_native)
@@ -2064,8 +2058,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/users/token/recreate".format(self.base_url_api_native)
@@ -2082,8 +2076,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/users/token".format(self.base_url_api_native)
@@ -2107,8 +2101,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/roles?dvo={1}".format(self.base_url_api_native, dataverse_id)
@@ -2132,8 +2126,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
@@ -2151,8 +2145,8 @@ class NativeApi(Api):
 
         Returns
         -------
-        requests.Response
-            Response object of requests library.
+        httpx.Response
+            Response object of httpx library.
 
         """
         url = "{0}/roles/{1}".format(self.base_url_api_native, role_id)
