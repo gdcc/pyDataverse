@@ -742,7 +742,7 @@ class MetricsApi(Api):
 
     def get_datasets_by_data_location(self, data_location, auth=False):
         """
-        GET https://$SERVER/api/info/metrics/datasets/bySubject
+        GET https://$SERVER/api/info/metrics/datasets/?dataLocation=$location
 
         $type can be set to dataverses, datasets, files or downloads.
         """
