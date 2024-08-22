@@ -5,7 +5,7 @@ services:
     image: python:${PYTHON_VERSION}-slim
     environment:
       BASE_URL: http://dataverse:8080
-      DV_VERSION: 6.2
+      DV_VERSION: 6.3
     networks:
       - dataverse
     volumes:
