@@ -260,16 +260,15 @@ class Api:
             return self._sync_request(
                 method=httpx.post,
                 url=url,
-                json=data,
                 headers=headers,
                 params=params,
                 files=files,
+                **request_params,
             )
         else:
             return self._async_request(
                 method=self.client.post,
                 url=url,
-                json=data,
                 headers=headers,
                 params=params,
                 files=files,
