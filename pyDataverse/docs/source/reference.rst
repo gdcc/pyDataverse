@@ -17,6 +17,7 @@ Access all of Dataverse APIs.
 
 .. automodule:: pyDataverse.api
    :members:
+   :special-members:
 
 
 Models Interface
@@ -35,6 +36,13 @@ Utils Interface
 Helper functions.
 
 .. automodule:: pyDataverse.utils
+  :members:
+
+
+Auth Helpers
+-----------------------------
+
+.. automodule:: pyDataverse.auth
   :members:
 
 

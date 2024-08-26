@@ -1,8 +1,10 @@
 import os
+import httpx
 import pytest
 from httpx import Response
 from time import sleep
-from pyDataverse.api import NativeApi
+from pyDataverse.api import DataAccessApi, NativeApi, SwordApi
+from pyDataverse.auth import ApiTokenAuth
 from pyDataverse.exceptions import ApiAuthorizationError
 from pyDataverse.exceptions import ApiUrlError
 from pyDataverse.models import Dataset
@@ -32,6 +34,36 @@ class TestApiConnect(object):
         # None
         with pytest.raises(ApiUrlError):
             NativeApi(None)
+
+
+class TestApiTokenAndAuthBehavior:
+    def test_api_token_none_and_auth_none(self):
+        api = NativeApi("https://demo.dataverse.org")
+        assert api.api_token is None
+        assert api.auth is None
+
+    def test_api_token_none_and_auth(self):
+        auth = ApiTokenAuth("mytoken")
+        api = NativeApi("https://demo.dataverse.org", auth=auth)
+        assert api.api_token is None
+        assert api.auth is auth
+
+    def test_api_token_and_auth(self):
+        auth = ApiTokenAuth("mytoken")
+        # Only one, api_token or auth, should be specified
+        with pytest.warns(UserWarning):
+            api = NativeApi(
+                "https://demo.dataverse.org", api_token="sometoken", auth=auth
+            )
+        assert api.api_token is None
+        assert api.auth is auth
+
+    def test_api_token_and_auth_none(self):
+        api_token = "mytoken"
+        api = NativeApi("https://demo.dataverse.org", api_token)
+        assert api.api_token == api_token
+        assert isinstance(api.auth, ApiTokenAuth)
+        assert api.auth.api_token == api_token
 
 
 class TestApiRequests(object):
@@ -150,3 +182,51 @@ if not os.environ.get("TRAVIS"):
 
             resp = api_su.delete_dataset(pid)
             assert resp.json()["status"] == "OK"
+
+        def test_token_should_not_be_exposed_on_error(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = DataAccessApi(BASE_URL, API_TOKEN)
+
+            result = api.get_datafile("does-not-exist").json()
+            assert API_TOKEN not in result["requestUrl"]
+
+        @pytest.mark.parametrize(
+            "auth", (True, False, "api-token", ApiTokenAuth("some-token"))
+        )
+        def test_using_auth_on_individual_requests_is_deprecated(self, auth):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = DataAccessApi(BASE_URL, auth=ApiTokenAuth(API_TOKEN))
+            with pytest.warns(DeprecationWarning):
+                api.get_datafile("does-not-exist", auth=auth)
+
+        @pytest.mark.parametrize(
+            "auth", (True, False, "api-token", ApiTokenAuth("some-token"))
+        )
+        def test_using_auth_on_individual_requests_is_deprecated_unauthorized(
+            self, auth
+        ):
+            BASE_URL = os.getenv("BASE_URL")
+            no_auth_api = DataAccessApi(BASE_URL)
+            with pytest.warns(DeprecationWarning):
+                no_auth_api.get_datafile("does-not-exist", auth=auth)
+
+        def test_sword_api_requires_http_basic_auth(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = SwordApi(BASE_URL, api_token=API_TOKEN)
+            assert isinstance(api.auth, httpx.BasicAuth)
+
+        def test_sword_api_can_authenticate(self):
+            BASE_URL = os.getenv("BASE_URL")
+            API_TOKEN = os.getenv("API_TOKEN")
+            api = SwordApi(BASE_URL, api_token=API_TOKEN)
+            response = api.get_service_document()
+            assert response.status_code == 200
+
+        def test_sword_api_cannot_authenticate_without_token(self):
+            BASE_URL = os.getenv("BASE_URL")
+            api = SwordApi(BASE_URL)
+            with pytest.raises(ApiAuthorizationError):
+                api.get_service_document()
