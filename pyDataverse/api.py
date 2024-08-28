@@ -110,7 +110,7 @@ class Api:
         if not isinstance(base_url, str):
             raise ApiUrlError("base_url {0} is not a string.".format(base_url))
 
-        self.base_url = base_url
+        self.base_url = base_url.rstrip("/")
         self.client = None
 
         if not isinstance(api_version, str):
