@@ -169,7 +169,7 @@ by calling ``poetry install``:
 
   $ poetry install --with=dev
   $ poetry run python3 -c "import pyDataverse; print(pyDataverse.__version__)"
-  0.3.3
+  0.3.4
 
 For most tasks, you can use poetry without activating the virtual environment,
 but sometimes you might want to use the virtual environment directly or save
@@ -180,7 +180,7 @@ poetry shell:
 
   $ poetry shell
   pyDataverse $ python3 -c "import pyDataverse; print(pyDataverse.__version__)"
-  0.3.3
+  0.3.4
   pyDataverse $ exit
   $
 
