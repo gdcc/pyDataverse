@@ -7,7 +7,6 @@ Licensed under the MIT License.
 
 from __future__ import absolute_import
 
-
 __author__ = "Stefan Kasberger"
 __email__ = "stefan.kasberger@univie.ac.at"
 __copyright__ = "Copyright (c) 2019 Stefan Kasberger"
