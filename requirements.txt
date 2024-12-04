@@ -1,3 +1,7 @@
 # Requirements
 httpx==0.27.0
-jsonschema==4.21.1
+jsonschema~=4.22.0
+
+pytest~=8.1.1
+pydataverse~=0.3.3
+pydantic~=2.7.4
