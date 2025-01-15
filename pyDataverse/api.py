@@ -1,5 +1,6 @@
 """Dataverse API wrapper for all it's API's."""
 
+from io import StringIO
 import json
 from typing import Any, Dict, Optional
 import httpx
@@ -275,7 +276,9 @@ class Api:
                 **request_params,
             )
 
-    def put_request(self, url, data=None, auth=DEPRECATION_GUARD, params=None):
+    def put_request(
+        self, url, data=None, auth=DEPRECATION_GUARD, params=None, files=None
+    ):
         """Make a PUT request.
 
         Parameters
@@ -326,7 +329,6 @@ class Api:
             return self._sync_request(
                 method=httpx.put,
                 url=url,
-                json=data,
                 headers=headers,
                 params=params,
                 **request_params,
@@ -335,7 +337,6 @@ class Api:
             return self._async_request(
                 method=self.client.put,
                 url=url,
-                json=data,
                 headers=headers,
                 params=params,
                 **request_params,
@@ -1545,7 +1546,12 @@ class NativeApi(Api):
                 self.base_url_api_native, identifier
             )
         params = {"replace": True} if replace else {}
-        resp = self.put_request(url, metadata, auth, params)
+        resp = self.put_request(
+            url=url,
+            data=metadata,
+            auth=auth,
+            params=params,
+        )
 
         if resp.status_code == 401:
             error_msg = resp.json()["message"]
