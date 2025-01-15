@@ -1,6 +1,5 @@
 """Dataverse API wrapper for all it's API's."""
 
-from io import StringIO
 import json
 from typing import Any, Dict, Optional
 import httpx
