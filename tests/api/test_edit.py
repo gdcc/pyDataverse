@@ -46,7 +46,9 @@ class TestEditDatasetMetadata:
         # Assert
         dataset = api.get_dataset(pid)
         assert (
-            dataset.json()["data"]["metadataBlocks"]["citation"]["fields"][0]["value"]
+            dataset.json()["data"]["latestVersion"]["metadataBlocks"]["citation"][
+                "fields"
+            ][0]["value"]
             == "New Title"
         ), "Metadata edit failed."
         assert response.status_code == 200, "Metadata edit failed."
