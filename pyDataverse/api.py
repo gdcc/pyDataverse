@@ -1536,15 +1536,18 @@ class NativeApi(Api):
             200: metadata updated
 
         """
+        params = {"replace": "true"} if replace else {}
+
         if is_pid:
-            url = "{0}/datasets/:persistentId/editMetadata/?persistentId={1}".format(
-                self.base_url_api_native, identifier
+            url = "{0}/datasets/:persistentId/editMetadata".format(
+                self.base_url_api_native
             )
+            params["persistentId"] = identifier
         else:
             url = "{0}/datasets/editMetadata/{1}".format(
                 self.base_url_api_native, identifier
             )
-        params = {"replace": True} if replace else {}
+
         resp = self.put_request(
             url=url,
             data=metadata,
