@@ -1,0 +1,55 @@
+# This workflow performs pre-publish validation and publishes the pyDataverse package to TestPyPI.
+#
+# The workflow can be triggered in two ways:
+# 1. Automatically when a new release is created on GitHub
+# 2. Manually via workflow_dispatch with optional parameters
+#
+# The workflow performs the following steps:
+# - Validates version consistency between pyproject.toml and __init__.py
+# - Modifies the package name to "pyDataverse-test" for TestPyPI compatibility
+# - Builds and publishes the package to TestPyPI (if enabled)
+#
+# Manual trigger parameters:
+# - version_tag: Specify a version tag to publish (e.g., v0.3.5)
+# - publish: Whether to actually publish to TestPyPI (default: true)
+
+name: Pre-publish and publish to TestPyPi
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag to publish (e.g., v0.3.5)'
+        required: false
+        type: string
+      publish:
+        description: 'Publish to TestPyPi'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: 'Install dependencies'
+        run: |
+          pip install toml
+      - name: 'Pre-publish checks'
+        run: python .github/scripts/pre_publish.py
+        env:
+          VERSION_TAG: ${{ inputs.version_tag || github.ref_name }}
+      - name: 'Build and publish to TestPyPi'
+        if: inputs.publish
+        uses: JRubics/poetry-publish@v2.0
+        with:
+          pypi_token: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_name: 'testpypi'
+          repository_url: 'https://test.pypi.org/legacy/'
