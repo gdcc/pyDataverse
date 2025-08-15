@@ -42,6 +42,7 @@ jobs:
       - name: 'Install dependencies'
         run: |
           pip install toml
+          pip install .
       - name: 'Pre-publish checks'
         run: python .github/scripts/pre_publish.py
         env:
