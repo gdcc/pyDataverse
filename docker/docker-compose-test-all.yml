@@ -8,7 +8,7 @@ services:
       - dataverse
     volumes:
       - ${PWD}:/pydataverse
-      - ../dv:/dv
+      - ${PWD}/dv:/dv
     command:
       - sh
       - -ceu
