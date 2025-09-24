@@ -21,7 +21,7 @@ In order to run the tests, you need to have a Dataverse instance running. We hav
 ./run_tests.sh -p 3.8
 ```
 
-Once finished, you can find the test results in the `dv/unit-tests.log` file and in the terminal.
+Once finished, you can find the test results in the `dv/unit-tests.log` file and in the terminal. The Dataverse logs are saved in the `dv/dataverse-logs.log` file and can be helpful in cases of internal server errors. If you happen to encounter such an error, please share the logs with us at the [Zulip](https://dataverse.zulipchat.com/#narrow/stream/377090-python) so we can investigate the issue.
 
 ## Manual setup
 
