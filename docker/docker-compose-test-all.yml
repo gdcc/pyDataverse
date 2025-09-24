@@ -1,30 +1,49 @@
-version: "2.4"
 services:
   unit-tests:
     container_name: unit-tests
     image: python:${PYTHON_VERSION}-slim
     environment:
       BASE_URL: http://dataverse:8080
-      DV_VERSION: 6.3
     networks:
       - dataverse
     volumes:
       - ${PWD}:/pydataverse
-      - ../dv:/dv
+      - ${PWD}/dv:/dv
     command:
       - sh
-      - -c
+      - -ceu
       - |
+        set -o pipefail
+
+        # Install curl
+        apt-get update && apt-get install -y curl
+
+        # Wait for Dataverse to be ready
+        echo "⏳ Waiting for Dataverse to be ready..."
+        until curl -f http://dataverse:8080/api/info/version >/dev/null 2>&1; do
+          echo "   Waiting for Dataverse API..."
+          sleep 5
+        done
+        echo "✅ Dataverse is ready!"
+
+        # Fetch Dataverse version dynamically
+        echo "🔍 Fetching Dataverse version..."
+        export DV_VERSION=$$(curl -s http://dataverse:8080/api/info/version | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+        echo "   Detected Dataverse version: $$DV_VERSION"
+
         # Fetch the API Token from the local file
-        export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
+        export $$(grep "API_TOKEN" "dv/bootstrap.exposed.env")
         export API_TOKEN_SUPERUSER=$$API_TOKEN
+
         cd /pydataverse
 
-        # Run the unit tests
+        # Install Poetry and dependencies
         python3 -m pip install --upgrade pip
-        python3 -m pip install pytest pytest-cov
-        python3 -m pip install -e .
-        python3 -m pytest > /dv/unit-tests.log
+        python3 -m pip install .
+        python3 -m pip install pytest pytest-cov pytest-asyncio tox selenium
+
+        echo "🧪 Starting pytest with DV_VERSION=${DV_VERSION}..."
+        python3 -m pytest -vv --tb=short 2>&1 | tee /dv/unit-tests.log
 
     depends_on:
       bootstrap:

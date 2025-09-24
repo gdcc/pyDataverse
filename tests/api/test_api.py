@@ -174,14 +174,22 @@ if not os.environ.get("TRAVIS"):
                 )
             )
             resp = api_su.create_dataset(":root", ds.json())
-            pid = resp.json()["data"]["persistentId"]
-            assert resp.json()["status"] == "OK"
+            resp.raise_for_status()
+
+            resp = resp.json()
+            pid = resp["data"]["persistentId"]
+
+            if resp["status"] != "OK":
+                raise Exception(resp["message"])
 
             # with pytest.raises(ApiAuthorizationError):
             #     resp = api_nru.get_dataset(pid)
 
             resp = api_su.delete_dataset(pid)
-            assert resp.json()["status"] == "OK"
+            resp.raise_for_status()
+            resp = resp.json()
+            if resp["status"] != "OK":
+                raise Exception(resp["message"])
 
         def test_token_should_not_be_exposed_on_error(self):
             BASE_URL = os.getenv("BASE_URL")
