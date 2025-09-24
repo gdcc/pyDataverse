@@ -44,7 +44,10 @@ export PYTHON_VERSION=${p}
 printf "\n🚀 Preparing containers\n"
 printf "   Using PYTHON_VERSION=${p}\n\n"
 
-# Run all containers
+# Start all containers (infrastructure + tests)
+printf "\n🚀 Starting all containers...\n"
+printf "   The test container will wait for Dataverse and fetch the version automatically\n\n"
+
 docker compose \
     -f docker/docker-compose-base.yml \
     -f ./docker/docker-compose-test-all.yml \
@@ -52,19 +55,37 @@ docker compose \
     up -d
 
 printf "\n🔎 Running pyDataverse tests\n"
-printf "   Logs will be printed once finished...\n\n"
+printf "   Test container will handle version detection and testing...\n\n"
 
 # Check if "unit-test" container has finished
+WAIT_COUNT=0
 while [ -n "$(docker ps -f "name=unit-tests" -f "status=running" -q)" ]; do
-    printf "   Waiting for unit-tests container to finish...\n"
+    WAIT_COUNT=$((WAIT_COUNT + 1))
+    printf "   ⏳ Waiting for tests to complete... (${WAIT_COUNT})\n"
     sleep 5
 done
 
 # Check if "unit-test" container has failed
-if [ "$(docker inspect -f '{{.State.ExitCode}}' unit-tests)" -ne 0 ]; then
-    printf "\n❌ Unit tests failed. Printing logs...\n"
-    docker logs unit-tests
-    printf "\n   Stopping containers\n"
+EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' unit-tests 2>/dev/null)
+if [ -z "$EXIT_CODE" ]; then
+    printf "\n❌ Unit tests container not found or failed to start\n"
+    EXIT_CODE=1
+else
+    printf "\n📋 Unit tests completed with exit code: ${EXIT_CODE}\n"
+fi
+
+if [ "${EXIT_CODE}" -ne 0 ]; then
+    printf "\n❌ Unit tests failed. Showing test results...\n\n"
+    printf "=== PYTEST OUTPUT ===\n"
+    if [ -f "dv/unit-tests.log" ]; then
+        cat dv/unit-tests.log
+    else
+        printf "⚠️  Test log file not found, showing container logs instead:\n"
+        docker logs unit-tests
+    fi
+    printf "\n=== END PYTEST OUTPUT ===\n"
+    
+    printf "\n🧹 Stopping containers...\n"
     docker compose \
         -f docker/docker-compose-base.yml \
         -f ./docker/docker-compose-test-all.yml \
@@ -74,11 +95,18 @@ if [ "$(docker inspect -f '{{.State.ExitCode}}' unit-tests)" -ne 0 ]; then
 fi
 
 # Print test results
-printf "\n"
-cat dv/unit-tests.log
-printf "\n\n✅ Unit tests passed\n\n"
+printf "\n✅ Unit tests passed! Showing results...\n\n"
+printf "=== PYTEST RESULTS ===\n"
+if [ -f "dv/unit-tests.log" ]; then
+    cat dv/unit-tests.log
+else
+    printf "⚠️  Test log file not found, showing container logs:\n"
+    docker logs unit-tests
+fi
+printf "\n=== END PYTEST RESULTS ===\n"
 
 # Stop all containers
+printf "\n🧹 Stopping containers...\n"
 docker compose \
     -f docker/docker-compose-base.yml \
     -f ./docker/docker-compose-test-all.yml \
