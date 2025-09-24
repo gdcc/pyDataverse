@@ -45,7 +45,16 @@ export $(grep "API_TOKEN" "dv/bootstrap.exposed.env")
 export API_TOKEN_SUPERUSER=$API_TOKEN
 ```
 
-**3. Run the test(s) with pytest**
+**3. Install test dependencies
+
+```
+python3 -m venv venv # or conda create -n pydataverse
+source venv/bin/activate
+pip install -e .
+python3 -m pip install pytest pytest-cov pytest-asyncio tox selenium
+```
+
+**4. Run the test(s) with pytest**
 
 ```bash
 python -m pytest -v
