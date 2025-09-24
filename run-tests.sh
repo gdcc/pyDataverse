@@ -67,12 +67,17 @@ done
 
 # Check if "unit-test" container has failed
 EXIT_CODE=$(docker inspect -f '{{.State.ExitCode}}' unit-tests 2>/dev/null)
+
 if [ -z "$EXIT_CODE" ]; then
     printf "\n❌ Unit tests container not found or failed to start\n"
     EXIT_CODE=1
 else
     printf "\n📋 Unit tests completed with exit code: ${EXIT_CODE}\n"
 fi
+
+# Capture Dataverse logs after tests complete
+printf "\n📝 Capturing Dataverse logs...\n"
+docker logs dataverse > dv/dataverse-logs.log 2>&1
 
 if [ "${EXIT_CODE}" -ne 0 ]; then
     printf "\n❌ Unit tests failed. Showing test results...\n\n"
@@ -84,6 +89,7 @@ if [ "${EXIT_CODE}" -ne 0 ]; then
         docker logs unit-tests
     fi
     printf "\n=== END PYTEST OUTPUT ===\n"
+
     
     printf "\n🧹 Stopping containers...\n"
     docker compose \
