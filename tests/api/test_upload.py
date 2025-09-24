@@ -161,6 +161,8 @@ class TestFileUpload:
             json_str=df.json(),
         )
 
+        response.raise_for_status()
+
         # Retrieve file ID
         file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
 
@@ -181,6 +183,8 @@ class TestFileUpload:
                 json_str=json.dumps(json_data),
                 is_filepid=False,
             )
+
+            response.raise_for_status()
 
         # Assert
         file_id = response.json()["data"]["files"][0]["dataFile"]["id"]
