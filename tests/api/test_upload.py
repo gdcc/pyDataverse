@@ -184,7 +184,7 @@ class TestFileUpload:
                 is_filepid=False,
             )
 
-            if not response.ok:
+            if not response.is_success:
                 raise Exception(response.json()["message"])
 
         # Assert
@@ -223,7 +223,7 @@ class TestFileUpload:
             json_str=df.json(),
         )
 
-        if not response.ok:
+        if not response.is_success:
             raise Exception(response.json()["message"])
 
         # Retrieve file ID
@@ -252,7 +252,7 @@ class TestFileUpload:
                 is_filepid=False,
             )
 
-            if not response.ok:
+            if not response.is_success:
                 raise Exception(response.json()["message"])
 
         # Assert
