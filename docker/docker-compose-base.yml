@@ -1,8 +1,7 @@
-version: "2.4"
 name: pydataverse
 services:
   dataverse:
-    container_name: "dataverse"
+    container_name: 'dataverse'
     hostname: dataverse
     image: ${DATAVERSE_IMAGE}
     restart: on-failure
@@ -18,7 +17,7 @@ services:
         -Ddataverse.pid.fake.authority=10.5072
         -Ddataverse.pid.fake.shoulder=FK2/
     ports:
-      - "8080:8080"
+      - '8080:8080'
     networks:
       - dataverse
     depends_on:
@@ -45,18 +44,18 @@ services:
       timeout: 240s
 
   dv_initializer:
-    container_name: "dv_initializer"
+    container_name: 'dv_initializer'
     image: ${CONFIGBAKER_IMAGE}
-    restart: "no"
+    restart: 'no'
     command:
       - sh
       - -c
-      - "fix-fs-perms.sh dv"
+      - 'fix-fs-perms.sh dv'
     volumes:
       - ${PWD}/dv/data:/dv
 
   postgres:
-    container_name: "postgres"
+    container_name: 'postgres'
     hostname: postgres
     image: postgres:${POSTGRES_VERSION}
     restart: on-failure
@@ -64,49 +63,49 @@ services:
       - POSTGRES_USER=${DATAVERSE_DB_USER}
       - POSTGRES_PASSWORD=${DATAVERSE_DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - dataverse
 
   solr_initializer:
-    container_name: "solr_initializer"
+    container_name: 'solr_initializer'
     image: ${CONFIGBAKER_IMAGE}
-    restart: "no"
+    restart: 'no'
     command:
       - sh
       - -c
-      - "fix-fs-perms.sh solr && cp -a /template/* /solr-template"
+      - 'fix-fs-perms.sh solr && cp -a /template/* /solr-template'
     volumes:
       - ${PWD}/solr/data:/var/solr
       - ${PWD}/solr/conf:/solr-template
 
   solr:
-    container_name: "solr"
-    hostname: "solr"
+    container_name: 'solr'
+    hostname: 'solr'
     image: solr:${SOLR_VERSION}
     depends_on:
       solr_initializer:
         condition: service_completed_successfully
     restart: on-failure
     ports:
-      - "8983:8983"
+      - '8983:8983'
     networks:
       - dataverse
     command:
-      - "solr-precreate"
-      - "collection1"
-      - "/template"
+      - 'solr-precreate'
+      - 'collection1'
+      - '/template'
     volumes:
       - ${PWD}/solr/data:/var/solr
       - ${PWD}/solr/conf:/template
 
   smtp:
-    container_name: "smtp"
-    hostname: "smtp"
+    container_name: 'smtp'
+    hostname: 'smtp'
     image: maildev/maildev:2.0.5
     restart: on-failure
     expose:
-      - "25" # smtp server
+      - '25' # smtp server
     environment:
       - MAILDEV_SMTP_PORT=25
       - MAILDEV_MAIL_DIRECTORY=/mail
@@ -116,10 +115,10 @@ services:
       - /mail:mode=770,size=128M,uid=1000,gid=1000
 
   bootstrap:
-    container_name: "bootstrap"
-    hostname: "bootstrap"
+    container_name: 'bootstrap'
+    hostname: 'bootstrap'
     image: ${CONFIGBAKER_IMAGE}
-    restart: "no"
+    restart: 'no'
     networks:
       - dataverse
     volumes:
@@ -127,7 +126,7 @@ services:
     command:
       - sh
       - -c
-      - "bootstrap.sh -e /.env dev"
+      - 'bootstrap.sh -e /.env dev'
     depends_on:
       dataverse:
         condition: service_healthy
