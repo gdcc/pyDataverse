@@ -29,7 +29,6 @@ services:
         condition: service_completed_successfully
     volumes:
       - ${PWD}/dv/data:/dv
-      - ${PWD}:/secrets
     tmpfs:
       - /dumps:mode=770,size=2052M,uid=1000,gid=1000
       - /tmp:mode=770,size=2052M,uid=1000,gid=1000
