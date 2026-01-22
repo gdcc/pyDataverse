@@ -14,7 +14,7 @@ create_cache:
             files:
                 - poetry.lock
         paths:
-            - venv/
+            - .venv/
             - poetry.lock
         policy: pull-push
 
@@ -32,7 +32,7 @@ pytest:
             files:
                 - poetry.lock
         paths:
-            - venv/
+            - .venv/
             - poetry.lock
         policy: pull
     artifacts:
@@ -84,6 +84,14 @@ upload_reports:
 ruff:
     stage: test
     image: python:3.12
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - .venv/
+            - poetry.lock
+        policy: pull
     before_script:
         - pip3 install poetry
     script:
@@ -93,6 +101,14 @@ ruff:
 mypy:
     stage: test
     image: python:3.12
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - .venv/
+            - poetry.lock
+        policy: pull
     before_script:
         - pip3 install poetry
     script:
@@ -102,6 +118,14 @@ mypy:
 autopep8:
     stage: test
     image: python:3.12
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - .venv/
+            - poetry.lock
+        policy: pull
     before_script:
         - pip3 install poetry
     script:
