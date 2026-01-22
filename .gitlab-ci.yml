@@ -33,8 +33,6 @@ pytest:
         policy: pull
     artifacts:
         when: always
-        reports:
-            codecoverage: coverage.xml
         paths: 
             - coverage.xml
 
