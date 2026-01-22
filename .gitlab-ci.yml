@@ -4,7 +4,9 @@ stages:
 
 create_cache:
     stage: cache
-    image: node:18-bullseye
+    image: python:3.12
+    before_script:
+        - pip3 install poetry
     script:
         - poetry install --with dev
     cache:
@@ -19,6 +21,8 @@ create_cache:
 pytest:
     stage: test
     image: python:3.12
+    before_script:
+        - pip3 install poetry
     script:
         - poetry run pytest tests/
         - poetry run pytest --cov tests/
@@ -78,26 +82,32 @@ upload_reports:
         - python3 upload-reports.py coverage.xml
 
 ruff:
-  stage: test
-  image: python:3.12
-  script:
-    - poetry run ruff
-  allow_failure: true
+    stage: test
+    image: python:3.12
+    before_script:
+        - pip3 install poetry
+    script:
+        - poetry run ruff
+    allow_failure: true
 
 mypy:
-  stage: test
-  image: python:3.12
-  script:
-    - poetry run mypy src/pyDataverse/
-  allow_failure: true
+    stage: test
+    image: python:3.12
+    before_script:
+        - pip3 install poetry
+    script:
+        - poetry run mypy src/pyDataverse/
+    allow_failure: true
 
 autopep8:
-  stage: test
-  image: python:3.12
-  script:
-    - poetry run autopep8 -i src/pyDataverse/api.py
-    - poetry run autopep8 -i src/pyDataverse/auth.py
-    - poetry run autopep8 -i src/pyDataverse/exceptions.py
-    - poetry run autopep8 -i src/pyDataverse/models.py
-    - poetry run autopep8 -i src/pyDataverse/utils.py
-  allow_failure: true
+    stage: test
+    image: python:3.12
+    before_script:
+        - pip3 install poetry
+    script:
+        - poetry run autopep8 -i src/pyDataverse/api.py
+        - poetry run autopep8 -i src/pyDataverse/auth.py
+        - poetry run autopep8 -i src/pyDataverse/exceptions.py
+        - poetry run autopep8 -i src/pyDataverse/models.py
+        - poetry run autopep8 -i src/pyDataverse/utils.py
+    allow_failure: true
