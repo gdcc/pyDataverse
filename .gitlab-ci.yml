@@ -95,7 +95,7 @@ ruff:
     before_script:
         - pip3 install poetry
     script:
-        - poetry run ruff
+        - poetry run ruff check src/pyDataverse/
     allow_failure: true
 
 mypy:
