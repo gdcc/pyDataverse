@@ -1,86 +1,196 @@
-[tool.poetry]
+[project]
 name = "pyDataverse"
 version = "0.3.5"
 description = "A Python module for Dataverse."
-authors = [
-    "Stefan Kasberger <stefan.kasberger@univie.ac.at>",
-    "Jan Range <jan.range@simtech.uni-stuttgart.de>",
-]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/gdcc/pyDataverse"
-packages = [{ include = "pyDataverse" }]
+authors = [
+  { name="Stefan Kasberger", email="mail@stefankasberger.at" },
+  { name="Jan Range", email="jan.range@simtech.uni-stuttgart.de" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable"
+]
+maintainers = [
+  { name="Stefan Kasberger", email="mail@stefankasberger.at" },
+  { name="Jan Range", email="jan.range@simtech.uni-stuttgart.de" },
+]
+requires-python = "^3.8.1"
+keywords = ["Dataverse", "API", "Python"]
+dependencies = [
+    "httpx >= 0.27.0",
+    "jsonschema >= 4.21.1"
+]
 
-[tool.poetry.dependencies]
-python = "^3.8.1"
-httpx = ">=0.27,<0.30"
-jsonschema = "^4.21.1"
+[project.urls]
+Homepage = "https://github.com/gdcc/pyDataverse"
+Issues = "https://github.com/gdcc/pyDataverse"
+
+[tool.poetry]
+packages = [{ include = "pyDataverse", from = "src" }]
+requires-poetry = ">=2.1.1"
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.3.0"
-radon = "^6.0.1"
-mypy = "^1.9.0"
-autopep8 = "^2.1.0"
-pydocstyle = "^6.3.0"
-pygments = "^2.17.2"
-pytest = "^8.1.1"
-pytest-cov = "^5.0.0"
-tox = "^4.14.2"
+autopep8 = "^2.3.2"
+black = "^26.0.0" # NOTE: If black version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
+mypy = "^1.19.0"
+pre-commit = "^4.5.0"
+pytest = "^9.0.2"
+pytest-cov = "^7.0.0"
+pytest-dotenv = "^0.5.2"
+ruff = "^0.13.1" # NOTE: If ruff version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
 selenium = "^4.19.0"
-wheel = "^0.43.0"
-pre-commit = "3.5.0"
 sphinx = "7.1.2"
 restructuredtext-lint = "^1.4.0"
 rstcheck = "^6.2.1"
-ruff = "^0.4.4"
-
-
-[tool.poetry.group.tests]
-optional = true
-
-[tool.poetry.group.tests.dependencies]
-pytest = "^8.1.1"
-pytest-cov = "^5.0.0"
-pytest-asyncio = "^0.23.7"
 tox = "^4.14.2"
-selenium = "^4.19.0"
-
-[tool.poetry.group.docs]
-optional = true
-
-[tool.poetry.group.docs.dependencies]
-sphinx = "7.1.2"
 pydocstyle = "^6.3.0"
-restructuredtext-lint = "^1.4.0"
-pygments = "^2.17.2"
-rstcheck = "^6.2.1"
 
-[tool.poetry.group.lint]
-optional = true
+[tool.pytest]
+addopts = ["-p", "no:cacheprovider"]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]
 
-[tool.poetry.group.lint.dependencies]
-black = "^24.3.0"
-radon = "^6.0.1"
-mypy = "^1.9.0"
-types-jsonschema = "^4.23.0"
-autopep8 = "^2.1.0"
-ruff = "^0.4.4"
+[tool.coverage.paths]
+source = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+show_missing = true
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest.ini_options]
-addopts = ["-v", "--cov=pyDataverse"]
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+indent-width = 4
 
-[tool.coverage.run]
-source = "tests"
+# A list of check code prefixes to enable. Prefixes can specify exact checks (like F841),
 
-[tool.coverage.report]
-show_missing = true
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "internal",
+]
 
-[tool.radon]
-cc_min = "B"
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["N","I","PL","UP","RUF","F","E","W"]
+# A list of check code prefixes to ignore.
+ignore = [
+    "D100", # Checks for undocumented public module definitions.
+    "D101", # Checks for undocumented public class definitions.
+    "D104", # Checks for undocumented public package definitions.
+    "D203", # Checks for docstrings on class definitions that are not preceded by a blank line.
+    "D204", # Checks for class methods that are not separated from the class's docstring by a blank line.
+    "D213", # Checks for docstring summary lines that are not positioned on the second physical line of the docstring.
+    "D215", # Checks for over-indented section underlines in docstrings.
+    "D400", # Checks for docstrings in which the first line does not end in a period.
+    "D404", # Checks for docstrings that start with This
+    "D406", # Checks that section headers in docstrings that are not followed by a newline.
+    "D407", # Checks for section headers in docstrings that are not followed by underlines.
+    "D408", # Checks for section underlines in docstrings that are not on the line immediately following the section name.
+    "D409", # Checks for section underlines in docstrings that do not match the length of the corresponding section header.
+    "D413", # Checks for missing blank lines after the last section of a multi-line docstring.
+    "PLR0913", # Checks for function definitions that include too many arguments.
+    "PLR0915", # Checks for functions or methods with too many statements.
+    "PLR2004", # Checks for the use of unnamed numerical constants ("magic") values in comparisons.
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 15
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.lint.per-file-ignores]
+# Ignore specific rules in specific files
+"__init__.py" = ["F401"] # Checks for unused imports.
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.mypy]
+files = "src"
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
+show_error_codes = true
+strict = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[tool.autopep8]
+max_line_length = 120
+ignore = "E501,W6"  # or ["E501", "W6"]
+in-place = true
+recursive = true
+aggressive = 3
+
+[tool.poetry.build]
+generate-setup-file = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

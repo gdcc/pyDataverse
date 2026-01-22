@@ -1,0 +1,105 @@
+stages:
+    - cache
+    - test
+
+create_cache:
+    stage: cache
+    image: node:18-bullseye
+    script:
+        - poetry install --with dev
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - venv/
+            - poetry.lock
+        policy: pull-push
+
+pytest:
+    stage: test
+    image: python:3.12
+    script:
+        - poetry run pytest tests/
+        - poetry run pytest --cov tests/
+        - poetry run coverage xml
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - venv/
+            - poetry.lock
+        policy: pull
+    artifacts:
+        when: always
+        reports:
+            codecoverage: coverage.xml
+        paths: 
+            - coverage.xml
+
+gitleaks:
+    stage: test
+    image:
+        name: zricethezav/gitleaks
+        entrypoint: [""]
+    script: gitleaks detect --verbose --source . -f json -r gitleaks.json
+    allow_failure: true
+    artifacts:
+        when: always
+        reports:
+            codequality: gitleaks.json
+        paths: 
+            - gitleaks.json
+
+semgrep:
+    stage: test
+    image: semgrep/semgrep
+    variables:
+        SEMGREP_RULES: p/python
+    script:
+        - semgrep ci --json --output semgrep.json
+    allow_failure: true
+    artifacts:
+        when: always
+        reports:
+            codequality: semgrep.json
+        paths: 
+            - semgrep.json
+
+upload_reports:
+    stage: test
+    image: python:3.12
+    needs: ["gitleaks", "semgrep", "pytest"]
+    when: always
+    before_script:
+        - pip3 install requests
+    script:
+        - python3 upload-reports.py gitleaks.json
+        - python3 upload-reports.py semgrep.json
+        - python3 upload-reports.py coverage.xml
+
+ruff:
+  stage: test
+  image: python:3.12
+  script:
+    - poetry run ruff
+  allow_failure: true
+
+mypy:
+  stage: test
+  image: python:3.12
+  script:
+    - poetry run mypy src/pyDataverse/
+  allow_failure: true
+
+autopep8:
+  stage: test
+  image: python:3.12
+  script:
+    - poetry run autopep8 -i src/pyDataverse/api.py
+    - poetry run autopep8 -i src/pyDataverse/auth.py
+    - poetry run autopep8 -i src/pyDataverse/exceptions.py
+    - poetry run autopep8 -i src/pyDataverse/models.py
+    - poetry run autopep8 -i src/pyDataverse/utils.py
+  allow_failure: true
