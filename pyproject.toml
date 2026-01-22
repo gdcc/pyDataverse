@@ -19,7 +19,7 @@ maintainers = [
   { name="Stefan Kasberger", email="mail@stefankasberger.at" },
   { name="Jan Range", email="jan.range@simtech.uni-stuttgart.de" },
 ]
-requires-python = "^3.8.1"
+requires-python = "^3.12"
 keywords = ["Dataverse", "API", "Python"]
 dependencies = [
     "httpx >= 0.27.0",
@@ -71,10 +71,6 @@ source = ["src"]
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 show_missing = true
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 120
