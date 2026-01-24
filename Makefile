@@ -27,7 +27,7 @@ help:
 # Installation
 # ---------------------------------------------------------
 install:
-	$(POETRY) install
+	$(POETRY) install --with dev
 
 # ---------------------------------------------------------
 # Linting & formatting
@@ -54,13 +54,7 @@ test:
 	$(PYTEST)
 
 coverage:
-	$(PYTEST) --cov=src --cov-report=term-missing
-
-# ---------------------------------------------------------
-# Documentation
-# ---------------------------------------------------------
-docs:
-	$(POETRY) run sphinx-build -b html docs docs/_build
+	$(PYTEST) --cov=src
 
 # ---------------------------------------------------------
 # Cleanup
@@ -68,5 +62,4 @@ docs:
 clean:
 	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage
 	rm -rf build dist
-	rm -rf docs/_build
 	find . -type d -name "__pycache__" -exec rm -rf {} +

@@ -46,6 +46,7 @@ pytest = "^9.0.2"
 pytest-cov = "^7.0.0"
 pytest-dotenv = "^0.5.2"
 ruff = "^0.13.1" # NOTE: If ruff version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
+pyright =  "^1.1.408"
 
 [tool.pytest]
 addopts = ["-p", "no:cacheprovider"]
