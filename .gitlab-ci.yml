@@ -139,6 +139,14 @@ autopep8:
 poetry_build:
     stage: build
     image: python:3.12
+    cache:
+        key:
+            files:
+                - poetry.lock
+        paths:
+            - .venv/
+            - poetry.lock
+        policy: pull
     before_script:
         - pip3 install poetry
     script:
