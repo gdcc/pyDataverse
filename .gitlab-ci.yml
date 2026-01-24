@@ -79,7 +79,6 @@ upload_reports:
     script:
         - python3 upload-reports.py gitleaks.json
         - python3 upload-reports.py semgrep.json
-        - python3 upload-reports.py coverage.xml
 
 ruff:
     stage: test
