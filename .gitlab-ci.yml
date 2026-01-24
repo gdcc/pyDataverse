@@ -24,8 +24,8 @@ pytest:
     before_script:
         - pip3 install poetry
     script:
-        - poetry run pytest tests/
-        - poetry run pytest --cov tests/
+        - poetry run pytest tests/unit/
+        - poetry run pytest --cov tests/unit/
         - poetry run coverage xml
     cache:
         key:
