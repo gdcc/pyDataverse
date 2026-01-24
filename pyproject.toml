@@ -33,6 +33,7 @@ Issues = "https://github.com/gdcc/pyDataverse"
 [tool.poetry]
 packages = [{ include = "pyDataverse", from = "src" }]
 requires-poetry = ">=2.1.1"
+package-mode = true
 
 [tool.poetry.group.dev]
 optional = true

@@ -1,6 +1,7 @@
 stages:
     - cache
     - test
+    - build
 
 create_cache:
     stage: cache
@@ -134,3 +135,11 @@ autopep8:
         - poetry run autopep8 -i src/pyDataverse/models.py
         - poetry run autopep8 -i src/pyDataverse/utils.py
     allow_failure: true
+
+poetry_build:
+    stage: build
+    image: python:3.12
+    before_script:
+        - pip3 install poetry
+    script:
+        - poetry build
