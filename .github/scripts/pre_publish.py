@@ -12,7 +12,9 @@ The script performs the following operations:
 """
 
 import os
+
 import toml
+
 import pyDataverse
 
 
@@ -52,15 +54,13 @@ def validate_version_consistency(version_tag):
     pyproject_version = pyproject["tool"]["poetry"]["version"]
 
     assert version_tag == pyproject_version, (
-        f"Version tag does not match package version in pyproject.toml: "
-        f"{version_tag} != {pyproject_version}"
+        f"Version tag does not match package version in pyproject.toml: " f"{version_tag} != {pyproject_version}"
     )
 
     # Check version in __init__.py
     init_version = pyDataverse.__version__
     assert version_tag == init_version, (
-        f"Version tag does not match package version in __init__.py: "
-        f"{version_tag} != {init_version}"
+        f"Version tag does not match package version in __init__.py: " f"{version_tag} != {init_version}"
     )
 
     return pyproject

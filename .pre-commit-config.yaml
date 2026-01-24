@@ -30,10 +30,6 @@ repos:
     rev: "25.9.0"
     hooks:
       - id: black
-  - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.2
-    hooks:
-    -   id: autopep8
   - repo: https://github.com/python-poetry/poetry
     rev: "2.1.1"
     hooks:

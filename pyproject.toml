@@ -5,8 +5,8 @@ description = "A Python module for Dataverse."
 license = "MIT"
 readme = "README.md"
 authors = [
-  { name="Stefan Kasberger", email="mail@stefankasberger.at" },
-  { name="Jan Range", email="jan.range@simtech.uni-stuttgart.de" },
+  { name = "Stefan Kasberger", email ="mail@stefankasberger.at" },
+  { name = "Jan Range", email = "jan.range@simtech.uni-stuttgart.de" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -16,8 +16,8 @@ classifiers = [
     "Development Status :: 5 - Production/Stable"
 ]
 maintainers = [
-  { name="Stefan Kasberger", email="mail@stefankasberger.at" },
-  { name="Jan Range", email="jan.range@simtech.uni-stuttgart.de" },
+  { name = "Stefan Kasberger", email = "mail@stefankasberger.at" },
+  { name = "Jan Range", email = "jan.range@simtech.uni-stuttgart.de" },
 ]
 requires-python = ">=3.12"
 keywords = ["Dataverse", "API", "Python"]
@@ -30,16 +30,15 @@ dependencies = [
 Homepage = "https://github.com/gdcc/pyDataverse"
 Issues = "https://github.com/gdcc/pyDataverse"
 
+# ---------------------------------------------------------
+# Poetry configuration
+# ---------------------------------------------------------
 [tool.poetry]
 packages = [{ include = "pyDataverse", from = "src" }]
 requires-poetry = ">=2.1.1"
 package-mode = true
 
-[tool.poetry.group.dev]
-optional = true
-
 [tool.poetry.group.dev.dependencies]
-autopep8 = "^2.3.2"
 black = "^26.0.0" # NOTE: If black version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
 mypy = "^1.19.0"
 pre-commit = "^4.5.0"
@@ -47,12 +46,6 @@ pytest = "^9.0.2"
 pytest-cov = "^7.0.0"
 pytest-dotenv = "^0.5.2"
 ruff = "^0.13.1" # NOTE: If ruff version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
-selenium = "^4.19.0"
-sphinx = "7.1.2"
-restructuredtext-lint = "^1.4.0"
-rstcheck = "^6.2.1"
-tox = "^4.14.2"
-pydocstyle = "^6.3.0"
 
 [tool.pytest]
 addopts = ["-p", "no:cacheprovider"]
@@ -167,7 +160,7 @@ line-ending = "auto"
 
 [tool.black]
 line-length = 120
-target-version = ['py312']
+target-version = ["py312"]
 
 [tool.mypy]
 files = "src"
@@ -177,13 +170,6 @@ explicit_package_bases = true
 show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-
-[tool.autopep8]
-max_line_length = 120
-ignore = "E501,W6"  # or ["E501", "W6"]
-in-place = true
-recursive = true
-aggressive = 3
 
 [tool.poetry.build]
 generate-setup-file = false

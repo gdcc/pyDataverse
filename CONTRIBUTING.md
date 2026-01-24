@@ -10,10 +10,10 @@ If you're new to open source or pyDataverse, browse the GitHub issues, especiall
 - Issues labeled **docs**
 - Issues that are **unassigned**
 
-If you want to work on an issue, assign it to yourself (or comment if you cannot assign).  
+If you want to work on an issue, assign it to yourself (or comment if you cannot assign).
 If you stop working on it, unassign so others can continue.
 
-This project follows the **pyDataverse Code of Conduct**.  
+This project follows the **pyDataverse Code of Conduct**.
 Be respectful, supportive, and nice to each other.
 
 ---
@@ -28,15 +28,15 @@ Bug reports help make pyDataverse more stable. Before creating an issue:
 
 Issue templates include:
 
-- Bug report  
-- Feature request  
-- Other issues  
+- Bug report
+- Feature request
+- Other issues
 
 You can also contribute by:
 
-- Sharing knowledge in issues/PRs  
-- Reviewing PRs  
-- Talking about pyDataverse  
+- Sharing knowledge in issues/PRs
+- Reviewing PRs
+- Talking about pyDataverse
 
 ---
 
@@ -44,14 +44,14 @@ You can also contribute by:
 
 ### Version Control, Git, and GitHub
 
-The code is hosted on GitHub.  
+The code is hosted on GitHub.
 You need a GitHub account and Git installed.
 
 Helpful resources:
 
-- GitHub help pages  
-- GitHub flow  
-- Git flow  
+- GitHub help pages
+- GitHub flow
+- Git flow
 
 ### Getting Started With Git
 
@@ -112,8 +112,8 @@ Documentation is written in **reStructuredText** and built with **Sphinx**.
 
 Two parts:
 
-- Docstrings in the code  
-- Files in `pyDataverse/doc/`  
+- Docstrings in the code
+- Files in `pyDataverse/doc/`
 
 Docstrings follow the **NumPy Docstring Standard**.
 
@@ -145,10 +145,10 @@ Docs are built automatically by Read the Docs when changes land on `main`.
 
 ### Code Standards
 
-- Follow PEP8  
-- Use Black and ruff  
-- Use absolute imports  
-- Use f-strings  
+- Follow PEP8
+- Use Black and ruff
+- Use absolute imports
+- Use f-strings
 
 ### Pre-commit
 
@@ -174,7 +174,7 @@ Tests run automatically on CI.
 
 ### Test-driven Development
 
-Write tests before writing code.  
+Write tests before writing code.
 pyDataverse uses **pytest** and **tox**.
 
 ### Running the Test Suite
@@ -214,9 +214,9 @@ poetry run tox -e coverage
 
 Checklist:
 
-- On the correct branch  
-- Tests pass  
-- Style checks pass  
+- On the correct branch
+- Tests pass
+- Style checks pass
 
 Add files:
 
@@ -269,11 +269,11 @@ git push origin --delete BRANCH_NAME
 
 ## Tips for a Successful Pull Request
 
-- Reference an open issue  
-- Include tests  
-- Keep PRs small  
-- Ensure CI is green  
-- Update your PR regularly  
+- Reference an open issue
+- Include tests
+- Keep PRs small
+- Ensure CI is green
+- Update your PR regularly
 
 ---
 
@@ -287,12 +287,11 @@ Maintainers assign labels, milestones, and reviewers.
 
 Steps include:
 
-- Define issues and version  
-- Create milestone  
-- Review and test  
-- Write release notes  
-- Tag release (e.g., `v0.3.0`)  
-- Upload to PyPI and conda-forge  
+- Define issues and version
+- Create milestone
+- Review and test
+- Write release notes
+- Tag release (e.g., `v0.3.0`)
+- Upload to PyPI and conda-forge
 
 Semantic versioning is used.
-

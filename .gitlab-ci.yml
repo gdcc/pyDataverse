@@ -38,7 +38,7 @@ pytest:
         policy: pull
     artifacts:
         when: always
-        paths: 
+        paths:
             - coverage.xml
 
 gitleaks:
@@ -52,7 +52,7 @@ gitleaks:
         when: always
         reports:
             codequality: gitleaks.json
-        paths: 
+        paths:
             - gitleaks.json
 
 semgrep:
@@ -67,7 +67,7 @@ semgrep:
         when: always
         reports:
             codequality: semgrep.json
-        paths: 
+        paths:
             - semgrep.json
 
 upload_reports:
