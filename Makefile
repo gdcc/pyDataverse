@@ -4,11 +4,19 @@
 POETRY = poetry
 PYTHON = $(POETRY) run python
 PYTEST = $(POETRY) run pytest
+TOX = $(POETRY) run tox
 COVERAGE = $(POETRY) run coverage
 RUFF = $(POETRY) run ruff
 BLACK = $(POETRY) run black
 MYPY = $(POETRY) run mypy
 PYRIGHT = $(POETRY) run pyright
+
+# Default target
+.DEFAULT_GOAL := help
+
+# Colors for nicer output
+GREEN := \033[0;32m
+NC := \033[0m
 
 # ---------------------------------------------------------
 # Default target
@@ -19,7 +27,7 @@ help:
 	@echo "  make lint           Run all linters (ruff + black check)"
 	@echo "  make format         Auto-format code (ruff + black)"
 	@echo "  make typecheck      Run mypy + pyright"
-	@echo "  make test           Run pytest"
+	@echo "  make test           Run tests across all Python versions (nox)"
 	@echo "  make coverage       Run pytest with coverage"
 	@echo "  make clean          Remove caches and build artifacts"
 
@@ -27,54 +35,53 @@ help:
 # Installation
 # ---------------------------------------------------------
 install:
+	@echo "$(GREEN)Installing dependencies with Poetry...$(NC)"
 	$(POETRY) install --with dev
 
 # ---------------------------------------------------------
 # Linting & formatting & type checking
 # ---------------------------------------------------------
 lint:
-	$(RUFF) check src tests
-	$(BLACK) --check src tests
+	@echo "$(GREEN)Running linting (ruff + black)...$(NC)"
+	nox -s lint
 
 format:
-	$(RUFF) check --fix src tests
-	$(BLACK) src tests
+	@echo "$(GREEN)Running formatting (black + ruff)...$(NC)"
+	nox -s format
 
 typecheck:
-	$(PYRIGHT) src
-	-$(MYPY) src
+	@echo "$(GREEN)Running type checking (mypy + pyright)...$(NC)"
+	nox -s typecheck
 
 # ---------------------------------------------------------
 # Testing
 # ---------------------------------------------------------
 test:
-	$(PYTEST)
-
-coverage:
-	$(PYTEST) --cov=src
-	$(COVERAGE) xml
+	@echo "$(GREEN)Running tests via nox...$(NC)"
+	nox -s tests
 
 # ---------------------------------------------------------
 # Build
 # ---------------------------------------------------------
 build:
-	$(POETRY) build
+	@echo "$(GREEN)Building package via Poetry...$(NC)"
+	nox -s build
 
 publish:
 	$(POETRY) publish
-
 
 # ---------------------------------------------------------
 # Report
 # ---------------------------------------------------------
 report:
 	- ${PYTHON} upload-reports.py gitleaks.json
-	- ${PYTHON} upload-reports.py semgrep.json
+# 	- ${PYTHON} upload-reports.py semgrep.json
 
 # ---------------------------------------------------------
 # Cleanup
 # ---------------------------------------------------------
 clean:
-	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage
-	rm -rf build dist
+	@echo "$(GREEN)Cleaning project...$(NC)"
+	rm -rf .nox .pytest_cache .mypy_cache .ruff_cache .coverage
+	rm -rf build dist *.egg-info
 	find . -type d -name "__pycache__" -exec rm -rf {} +

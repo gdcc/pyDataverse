@@ -62,23 +62,23 @@ class HttpClient:
     # Public HTTP methods
     # ------------------------------------------------------------------
 
-    def get(self, path: str, **kwargs) -> Any:
+    def get(self, path: str, **kwargs: Any) -> Any:
         return self._request("GET", path, **kwargs)
 
-    def post(self, path: str, **kwargs) -> Any:
+    def post(self, path: str, **kwargs: Any) -> Any:
         return self._request("POST", path, **kwargs)
 
-    def put(self, path: str, **kwargs) -> Any:
+    def put(self, path: str, **kwargs: Any) -> Any:
         return self._request("PUT", path, **kwargs)
 
-    def delete(self, path: str, **kwargs) -> Any:
+    def delete(self, path: str, **kwargs: Any) -> Any:
         return self._request("DELETE", path, **kwargs)
 
     # ------------------------------------------------------------------
     # Core request logic
     # ------------------------------------------------------------------
 
-    def _request(self, method: str, path: str, **kwargs) -> Any:
+    def _request(self, method: str, path: str, **kwargs: Any) -> Any:
         url = self._build_url(path)
 
         for attempt in range(self.max_retries + 1):
