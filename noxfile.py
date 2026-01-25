@@ -11,8 +11,16 @@ def install_with_poetry(session):
     session.run("poetry", "install", "--no-interaction", external=True)
 
 
+@nox.session
+def test(session):
+    """Run pytest with coverage."""
+    install_with_poetry(session)
+    session.run("pytest", "--cov", PACKAGE, "--cov-report=xml", TESTS)
+    session.run("coverage", "xml")
+
+
 @nox.session(python=PYTHON_VERSIONS)
-def tests(session):
+def test_all(session):
     """Run pytest with coverage across multiple Python versions."""
     install_with_poetry(session)
     session.run("pytest", "--cov", PACKAGE, "--cov-report=xml", TESTS)

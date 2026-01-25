@@ -67,6 +67,23 @@ typecheck:
 
 test:
     stage: test
+    script:
+        - make test
+    artifacts:
+        when: always
+        paths:
+            - coverage.xml
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage.xml
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
+
+test_all:
+    stage: test
     parallel:
         matrix:
             - PYTHON_VERSION: "3.9"
@@ -87,10 +104,11 @@ test:
                 path: coverage.xml
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: '$CI_COMMIT_BRANCH == "release/*"'
+    when: always
 
 build:
     stage: build
-    image: python:3.12
     script:
         - make build
     artifacts:
@@ -130,7 +148,6 @@ gitleaks:
 
 upload_reports:
     stage: scans
-    image: python:3.12
     needs: ["gitleaks"]
     when: always
     script:
@@ -140,7 +157,6 @@ upload_reports:
 
 sca_pip_audit:
     stage: scans
-    image: python:${PYTHON_VERSION}
     script:
         - pip install pip-audit
         - pip-audit -r pyproject.toml -f json -o pip-audit.json

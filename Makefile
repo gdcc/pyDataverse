@@ -27,8 +27,8 @@ help:
 	@echo "  make lint           Run all linters (ruff + black check)"
 	@echo "  make format         Auto-format code (ruff + black)"
 	@echo "  make typecheck      Run mypy + pyright"
-	@echo "  make test           Run tests across all Python versions (nox)"
-	@echo "  make coverage       Run pytest with coverage"
+	@echo "  make test           Run tests with coverage (nox)"
+	@echo "  make test_all       Run tests across all Python versions with coverage (nox)"
 	@echo "  make clean          Remove caches and build artifacts"
 
 # ---------------------------------------------------------
@@ -58,7 +58,11 @@ typecheck:
 # ---------------------------------------------------------
 test:
 	@echo "$(GREEN)Running tests via nox...$(NC)"
-	nox -s tests
+	nox -s test
+
+test_all:
+	@echo "$(GREEN)Running all tests via nox...$(NC)"
+	nox -s all_test
 
 # ---------------------------------------------------------
 # Build
