@@ -156,7 +156,7 @@ upload_reports:
 
 
 generate_sbom:
-    stage: scan
+    stage: scans
     image: python:3.12
     script:
         - pip install cyclonedx-bom
@@ -166,7 +166,7 @@ generate_sbom:
             - bom.json
 
 # upload_sbom_to_dependency_track:
-#   stage: scan
+#   stage: scans
 #   image: curlimages/curl:latest
 #   script:
 #     - |
