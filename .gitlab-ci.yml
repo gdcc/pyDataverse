@@ -155,6 +155,30 @@ upload_reports:
         - make report
 
 
+generate_sbom:
+    stage: scan
+    image: python:3.12
+    script:
+        - pip install cyclonedx-bom
+        - cyclonedx-py poetry --format json --output bom.json
+    artifacts:
+        paths:
+            - bom.json
+
+# upload_sbom_to_dependency_track:
+#   stage: scan
+#   image: curlimages/curl:latest
+#   script:
+#     - |
+#       curl -X POST "${DT_URL}/api/v1/bom" \
+#         -H "X-Api-Key: ${DT_API_KEY}" \
+#         -F "projectName=${CI_PROJECT_NAME}" \
+#         -F "projectVersion=${CI_COMMIT_REF_NAME}" \
+#         -F "autoCreate=true" \
+#         -F "bom=@bom.json"
+#   dependencies:
+#     - generate_sbom
+
 sca_pip_audit:
     stage: scans
     script:
