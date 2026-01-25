@@ -160,7 +160,7 @@ generate_sbom:
     image: python:3.12
     script:
         - pip install cyclonedx-bom
-        - cyclonedx-py poetry --format json --output bom.json
+        - cyclonedx-py poetry --output-format json --output-file bom.json
     artifacts:
         paths:
             - bom.json
