@@ -45,7 +45,7 @@ poetry shell
 
 This installs:
 
-- Runtime dependencies (httpx, jsonschema)
+- Runtime dependencies (requests)
 - Development tools (pytest, ruff, black, mypy, pyright, sphinx, etc.)
 
 ## 🧭 4. Project Structure
@@ -66,8 +66,8 @@ pyDataverse/
 │       └── ...
 ├── tests/
 │   ├── unit/
+│   ├── system/ (optional)
 │   └── integration/ (optional)
-├── docs/
 ├── pyproject.toml
 └── Makefile
 ```
