@@ -8,15 +8,14 @@ stages:
 
 variables:
     POETRY_VERSION: "2.1.3"
-    PYTHON_VERSION: "3.12"
-    PYTHON_VERSIONS: "3.9 3.10 3.11 3.12 3.13"
+    NOX_VERSION: "2025.11.12"
     VENV_PATH: "$CI_PROJECT_DIR/.venv"
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pypoetry"
     NOX_CACHE_DIR: "$CI_PROJECT_DIR/.nox"
 
 default:
-    image: python:${PYTHON_VERSION}
+    image: python:3.12
     cache:
         key:
             files:
@@ -32,8 +31,8 @@ default:
         - python -m venv "$VENV_PATH"
         - source "$VENV_PATH/bin/activate"
         - pip install --upgrade pip
+        - pip install "nox==$NOX_VERSION"
         - pip install "poetry==$POETRY_VERSION"
-        - poetry install --no-interaction --with dev
 
 
 # GitLab built-in security scanners
@@ -46,6 +45,7 @@ prepare:
     stage: prepare
     script:
         - echo "Environment prepared with Poetry and dependencies installed."
+        - make install
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
 
@@ -65,8 +65,8 @@ typecheck:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
 
-pytest:
-    image: "python:${PYTHON_VERSION}"
+test:
+    stage: test
     parallel:
         matrix:
             - PYTHON_VERSION: "3.9"
@@ -74,7 +74,7 @@ pytest:
             - PYTHON_VERSION: "3.11"
             - PYTHON_VERSION: "3.12"
             - PYTHON_VERSION: "3.13"
-    stage: test
+    image: "python:${PYTHON_VERSION}"
     script:
         - make test
     artifacts:
