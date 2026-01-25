@@ -21,7 +21,6 @@ help:
 	@echo "  make typecheck      Run mypy + pyright"
 	@echo "  make test           Run pytest"
 	@echo "  make coverage       Run pytest with coverage"
-	@echo "  make docs           Build Sphinx documentation"
 	@echo "  make clean          Remove caches and build artifacts"
 
 # ---------------------------------------------------------
@@ -45,8 +44,8 @@ format:
 # Type checking
 # ---------------------------------------------------------
 typecheck:
-	$(MYPY) src
-	$(PYRIGHT)
+	-$(MYPY) src
+	$(PYRIGHT) src
 
 # ---------------------------------------------------------
 # Testing

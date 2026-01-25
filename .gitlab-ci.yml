@@ -97,7 +97,7 @@ linting:
         - make lint
     allow_failure: true
 
-mypy:
+typecheck:
     stage: test
     image: python:3.12
     cache:
@@ -111,7 +111,7 @@ mypy:
     before_script:
         - pip3 install poetry
     script:
-        - poetry run mypy src/pyDataverse/
+        - make typecheck
     allow_failure: true
 
 poetry_build:
