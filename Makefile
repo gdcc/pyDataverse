@@ -30,7 +30,7 @@ install:
 	$(POETRY) install --with dev
 
 # ---------------------------------------------------------
-# Linting & formatting
+# Linting & formatting & type checking
 # ---------------------------------------------------------
 lint:
 	$(RUFF) check src tests
@@ -40,9 +40,6 @@ format:
 	$(RUFF) check --fix src tests
 	$(BLACK) src tests
 
-# ---------------------------------------------------------
-# Type checking
-# ---------------------------------------------------------
 typecheck:
 	$(PYRIGHT) src
 	-$(MYPY) src

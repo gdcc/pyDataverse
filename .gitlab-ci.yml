@@ -1,7 +1,6 @@
 stages:
     - prepare
     - lint
-    - typecheck
     - test
     - build
     - scans
@@ -32,7 +31,7 @@ default:
         - source "$VENV_PATH/bin/activate"
         - pip install --upgrade pip
         - pip install "poetry==$POETRY_VERSION"
-        - poetry install --no-interaction --no-root --with dev
+        - poetry install --no-interaction --with dev
 
 
 # GitLab built-in security scanners
@@ -57,7 +56,7 @@ lint:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
 
 typecheck:
-    stage: typecheck
+    stage: lint
     script:
         - make typecheck
     allow_failure: true
@@ -72,6 +71,7 @@ pytest:
             - PYTHON_VERSION: "3.10"
             - PYTHON_VERSION: "3.11"
             - PYTHON_VERSION: "3.12"
+            - PYTHON_VERSION: "3.13"
     stage: test
     script:
         - make test
