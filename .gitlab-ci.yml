@@ -82,9 +82,9 @@ pytest:
         paths:
             - coverage.xml
         reports:
-        coverage_report:
-            coverage_format: cobertura
-            path: coverage.xml
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage.xml
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
 
