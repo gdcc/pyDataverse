@@ -10,7 +10,11 @@ authors = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable"
@@ -19,7 +23,7 @@ maintainers = [
   { name = "Stefan Kasberger", email = "mail@stefankasberger.at" },
   { name = "Jan Range", email = "jan.range@simtech.uni-stuttgart.de" },
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.9,<3.14"
 keywords = ["Dataverse", "API", "Python"]
 dependencies = [
     "requests (>=2.32.5,<3.0.0)"
