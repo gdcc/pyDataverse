@@ -77,8 +77,7 @@ upload_reports:
     before_script:
         - pip3 install requests
     script:
-        - python3 upload-reports.py gitleaks.json
-        - python3 upload-reports.py semgrep.json
+        - make report
 
 linting:
     stage: test
