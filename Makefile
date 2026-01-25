@@ -4,6 +4,7 @@
 POETRY = poetry
 PYTHON = $(POETRY) run python
 PYTEST = $(POETRY) run pytest
+COVERAGE = $(POETRY) run coverage
 RUFF = $(POETRY) run ruff
 BLACK = $(POETRY) run black
 MYPY = $(POETRY) run mypy
@@ -55,6 +56,16 @@ test:
 
 coverage:
 	$(PYTEST) --cov=src
+	$(COVERAGE) xml
+
+# ---------------------------------------------------------
+# Build
+# ---------------------------------------------------------
+build:
+	$(POETRY) build
+
+publish:
+	$(POETRY) publish
 
 # ---------------------------------------------------------
 # Cleanup

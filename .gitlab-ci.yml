@@ -25,9 +25,8 @@ pytest:
     before_script:
         - pip3 install poetry
     script:
-        - poetry run pytest tests/unit/
-        - poetry run pytest --cov tests/unit/
-        - poetry run coverage xml
+        - make test
+        - make coverage
     cache:
         key:
             files:
@@ -73,7 +72,7 @@ semgrep:
 upload_reports:
     stage: test
     image: python:3.12
-    needs: ["gitleaks", "semgrep", "pytest"]
+    needs: ["gitleaks", "semgrep"]
     when: always
     before_script:
         - pip3 install requests
@@ -81,7 +80,7 @@ upload_reports:
         - python3 upload-reports.py gitleaks.json
         - python3 upload-reports.py semgrep.json
 
-ruff:
+linting:
     stage: test
     image: python:3.12
     cache:
@@ -95,7 +94,7 @@ ruff:
     before_script:
         - pip3 install poetry
     script:
-        - poetry run ruff check src/pyDataverse/
+        - make lint
     allow_failure: true
 
 mypy:
@@ -115,27 +114,6 @@ mypy:
         - poetry run mypy src/pyDataverse/
     allow_failure: true
 
-autopep8:
-    stage: test
-    image: python:3.12
-    cache:
-        key:
-            files:
-                - poetry.lock
-        paths:
-            - .venv/
-            - poetry.lock
-        policy: pull
-    before_script:
-        - pip3 install poetry
-    script:
-        - poetry run autopep8 -i src/pyDataverse/api.py
-        - poetry run autopep8 -i src/pyDataverse/auth.py
-        - poetry run autopep8 -i src/pyDataverse/exceptions.py
-        - poetry run autopep8 -i src/pyDataverse/models.py
-        - poetry run autopep8 -i src/pyDataverse/utils.py
-    allow_failure: true
-
 poetry_build:
     stage: build
     image: python:3.12
@@ -150,4 +128,4 @@ poetry_build:
     before_script:
         - pip3 install poetry
     script:
-        - poetry build
+        - make build
