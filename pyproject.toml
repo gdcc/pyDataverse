@@ -42,10 +42,10 @@ requires-poetry = ">=2.1.1"
 package-mode = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^26.0.0" # NOTE: If black version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
+black = "^25.0.0" # NOTE: If black version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
 mypy = "^1.19.0"
-pre-commit = "^4.5.0"
-pytest = "^9.0.2"
+pre-commit = "^4.0.0"
+pytest = "^8.0.0"
 pytest-cov = "^7.0.0"
 pytest-dotenv = "^0.5.2"
 ruff = "^0.13.1" # NOTE: If ruff version is adapted, also adapt in .pre-commit-config.yaml & pyproject.toml in project
