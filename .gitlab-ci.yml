@@ -4,9 +4,7 @@ stages:
     - typecheck
     - test
     - build
-    - sca
-    - sast
-    - dast
+    - scans
     - release
 
 variables:
@@ -88,8 +86,19 @@ pytest:
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
 
+build:
+    stage: build
+    image: python:3.12
+    script:
+        - make build
+    artifacts:
+        paths:
+            - dist/
+    rules:
+        - if: $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+
 gitleaks:
-    stage: test
+    stage: scans
     image:
         name: zricethezav/gitleaks
         entrypoint: [""]
@@ -103,7 +112,7 @@ gitleaks:
             - gitleaks.json
 
 # semgrep:
-#     stage: test
+#     stage: scans
 #     image: semgrep/semgrep
 #     variables:
 #         SEMGREP_RULES: p/python
@@ -118,7 +127,7 @@ gitleaks:
 #             - semgrep.json
 
 upload_reports:
-    stage: test
+    stage: scans
     image: python:3.12
     needs: ["gitleaks"]
     when: always
@@ -127,19 +136,8 @@ upload_reports:
         - make report
 
 
-build:
-    stage: build
-    image: python:3.12
-    script:
-        - make build
-    artifacts:
-        paths:
-            - dist/
-    rules:
-        - if: $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"
-
 sca_pip_audit:
-    stage: sca
+    stage: scans
     image: python:${PYTHON_VERSION}
     script:
         - pip install pip-audit
@@ -154,11 +152,11 @@ sca_pip_audit:
 
 # GitLab SAST runs automatically from template
 sast:
-      stage: sast
+      stage: scans
 
 # GitLab DAST runs automatically from template
 dast:
-    stage: dast
+    stage: scans
     variables:
         DAST_WEBSITE: "https://example.com"  # set your staging URL
     rules:
