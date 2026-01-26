@@ -2,12 +2,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from pyDataverse.api.client import DataverseClient
-from pyDataverse.api.endpoints.datasets import DatasetEndpoint
-from pyDataverse.api.endpoints.files import FileEndpoint
-from pyDataverse.api.endpoints.info import InfoEndpoint
-from pyDataverse.api.endpoints.search import SearchEndpoint
-from pyDataverse.api.transport import HttpClient
+from pydataverse.api.client import DataverseClient
+from pydataverse.api.endpoints.datasets import DatasetEndpoint
+from pydataverse.api.endpoints.files import FileEndpoint
+from pydataverse.api.endpoints.info import InfoEndpoint
+from pydataverse.api.endpoints.search import SearchEndpoint
+from pydataverse.api.transport import HttpClient
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ def client(mock_http):
     is replaced with a mock. This ensures all endpoint modules
     receive the same mocked transport layer.
     """
-    with patch("pyDataverse.api.client.HttpClient", return_value=mock_http):
+    with patch("pydataverse.api.client.HttpClient", return_value=mock_http):
         client = DataverseClient("https://demo.dataverse.org", api_token="XYZ")
     return client
 

@@ -1,6 +1,6 @@
 import pytest
 
-from pyDataverse.api.exceptions import (
+from pydataverse.api.exceptions import (
     AuthenticationError,
     DataverseError,
     NotFoundError,

@@ -3,14 +3,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from requests import Response
 
-from pyDataverse.api.exceptions import (
+from pydataverse.api.exceptions import (
     AuthenticationError,
     DataverseError,
     NotFoundError,
     ServerError,
     ValidationError,
 )
-from pyDataverse.api.transport import HttpClient
+from pydataverse.api.transport import HttpClient
 
 # ----------------------------------------------------------------------
 # Helpers
