@@ -1,5 +1,5 @@
 [project]
-name = "pyDataverse"
+name = "pydataverse"
 version = "0.4.0"
 description = "A Python module for Dataverse."
 license = "MIT"
@@ -37,7 +37,7 @@ Issues = "https://github.com/gdcc/pyDataverse"
 # Poetry configuration
 # ---------------------------------------------------------
 [tool.poetry]
-packages = [{ include = "pyDataverse", from = "src" }]
+packages = [{ include = "pydataverse", from = "src" }]
 requires-poetry = ">=2.1.1"
 package-mode = true
 
