@@ -79,7 +79,7 @@ test:
                 path: coverage.xml
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
-        - if: '$CI_COMMIT_BRANCH == "main"'
+        - if: $CI_COMMIT_BRANCH == "main"
     when: always
 
 test_all:
@@ -104,7 +104,7 @@ test_all:
                 path: coverage.xml
     rules:
         - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
-        - if: '$CI_COMMIT_BRANCH == "release/*"'
+        - if: $CI_COMMIT_TAG
     when: always
 
 build:
@@ -201,8 +201,6 @@ dast:
     stage: scans
     variables:
         DAST_WEBSITE: "https://example.com"  # set your staging URL
-    rules:
-        - if: $CI_COMMIT_BRANCH == "main"
 
 release:
     stage: release
