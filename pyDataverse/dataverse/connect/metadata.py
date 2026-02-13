@@ -407,17 +407,8 @@ class MetadataBlockBase(
     @classmethod
     def _process_compound_field(cls, field, field_info):
         """Process a compound field value."""
-        # Get CompoundField from module globals (defined later in this module)
-        CompoundField = globals().get("CompoundField")
-        if CompoundField is None:
-            # Fallback: import if not yet defined (shouldn't happen)
-            import sys
-
-            module = sys.modules[__name__]
-            CompoundField = getattr(module, "CompoundField", None)
-
-        if CompoundField is not None and isinstance(field.value, dict):
-            return CompoundField.from_dataverse_dict(field.value)
+        if isinstance(field.value, dict):
+            return field_info.dtype.from_dataverse_dict(field.value)
 
         if isinstance(field.value, list):
             return [
