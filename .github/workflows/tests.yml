@@ -11,21 +11,21 @@ jobs:
     env:
       PORT: 8080
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v4"
+      - name: Checkout
+        uses: actions/checkout@v5
+
       - name: Run Dataverse Action
         id: dataverse
         uses: gdcc/dataverse-action@main
-      - name: Setup Python
-        uses: actions/setup-python@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install Python Dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-
-          poetry install --all-extras
+          uv sync --all-extras
 
       - name: Run tests
         env:
@@ -34,4 +34,4 @@ jobs:
           BASE_URL: ${{ steps.dataverse.outputs.base_url }}
           DV_VERSION: ${{ steps.dataverse.outputs.dv_version }}
         run: |
-          python3 -m poetry run pytest
+          uv run pytest
