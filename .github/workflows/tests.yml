@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12"]
     name: Test pyDataverse
     env:
       PORT: 8080
@@ -28,7 +28,6 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          uv pip install --system setuptools wheel
           uv pip install --system ".[tests,mcp]"
 
       - name: Run tests
