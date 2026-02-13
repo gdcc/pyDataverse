@@ -1,79 +1,63 @@
-import httpx
+from enum import Enum
 
-from pyDataverse.api.api import Api
-from pyDataverse.exceptions import ApiUrlError
+from pydantic import ConfigDict, Field, computed_field, field_validator
+
+from .api import Api
+
+
+class SwordApiVersion(Enum):
+    """Enumeration of supported SWORD API versions.
+
+    Attributes:
+        V1_1: Version 1.1 of the SWORD API.
+    """
+
+    V1_1 = "v1.1"
 
 
 class SwordApi(Api):
     """Class to access Dataverse's SWORD API.
 
-    Parameters
-    ----------
-    sword_api_version : str
-        SWORD API version. Defaults to 'v1.1'.
+    Args:
+        sword_api_version: SWORD API version. Defaults to 'v1.1'.
 
-    Attributes
-    ----------
-    base_url_api_sword : str
-        Description of attribute `base_url_api_sword`.
-    base_url : str
-        Description of attribute `base_url`.
-    native_api_version : str
-        Description of attribute `native_api_version`.
-    sword_api_version
-
+    Attributes:
+        base_url_api_sword: Description of attribute `base_url_api_sword`.
+        base_url: Description of attribute `base_url`.
+        native_api_version: Description of attribute `native_api_version`.
+        sword_api_version: SWORD API version.
     """
 
-    def __init__(
-        self,
-        base_url,
-        api_version="v1.1",
-        api_token=None,
-        sword_api_version="v1.1",
-        *,
-        auth=None,
-    ):
-        """Init a :class:`SwordApi <pyDataverse.api.SwordApi>` instance.
+    sword_api_version: SwordApiVersion = Field(
+        default=SwordApiVersion.V1_1,
+        description="The SWORD API version to use.",
+    )
 
-        Parameters
-        ----------
-        sword_api_version : str
-            Api version of Dataverse SWORD API.
-        api_token : str | None
-            An Api token as retrieved from your Dataverse instance.
-        auth : httpx.Auth
-            Note that the SWORD API uses a different authentication mechanism
-            than the native API, in particular it uses `HTTP Basic
-            Authentication
-            <https://guides.dataverse.org/en/latest/api/sword.html#sword-auth>`_.
-            Thus, if you pass an api_token, it will be used as the username in
-            the HTTP Basic Authentication. If you pass a custom :py:class:`httpx.Auth`, use
-            :py:class:`httpx.BasicAuth` with an empty password:
+    model_config: ConfigDict = ConfigDict(
+        use_enum_values=True,
+    )
 
-            .. code-block:: python
+    @computed_field
+    @property
+    def api_base_url(self) -> str:
+        return self.base_url_api
 
-                sword_api = Api(
-                    "https://demo.dataverse.org", auth=httpx.BasicAuth(username="my_token", password="")
-                )
+    @field_validator("sword_api_version")
+    @classmethod
+    def validate_sword_api_version(cls, v):
+        if not isinstance(v, str):
+            raise ValueError("sword_api_version {0} is not a string.".format(v))
+        return v
 
-        """
-        if auth is None and api_token is not None:
-            auth = httpx.BasicAuth(api_token, "")
-        super().__init__(base_url, api_token, api_version, auth=auth)
-        if not isinstance(sword_api_version, ("".__class__, "".__class__)):
-            raise ApiUrlError(
-                "sword_api_version {0} is not a string.".format(sword_api_version)
-            )
-        self.sword_api_version = sword_api_version
-
-        # Test connection.
-        if self.base_url and sword_api_version:
-            self.base_url_api_sword = "{0}/dvn/api/data-deposit/{1}".format(
-                self.base_url, self.sword_api_version
+    @computed_field(return_type=str)
+    def base_url_api_sword(self):
+        if self.base_url and self.sword_api_version:
+            return "{0}/dvn/api/data-deposit/{1}".format(
+                self.base_url, self.sword_api_version.value
             )
         else:
-            self.base_url_api_sword = base_url
+            return self.base_url
 
     def get_service_document(self):
-        url = "{0}/swordv2/service-document".format(self.base_url_api_sword)
+        url = self._assemble_url("swordv2/service-document")
         return self.get_request(url, auth=True)
