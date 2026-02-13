@@ -28,6 +28,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
+          uv pip install --system setuptools wheel
           uv pip install --system ".[tests,mcp]"
 
       - name: Run tests
