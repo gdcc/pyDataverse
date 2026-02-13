@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "ExportersResponse",
+    "type": "object",
+    "additionalProperties": {
+        "$ref": "#/definitions/Exporter"
+    },
+    "definitions": {
+        "Exporter": {
+            "type": "object",
+            "properties": {
+                "displayName": {
+                    "type": "string"
+                },
+                "mediaType": {
+                    "type": "string"
+                },
+                "isHarvestable": {
+                    "type": "boolean"
+                },
+                "isVisibleInUserInterface": {
+                    "type": "boolean"
+                },
+                "XMLNameSpace": {
+                    "type": "string"
+                },
+                "XMLSchemaLocation": {
+                    "type": "string"
+                },
+                "XMLSchemaVersion": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "displayName",
+                "mediaType",
+                "isHarvestable",
+                "isVisibleInUserInterface"
+            ]
+        }
+    }
+}

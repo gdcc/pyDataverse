@@ -1,0 +1,9 @@
+{
+  "title": "PublishResponse",
+  "type": "object",
+  "properties": {
+    "message": {
+      "type": "string"
+    }
+  }
+}

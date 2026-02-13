@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "User",
+  "description": "Schema for a Dataverse user object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the user"
+    },
+    "identifier": {
+      "type": "string",
+      "description": "User identifier (username)"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Display name of the user"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "First name of the user"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Last name of the user"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the user"
+    },
+    "superuser": {
+      "type": "boolean",
+      "description": "Whether the user has superuser privileges"
+    },
+    "deactivated": {
+      "type": "boolean",
+      "description": "Whether the user account is deactivated"
+    },
+    "affiliation": {
+      "type": "string",
+      "description": "User's institutional affiliation"
+    },
+    "position": {
+      "type": "string",
+      "description": "User's position or title"
+    },
+    "persistentUserId": {
+      "type": "string",
+      "description": "Persistent identifier for the user"
+    },
+    "createdTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the user account was created"
+    },
+    "lastLoginTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the user's last login"
+    },
+    "lastApiUseTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the user's last API usage"
+    },
+    "authenticationProviderId": {
+      "type": "string",
+      "description": "ID of the authentication provider used by the user"
+    }
+  },
+  "required": [
+    "id",
+    "identifier",
+    "displayName",
+    "firstName",
+    "lastName",
+    "email",
+    "superuser",
+    "deactivated",
+    "persistentUserId",
+    "createdTime",
+    "authenticationProviderId"
+  ],
+  "additionalProperties": false
+}

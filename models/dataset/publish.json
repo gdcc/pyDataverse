@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "DatasetPublishResponse",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "identifier": {
+      "type": "string"
+    },
+    "persistentUrl": {
+      "type": "string"
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "authority": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "storageIdentifier": {
+      "type": "string"
+    }
+  }
+}

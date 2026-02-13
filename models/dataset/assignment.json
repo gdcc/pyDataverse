@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DatasetRoleAssignment",
+    "type": "array",
+    "default": [],
+    "items": {
+        "$ref": "#/definitions/DatasetAssignment"
+    },
+    "definitions": {
+        "DatasetAssignment": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "assignee": {
+                    "type": "string"
+                },
+                "roleId": {
+                    "type": "integer"
+                },
+                "roleName": {
+                    "type": "string"
+                },
+                "definitionPointId": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "id",
+                "assignee",
+                "roleId",
+                "roleName",
+                "definitionPointId"
+            ]
+        }
+    }
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AccessRequests",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "Unique identifier for the access request"
+      },
+      "identifier": {
+        "type": "string",
+        "description": "User identifier"
+      },
+      "displayName": {
+        "type": "string",
+        "description": "Display name of the user"
+      },
+      "firstName": {
+        "type": "string",
+        "description": "First name of the user"
+      },
+      "lastName": {
+        "type": "string",
+        "description": "Last name of the user"
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "description": "Email address of the user"
+      },
+      "superuser": {
+        "type": "boolean",
+        "description": "Whether the user is a superuser"
+      },
+      "deactivated": {
+        "type": "boolean",
+        "description": "Whether the user account is deactivated"
+      },
+      "persistentUserId": {
+        "type": "string",
+        "description": "Persistent user identifier"
+      },
+      "createdTime": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp when the user was created"
+      },
+      "lastLoginTime": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of the user's last login"
+      },
+      "lastApiUseTime": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of the user's last API usage"
+      },
+      "authenticationProviderId": {
+        "type": "string",
+        "description": "Authentication provider identifier"
+      }
+    },
+    "required": [
+      "id",
+      "identifier",
+      "displayName",
+      "firstName",
+      "lastName",
+      "email",
+      "superuser",
+      "deactivated",
+      "persistentUserId",
+      "createdTime",
+      "lastLoginTime",
+      "lastApiUseTime",
+      "authenticationProviderId"
+    ]
+  }
+}

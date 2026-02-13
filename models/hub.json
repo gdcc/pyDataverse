@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Hub",
+    "definitions": {
+        "InstallationStatusResponse": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/InstallationStatus"
+            }
+        },
+        "InstallationStatus": {
+            "type": "object",
+            "properties": {
+                "recordId": {
+                    "type": "integer"
+                },
+                "installation": {
+                    "$ref": "#/definitions/Installation"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "build": {
+                    "type": "string"
+                },
+                "recordDate": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "Installation": {
+            "type": "object",
+            "properties": {
+                "dvHubId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "hostname": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "continent": {
+                    "type": "string"
+                },
+                "launchYear": {
+                    "type": "integer"
+                },
+                "gdccMember": {
+                    "type": "boolean"
+                },
+                "doiAuthority": {
+                    "type": ["string", "null"]
+                },
+                "contactEmail": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}

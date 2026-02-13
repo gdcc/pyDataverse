@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "DatasetLocks",
+    "definitions": {
+        "SetLockResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "LockResponse": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Lock"
+            }
+        },
+        "Lock": {
+            "type": "object",
+            "properties": {
+                "lockType": {
+                    "$ref": "#/definitions/LockType"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "dataset": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "lockType",
+                "date",
+                "user",
+                "dataset"
+            ]
+        },
+        "LockType": {
+            "type": "string",
+            "enum": [
+                "Ingest",
+                "Workflow",
+                "InReview",
+                "finalizePublication",
+                "EditInProgress",
+                "FileValidationFailed"
+            ]
+        }
+    }
+}

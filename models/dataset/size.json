@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "DatasetSizeResponse",
+  "type": "object",
+  "properties": {
+    "storageSize": {
+      "type": "integer"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}

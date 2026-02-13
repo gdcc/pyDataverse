@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "definitions": {
+    "DatasetCreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "persistentId": {
+          "type": "string"
+        }
+      },
+      "required": ["persistentId", "id"]
+    },
+    "DatasetCreateBody": {
+      "type": "object",
+      "properties": {
+        "datasetType": {
+          "type": "string"
+        },
+        "datasetVersion": {
+          "type": "object",
+          "properties": {
+            "license": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "$ref": "#/definitions/license"
+                },
+                { "type": "string" }
+              ]
+            },
+            "metadataBlocks": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/metadataBlock"
+              },
+              "default": {}
+            }
+          },
+          "required": ["metadataBlocks"]
+        }
+      },
+      "required": ["datasetVersion"]
+    },
+    "metadataBlock": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/metadataField"
+          }
+        }
+      },
+      "required": ["fields"]
+    },
+    "metadataField": {
+      "type": "object",
+      "properties": {
+        "typeClass": {
+          "type": "string",
+          "enum": ["primitive", "compound", "controlledVocabulary"]
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "integer" },
+            { "type": "number" },
+            { "$ref": "#/definitions/compound" },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "integer" },
+                  { "type": "number" },
+                  { "$ref": "#/definitions/compound" }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "compound": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/metadataField"
+      }
+    },
+    "license": {
+      "type": "object",
+      "required": ["name", "uri"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}
