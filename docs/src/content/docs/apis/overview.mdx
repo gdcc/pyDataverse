@@ -1,0 +1,168 @@
+---
+title: API Overview
+description: An overview of the low-level API classes for direct access to Dataverse endpoints.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+pyDataverse provides several low-level API classes that offer direct access to Dataverse's REST endpoints. These APIs provide fine-grained control over Dataverse operations and are particularly useful when you need access to features not yet covered by the high-level `Dataverse` class, require legacy API access, or want precise control over requests and responses.
+
+## Available APIs
+
+<CardGrid>
+  <LinkCard
+    title="Native API"
+    href="/apis/native"
+    description="Primary low-level client for collections, datasets, files, and metadata operations."
+  />
+  <LinkCard
+    title="Data Access API"
+    href="/apis/data-access"
+    description="Specialized file retrieval, downloads, streaming, and access management."
+  />
+  <LinkCard
+    title="Semantic API"
+    href="/apis/semantic"
+    description="JSON-LD metadata, RDF conversion, SPARQL queries, and knowledge graphs."
+  />
+  <LinkCard
+    title="Metrics API"
+    href="/apis/metrics"
+    description="Usage statistics, analytics, and insights into content distribution."
+  />
+  <LinkCard
+    title="Search API"
+    href="/apis/search"
+    description="Full-text search across collections, datasets, and files with advanced filtering."
+  />
+</CardGrid>
+
+## Initialization Patterns
+
+All API classes share a common initialization pattern. You can create API instances directly with configuration parameters, or create new API instances from existing ones to reuse configuration.
+
+### Direct Initialization
+
+The most common pattern is to create an API instance directly with the base URL and optional API token:
+
+```python
+from pyDataverse.api import NativeApi, SearchApi, MetricsApi
+
+# Create APIs directly
+native_api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token",
+)
+
+search_api = SearchApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token",
+)
+```
+
+### Initializing from Another API
+
+When you need multiple API classes with the same configuration, you can use the `from_api` class method to create new API instances from an existing one. This copies all configuration (base URL, API token, authentication, timeouts, etc.) to the new instance:
+
+```python
+from pyDataverse.api import NativeApi, SearchApi, DataAccessApi, MetricsApi
+
+# Create one API with your configuration
+native_api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token",
+)
+
+# Create other APIs from the existing one
+search_api = SearchApi.from_api(native_api)
+data_access_api = DataAccessApi.from_api(native_api)
+metrics_api = MetricsApi.from_api(native_api)
+
+# All APIs now share the same configuration
+# You can use them independently
+results = search_api.search("climate change")
+files = data_access_api.get_datafile(12345)
+stats = metrics_api.total("datasets")
+```
+
+This pattern is particularly useful when:
+- **You need multiple APIs** in the same application and want to avoid repeating configuration
+- **Configuration is complex** (custom authentication, timeouts, connection limits) and you want to reuse it
+- **You're building tools** that need to switch between different API classes dynamically
+- **You want to ensure consistency** across all API instances in your application
+
+The `from_api` method copies all relevant configuration:
+- Base URL and API version
+- API token and authentication settings
+- Timeout and connection settings
+- Verbosity and logging configuration
+
+This ensures that all API instances created from the same source share identical connection and authentication settings, making it easy to work with multiple APIs in a consistent way.
+
+## Strongly Typed Models
+
+All API classes use strongly typed Pydantic models from the `pyDataverse.models` module for both request payloads and responses. This provides:
+
+- **Type safety**: Catch errors at development time with IDE autocomplete and type checking
+- **Validation**: Automatic validation of request payloads and response parsing
+- **Documentation**: Models serve as self-documenting interfaces to the API
+- **Consistency**: Predictable data structures across all API interactions
+
+These models are organized by domain:
+
+- **`pyDataverse.models.collection`**: Models for collection operations (`CollectionCreateBody`, `UpdateCollection`, etc.)
+- **`pyDataverse.models.dataset`**: Models for dataset operations (`DatasetCreateBody`, `EditMetadataBody`, `GetDatasetResponse`, etc.)
+- **`pyDataverse.models.file`**: Models for file operations (`UploadBody`, `FileInfo`, `AccessRequest`, etc.)
+- **`pyDataverse.models.metrics`**: Models for metrics (`MetricsResponse`)
+- **`pyDataverse.models.search`**: Models for search operations (`SearchResponse`, `Item`, `Facet`, etc.)
+- **`pyDataverse.models.message`**: Common message responses (`Message`)
+
+### Example: Using Typed Models
+
+```python
+from pyDataverse.api import NativeApi
+from pyDataverse.models.dataset import DatasetCreateBody
+from pyDataverse.models.collection import CollectionCreateBody
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token",
+)
+
+# Create a collection using a typed model
+collection_body = CollectionCreateBody(
+    name="Research Lab",
+    alias="research-lab",
+    dataverse_contacts=[{"contactEmail": "lab@university.edu"}],
+    affiliation="Department of Science",
+)
+collection = api.create_collection(parent="root", metadata=collection_body)
+# 'collection' is typed as CollectionCreateResponse
+
+# Create a dataset using a typed model
+dataset_body = DatasetCreateBody(
+    # ... dataset metadata fields
+)
+dataset = api.create_dataset(
+    dataverse="research-lab",
+    metadata=dataset_body,
+)
+# 'dataset' is typed as DatasetCreateResponse
+```
+
+The models provide:
+- **Autocomplete**: Your IDE will suggest available fields and methods
+- **Validation**: Invalid data is caught before sending requests
+- **Documentation**: Models include field descriptions and types
+- **Refactoring safety**: Type checkers can verify your code uses the models correctly
+
+
+## Choosing the Right API
+
+- **For general Dataverse operations**: Use `NativeApi` - it covers the broadest range of functionality
+- **For file downloads and access management**: Use `DataAccessApi` - specialized for file operations
+- **For semantic web and linked data**: Use `SemanticApi` - provides JSON-LD and RDF capabilities
+- **For analytics and reporting**: Use `MetricsApi` - focused on usage statistics
+- **For content discovery and search**: Use `SearchApi` - provides full-text search across all content types
+
+For most everyday research workflows (creating datasets, uploading files, basic exploration), the high-level `Dataverse` class is usually more convenient. When you need fine-grained control, advanced features, legacy access, or when you're closely following the official API documentation, the API classes give you precise, typed interfaces to everything Dataverse offers.

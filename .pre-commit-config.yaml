@@ -3,7 +3,7 @@ default_language_version:
 exclude: ^migrations/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -18,20 +18,21 @@ repos:
         args: [--autofix, --no-sort-keys]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.15.1
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: v1.7.0
+    rev: 1.20.0
     hooks:
       - id: blacken-docs
         additional_dependencies: [black==19.10b0]
 
   - repo: https://github.com/codespell-project/codespell
     # Configuration for codespell is in setup.cfg
-    rev: v2.2.6
+    rev: v2.4.1
     hooks:
       - id: codespell
+        files: ^(pyDataverse|tests)/

@@ -1,0 +1,385 @@
+---
+title: Collection
+description: The Collection class represents a Dataverse collection (sub-dataverse) for organizing datasets.
+---
+
+The `Collection` class represents a Dataverse collection, also referred to as a "sub-dataverse." Collections are organizational units that group related datasets together, creating a hierarchical structure within a Dataverse installation. Think of collections as folders or categories that help organize and structure research data.
+
+In Dataverse, collections serve multiple purposes: they organize datasets by research area, department, project, or any other organizational scheme; they can have their own metadata and settings; and they can contain both datasets and other collections (sub-collections), creating a nested hierarchy. This hierarchical organization makes it easier to navigate large Dataverse installations and helps researchers find relevant datasets.
+
+This class provides a convenient interface for working with collections, including accessing collection metadata, browsing datasets and sub-collections within a collection, creating new datasets and sub-collections, and managing collection properties. It abstracts away the complexity of working with Dataverse's API while maintaining full access to collection functionality.
+
+## Overview
+
+The `Collection` class encapsulates all operations related to a Dataverse collection, providing a unified interface for working with collections throughout their lifecycle—from creation through ongoing management and content organization.
+
+The class handles several key responsibilities:
+
+- **Metadata management**: Access and update collection metadata, including name, description, affiliation, and contact information. Collections have their own metadata that describes their purpose and organization.
+
+- **Content browsing**: Access datasets and sub-collections within the collection through convenient view objects that support both iteration and dictionary-like access. This makes it easy to explore what's available in a collection.
+
+- **Dataset creation**: Create new datasets within the collection, automatically configuring them with the metadata blocks enabled for that collection. This ensures datasets created in a collection conform to the collection's requirements.
+
+- **Sub-collection management**: Create and manage sub-collections (nested collections) within the collection, enabling hierarchical organization of research data.
+
+- **Metadata block configuration**: Access information about which metadata blocks are enabled for datasets created within the collection. Different collections can have different metadata block configurations.
+
+## Attributes
+
+A `Collection` instance contains a key attribute that identifies it:
+
+- **`identifier`** (Union[Literal[":root"], str, int]): The unique identifier for the collection. This can be:
+  - The special value `":root"` for the root collection (the top-level collection in a Dataverse installation)
+  - A string alias (a short, memorable name like `"harvard"` or `"research-lab"`)
+  - An integer database ID assigned by the Dataverse server
+
+The identifier determines how the collection is accessed and referenced. String aliases are human-readable and stable, while database IDs are internal identifiers that may change if data is migrated. The `:root` identifier is a special case that refers to the root level of the Dataverse installation.
+
+## Accessing Collections
+
+Collections are typically accessed through the [`Dataverse`](/high-level/Dataverse/) class or as sub-collections of other collections:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse("https://demo.dataverse.org")
+
+# Fetch a collection by alias
+collection = dv.fetch_collection("harvard")
+
+# Access via dictionary-style access (tries dataset first, then collection)
+collection = dv["harvard"]
+
+# Access collections from the root
+for coll in dv.collections:
+    print(coll.identifier)
+
+# Access a specific collection from root
+collection = dv.collections["harvard"]
+
+# Access sub-collections within a collection
+parent_collection = dv.fetch_collection("parent-collection")
+for sub_collection in parent_collection.collections:
+    print(sub_collection.identifier)
+```
+
+Collections can be nested hierarchically—a collection can contain other collections, which can contain yet more collections, creating a tree structure. This allows for flexible organization schemes, such as organizing by institution, then department, then research lab.
+
+## Accessing Collection Metadata
+
+Collection metadata describes the collection's purpose, organization, and contact information. You can access this metadata through the `metadata` property:
+
+```python
+# Get collection metadata
+metadata = collection.metadata
+
+# Access metadata fields
+print(metadata.name)  # Display name
+print(metadata.description)  # Description
+print(metadata.affiliation)  # Affiliation
+print(metadata.alias)  # Short alias
+print(metadata.dataverse_type)  # Type (e.g., "LABORATORY", "DEPARTMENT")
+```
+
+The `metadata` property fetches fresh metadata from the Dataverse server each time it's accessed, ensuring you always have up-to-date information. This is useful when metadata might have been changed by other users or through the web interface.
+
+Collection metadata includes information such as:
+- **Name**: The human-readable display name of the collection
+- **Alias**: A short, unique identifier used in URLs and API calls
+- **Description**: A text description explaining the collection's purpose and contents
+- **Affiliation**: The organization or institution associated with the collection
+- **Type**: The category of collection (department, laboratory, research project, etc.)
+- **Contacts**: Email addresses of people responsible for the collection
+
+## Updating Collection Metadata
+
+You can update collection metadata using the `update_metadata()` method:
+
+```python
+# Update collection metadata
+collection.update_metadata(
+    name="Updated Collection Name",
+    description="Updated description of the collection's purpose",
+    affiliation="Updated Affiliation",
+    dataverse_contacts=["new-contact@university.edu"]
+)
+
+# Update just the alias (this also updates the local identifier)
+collection.update_metadata(alias="new-alias")
+```
+
+The method allows you to update any combination of metadata fields. You only need to provide the fields you want to change—omitted fields remain unchanged. This makes it easy to make targeted updates without needing to specify all fields.
+
+When you update the alias, the method automatically updates the local `identifier` attribute to reflect the new alias. This ensures that subsequent operations use the correct identifier. Note that changing an alias affects URLs and references to the collection, so it should be done carefully.
+
+The method sends updates to the Dataverse server immediately, so changes are visible right away. If the update fails (for example, due to permission issues or validation errors), an exception is raised.
+
+## Publishing Collections
+
+You can publish a collection to make it publicly accessible using the `publish()` method:
+
+```python
+collection.publish()
+```
+
+Once published, the collection and its contents become discoverable through search and browsing.
+
+## Accessing Child Content
+
+Collections contain datasets and can also contain other collections (sub-collections). The `Collection` class provides convenient properties for accessing this content.
+
+### Accessing Datasets
+
+The `datasets` property provides a view of all datasets within the collection:
+
+```python
+# Iterate over all datasets in the collection
+for dataset in collection.datasets:
+    print(f"{dataset.title}: {dataset.identifier}")
+
+# Access a specific dataset by identifier
+dataset = collection.datasets["doi:10.5072/FK2/ABC123"]  # By DOI
+dataset = collection.datasets[12345]  # By database ID
+
+# Check how many datasets are in the collection
+dataset_count = sum(1 for _ in collection.datasets)
+```
+
+The `datasets` property returns a `DatasetView` object that supports both iteration and dictionary-like access. When you iterate over it, the view prefetches all datasets concurrently for better performance, then caches them for fast repeated access. When you access a specific dataset by identifier, the view checks its cache first, then fetches from the server if needed.
+
+This lazy-loading approach is efficient for collections with many datasets—you only fetch the datasets you actually need, and once fetched, they're cached for quick access. The view handles the complexity of managing identifiers (DOIs vs database IDs) and ensures you get the correct dataset regardless of which identifier type you use.
+
+### Accessing Sub-Collections
+
+The `collections` property provides a view of all sub-collections within the collection:
+
+```python
+# Iterate over all sub-collections
+for sub_collection in collection.collections:
+    print(f"{sub_collection.metadata.name}: {sub_collection.identifier}")
+
+# Access a specific sub-collection by identifier
+sub_collection = collection.collections["research-lab"]  # By alias
+sub_collection = collection.collections[42]  # By database ID
+```
+
+Like the `datasets` property, `collections` returns a `CollectionView` object with the same lazy-loading and caching behavior. This makes it easy to navigate the collection hierarchy, exploring nested collections and their contents.
+
+The ability to nest collections creates flexible organizational structures. For example, a university might have a top-level collection, with department-level collections underneath, and research lab collections under those. This hierarchy helps researchers navigate to relevant datasets quickly.
+
+## Creating Datasets
+
+You can create new datasets within a collection using the `create_dataset()` method:
+
+```python
+# Create a dataset in the collection
+dataset = collection.create_dataset(
+    title="My Research Dataset",
+    description="A dataset containing experimental results",
+    authors=[{"name": "Jane Smith", "affiliation": "University"}],
+    contacts=[{"name": "Jane Smith", "email": "jane@university.edu"}],
+    subjects=["Computer and Information Science"],
+    upload_to_collection=True  # Upload immediately (default)
+)
+
+# Create without uploading (build locally first)
+dataset = collection.create_dataset(
+    title="Draft Dataset",
+    description="Dataset I'm still working on",
+    authors=[{"name": "Researcher", "affiliation": "Lab"}],
+    contacts=[{"name": "Researcher", "email": "researcher@lab.edu"}],
+    subjects=["Physics"],
+    upload_to_collection=False  # Don't upload yet
+)
+
+# Add files and modify metadata before uploading
+dataset.open("data/results.csv", mode="w").write("data,value\n1,10\n")
+dataset.upload_to_collection(collection.identifier)
+```
+
+The `create_dataset()` method automatically configures the new dataset with the metadata blocks enabled for the collection. This ensures that datasets created within a collection conform to the collection's requirements and have access to the appropriate metadata fields.
+
+If `upload_to_collection` is `True` (the default), the dataset is immediately uploaded to the collection and receives an identifier. If `False`, the dataset is created locally only, allowing you to add files and modify metadata before uploading. This is useful when you're preparing a dataset and want to ensure everything is correct before making it public.
+
+The method uses the same parameters as `Dataverse.create_dataset()`, ensuring consistency across the API. Authors and contacts are provided as dictionaries, and subjects are specified as a list of predefined subject categories.
+
+## Creating Sub-Collections
+
+You can create sub-collections (nested collections) within a collection using the `create_collection()` method:
+
+```python
+# Create a sub-collection
+sub_collection = collection.create_collection(
+    alias="research-lab",
+    name="Research Laboratory",
+    description="A collection for research lab datasets",
+    affiliation="Department of Science",
+    dataverse_type="LABORATORY",
+    dataverse_contacts=["lab@university.edu", "admin@university.edu"]
+)
+
+# The new collection is ready to use
+print(sub_collection.identifier)  # "research-lab"
+
+# Create datasets in the sub-collection
+dataset = sub_collection.create_dataset(
+    title="Lab Dataset",
+    description="Dataset from the lab",
+    authors=[{"name": "Lab Member", "affiliation": "Research Lab"}],
+    contacts=[{"name": "Lab Member", "email": "member@lab.edu"}],
+    subjects=["Physics"]
+)
+```
+
+Creating sub-collections enables hierarchical organization of research data. For example, a university might have department-level collections, with research lab collections nested within them, and datasets within those lab collections. This structure helps researchers navigate to relevant content and maintains clear organizational boundaries.
+
+The method requires several pieces of information:
+- **`alias`**: A unique, short identifier (no spaces allowed)
+- **`name`**: A human-readable display name
+- **`description`**: A description of the collection's purpose
+- **`affiliation`**: The organization or institution
+- **`dataverse_type`**: The type of collection (see below for options)
+- **`dataverse_contacts`**: List of contact email addresses
+
+The `dataverse_type` parameter categorizes the collection. Common types include:
+- `"DEPARTMENT"` - For academic departments
+- `"LABORATORY"` - For research labs
+- `"RESEARCH_PROJECTS"` - For specific research projects
+- `"JOURNALS"` - For journal-related collections
+- `"ORGANIZATIONS_INSTITUTIONS"` - For larger organizations
+- `"RESEARCHERS"` - For individual researchers
+- `"RESEARCH_GROUP"` - For research groups
+- `"TEACHING_COURSES"` - For course-related content
+- `"UNCATEGORIZED"` - For collections that don't fit other categories
+
+After creation, the sub-collection is immediately available and can be used to create datasets or further sub-collections. The method returns a `Collection` object representing the newly created collection, which you can use for subsequent operations.
+
+## Metadata Blocks
+
+Collections can have different metadata block configurations than the root Dataverse installation. This allows different collections to require different metadata fields based on their research focus. For example, a collection focused on geospatial data might require geospatial metadata blocks, while a collection focused on social science might require social science-specific blocks.
+
+You can access information about enabled metadata blocks through the `metadatablocks` property:
+
+```python
+# Get metadata block specifications for this collection
+blocks = collection.metadatablocks
+
+# See which blocks are enabled
+for block_name, block_spec in blocks.items():
+    print(f"{block_name}: {block_spec.name}")
+
+# Check if a specific block is enabled
+if "geospatial" in collection.metadatablocks:
+    print("Geospatial metadata is enabled for this collection")
+```
+
+The `metadatablocks` property returns a dictionary mapping block names to their specifications. Each specification contains detailed information about the block's fields, validation rules, and structure. This information is useful when creating datasets within the collection, as it tells you what metadata fields will be available.
+
+When you create a dataset within a collection using `create_dataset()`, the dataset is automatically configured with only the metadata blocks enabled for that collection. This ensures consistency—all datasets in a collection have the same metadata structure, making them easier to search, filter, and compare.
+
+## Counting Content
+
+You can determine how many direct children (datasets and sub-collections) a collection has using the `len()` function:
+
+```python
+# Count direct children (datasets + sub-collections)
+child_count = len(collection)
+print(f"Collection has {child_count} direct children")
+
+# This counts both datasets and sub-collections together
+# To count them separately, iterate over each:
+dataset_count = sum(1 for _ in collection.datasets)
+collection_count = sum(1 for _ in collection.collections)
+print(f"Datasets: {dataset_count}, Sub-collections: {collection_count}")
+```
+
+The `len()` function returns the total number of direct children, which includes both datasets and sub-collections at the immediate level (not nested deeper). This is useful for getting a quick overview of collection size or for pagination logic.
+
+Note that this counts only direct children—it doesn't include grandchildren or deeper descendants. If you need to count all descendants recursively, you would need to traverse the collection hierarchy.
+
+## Complete Example
+
+The following example demonstrates a complete workflow for working with collections:
+
+```python
+from pyDataverse import Dataverse
+
+# Initialize connection
+dv = Dataverse(
+    base_url="https://demo.dataverse.org",
+    api_token="your-token"
+)
+
+# Fetch an existing collection
+collection = dv.fetch_collection("research-lab")
+
+# View collection metadata
+print(f"Collection: {collection.metadata.name}")
+print(f"Description: {collection.metadata.description}")
+
+# Browse datasets in the collection
+print("\nDatasets in collection:")
+for dataset in collection.datasets:
+    print(f"  - {dataset.title} ({dataset.identifier})")
+
+# Browse sub-collections
+print("\nSub-collections:")
+for sub_coll in collection.collections:
+    print(f"  - {sub_coll.metadata.name} ({sub_coll.identifier})")
+
+# Create a new dataset in the collection
+new_dataset = collection.create_dataset(
+    title="Experimental Results 2024",
+    description="Results from our latest experiments",
+    authors=[{"name": "Dr. Jane Smith", "affiliation": "Research Lab"}],
+    contacts=[{"name": "Dr. Jane Smith", "email": "jane@lab.edu"}],
+    subjects=["Physics", "Engineering"]
+)
+
+# Add files to the dataset
+with new_dataset.open("data/results.csv", mode="w") as f:
+    f.write("experiment,result\n")
+    f.write("exp1,0.95\n")
+
+# Create a sub-collection for a specific project
+project_collection = collection.create_collection(
+    alias="project-alpha",
+    name="Project Alpha",
+    description="Datasets for Project Alpha",
+    affiliation="Research Lab",
+    dataverse_type="RESEARCH_PROJECTS",
+    dataverse_contacts=["project@lab.edu"]
+)
+
+# Create a dataset in the sub-collection
+project_dataset = project_collection.create_dataset(
+    title="Project Alpha Data",
+    description="Data collected for Project Alpha",
+    authors=[{"name": "Project Lead", "affiliation": "Research Lab"}],
+    contacts=[{"name": "Project Lead", "email": "lead@lab.edu"}],
+    subjects=["Engineering"]
+)
+
+# Update collection metadata
+collection.update_metadata(
+    description="Updated description: A collection for research lab datasets and publications"
+)
+
+# Check collection size
+print(f"\nCollection has {len(collection)} direct children")
+```
+
+This example demonstrates the typical workflow: fetching a collection, browsing its content, creating new datasets and sub-collections, and managing collection metadata. Collections provide a flexible way to organize research data hierarchically, making it easier to navigate and manage large Dataverse installations.
+
+## Related Classes
+
+- **[`Dataverse`](/high-level/Dataverse/)** - Factory class for creating and managing collections and datasets
+- **[`Dataset`](/high-level/dataset/)** - Represents a Dataverse dataset that can be created within or accessed from collections
+- **[`File`](/high-level/file/)** - Represents an individual file within a dataset
+
+## See Also
+
+- [Dataverse Documentation](/high-level/Dataverse/) - Learn more about creating and managing collections
+- [Dataset Documentation](/high-level/dataset/) - Learn more about working with datasets within collections
+- [File Documentation](/high-level/file/) - Learn more about working with files in datasets

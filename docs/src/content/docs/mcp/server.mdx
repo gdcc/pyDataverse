@@ -1,0 +1,302 @@
+---
+title: Creating a Dataverse MCP Server
+description: Learn how to set up and configure a Dataverse MCP server for LLM-powered exploration of your repositories.
+---
+
+Setting up a Dataverse MCP server enables Large Language Models to explore and interact with your Dataverse repositories through natural language. This guide walks you through creating a server, understanding how it works internally, and configuring it for your specific needs.
+
+## How It Works Internally
+
+Before diving into the code, it's helpful to understand what happens when you create a Dataverse MCP server:
+
+1. **Connection Establishment**: Your server connects to one or more Dataverse installations using the pyDataverse client
+2. **Tool Registration**: The `DataverseMCP` class examines your configuration and registers the appropriate tools with the MCP server
+3. **Middleware Setup**: A middleware layer is added to manage Dataverse connections and make them available to all tools
+4. **Context Injection**: When tools are called, the Dataverse connection is automatically injected so tools can execute operations
+5. **Response Formatting**: Tool results are encoded in TOON format and returned to the LLM for interpretation
+
+The key insight is that `DataverseMCP` **adds functionality to an existing MCP server**—it doesn't create the server itself. You create a `FastMCP` server instance, then use `DataverseMCP` to enhance it with Dataverse-specific capabilities.
+
+## Basic Server Setup
+
+Here's a minimal example that creates an MCP server for a single Dataverse installation:
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP
+
+# Step 1: Create the MCP server
+mcp = FastMCP(name="My Dataverse Server")
+
+# Step 2: Connect to your Dataverse installation
+dataverse = Dataverse(
+    base_url="https://demo.dataverse.org",
+    verbose=0  # Reduce logging noise
+)
+
+# Step 3: Add Dataverse tools to the MCP server
+DataverseMCP(dataverse=dataverse).to_mcp(mcp)
+
+# Step 4: Run the server
+if __name__ == "__main__":
+    mcp.run()
+```
+
+Let's break down what each step does:
+
+**Step 1**: Create a `FastMCP` instance. This is the standard MCP server that will handle communication with LLMs. The name identifies your server in logs and client connections.
+
+**Step 2**: Create a `Dataverse` connection. This establishes the connection to your target installation. You can provide an `api_token` parameter if you need authenticated access for operations beyond reading public data.
+
+**Step 3**: Create a `DataverseMCP` instance and call `to_mcp()`. This is where the magic happens—all Dataverse tools are registered with your MCP server. The `to_mcp()` method configures middleware, registers tools, and handles all the setup automatically.
+
+**Step 4**: Run the server. This starts the MCP server and makes it available for LLM connections.
+
+## Server Configuration
+
+The `DataverseMCP` class accepts an optional configuration object that controls which tools are available. This gives you fine-grained control over what operations LLMs can perform.
+
+### Using MCPConfiguration
+
+The `MCPConfiguration` class defines four categories of tools, each corresponding to a level of the Dataverse hierarchy:
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP, MCPConfiguration
+
+# Create a custom configuration
+config = MCPConfiguration(
+    dataverse=["metrics"],              # Installation-level tools
+    collection=["read", "graph"],       # Collection-level tools
+    dataset=["read"],                   # Dataset-level tools
+    file=["read", "metadata"]           # File-level tools
+)
+
+# Set up the server with custom configuration
+mcp = FastMCP(name="Configured Dataverse Server")
+dataverse = Dataverse("https://demo.dataverse.org")
+DataverseMCP(dataverse=dataverse, config=config).to_mcp(mcp)
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### Configuration Options
+
+Each category accepts a list of capabilities to enable:
+
+**Dataverse Level** (`dataverse`):
+- `"metrics"`: Enable installation-wide statistics and metrics
+
+**Collection Level** (`collection`):
+- `"read"`: Enable collection metadata and content listing
+- `"graph"`: Enable knowledge graph summaries and SPARQL queries
+
+**Dataset Level** (`dataset`):
+- `"read"`: Enable dataset metadata retrieval and file listings
+
+**File Level** (`file`):
+- `"read"`: Enable reading file contents
+- `"metadata"`: Enable file schema and metadata retrieval
+
+### Default Configuration
+
+If you don't provide a configuration, `DataverseMCP` uses sensible defaults that enable comprehensive read-only access:
+
+```python
+# These are the defaults
+MCPConfiguration(
+    dataverse=["metrics"],
+    collection=["read", "graph"],
+    dataset=["read"],
+    file=["read", "metadata"]
+)
+```
+
+This configuration provides full exploration capabilities while preventing any modifications to your Dataverse repositories.
+
+## Multi-Dataverse Setup
+
+You can configure a single MCP server to connect to multiple Dataverse installations simultaneously. This is useful for federated search, cross-repository analysis, or comparing content across institutions.
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP
+
+# Create the MCP server
+mcp = FastMCP(name="Multi-Dataverse Server")
+
+# Connect to multiple Dataverse installations
+dataverses = {
+    "demo": Dataverse("https://demo.dataverse.org"),
+    "harvard": Dataverse("https://dataverse.harvard.edu"),
+    "darus": Dataverse("https://darus.uni-stuttgart.de"),
+}
+
+# Add all installations to the MCP server
+DataverseMCP(dataverse=dataverses).to_mcp(mcp)
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+When you provide a dictionary of Dataverse instances, the server automatically:
+
+- Makes all tools available for each installation
+- Adds a `dataverse_name` parameter to search tools
+- Lists available installation names in tool descriptions
+- Routes requests to the correct installation based on LLM decisions
+
+The LLM can then direct questions to specific installations: "Search demo Dataverse for climate data" or "Compare metrics between Harvard and DaRUS".
+
+## Authenticated Access
+
+For operations that require authentication (such as accessing restricted datasets or private collections), provide an API token when creating your Dataverse connection:
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP
+
+mcp = FastMCP(name="Authenticated Dataverse Server")
+
+# Connect with authentication
+dataverse = Dataverse(
+    base_url="https://your-dataverse.edu",
+    api_token="your-api-token-here"
+)
+
+DataverseMCP(dataverse=dataverse).to_mcp(mcp)
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+:::caution[Security Consideration]
+API tokens provide full access to your Dataverse account. When running an MCP server with authentication:
+- Store tokens securely (environment variables, secret managers)
+- Don't commit tokens to version control
+- Be aware that the connected LLM will have the same access level as your token
+- Consider using read-only API tokens if your Dataverse installation supports them
+:::
+
+## Real-World Example
+
+Here's a practical example that sets up an MCP server for DaRUS (Data Repository of the University of Stuttgart):
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP, MCPConfiguration
+
+# Create the MCP server
+darus_mcp = FastMCP(name="DaRUS Dataverse MCP")
+
+# Connect to DaRUS
+darus = Dataverse(
+    base_url="https://darus.uni-stuttgart.de",
+    verbose=0  # Quiet logging
+)
+
+# Configure with default read-only access
+# (We could customize the config here if needed)
+DataverseMCP(dataverse=darus).to_mcp(darus_mcp)
+
+# Run the server
+if __name__ == "__main__":
+    darus_mcp.run()
+```
+
+Save this as `server.py` and run it with:
+
+```bash
+python server.py
+```
+
+Your MCP server is now running and ready to accept connections from LLM clients!
+
+## Connecting from LLM Clients
+
+Once your server is running, you can connect to it from various LLM clients:
+
+### Claude Desktop
+
+Add to your Claude configuration file (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "dataverse": {
+      "command": "python",
+      "args": ["/path/to/your/server.py"]
+    }
+  }
+}
+```
+
+### Other MCP Clients
+
+Any MCP-compatible client can connect to your server. Refer to the client's documentation for configuration details. The server uses standard MCP protocol, so it should work with any compliant client.
+
+## Adding Custom Tools
+
+The `DataverseMCP` class adds Dataverse-specific tools to your MCP server, but you can also add your own custom tools to the same server instance:
+
+```python
+from fastmcp import FastMCP
+from pyDataverse import Dataverse
+from pyDataverse.mcp import DataverseMCP
+
+# Create the server
+mcp = FastMCP(name="Extended Dataverse Server")
+
+# Add Dataverse tools
+dataverse = Dataverse("https://demo.dataverse.org")
+DataverseMCP(dataverse=dataverse).to_mcp(mcp)
+
+# Add your custom tools
+@mcp.tool()
+def custom_analysis(dataset_id: str) -> str:
+    """Perform custom analysis on a dataset."""
+    # Your custom logic here
+    return f"Analysis results for {dataset_id}"
+
+# Run the server
+if __name__ == "__main__":
+    mcp.run()
+```
+
+The LLM will now have access to both the standard Dataverse tools and your custom tools, enabling powerful hybrid workflows.
+
+## Best Practices
+
+When setting up your Dataverse MCP server:
+
+1. **Start with defaults**: Use the default configuration first, then customize only if you have specific security or functionality requirements
+
+2. **Use environment variables**: Store sensitive information like API tokens in environment variables rather than hardcoding them
+
+3. **Name your servers clearly**: Choose descriptive names that indicate which Dataverse installation they connect to
+
+4. **Document your configuration**: If you customize the configuration, document which tools you've enabled and why
+
+5. **Test with public data first**: Validate your setup with public Dataverse installations before connecting to production repositories
+
+6. **Monitor usage**: Keep an eye on server logs to understand how the LLM is using your tools
+
+7. **Version control**: Keep your server configuration in version control (excluding tokens and secrets)
+
+## Troubleshooting
+
+**Server won't start**: Check that all dependencies are installed (`pip install pyDataverse[mcp]`) and that your Python version is compatible (3.8+).
+
+**Can't connect to Dataverse**: Verify the base URL is correct and that the Dataverse installation is accessible from your network. Test the connection manually using a browser.
+
+**Tools not appearing**: Verify that your configuration includes the tool categories you need. Remember that tools must be explicitly enabled in the configuration.
+
+**Authentication errors**: Ensure your API token is valid and has the necessary permissions. Test the token using the pyDataverse API directly before setting up the MCP server.
+
+**Performance issues**: For large repositories, consider enabling only the tools you need. Knowledge graph queries and full metadata retrieval can be expensive—use them judiciously.

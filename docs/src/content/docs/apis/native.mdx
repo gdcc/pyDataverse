@@ -1,0 +1,522 @@
+---
+title: Native API
+description: The Native API is the primary API for interacting with Dataverse.
+---
+
+The `NativeApi` class is the low-level client for talking directly to a Dataverse installation. It provides thin, well-typed wrappers around the official Dataverse Native API endpoints and is used internally by the high-level `Dataverse` class, but you can also use it directly when you need full control or access to advanced features.
+
+Compared to the high-level classes, `NativeApi` exposes Dataverse as it appears on the wire: URLs, identifiers, HTTP methods, and response models closely follow the Dataverse API documentation. Each method is a small convenience wrapper around a single REST endpoint and returns a pydantic model that mirrors the JSON returned by the server.
+
+## Initialization
+
+To start using the Native API, create a `NativeApi` instance with the base URL of your Dataverse installation and, if needed, an API token for authenticated operations.
+
+```python
+from pyDataverse.api import NativeApi
+
+# Read-only access (public data and metadata)
+api = NativeApi(base_url="https://demo.dataverse.org")
+
+# Authenticated access for creating and modifying content
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+```
+
+### Understanding the Parameters
+
+`NativeApi` supports a small set of core parameters:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation, such as `"https://demo.dataverse.org"` or `"https://dataverse.harvard.edu"`. All API calls are constructed from this URL.
+- **`api_token`** (str, optional): API token used for endpoints that require authentication, such as creating datasets, uploading files, or changing permissions.
+- **`api_version`** (str, optional): API version string passed to the Dataverse server. This is typically left at its default unless you have a specific reason to override it.
+
+The `NativeApi` class automatically manages request URLs, parameters, and authentication headers for you. Methods that only need public access can be called without an API token, while methods that require permissions will use the provided token.
+
+## Working with Collections
+
+Collections (also called *dataverses*) are organizational units that group datasets. The `NativeApi` exposes methods for reading, creating, updating, publishing, deleting, and crawling collections.
+
+### Fetching a Collection
+
+Use `get_collection` to fetch a single collection (dataverse) by alias, ID, or the special `:root` identifier.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+# Fetch the root collection
+root = api.get_collection(":root")
+print(root.alias, root.name)
+
+# Fetch a collection by alias
+harvard = api.get_collection("harvard")
+
+# Fetch a collection by numeric ID
+collection = api.get_collection(1)
+```
+
+The returned object is a pydantic `Collection` model with attributes such as `alias`, `name`, `description`, and more.
+
+### Creating and Updating Collections
+
+You can create new collections under an existing parent and update metadata on existing collections.
+
+```python
+from pyDataverse.api import NativeApi
+from pyDataverse.models.collection import CollectionCreateBody, UpdateCollection
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Create a new collection under the root
+body = CollectionCreateBody(
+    name="Research Laboratory",
+    alias="research-lab",
+    dataverse_contacts=[{"contactEmail": "lab@university.edu"}],
+    affiliation="Department of Science",
+)
+
+created = api.create_collection(parent="root", metadata=body)
+print(created.id, created.alias)
+
+# Update an existing collection
+update = UpdateCollection(
+    name="Updated Research Laboratory",
+    description="An updated description for the research lab collection.",
+)
+
+updated = api.update_collection(identifier="research-lab", metadata=update)
+print(updated.name)
+```
+
+Collection-related methods closely follow the Dataverse API:
+
+- **`get_collection`**: Retrieve a single collection.
+- **`create_collection`**: Create a new collection under a parent.
+- **`update_collection`**: Update collection metadata.
+- **`publish_collection`**: Publish a collection so it becomes publicly visible.
+- **`delete_collection`**: Delete an unpublished collection.
+- **`get_collection_contents`**: Get immediate datasets and sub-collections in a collection.
+- **`get_collection_assignments`** and **`get_dataverse_roles`**: Inspect roles and permissions on a collection.
+- **`get_collection_facets`**: Retrieve configured search facets for a collection.
+
+### Crawling Collections
+
+For large installations, you often need to traverse an entire hierarchy of collections and datasets. The `crawl_collection` method does this for you using concurrent requests under the hood.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+# Crawl all collections and datasets under the root
+items = api.crawl_collection(":root")
+print(f"Found {len(items)} items under the root collection")
+
+# Only collections (sub-dataverses)
+collections = api.crawl_collection("harvard", filter_by="collections")
+
+# Only datasets
+datasets = api.crawl_collection("harvard", filter_by="datasets")
+for ds in datasets:
+    print(ds.title)
+```
+
+The result is a flat list of collection and dataset objects, depending on the `filter_by` parameter.
+
+## Working with Datasets
+
+Datasets are the central objects in Dataverse. `NativeApi` provides methods to create, read, edit, publish, delete, and inspect datasets and their versions.
+
+### Fetching Datasets and Versions
+
+You can retrieve a dataset by its persistent identifier (PID) or numeric database ID. The default is to fetch the latest version.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+# Fetch a single dataset (latest version)
+ds = api.get_dataset("doi:10.5072/FK2/ABC123")
+print(ds.dataset_version.version_number, ds.dataset_version.metadata_blocks.keys())
+
+# Fetch all versions of a dataset
+versions = api.get_dataset_versions("doi:10.5072/FK2/ABC123")
+for v in versions:
+    print(v.dataset_version.version_number, v.dataset_version.version_state)
+
+# Fetch a specific version
+v1 = api.get_dataset_version("doi:10.5072/FK2/ABC123", version="1.0")
+```
+
+To fetch multiple datasets efficiently, use `get_datasets`, which runs concurrent requests:
+
+```python
+datasets = api.get_datasets(
+    identifiers=[
+        "doi:10.5072/FK2/ABC123",
+        "doi:10.5072/FK2/XYZ789",
+        12345,  # numeric ID also supported
+    ],
+)
+print(f"Fetched {len(datasets)} datasets")
+```
+
+### Creating and Validating Datasets
+
+Use `create_dataset` to create a new dataset in a collection or to import an existing dataset with a persistent identifier.
+
+```python
+from pyDataverse.api import NativeApi
+from pyDataverse.models.dataset import DatasetCreateBody
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+metadata = DatasetCreateBody(
+    # Fill required citation fields and any additional metadata blocks
+)
+
+# Create a new draft dataset in the "research-lab" collection
+created = api.create_dataset(
+    dataverse="research-lab",
+    metadata=metadata,
+)
+print(created.persistent_id)
+
+# Optionally validate the JSON against the collection's schema before creation
+validation = api.validate_dataset_json(
+    collection="research-lab",
+    metadata=metadata,
+)
+print(validation.message)
+```
+
+The `create_dataset` method can also import an existing dataset with a PID (using the `identifier` argument) and optionally publish it immediately with `publish=True`.
+
+### Editing and Publishing Datasets
+
+After creating a draft dataset, you can update its metadata and publish it.
+
+```python
+from pyDataverse.api import NativeApi
+from pyDataverse.models.dataset import EditMetadataBody
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+pid = "doi:10.5072/FK2/ABC123"
+
+# Edit some metadata fields (adds to or appends values by default)
+edit_body = EditMetadataBody(
+    # Only include fields you want to change
+)
+
+updated = api.edit_dataset_metadata(
+    identifier=pid,
+    metadata=edit_body,
+    replace=False,  # set to True to fully replace existing metadata
+)
+
+# Publish the dataset as a major release (e.g. 1.0 -> 2.0)
+published = api.publish_dataset(pid=pid, release_type="major")
+print(published.persistent_url)
+```
+
+You can also:
+
+- **get dataset locks** with `get_dataset_lock`, which is useful when ingest or workflows are in progress.
+- **inspect role assignments** on a dataset via `get_dataset_assignments`.
+- **delete an unpublished dataset** with `delete_dataset`, or irreversibly **destroy** a dataset (including published ones) with `destroy_dataset` (superuser only).
+
+## Listing and Managing Files
+
+Files are attached to datasets and are often the main objects you interact with. `NativeApi` offers several conveniences for listing, uploading, updating, and deleting files.
+
+### Listing Files as a Table
+
+The `datafiles_table` method returns a `pandas.DataFrame` summarizing the files in a dataset, which is convenient for analysis and filtering.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+df = api.datafiles_table("doi:10.5072/FK2/ABC123")
+print(df.head())
+
+# Filter only CSV files
+csv_df = api.datafiles_table(
+    "doi:10.5072/FK2/ABC123",
+    filter_mime_types=["text/csv"],
+)
+```
+
+Behind the scenes, this uses `get_datafiles_metadata`, which returns a list of `FileInfo` models. You can also call `get_datafiles_metadata` directly and filter by MIME type.
+
+### Fetching and Updating File Metadata
+
+You can fetch and update metadata for individual files using their file ID or file PID.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Fetch metadata for a published file
+file_info = api.get_datafile_metadata(12345)
+print(file_info.label, file_info.data_file.content_type)
+
+# Fetch draft metadata
+draft_info = api.get_datafile_metadata(12345, is_draft=True)
+```
+
+To update metadata, use `update_datafile_metadata` with an `UploadBody` model (the same structure used when uploading files).
+
+### Uploading and Replacing Files
+
+Use `upload_datafile` to add a new file to a dataset, and `replace_datafile` to replace an existing file while preserving its metadata and history.
+
+```python
+from pathlib import Path
+
+from pyDataverse.api import NativeApi
+from pyDataverse.models.file import UploadBody
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+pid = "doi:10.5072/FK2/ABC123"
+path = Path("data/results.csv")
+
+upload_metadata = UploadBody(
+    description="Analysis results",
+    directory_label="analysis",
+    restrict=False,
+)
+
+upload_response = api.upload_datafile(
+    identifier=pid,
+    file=path,
+    metadata=upload_metadata,
+)
+print(upload_response.files[0].data_file.id)
+```
+
+To replace a file:
+
+```python
+from pathlib import Path
+
+from pyDataverse.api import NativeApi
+from pyDataverse.models.file import UploadBody
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+file_id = 12345
+replacement = Path("data/results_v2.csv")
+
+replace_metadata = UploadBody(
+    description="Updated analysis results",
+)
+
+api.replace_datafile(
+    identifier=file_id,
+    file=replacement,
+    metadata=replace_metadata,
+)
+```
+
+You can also:
+
+- **delete files** with `delete_datafile` (behavior depends on whether the dataset is published).
+- **redetect file types** using `redetect_file_type` (for example when MIME types are incorrect).
+- **reingest or uningest files** for tabular processing using `reingest_datafile` and `uningest_datafile`.
+- **restrict or unrestrict files** using `restrict_datafile`.
+
+### Private URLs for Unpublished Datasets
+
+Private URLs allow you to share draft datasets for review without making them public. `NativeApi` exposes methods to create, inspect, and delete private URLs.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+pid = "doi:10.5072/FK2/ABC123"
+
+# Create a private URL
+private = api.create_dataset_private_url(pid)
+print(private.link)
+
+# Retrieve existing private URL information
+info = api.get_dataset_private_url(pid)
+
+# Delete the private URL to revoke anonymous access
+message = api.delete_dataset_private_url(pid)
+print(message)
+```
+
+## Exporting Dataset Metadata
+
+Dataverse supports several export formats for dataset metadata, such as DDI, Dublin Core, and Schema.org. `NativeApi` provides methods to export single or multiple datasets in these formats.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+pid = "doi:10.5072/FK2/ABC123"
+
+# Export as DDI XML (string)
+ddi_xml = api.get_dataset_export(
+    identifier=pid,
+    export_format="ddi",
+)
+
+# Export multiple datasets and parse as JSON (when supported by the exporter)
+exports = api.get_datasets_export(
+    identifiers=[pid],
+    export_format="dataverse_json",
+    as_dict=True,
+)
+print(exports[0].keys())
+```
+
+You can use `get_export_formats` to discover which exporters are available on your installation.
+
+```python
+formats = api.get_export_formats()
+for name, exporter in formats.items():
+    print(name, "->", exporter.display_name)
+```
+
+## Server Information, Metrics, and Metadata Blocks
+
+The `NativeApi` also exposes endpoints that provide information about the Dataverse installation itself and its metadata configuration.
+
+### Server and Version Information
+
+You can get version, server, and API terms of use information:
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+version = api.get_info_version()
+print(version.version, version.build)
+
+server = api.get_info_server()
+print(server.hostname)
+
+terms = api.get_info_api_terms_of_use()
+print(terms.message)
+```
+
+### Metadata Blocks
+
+Metadata blocks describe the structure of metadata used in datasets. `NativeApi` allows you to list all blocks and inspect them in detail.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+# Brief info about all metadata blocks
+blocks = api.get_metadatablocks()
+for block in blocks:
+    print(block.name, block.display_name)
+
+# Full specifications for all blocks
+full_blocks = api.get_metadatablocks(full=True)
+citation_block = full_blocks["citation"]
+print(citation_block.fields[0].name)
+
+# Inspect a single block by name
+geo = api.get_metadatablock("geospatial")
+print(geo.display_name)
+```
+
+These endpoints are especially useful when building tools that need to understand or validate metadata structures.
+
+## Licenses and Terms of Use
+
+Dataverse installations can be configured with a set of licenses that dataset creators can choose from. `NativeApi` provides methods to inspect these licenses.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi("https://demo.dataverse.org")
+
+# List all available licenses
+licenses = api.get_available_licenses()
+for license in licenses:
+    print(f"{license.name}: {license.uri}")
+
+# Fetch a single license by numeric ID or identifier string
+cc_by = api.get_license("CC BY")
+print(cc_by.name, cc_by.uri)
+```
+
+This is helpful when you build tools that need to present license choices or interpret license information programmatically.
+
+## User and Token Management
+
+For user-centric workflows, `NativeApi` exposes helper methods for introspecting the current user and managing API tokens.
+
+```python
+from pyDataverse.api import NativeApi
+
+api = NativeApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Get information about the authenticated user
+user = api.get_user()
+print(user.display_name, user.email)
+
+# Inspect, recreate, or delete API tokens
+expiration = api.get_user_api_token_expiration_date()
+print(expiration.message)
+
+recreated = api.recreate_user_api_token()
+print(recreated.message)
+
+deleted = api.delete_user_api_token()
+print(deleted.message)
+```
+
+These methods are particularly useful for tools that need to manage user access or verify the health of authentication credentials.
+
+## When to Use `NativeApi`
+
+Use `NativeApi` when you:
+
+- **need direct control** over Dataverse endpoints, parameters, and responses.
+- **want to call endpoints that are not yet wrapped** in the higher-level `Dataverse` class.
+- **are building automation, integration, or administrative tools** that mirror the Dataverse HTTP API closely.
+
+For most everyday research workflows (creating datasets, uploading files, basic exploration), the high-level `Dataverse` class is usually more convenient. When you need fine-grained control, advanced features, or when you are closely following the official API documentation, `NativeApi` gives you a precise, typed interface to everything the Native API offers.

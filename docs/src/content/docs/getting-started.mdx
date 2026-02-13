@@ -1,0 +1,66 @@
+---
+title: Welcome to pyDataverse
+description: Quick introduction to pyDataverse and Dataverse with a minimal working example.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+pyDataverse is a Python library for working with Dataverse research data repositories. It wraps the Dataverse HTTP APIs in high level Python classes so that you can think in terms of installations, collections, datasets, and files instead of raw requests.
+
+Dataverse itself is an open source platform for publishing, sharing, and preserving research data. A single Dataverse installation can host many collections, each of which contains datasets and their files. pyDataverse connects to such an installation and lets you explore and manage its content from Python.
+
+## Install pyDataverse
+
+Install pyDataverse with pip in your preferred virtual environment.
+
+```bash
+pip install pyDataverse
+```
+
+On some systems you may need to use `pip3` or `python -m pip` instead. This installs pyDataverse together with its dependencies.
+
+## Example Code
+
+The example below shows the full flow to connect to a Dataverse installation, select a collection and dataset, and read the contents of a file in that dataset. It also demonstrates the filesystem like interface that pyDataverse provides for reading and writing files.
+
+```python
+from pyDataverse import Dataverse
+
+# 1. Connect to a Dataverse installation
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# 2. Select a collection and a dataset
+collection = dv.collections["my-collection"]
+dataset = collection.datasets["doi:10.5072/FK2/ABC123"]
+
+# 3. Open a file from the dataset and read its contents
+with dataset.open("data/example.txt", mode="r") as f:
+    text = f.read()
+
+# 4. Update metadata of the dataset
+dataset["citation"]["title"] = "My new title"
+dataset.update_metadata()
+
+# 4. Create a new file in the dataset from in memory content
+with dataset.open("data/hello.txt", mode="w") as f:
+    f.write("Hello, Dataverse!")
+```
+
+In this short script you connect to a Dataverse installation, navigate down to a collection and dataset, and then read a file inside that dataset as plain text. You can adapt the identifiers and file path to match your own Dataverse installation.
+
+For many use cases this pattern is all you need to get started. As you become more familiar with Dataverse, you can move on to creating datasets, uploading files, and working with advanced metadata.
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="High-Level API"
+    href="/high-level/concept/"
+    description="Learn about the high-level API classes for working with Dataverse installations, collections, datasets, and files."
+  />
+  <LinkCard
+    title="Direct APIs"
+    href="/apis/overview/"
+    description="Explore the low-level API classes for direct access to Dataverse REST endpoints."
+  />
+</CardGrid>

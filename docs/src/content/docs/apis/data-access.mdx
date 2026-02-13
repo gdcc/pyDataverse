@@ -1,0 +1,327 @@
+---
+title: Data Access API
+description: The Data Access API provides methods for downloading files and managing file access permissions.
+---
+
+The `DataAccessApi` class provides direct access to Dataverse's Data Access API endpoints. It focuses specifically on downloading datafiles, streaming large files efficiently, and managing access permissions for restricted files. While the high-level `Dataverse` class provides convenient methods for file operations, `DataAccessApi` gives you fine-grained control over file downloads, format conversions, and access management.
+
+Compared to other APIs, `DataAccessApi` is specialized for file retrieval and access control. It supports both database IDs and persistent identifiers (PIDs) for file access, handles format conversions for tabular data, and provides streaming capabilities for large files. Each method returns raw HTTP responses or typed models that mirror the Dataverse API responses.
+
+## Initialization
+
+To start using the Data Access API, create a `DataAccessApi` instance with the base URL of your Dataverse installation and, if needed, an API token for authenticated operations.
+
+```python
+from pyDataverse.api import DataAccessApi
+
+# Read-only access (public files)
+api = DataAccessApi(base_url="https://demo.dataverse.org")
+
+# Authenticated access for restricted files and access management
+api = DataAccessApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+```
+
+### Understanding the Parameters
+
+`DataAccessApi` supports the same core parameters as other API classes:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation, such as `"https://demo.dataverse.org"` or `"https://dataverse.harvard.edu"`. All API calls are constructed from this URL.
+- **`api_token`** (str, optional): API token used for endpoints that require authentication, such as accessing restricted files or managing access permissions.
+- **`api_version`** (str, optional): API version string passed to the Dataverse server. This is typically left at its default unless you have a specific reason to override it.
+
+The `DataAccessApi` class automatically manages request URLs, parameters, and authentication headers for you. Methods that download public files can be called without an API token, while methods that access restricted files or manage permissions require authentication.
+
+## Downloading Files
+
+The Data Access API provides several methods for downloading files, supporting both database IDs and persistent identifiers (PIDs) like DOIs.
+
+### Downloading a Single File
+
+Use `get_datafile` to download a file by its database ID or persistent identifier. The method returns an `httpx.Response` object containing the file content.
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Download by database ID
+response = api.get_datafile(1234567)
+with open("downloaded_file.csv", "wb") as f:
+    f.write(response.content)
+
+# Download by persistent identifier (DOI)
+response = api.get_datafile("doi:10.5072/FK2/ABC123")
+with open("dataset_file.csv", "wb") as f:
+    f.write(response.content)
+```
+
+### Format Conversion and Options
+
+For tabular data files, you can request format conversions and control various download options:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Download in tabular format (converts proprietary formats to tab-delimited)
+response = api.get_datafile(
+    1234567,
+    data_format="tabular",
+)
+
+# Download without variable headers
+response = api.get_datafile(
+    1234567,
+    data_format="tabular",
+    no_var_header=True,
+)
+
+# Download an image thumbnail instead of the full image
+response = api.get_datafile(
+    1234567,
+    image_thumb=True,
+)
+```
+
+The `data_format` parameter supports values like `"original"`, `"tabular"`, `"bundle"`, and others depending on what formats are available for the specific file type.
+
+### Getting Download URLs
+
+For workflows that need to manage redirects manually (for example, in federated storage setups), use `get_datafile_download_url` to retrieve the direct download URL without following redirects:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Get the direct download URL
+download_url = api.get_datafile_download_url(1234567)
+print(f"Download URL: {download_url}")
+
+# Use the URL in your own HTTP client or workflow
+```
+
+## Streaming Large Files
+
+For large files, streaming avoids loading the entire file into memory. `DataAccessApi` provides context managers for streaming downloads.
+
+### Streaming a Single File
+
+Use `stream_datafile` as a context manager to stream a file download:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Stream a large file
+with api.stream_datafile(1234567) as response:
+    with open("large_file.csv", "wb") as f:
+        for chunk in response.iter_bytes():
+            f.write(chunk)
+```
+
+You can also use format options with streaming:
+
+```python
+with api.stream_datafile(
+    1234567,
+    data_format="tabular",
+    no_var_header=True,
+) as response:
+    # Process the streamed data
+    for chunk in response.iter_bytes():
+        process_chunk(chunk)
+```
+
+## Downloading Multiple Files
+
+When you need to download several files from a dataset, `get_datafiles` downloads them as a single ZIP archive.
+
+### Batch Downloads
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Download multiple files as a ZIP archive
+file_ids = [1234567, 1234568, 1234569]
+response = api.get_datafiles(file_ids)
+
+with open("dataset_files.zip", "wb") as f:
+    f.write(response.content)
+```
+
+Note that the `get_datafiles` endpoint only supports database IDs, not persistent identifiers.
+
+### Streaming Multiple Files
+
+For large archives, use `stream_datafiles` to stream the ZIP download:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+file_ids = [1234567, 1234568, 1234569]
+
+with api.stream_datafiles(file_ids) as response:
+    with open("dataset_files.zip", "wb") as f:
+        for chunk in response.iter_bytes():
+            f.write(chunk)
+```
+
+## File Bundles
+
+For tabular data files, Dataverse can package the data in multiple formats as a single bundle. This is particularly useful when you need the data in different formats for various analysis tools.
+
+### Downloading File Bundles
+
+Use `get_datafile_bundle` to download a file in all its available formats:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+# Download bundle containing multiple formats
+response = api.get_datafile_bundle(1234567)
+
+with open("file_bundle.zip", "wb") as f:
+    f.write(response.content)
+```
+
+The bundle contains:
+- Tab-delimited version of the data
+- "Saved Original" file (SPSS, Stata, R, etc.) from which the data was ingested
+- Generated R Data frame (unless the original was already in R)
+- Data (Variable) metadata record in DDI XML
+- File citation in Endnote and RIS formats
+
+You can also specify a file metadata ID to download a bundle for a specific version:
+
+```python
+# Download bundle for a specific file version
+response = api.get_datafile_bundle(
+    1234567,
+    file_metadata_id=98765,
+)
+```
+
+### Streaming File Bundles
+
+For large bundles, use `stream_datafiles_bundle` to stream the download:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi("https://demo.dataverse.org")
+
+with api.stream_datafiles_bundle(1234567) as response:
+    with open("file_bundle.zip", "wb") as f:
+        for chunk in response.iter_bytes():
+            f.write(chunk)
+```
+
+## Managing File Access
+
+For restricted files, `DataAccessApi` provides methods to request access, grant access to users, and manage access requests. These operations require authentication.
+
+### Requesting Access to Restricted Files
+
+When a file is restricted, users can request access through the API:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Request access to a restricted file
+message = api.request_access(1234567)
+print(message.message)
+```
+
+Note that not all datasets allow access requests to restricted files. The dataset owner or administrator must enable this feature.
+
+### Allowing Access Requests
+
+Dataset administrators can enable or disable the ability for users to request access to restricted files:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Enable access requests for a file
+message = api.allow_access_request(1234567, do_allow=True)
+print(message.message)
+
+# Disable access requests
+message = api.allow_access_request(1234567, do_allow=False)
+```
+
+### Granting File Access
+
+Administrators can grant access to a specific user for a restricted file:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# Grant access to a user by username
+message = api.grant_file_access(1234567, user="researcher@university.edu")
+print(message.message)
+
+# Grant access by user ID
+message = api.grant_file_access(1234567, user=42)
+```
+
+### Listing Access Requests
+
+Administrators can review pending access requests for a file:
+
+```python
+from pyDataverse.api import DataAccessApi
+
+api = DataAccessApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+
+# List all pending access requests
+requests = api.list_file_access_requests(1234567)
+
+for request in requests:
+    print(f"User: {request.user_identifier}")
+    print(f"Requested: {request.request_date}")
+    print(f"Status: {request.status}")
+```
+
+Each `AccessRequest` object contains user information, request timestamps, and status details that help administrators make informed decisions about access approvals.
+
+## When to Use `DataAccessApi`
+
+Use `DataAccessApi` when you:
+
+- **need to download files** with specific format conversions or options that aren't available in higher-level classes.
+- **are working with large files** and need streaming capabilities to avoid memory issues.
+- **need to manage file access permissions** programmatically, such as in automated workflows or administrative tools.
+- **want direct control** over file download URLs, redirects, and HTTP response handling.
+- **are building batch download tools** that need to download multiple files efficiently.
+
+For most everyday workflows (downloading files from datasets you're working with), the high-level `Dataverse` class provides convenient methods that handle file operations through dataset objects. When you need specialized download features, format conversions, streaming, or access management, `DataAccessApi` gives you precise control over the Data Access API endpoints.
