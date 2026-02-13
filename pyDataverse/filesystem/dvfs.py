@@ -1,25 +1,18 @@
-import warnings
 from typing import Any, Dict, List, Literal, Optional, Set, Union, overload
 from urllib.parse import parse_qs, urlparse
 
+import pandas as pd
+from cachetools import TTLCache
+from typing_extensions import Self
+
 from pyDataverse.models.file import update
 
-# Suppress pkg_resources deprecation warnings from fs package
-# Must be before fs import to suppress warnings during import
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="fs")
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
-
-import pandas as pd  # noqa: E402
-from cachetools import TTLCache  # noqa: E402
-from fs.base import FS  # noqa: E402
-from typing_extensions import Self  # noqa: E402
-
-from ..api import DataAccessApi, NativeApi  # noqa: E402
-from ..models.dataset.edit_get import DataFile, File, GetDatasetResponse  # noqa: E402
-from ..models.file.filemeta import UploadBody  # noqa: E402
-from .reader import DataverseFileReader  # noqa: E402
-from .tab import TABULAR_MIME_TYPES, TabSpecs  # noqa: E402
-from .writer import DataverseFileWriter  # noqa: E402
+from ..api import DataAccessApi, NativeApi
+from ..models.dataset.edit_get import DataFile, File, GetDatasetResponse
+from ..models.file.filemeta import UploadBody
+from .reader import DataverseFileReader
+from .tab import TABULAR_MIME_TYPES, TabSpecs
+from .writer import DataverseFileWriter
 
 
 class Info(DataFile):
@@ -28,7 +21,7 @@ class Info(DataFile):
         return self.model_dump()
 
 
-class DataverseFS(FS):
+class DataverseFS:
     """
     A PyFilesystem2 implementation for Dataverse datasets.
 
