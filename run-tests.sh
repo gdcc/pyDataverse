@@ -1,87 +1,40 @@
-#!bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Parse arguments
-usage() {
-    echo "Usage: $0 [-p Python version (e.g. 3.10, 3.11, ...)]" 1>&2
-    exit 1
-}
+PYTHON_VERSION="${PYTHON_VERSION:-3.11}"
 
-while getopts ":p:d:" o; do
-    case "${o}" in
-    p)
-        p=${OPTARG}
-        ;;
-    *) ;;
-    esac
-done
-shift $((OPTIND - 1))
-
-# Fall back to Python 3.11 if no Python version is specified
-if [ -z "${p}" ]; then
-    printf "\n⚠️  No Python version specified falling back to '3.11'\n"
-    p=3.11
-fi
-
-# Validate Python version
-if [[ ! "${p}" =~ ^3\.[0-9]+$ ]]; then
-    echo "\n❌ Invalid Python version. Please specify a valid Python version (e.g. 3.10, 3.11, ...)\n"
+if [[ -z "${API_TOKEN:-}" ]]; then
+    echo "API_TOKEN is required."
     exit 1
 fi
 
-# Check if Docker is installed
-if ! command -v docker &>/dev/null; then
-    echo "✋ Docker is not installed. Please install Docker before running this script."
+if [[ -z "${BASE_URL:-}" ]]; then
+    echo "BASE_URL is required."
     exit 1
 fi
 
-# Prepare the environment for the test
-mkdir dv >>/dev/null 2>&1
-touch dv/bootstrap.exposed.env >>/dev/null 2>&1
+# Usually identical to API_TOKEN, but can be overridden.
+API_TOKEN_SUPERUSER="${API_TOKEN_SUPERUSER:-$API_TOKEN}"
 
-# Add python version to the environment
-export PYTHON_VERSION=${p}
+CONTAINER_BASE_URL="$BASE_URL"
+CONTAINER_BASE_URL="${CONTAINER_BASE_URL//localhost/host.docker.internal}"
+CONTAINER_BASE_URL="${CONTAINER_BASE_URL//127.0.0.1/host.docker.internal}"
 
-printf "\n🚀 Preparing containers\n"
-printf "   Using PYTHON_VERSION=${p}\n\n"
+echo "Building test image with Python ${PYTHON_VERSION}..."
+docker build \
+    --build-arg PYTHON_VERSION="${PYTHON_VERSION}" \
+    -t pydataverse-tests .
 
-# Run all containers
-docker compose \
-    -f docker/docker-compose-base.yml \
-    -f ./docker/docker-compose-test-all.yml \
-    --env-file local-test.env \
-    up -d
-
-printf "\n🔎 Running pyDataverse tests\n"
-printf "   Logs will be printed once finished...\n\n"
-
-# Check if "unit-test" container has finished
-while [ -n "$(docker ps -f "name=unit-tests" -f "status=running" -q)" ]; do
-    printf "   Waiting for unit-tests container to finish...\n"
-    sleep 5
-done
-
-# Check if "unit-test" container has failed
-if [ "$(docker inspect -f '{{.State.ExitCode}}' unit-tests)" -ne 0 ]; then
-    printf "\n❌ Unit tests failed. Printing logs...\n"
-    docker logs unit-tests
-    printf "\n   Stopping containers\n"
-    docker compose \
-        -f docker/docker-compose-base.yml \
-        -f ./docker/docker-compose-test-all.yml \
-        --env-file local-test.env \
-        down
-    exit 1
+echo "Running pytest in container..."
+DOCKER_TTY_ARGS=()
+if [[ -t 1 ]]; then
+    DOCKER_TTY_ARGS=(-it)
 fi
 
-# Print test results
-printf "\n"
-cat dv/unit-tests.log
-printf "\n\n✅ Unit tests passed\n\n"
-
-# Stop all containers
-docker compose \
-    -f docker/docker-compose-base.yml \
-    -f ./docker/docker-compose-test-all.yml \
-    --env-file local-test.env \
-    down
-printf "\n🎉 Done\n\n"
+docker run --rm \
+    "${DOCKER_TTY_ARGS[@]}" \
+    --add-host=host.docker.internal:host-gateway \
+    -e BASE_URL="${CONTAINER_BASE_URL}" \
+    -e API_TOKEN="${API_TOKEN}" \
+    -e API_TOKEN_SUPERUSER="${API_TOKEN_SUPERUSER}" \
+    pydataverse-tests
