@@ -117,7 +117,7 @@ def search(
     per_page: Annotated[int, "Maximum number of results to return per page"] = 10,
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
     ] = None,
     ctx: Context = CurrentContext(),
 ):

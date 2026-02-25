@@ -85,6 +85,20 @@ class DataverseMCP:
 
         self.config = config or MCPConfiguration()
 
+    @property
+    def base_url(self) -> str:
+        """
+        Get the base URL of the dataverse.
+        """
+        return self.dataverse.base_url
+
+    @property
+    def base_url_instructions(self) -> str:
+        """
+        Get the base URL instructions for the dataverse.
+        """
+        return f"This MCP server is connected to the dataverse at {self.base_url}. Provide the `base_url` parameter if you want to use a different dataverse."
+
     def to_mcp(self, mcp: FastMCP):
         """
         Configure the provided FastMCP instance with Dataverse tools and middleware.
@@ -116,7 +130,7 @@ class DataverseMCP:
             mcp.tool(
                 get_metrics,
                 name="Dataverse_Metrics",
-                description="Get metrics from the dataverse in total and for the past 7 days. This tool returns the metrics of the dataverse in a TOON format.",
+                description=f"Get metrics from the dataverse in total and for the past 7 days. This tool returns the metrics of the dataverse in a TOON format. {self.base_url_instructions}",
             )
 
     def _add_dataset_tools(self, mcp: FastMCP):
@@ -142,6 +156,8 @@ class DataverseMCP:
             The available metadata blocks are: {", ".join(available_metadatablocks)}. 
             If you do not specify the metadata blocks, the function will return all metadata blocks.
             To save tokens and compute resources, you should first request the dataset without the `full` flag to get the available metadata blocks and then request the dataset with the `full` flag and the metadata blocks you want to see.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 
@@ -149,7 +165,7 @@ class DataverseMCP:
             list_files,
             name="List_Files_in_Dataset",
             enabled="read" in self.config.dataset,
-            description="List the files in a dataset. This tool returns the files in a TOON format.",
+            description=f"List the files in a dataset. This tool returns the files in a TOON format. {self.base_url_instructions}",
         )
 
     def _add_file_tools(self, mcp: FastMCP):
@@ -168,11 +184,13 @@ class DataverseMCP:
             read_tabular,
             name="Read_Tabular_File",
             enabled="read" in self.config.file,
-            description="""
+            description=f"""
             Read a tabular file from a dataset. This tool returns the file in a TOON format.
             When `summarize` is True, the function will return the description of the file using the `describe` method of the pandas DataFrame.
             When `n_rows` is specified, the function will return the first `n_rows` rows of the file.
             When `n_rows` is not specified, the function will return the entire file. Please note that this is capped to 1000 rows.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 
@@ -180,8 +198,10 @@ class DataverseMCP:
             read_file,
             name="Read_File_Content",
             enabled="read" in self.config.file,
-            description="""
+            description=f"""
             Read then content of a file from a dataset. This tool returns the raw content of the file.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 
@@ -189,7 +209,7 @@ class DataverseMCP:
             tabular_schema,
             name="Get_Tabular_File_Schema",
             enabled="read" in self.config.file,
-            description="Get the schema of a tabular file. This tool returns the schema of the file in a TOON format.",
+            description=f"Get the schema of a tabular file. This tool returns the schema of the file in a TOON format. {self.base_url_instructions}",
         )
 
     def _add_collection_tools(self, mcp: FastMCP):
@@ -206,16 +226,18 @@ class DataverseMCP:
             get_collection_metadata,
             name="Get_Collection_Metadata",
             enabled="read" in self.config.collection,
-            description="Get the metadata of a collection. This tool returns the metadata of the collection in a TOON format.",
+            description=f"Get the metadata of a collection. This tool returns the metadata of the collection in a TOON format. {self.base_url_instructions}",
         )
 
         mcp.tool(
             list_content,
             name="List_Content_of_Collection",
             enabled="read" in self.config.collection,
-            description="""
+            description=f"""
             List the content of a collection. This tool returns the content in a TOON format.
             You can filter the content by type. The available types are: dataset, collection.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 
@@ -223,12 +245,14 @@ class DataverseMCP:
             get_graph_summary,
             name="Knowledge_Graph_Summary",
             enabled="graph" in self.config.collection,
-            description="""
+            description=f"""
             Get the summary of the RDF graph of a collection. This tool returns all classes and predicates 
             found in the collection's knowledge graph, including their full URIs and short names. 
             Useful for exploring the semantic structure of a collection before writing SPARQL queries.
             The graph can be generated in different formats: "croissant" or "OAI_ORE".
             Returns the summary in a TOON format.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 
@@ -236,12 +260,14 @@ class DataverseMCP:
             query_sparql,
             name="Query_Knowledge_Graph",
             enabled="graph" in self.config.collection,
-            description="""
+            description=f"""
             Execute a SPARQL query against a collection's RDF graph. This tool allows you to query the 
             semantic metadata of a collection using SPARQL syntax. The graph can be generated in different 
             formats: "croissant" or "OAI_ORE". Query results are returned as a list of dictionaries where 
             each dictionary represents a result row with variable names as keys. Use get_graph_summary first 
             to explore available classes and predicates before writing queries. Returns results in a TOON format.
+            
+            {self.base_url_instructions}
             """.strip(),
         )
 

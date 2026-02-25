@@ -90,8 +90,8 @@ def read_file(
     ],
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
-    ],
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
+    ] = None,
     ctx: Context = CurrentContext(),
 ) -> Union[ImageContent, List[TextContent], EmbeddedResource, TextContent]:
     """
@@ -209,7 +209,7 @@ def read_tabular(
     ] = None,
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
     ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:
@@ -280,7 +280,7 @@ def tabular_schema(
     ],
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
     ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:

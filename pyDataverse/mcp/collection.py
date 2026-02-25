@@ -17,8 +17,8 @@ def get_collection_metadata(
     ],
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
-    ],
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
+    ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:
     """
@@ -39,8 +39,8 @@ def list_content(
     ],
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
-    ],
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
+    ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:
     """
@@ -80,7 +80,7 @@ def get_graph_summary(
     depth: int = 3,
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
     ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:
@@ -130,7 +130,7 @@ def query_sparql(
     ] = 3,
     base_url: Annotated[
         Optional[str],
-        "The base URL of the dataverse to use. If not specified, the function will use the dataverse from the context.",
+        "The base URL of the dataverse to use. If not specified, the function will use the dataverse this MCP server is connected to by default.",
     ] = None,
     ctx: Context = CurrentContext(),
 ) -> str:
