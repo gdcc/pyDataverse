@@ -38,8 +38,36 @@ if TYPE_CHECKING:
     from .collection import Collection
     from .dataset import Dataset
 
-VERSION_PATTERN = re.compile(r"^v?(\d+)(?:\.\d+)*(?:-.*)?$")
+VERSION_PATTERN = re.compile(r"^v?(\d+)(?:\.\d+)*")
 MINIMUM_MAJOR_VERSION = 6
+
+
+def _extract_major_version(version_string: str) -> int:
+    """
+    Extract the major version from a Dataverse version string.
+
+    Supports canonical versions (e.g., ``6.10``, ``v6.10.1``, ``6.10.1-SNAPSHOT``)
+    and versions with trailing descriptors returned by some installations
+    (e.g., ``6.10 bugfixes``).
+
+    Args:
+        version_string: Raw version string returned by the Dataverse API.
+
+    Returns:
+        int: Parsed major version.
+
+    Raises:
+        ValueError: If the version string does not start with a valid version number.
+    """
+    match = VERSION_PATTERN.match(version_string.strip())
+
+    if match is None:
+        raise ValueError(
+            f"Unable to parse version string: {version_string}. "
+            "Expected to start with: vX.Y.Z, X.Y, X.Y.Z-SUFFIX, or X.Y <description>"
+        )
+
+    return int(match.group(1))
 
 # Used for autocomplete in the create_dataset method
 Subject = Literal[
@@ -183,17 +211,9 @@ class Dataverse(BaseModel):
             ValueError: If the Dataverse instance version is below the minimum required version.
         """
         version = self.native_api.get_info_version()
-        match = VERSION_PATTERN.match(version.version)
+        major_version = _extract_major_version(version.version)
 
-        if match is None:
-            raise ValueError(
-                f"Unable to parse version string: {version.version}. "
-                f"Expected format: vX.Y.Z or X.Y or X.Y.Z-SUFFIX"
-            )
-
-        major_version_str = match.group(1)
-
-        if int(major_version_str) < MINIMUM_MAJOR_VERSION:
+        if major_version < MINIMUM_MAJOR_VERSION:
             raise ValueError(
                 f"Dataverse version {version.version} is below the minimum required "
                 f"version {MINIMUM_MAJOR_VERSION}. Please upgrade your Dataverse instance."
