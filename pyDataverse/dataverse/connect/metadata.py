@@ -175,7 +175,6 @@ class MetadataBlockBase(
         fields = []
 
         for name, value in self:
-            print(name, value)
             if self._is_value_empty(value):
                 continue
             field_info = self._extract_info(name)
