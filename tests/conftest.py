@@ -19,6 +19,23 @@ from pyDataverse.models.dataset.create import DatasetCreateBody
 
 DatasetFactory = Callable[[], Dataset]
 CollectionFactory = Callable[[str], Collection]
+REQUIRED_TEST_ENV_VARS = ("BASE_URL", "API_TOKEN", "API_TOKEN_SUPERUSER")
+
+
+def _missing_required_test_env_vars() -> list[str]:
+    return [env_var for env_var in REQUIRED_TEST_ENV_VARS if not os.environ.get(env_var)]
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionstart(session):
+    missing_required = _missing_required_test_env_vars()
+    if missing_required:
+        raise pytest.UsageError(
+            "Missing required environment variables for integration tests: "
+            f"{', '.join(missing_required)}. "
+            "Set BASE_URL, API_TOKEN, and API_TOKEN_SUPERUSER to run the test suite "
+            "against a Dataverse instance."
+        )
 
 
 class Credentials(BaseModel):
@@ -36,13 +53,21 @@ def credentials():
     Returns:
         tuple: A tuple containing the base URL and API token.
     """
-    base_url = os.environ.get("BASE_URL", None)
-    api_token = os.environ.get("API_TOKEN", None)
-    api_token_superuser = os.environ.get("API_TOKEN_SUPERUSER", None)
+    base_url = os.environ.get("BASE_URL")
+    api_token = os.environ.get("API_TOKEN")
+    api_token_superuser = os.environ.get("API_TOKEN_SUPERUSER")
 
-    assert base_url is not None, "BASE_URL is not set"
-    assert api_token is not None, "API_TOKEN is not set"
-    assert api_token_superuser is not None, "API_TOKEN_SUPERUSER is not set"
+    missing_required = _missing_required_test_env_vars()
+    if missing_required:
+        pytest.fail(
+            "Missing required environment variables for integration tests: "
+            f"{', '.join(missing_required)}. "
+            "Set BASE_URL, API_TOKEN, and API_TOKEN_SUPERUSER to run against a "
+            "Dataverse instance."
+        )
+    assert base_url is not None
+    assert api_token is not None
+    assert api_token_superuser is not None
 
     return Credentials(
         base_url=base_url.rstrip("/"),
