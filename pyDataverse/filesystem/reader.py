@@ -1,232 +1,116 @@
-from io import IOBase
-from typing import Generic, Literal, Optional, TypeVar, Union, overload
+from typing import TYPE_CHECKING, Optional, Union
 
-from ..api import DataAccessApi
+from fsspec.spec import AbstractBufferedFile
 
-_ModeT = TypeVar("_ModeT", Literal["r"], Literal["rb"])
+if TYPE_CHECKING:
+    from .dvfs import DataverseFS
 
 
-class DataverseFileReader(IOBase, Generic[_ModeT]):
+class DataverseFileReader(AbstractBufferedFile):
     """
-    A read-only file-like object that streams content from Dataverse.
+    A read-only fsspec file object that streams content from Dataverse.
 
-    Wraps the Dataverse Data Access API streaming response, providing a
-    standard Python file interface. Data is fetched in chunks as needed,
-    making it memory-efficient for large files.
+    Built on :class:`fsspec.spec.AbstractBufferedFile`, so it supports the
+    full file protocol (``read``, ``seek``, iteration, context manager) while
+    only fetching the bytes that are actually requested. Random access is
+    served via HTTP Range requests against the Data Access API, so seeking
+    backwards or reading a slice never downloads the whole file.
 
     Example:
-        >>> reader = DataverseFileReader(data_access_api, file_identifier=12345)
-        >>> with reader:
-        ...     data = reader.read(1024)
-        ...     rest = reader.read()
-        >>> # Use slice notation to read specific byte ranges
-        >>> with reader:
-        ...     chunk = reader[100:1000]  # Read bytes 100-1000
+        >>> with fs.open("data/file.csv", "rb") as f:
+        ...     header = f.read(1024)
+        ...     f.seek(0)
+        >>> # Slice notation reads an explicit byte range
+        >>> with fs.open("data/file.csv", "rb") as f:
+        ...     chunk = f[100:1000]
     """
 
     def __init__(
         self,
-        data_access_api: DataAccessApi,
-        file_identifier: str | int,
-        mode: Literal["r", "rb"] = "r",
+        fs: "DataverseFS",
+        path: str,
+        file_identifier: Union[str, int],
+        size: Optional[int] = None,
+        block_size: Union[int, str] = "default",
+        cache_type: str = "readahead",
+        cache_options: Optional[dict] = None,
+        **kwargs,
     ):
         """
         Initialize a reader for a Dataverse file.
 
         Args:
-            data_access_api: API instance for accessing file data
-            file_identifier: Database ID or persistent ID of the file
-            mode: File mode. Supported modes:
-                - 'r', 'rb': Read (default)
-
-        Raises:
-            ValueError: If an invalid mode is provided
+            fs: The owning DataverseFS instance.
+            path: Path to the file within the dataset.
+            file_identifier: Database ID or persistent ID of the file.
+            size: Optional known file size, to avoid an extra metadata lookup.
+            block_size: Read-ahead block size ("default" for the fsspec default).
+            cache_type: fsspec read cache policy.
+            cache_options: Additional options for the read cache.
         """
-
-        self.api = data_access_api
+        self.data_access_api = fs.data_access_api
         self.file_identifier = file_identifier
-        self._mode = mode
+        super().__init__(
+            fs,
+            path,
+            mode="rb",
+            block_size=block_size,
+            cache_type=cache_type,
+            cache_options=cache_options,
+            size=size,
+            **kwargs,
+        )
 
-        self._stream_context = None
-        self._chunk_iterator = None
-        self._buffer = b""
-        self._closed = False
+    def _fetch_range(self, start: int, end: int) -> bytes:
+        """Fetch a byte range ``[start, end)`` via a Range request.
 
-    def _initialize_stream(self):
-        """Open the streaming connection to Dataverse on first read."""
-        if self._stream_context is None:
-            self._stream_context = self.api.stream_datafile(self.file_identifier)
-            response = self._stream_context.__enter__()
-            self._chunk_iterator = response.iter_bytes(chunk_size=8192)
-
-    def _decode_bytes(self, data: bytes) -> str:
-        """Decode bytes to string with UTF-8 fallback to latin-1."""
-        try:
-            return data.decode("utf-8")
-        except UnicodeDecodeError:
-            return data.decode("latin-1")
-
-    def _read_bytes(self, size: int = -1) -> bytes:
-        """Read bytes from the stream."""
-        if self._chunk_iterator is None:
+        fsspec uses an exclusive ``end``, whereas the Data Access API Range
+        header is inclusive, hence ``range_end=end - 1``.
+        """
+        if end <= start:
             return b""
 
-        if size == -1:
-            chunks = [self._buffer]
-            try:
-                while True:
-                    chunks.append(next(self._chunk_iterator))
-            except StopIteration:
-                pass
-            result = b"".join(chunks)
-            self._buffer = b""
-            return result
-
-        while len(self._buffer) < size:
-            try:
-                self._buffer += next(self._chunk_iterator)
-            except StopIteration:
-                break
-
-        result = self._buffer[:size]
-        self._buffer = self._buffer[size:]
-        return result
-
-    def _read_range(self, start: int, end: Optional[int]) -> bytes:
-        """Read a specific byte range using Range header."""
-        if self._closed:
-            raise ValueError("Cannot read from closed file")
-
-        # Create a new stream context for this range request
-        with self.api.stream_datafile(
+        with self.data_access_api.stream_datafile(
             self.file_identifier,
             range_start=start,
-            range_end=end,
+            range_end=end - 1,
         ) as response:
-            # Read all data from the range response
-            result = b""
-            for chunk in response.iter_bytes():
-                result += chunk
+            return b"".join(response.iter_bytes())
 
-        return result
-
-    def __getitem__(self, key: Union[int, slice]) -> Union[bytes, str]:
+    def __getitem__(self, key: Union[int, slice]) -> bytes:
         """
-        Support slice notation for reading byte ranges.
-
-        Args:
-            key: Integer index or slice object (e.g., [100:1000])
-
-        Returns:
-            Bytes (for 'rb' mode) or string (for 'r' mode) from the specified range
+        Read a byte range using indexing/slice notation.
 
         Examples:
-            >>> f[100:1000]  # Read bytes 100-1000
-            >>> f[100:]      # Read from byte 100 to end
-            >>> f[:1000]     # Read first 1000 bytes
-            >>> f[100]       # Read single byte at position 100
+            >>> f[100:1000]  # bytes 100-999
+            >>> f[100:]      # byte 100 to end
+            >>> f[:1000]     # first 1000 bytes
+            >>> f[100]       # single byte at position 100
         """
-        if self._closed:
+        if self.closed:
             raise ValueError("Cannot read from closed file")
 
         if isinstance(key, int):
-            # Single byte access: read one byte
-            data = self._read_range(key, key)
-            if len(data) == 0:
+            data = self._fetch_range(key, key + 1)
+            if not data:
                 raise IndexError("Index out of range")
-            result = data[0:1]
-        elif isinstance(key, slice):
-            # Slice access
+            return data
+
+        if isinstance(key, slice):
+            if key.step not in (None, 1):
+                raise ValueError("Slice steps other than 1 are not supported")
+
             start = key.start if key.start is not None else 0
             stop = key.stop
 
-            # Handle negative indices (would require knowing file size)
             if start < 0 or (stop is not None and stop < 0):
                 raise NotImplementedError(
-                    "Negative indices require file size information. "
-                    "Use positive indices or read the file first."
+                    "Negative indices are not supported; use positive indices."
                 )
 
-            # Read the range
-            data = self._read_range(start, stop)
-            result = data
-        else:
-            raise TypeError(f"Invalid key type: {type(key)}")
+            if stop is None:
+                stop = self.size
 
-        # Decode if in text mode
-        if self._mode == "r":
-            return self._decode_bytes(result)
-        return result
+            return self._fetch_range(start, stop)
 
-    def readable(self) -> bool:
-        return not self._closed
-
-    def writable(self) -> bool:
-        return False
-
-    @overload
-    def read(self: "DataverseFileReader[Literal['rb']]", size: int = -1) -> bytes:
-        """
-        Read bytes when in 'rb' mode.
-
-        Returns:
-            bytes: The file content as bytes
-        """
-        ...
-
-    @overload
-    def read(self: "DataverseFileReader[Literal['r']]", size: int = -1) -> str:
-        """
-        Read string when in 'r' mode.
-
-        Returns:
-            str: The file content as a decoded string
-        """
-        ...
-
-    def read(
-        self,
-        size: int = -1,
-    ) -> Union[bytes, str]:
-        """
-        Read data from the Dataverse file.
-
-        Args:
-            size: Number of bytes/characters to read. -1 reads all remaining data.
-
-        Returns:
-            Bytes (for 'rb' mode) or string (for 'r' mode) read from the file
-        """
-        if self._closed:
-            raise ValueError("Cannot read from closed file")
-
-        self._initialize_stream()
-
-        if self._chunk_iterator is None:
-            return b"" if self._mode == "rb" else ""
-
-        result = self._read_bytes(size)
-
-        if self._mode == "r":
-            return self._decode_bytes(result)
-        return result
-
-    def close(self):
-        """Close the streaming connection to Dataverse."""
-        if self._closed:
-            return
-
-        if self._stream_context is not None:
-            self._stream_context.__exit__(None, None, None)
-        self._closed = True
-
-    @property
-    def closed(self) -> bool:
-        return self._closed
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
+        raise TypeError(f"Invalid key type: {type(key)}")

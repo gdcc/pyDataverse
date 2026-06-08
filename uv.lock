@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10, <4.0"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -738,6 +738,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/1d/65/ce7f1b70157833bf3cb851b556a37d4547ceafc158aa9b34b36782f23696/filelock-3.20.3.tar.gz", hash = "sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1", size = 19485, upload-time = "2026-01-09T17:55:05.421Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b5/36/7fb70f04bf00bc646cd5bb45aa9eddb15e19437a28b8fb2b4a5249fac770/filelock-3.20.3-py3-none-any.whl", hash = "sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1", size = 16701, upload-time = "2026-01-09T17:55:04.334Z" },
+]
+
+[[package]]
+name = "fsspec"
+version = "2026.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/8d/1c51c094345df128ca4a990d633fe1a0ff28726c9e6b3c41ba65087bba1d/fsspec-2026.4.0.tar.gz", hash = "sha256:301d8ac70ae90ef3ad05dcf94d6c3754a097f9b5fe4667d2787aa359ec7df7e4", size = 312760, upload-time = "2026-04-29T20:42:38.635Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d5/0c/043d5e551459da400957a1395e0febbf771446ff34291afcbe3d8be2a279/fsspec-2026.4.0-py3-none-any.whl", hash = "sha256:11ef7bb35dab8a394fde6e608221d5cf3e8499401c249bebaeaad760a1a8dec2", size = 203402, upload-time = "2026-04-29T20:42:36.842Z" },
 ]
 
 [[package]]
@@ -1920,6 +1929,7 @@ dependencies = [
     { name = "bigtree" },
     { name = "cachetools" },
     { name = "deprecation" },
+    { name = "fsspec" },
     { name = "httpx" },
     { name = "nest-asyncio" },
     { name = "pandas" },
@@ -1957,6 +1967,7 @@ requires-dist = [
     { name = "cachetools", specifier = ">=6.2.1,<7.0.0" },
     { name = "deprecation", specifier = ">=2.1.0,<3.0.0" },
     { name = "fastmcp", marker = "extra == 'mcp'", specifier = ">=2.14.5,<3.0.0" },
+    { name = "fsspec", specifier = ">=2026.4.0" },
     { name = "httpx", specifier = ">=0.28.0,<0.30.0" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.26.0,<2.0.0" },
     { name = "nbconvert", marker = "extra == 'mcp'", specifier = ">=7.17.0,<8.0.0" },

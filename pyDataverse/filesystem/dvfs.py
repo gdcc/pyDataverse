@@ -1,8 +1,9 @@
-from typing import Any, Dict, List, Literal, Optional, Set, Union, overload
+from typing import Any, Dict, List, Literal, Optional, Union, overload
 from urllib.parse import parse_qs, urlparse
 
 import pandas as pd
 from cachetools import TTLCache
+from fsspec.spec import AbstractFileSystem
 from typing_extensions import Self
 
 from pyDataverse.models.file import update
@@ -21,13 +22,18 @@ class Info(DataFile):
         return self.model_dump()
 
 
-class DataverseFS:
+class DataverseFS(AbstractFileSystem):
     """
-    A PyFilesystem2 implementation for Dataverse datasets.
+    An fsspec filesystem implementation for Dataverse datasets.
 
-    Provides filesystem-like access to Dataverse datasets, allowing you to
-    browse, read, write, and manage files within a dataset using standard
-    filesystem operations.
+    Provides filesystem-like access to a single Dataverse dataset version,
+    allowing you to browse, read, write, and manage files using the standard
+    fsspec interface (``ls``, ``info``, ``open``, ``cat``, ``rm``, ...) as well
+    as a set of Dataverse-specific convenience helpers (``open_tabular``,
+    ``stream_tabular``).
+
+    Reads stream lazily via HTTP Range requests, and writes stream to Dataverse
+    in bounded chunks, so neither path holds an entire file in memory.
 
     Attributes:
         base_url: The base URL of the Dataverse instance
@@ -51,14 +57,18 @@ class DataverseFS:
         ... )
         >>>
         >>> # Read a file
-        >>> with fs.openbin("data/file.csv", "rb") as f:
+        >>> with fs.open("data/file.csv", "rb") as f:
         ...     data = f.read()
         >>>
         >>> # Write a file
-        >>> with fs.openbin("data/newfile.csv", "wb") as f:
+        >>> with fs.open("data/newfile.csv", "wb") as f:
         ...     f.write(b"column1,column2\\n")
         ...     f.write(b"value1,value2\\n")
     """
+
+    protocol = "dataverse"
+    # Each dataset gets its own instance; do not share via fsspec's cache.
+    cachable = False
 
     def __init__(
         self,
@@ -71,6 +81,7 @@ class DataverseFS:
         cache_ttl: int = 60,
         native_api: Optional[NativeApi] = None,
         data_access_api: Optional[DataAccessApi] = None,
+        **kwargs,
     ):
         """
         Initialize a DataverseFS instance.
@@ -86,8 +97,9 @@ class DataverseFS:
             cache_ttl: Cache TTL in seconds (default: 60, set to 0 to disable)
             native_api: Optional existing NativeApi instance to reuse
             data_access_api: Optional existing DataAccessApi instance to reuse
+            **kwargs: Forwarded to fsspec's AbstractFileSystem.
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.base_url = base_url
         self.identifier = identifier
@@ -100,6 +112,57 @@ class DataverseFS:
             self.native_api
         )
         self._cache = TTLCache(maxsize=1, ttl=cache_ttl) if cache_ttl > 0 else {}
+
+    @classmethod
+    def _strip_protocol(cls, path: str) -> str:
+        """Normalize an input to a dataset-relative, slash-trimmed file path.
+
+        Accepts either a plain relative path (e.g. ``data/file.csv``) or a full
+        ``dataverse://host/data/file.csv?persistentId=...`` URL, in which case
+        only the in-dataset file path is returned (the connection details live
+        in the query string and are handled by ``_get_kwargs_from_urls``).
+        """
+        if isinstance(path, (list, tuple)):
+            return [cls._strip_protocol(p) for p in path]  # type: ignore[return-value]
+        path = str(path)
+        if "://" in path:
+            return urlparse(path).path.strip("/")
+        return path.strip("/")
+
+    @staticmethod
+    def _get_kwargs_from_urls(url: str) -> Dict[str, Any]:
+        """Extract constructor kwargs from a ``dataverse://`` URL.
+
+        Recognized URL form::
+
+            dataverse://<host>/<file/path>?persistentId=doi:...&version=:latest
+            dataverse://<host>/<file/path>?id=12345
+
+        The scheme defaults to ``https`` and can be overridden with a
+        ``?scheme=http`` query parameter. The API token is *not* read from the
+        URL; pass it via ``storage_options={"api_token": ...}``.
+        """
+        parsed = urlparse(url)
+        kwargs: Dict[str, Any] = {}
+
+        if not parsed.netloc:
+            return kwargs
+
+        params = parse_qs(parsed.query)
+        scheme = params.get("scheme", ["https"])[0]
+        kwargs["base_url"] = f"{scheme}://{parsed.netloc}"
+
+        persistent_id = params.get("persistentId", [None])[0]
+        id_param = params.get("id", [None])[0]
+        if persistent_id:
+            kwargs["identifier"] = persistent_id
+        elif id_param:
+            kwargs["identifier"] = int(id_param)
+
+        if "version" in params:
+            kwargs["version"] = params["version"][0]
+
+        return kwargs
 
     @classmethod
     def from_url(cls, url: str, api_token: Optional[str] = None) -> Self:
@@ -164,9 +227,157 @@ class DataverseFS:
             api_token=api_token,
         )
 
+    # ------------------------------------------------------------------
+    # fsspec interface
+    # ------------------------------------------------------------------
+
+    def info(self, path: str, **kwargs) -> Dict[str, Any]:
+        """
+        Return an fsspec info dict for a file or (implicit) directory.
+
+        Args:
+            path: Path within the dataset ("" or "/" for the root).
+
+        Returns:
+            Dict with at least ``name``, ``size`` and ``type`` keys. Files also
+            carry ``id`` and ``content_type``.
+
+        Raises:
+            FileNotFoundError: If no file or directory matches the path.
+        """
+        path = self._strip_protocol(path)
+
+        if path == "":
+            return {"name": "", "size": 0, "type": "directory"}
+
+        dataset = self._get_dataset()
+        prefix = f"{path}/"
+        is_dir = False
+
+        for file in dataset.files or []:
+            full = self._build_file_path(file)
+            if full == path:
+                return self._file_info(path, file)
+            if full.startswith(prefix):
+                is_dir = True
+
+        if is_dir:
+            return {"name": path, "size": 0, "type": "directory"}
+
+        raise FileNotFoundError(f"File not found: {path}")
+
+    def ls(
+        self, path: str, detail: bool = True, **kwargs
+    ) -> Union[List[Dict[str, Any]], List[str]]:
+        """
+        List the immediate children of a path.
+
+        Args:
+            path: Directory path ("" or "/" for the root). If ``path`` points
+                at a file, a single-entry listing for that file is returned
+                (standard fsspec behavior).
+            detail: If True, return info dicts; if False, return path strings.
+
+        Returns:
+            List of info dicts (or names) for the immediate children.
+
+        Raises:
+            FileNotFoundError: If the path does not exist.
+        """
+        path = self._strip_protocol(path)
+
+        info = self.info(path)
+        if info["type"] == "file":
+            return [info] if detail else [info["name"]]
+
+        dataset = self._get_dataset()
+        prefix = f"{path}/" if path else ""
+
+        entries: Dict[str, Dict[str, Any]] = {}
+        for file in dataset.files or []:
+            full = self._build_file_path(file)
+            if prefix and not full.startswith(prefix):
+                continue
+
+            remainder = full[len(prefix) :] if prefix else full
+            if not remainder:
+                continue
+
+            head, _, rest = remainder.partition("/")
+            child = prefix + head
+
+            if rest:
+                entries.setdefault(
+                    child, {"name": child, "size": 0, "type": "directory"}
+                )
+            else:
+                entries[child] = self._file_info(child, file)
+
+        result = [entries[key] for key in sorted(entries)]
+        return result if detail else [entry["name"] for entry in result]
+
+    def _open(
+        self,
+        path: str,
+        mode: str = "rb",
+        block_size: Optional[int] = None,
+        autocommit: bool = True,
+        cache_options: Optional[dict] = None,
+        metadata: Optional[UploadBody] = None,
+        **kwargs,
+    ) -> Union[DataverseFileReader, DataverseFileWriter]:
+        """fsspec hook returning a binary file object (see ``open``)."""
+        path = self._strip_protocol(path)
+        block = block_size if block_size is not None else "default"
+
+        if mode in ("rb", "r"):
+            file = self._find_file(path)
+            if file.data_file is None or file.data_file.id is None:
+                raise ValueError(f"File '{path}' has no file ID")
+            return DataverseFileReader(
+                self,
+                path,
+                file_identifier=file.data_file.id,
+                size=file.data_file.filesize,
+                block_size=block,
+                cache_options=cache_options,
+            )
+
+        if mode in ("wb", "w"):
+            self._cache.clear()
+            return DataverseFileWriter(
+                self,
+                path,
+                metadata=metadata,
+                block_size=block,
+            )
+
+        raise ValueError(
+            f"Invalid mode '{mode}'. Supported modes: 'r', 'rb', 'w', 'wb'"
+        )
+
+    def _rm(self, path: str) -> None:
+        """fsspec hook to delete a single file."""
+        self.remove(path)
+
+    def invalidate_cache(self, path: Optional[str] = None) -> None:
+        """Clear cached dataset metadata in addition to fsspec's dir cache."""
+        self._cache.clear()
+        super().invalidate_cache(path)
+
+    def mkdir(self, path: str, create_parents: bool = True, **kwargs) -> None:
+        """No-op: Dataverse directories are implicit in file paths."""
+
+    def makedirs(self, path: str, exist_ok: bool = False) -> None:
+        """No-op: Dataverse directories are implicit in file paths."""
+
+    # ------------------------------------------------------------------
+    # Dataverse-specific / legacy convenience API
+    # ------------------------------------------------------------------
+
     def getinfo(self, path: str, namespace: Optional[str] = None) -> Info:
         """
-        Get information about a file.
+        Get rich Dataverse metadata about a file.
 
         Args:
             path: Path to the file (e.g., "data/file.csv")
@@ -179,9 +390,8 @@ class DataverseFS:
             FileNotFoundError: If file doesn't exist
 
         Example:
-            >>> fs = DataverseFS(base_url="...", identifier="...")
             >>> info = fs.getinfo("data/myfile.csv")
-            >>> print(info.size)
+            >>> print(info.filesize)
         """
         file = self._find_file(path)
 
@@ -192,41 +402,22 @@ class DataverseFS:
 
     def listdir(self, path: str) -> List[str]:
         """
-        List immediate children (files and directories) at a given path.
+        List immediate child names (files and directories) at a path.
 
         Args:
-            path: Directory path to list (e.g., "/" or "" for root, "dir1/dir2" for subdirectory)
+            path: Directory path to list ("/" or "" for root)
 
         Returns:
-            Sorted list of immediate children names
+            Sorted list of immediate child names
 
         Example:
-            >>> fs = DataverseFS(base_url="...", identifier="...")
-            >>> fs.listdir("/")  # List root directory
+            >>> fs.listdir("/")
             ['data', 'README.txt']
-            >>> fs.listdir("data")  # List subdirectory
+            >>> fs.listdir("data")
             ['file1.csv', 'file2.csv']
         """
-        dataset = self._get_dataset()
-        path = path.strip("/")
-
-        children: Set[str] = set()
-
-        assert dataset.files is not None
-
-        for file in dataset.files:
-            file_path = self._build_file_path(file)
-
-            if not path:
-                children.add(file_path.split("/")[0])
-                continue
-
-            if file_path.startswith(path + "/"):
-                relative_path = file_path[len(path) + 1 :]
-                immediate_child = relative_path.split("/")[0]
-                children.add(immediate_child)
-
-        return sorted(children)
+        names = self.ls(path, detail=False)
+        return sorted(name.split("/")[-1] for name in names)  # type: ignore[union-attr]
 
     def makedir(
         self, path: str, permissions: Optional[int] = None, recreate: bool = False
@@ -236,11 +427,6 @@ class DataverseFS:
 
         Note: Directories in Dataverse are implicit (based on file paths).
         This operation is not supported as a standalone action.
-
-        Args:
-            path: Directory path to create
-            permissions: Permissions (ignored)
-            recreate: Whether to recreate if exists (ignored)
 
         Raises:
             NotImplementedError: Always raised (directories are implicit)
@@ -274,122 +460,30 @@ class DataverseFS:
         mode: Literal["r", "rb", "w", "wb"] = "r",
         buffering: int = -1,
         metadata: Optional[UploadBody] = None,
-    ) -> Union[DataverseFileReader, DataverseFileWriter]:
+    ):
         """
-        Open a file in binary mode.
+        Open a file. ``r``/``w`` return text streams, ``rb``/``wb`` binary.
 
         Args:
             path: Path to the file in the dataset
-            mode: File mode. Supported modes:
-                - 'r', 'rb': Read (default)
-                - 'w', 'wb': Write (creates new file or replaces existing)
-            buffering: Buffering policy (ignored)
-            **metadata: File metadata
+            mode: 'r'/'rb' to read (default), 'w'/'wb' to create or replace
+            buffering: Accepted for compatibility (ignored)
+            metadata: Optional upload metadata (write mode only)
 
         Returns:
-            DataverseFileReader or DataverseFileWriter: File-like object
-
-        Raises:
-            FileNotFoundError: If file doesn't exist (read mode)
-            ValueError: If file has no ID (read mode) or invalid mode
+            A readable or writable file-like object.
 
         Example:
-            >>> # Read a file
-            >>> fs = DataverseFS(base_url="...", identifier="...")
             >>> with fs.openbin("data/file.csv") as f:
             ...     content = f.read()
-            >>>
-            >>> # Write a new file or replace existing
             >>> with fs.openbin("data/newfile.csv", mode="wb") as f:
             ...     f.write(b"data")
         """
-        if mode in ("r", "rb"):
-            return self._openbin_read(path, mode=mode)
-        elif mode in ("w", "wb"):
-            return self._openbin_write(path, metadata=metadata)
-        else:
+        if mode not in ("r", "rb", "w", "wb"):
             raise ValueError(
                 f"Invalid mode '{mode}'. Supported modes: 'r', 'rb', 'w', 'wb'"
             )
-
-    def _openbin_read(
-        self,
-        path: str,
-        mode: Literal["r", "rb"] = "r",
-    ) -> DataverseFileReader:
-        """
-        Open a file for reading.
-
-        Args:
-            path: Path to the file in the dataset
-
-        Returns:
-            DataverseFileReader: File-like object for reading
-
-        Raises:
-            FileNotFoundError: If file doesn't exist
-            ValueError: If file has no ID
-        """
-        file = self._find_file(path)
-
-        if file.data_file is None or file.data_file.id is None:
-            raise ValueError(f"File '{path}' has no file ID")
-
-        return DataverseFileReader(self.data_access_api, file.data_file.id, mode=mode)
-
-    def _openbin_write(
-        self,
-        path: str,
-        metadata: Optional[UploadBody] = None,
-    ) -> DataverseFileWriter:
-        """
-        Open a file for writing.
-
-        Creates a new file or replaces an existing one.
-
-        Args:
-            path: Path to the file in the dataset
-            **options: Additional options, may include 'metadata' dict
-
-        Returns:
-            DataverseFileWriter: File-like object for writing
-        """
-        path = path.strip("/")
-
-        # Split path into directory and filename
-        if "/" in path:
-            directory_label, label = path.rsplit("/", 1)
-        else:
-            directory_label = ""
-            label = path
-
-        if metadata is None:
-            metadata = UploadBody(
-                directory_label=directory_label if directory_label else None,
-                filename=label,
-            )
-
-        # Check if file exists to get its ID for replacement
-        file_id = None
-        try:
-            existing_file = self._find_file(path)
-            if existing_file.data_file:
-                file_id = existing_file.data_file.id
-        except FileNotFoundError:
-            pass
-
-        # Create writer (replaces file if it exists)
-        writer = DataverseFileWriter(
-            native_api=self.native_api,
-            ds_identifier=self.identifier,
-            metadata=metadata,
-            file_identifier=file_id,
-        )
-
-        # Clear cache to ensure fresh data on next read
-        self._cache.clear()
-
-        return writer
+        return self.open(path, mode=mode, metadata=metadata)
 
     def stream_tabular(
         self,
@@ -425,21 +519,8 @@ class DataverseFS:
             pd.DataFrame: Chunked DataFrame for each portion of the file.
 
         Example:
-            >>> # CSV with header (default)
-            >>> for chunk in fs.stream_tabular("data/file.csv"):
-            ...     print(chunk.columns)  # Uses first row as column names
-            >>>
-            >>> # CSV without header
-            >>> for chunk in fs.stream_tabular("data/file.csv", no_header=True):
-            ...     print(chunk.columns)  # Uses integer column names (0, 1, 2, ...)
-            >>>
-            >>> # Using pandas kwargs
-            >>> for chunk in fs.stream_tabular(
-            ...     "data/file.csv",
-            ...     usecols=[0, 1, 2],
-            ...     dtype={"col1": str, "col2": int},
-            ... ):
-            ...     process(chunk)
+            >>> for chunk in fs.stream_tabular("data/file.csv", api_token=None):
+            ...     print(chunk.columns)
         """
         download_link = self._get_tabular_download_link(path)
 
@@ -486,7 +567,7 @@ class DataverseFS:
 
         Args:
             path: Path to the file.
-            sep: Delimiter to use. Default is ",".
+            api_token: Optional Dataverse API token for authenticated access.
             no_header: If True, the file has no header row. Column names will
                 be integers (0, 1, 2, ...). Default is False.
             **kwargs: Additional keyword arguments passed to pandas.read_csv().
@@ -505,23 +586,7 @@ class DataverseFS:
             pd.DataFrame: The loaded DataFrame.
 
         Example:
-            >>> # CSV with header (default)
-            >>> df = fs.open_tabular("data/file.csv")
-            >>> print(df.columns)  # Uses first row as column names
-            >>>
-            >>> # CSV without header
-            >>> df = fs.open_tabular("data/file.csv", no_header=True)
-            >>> print(df.columns)  # Uses integer column names (0, 1, 2, ...)
-            >>> # Optionally rename columns after loading
-            >>> df.columns = ["col1", "col2", "col3"]
-            >>>
-            >>> # Using pandas kwargs
-            >>> df = fs.open_tabular(
-            ...     "data/file.csv",
-            ...     usecols=["col1", "col2"],
-            ...     dtype={"col1": str, "col2": int},
-            ...     na_values=["N/A", "null"],
-            ... )
+            >>> df = fs.open_tabular("data/file.csv", api_token=None)
         """
         download_link = self._get_tabular_download_link(path)
 
@@ -596,7 +661,6 @@ class DataverseFS:
             ValueError: If file has no ID
 
         Example:
-            >>> fs = DataverseFS(base_url="...", identifier="...", api_token="...")
             >>> fs.remove("data/old_file.csv")
         """
         file = self._find_file(path)
@@ -613,9 +677,6 @@ class DataverseFS:
 
         Note: Directories in Dataverse are implicit and cannot be deleted directly.
         Files must be removed individually.
-
-        Args:
-            path: Directory path to remove
 
         Raises:
             NotImplementedError: Always raised (directories cannot be deleted)
@@ -639,7 +700,6 @@ class DataverseFS:
 
         Example:
             >>> from pyDataverse.models.file.filemeta import UploadBody
-            >>> fs = DataverseFS(base_url="...", identifier="...", api_token="...")
             >>> metadata = UploadBody(description="Updated description")
             >>> fs.setinfo("data/file.csv", metadata)
         """
@@ -650,6 +710,10 @@ class DataverseFS:
 
         self.native_api.update_datafile_metadata(file.data_file.id, metadata=info)
         self._cache.clear()
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
 
     def _get_dataset(self) -> GetDatasetResponse:
         """Fetch dataset metadata from Dataverse."""
@@ -671,10 +735,26 @@ class DataverseFS:
         """Build full path for a file from its metadata."""
         return "/".join(filter(None, [file.directory_label, file.label]))
 
+    @staticmethod
+    def _file_info(name: str, file: File) -> Dict[str, Any]:
+        """Build an fsspec info dict for a file entry."""
+        data_file = file.data_file
+        return {
+            "name": name,
+            "size": data_file.filesize
+            if data_file is not None and data_file.filesize is not None
+            else 0,
+            "type": "file",
+            "id": data_file.id if data_file is not None else None,
+            "content_type": data_file.content_type
+            if data_file is not None
+            else None,
+        }
+
     def _find_file(self, path: str) -> File:
         """Find a file by its path in the dataset."""
         dataset = self._get_dataset()
-        path = path.strip("/")
+        path = self._strip_protocol(path)
 
         assert dataset.files is not None
 
