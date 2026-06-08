@@ -45,6 +45,7 @@ class File(ContentBase):
     )
     dataset: Dataset = Field(exclude=True, repr=False)
     _inner_df: Optional[pd.DataFrame] = PrivateAttr(default=None)
+    _metadata: Optional[FileInfo] = PrivateAttr(default=None)
 
     @property
     def id(self) -> int:
@@ -75,12 +76,17 @@ class File(ContentBase):
     @property
     def metadata(self) -> FileInfo:
         """
-        Returns the full FileInfo metadata for this file by querying the native Dataverse API.
+        Returns the full FileInfo metadata for this file.
+
+        Fetched from the native Dataverse API on first access and cached
+        thereafter (or pre-populated by the parent dataset listing).
 
         Returns:
             FileInfo: Metadata object describing this file.
         """
-        return self.native_api.get_datafile_metadata(self.identifier)
+        if self._metadata is None:
+            self._metadata = self.native_api.get_datafile_metadata(self.identifier)
+        return self._metadata
 
     @computed_field
     @property
@@ -223,10 +229,14 @@ class File(ContentBase):
             restrict=restrict,
         )
 
-        return self.native_api.update_datafile_metadata(
+        result = self.native_api.update_datafile_metadata(
             identifier=self.identifier,
             metadata=metadata,
         )
+
+        self._metadata = None  # drop stale cache
+
+        return result
 
     def open_in_browser(self) -> None:
         """
@@ -356,6 +366,8 @@ class File(ContentBase):
         )
 
         rich.print(f"Replaced {self.path} with {file}")
+
+        self._metadata = None  # drop stale cache
 
     def delete(self) -> None:
         """

@@ -41,6 +41,20 @@ if TYPE_CHECKING:
 VERSION_PATTERN = re.compile(r"^v?(\d+)(?:\.\d+)*")
 MINIMUM_MAJOR_VERSION = 6
 
+_PID_URL_PREFIXES = {"doi": "https://doi.org/", "hdl": "https://hdl.handle.net/"}
+
+
+def _persistent_url_from_pid(persistent_id: Optional[str]) -> Optional[str]:
+    """Build a dataset's resolver URL from its persistent identifier.
+
+    Returns ``None`` for missing or unrecognized identifier schemes.
+    """
+    if not persistent_id or ":" not in persistent_id:
+        return None
+    scheme, _, rest = persistent_id.partition(":")
+    prefix = _PID_URL_PREFIXES.get(scheme.lower())
+    return f"{prefix}{rest}" if prefix else None
+
 
 def _extract_major_version(version_string: str) -> int:
     """
@@ -68,6 +82,7 @@ def _extract_major_version(version_string: str) -> int:
         )
 
     return int(match.group(1))
+
 
 # Used for autocomplete in the create_dataset method
 Subject = Literal[
@@ -151,6 +166,7 @@ class Dataverse(BaseModel):
     _search_api: Optional[SearchApi] = PrivateAttr(default=None)
     _factory_lock: threading.Lock = PrivateAttr(default_factory=threading.Lock)
     _factory_initialized: bool = PrivateAttr(default=False)
+    _api_version_checked: bool = PrivateAttr(default=False)
 
     @model_validator(mode="after")
     def _setup_api(self) -> Self:
@@ -210,6 +226,9 @@ class Dataverse(BaseModel):
         Raises:
             ValueError: If the Dataverse instance version is below the minimum required version.
         """
+        if self._api_version_checked:
+            return
+
         version = self.native_api.get_info_version()
         major_version = _extract_major_version(version.version)
 
@@ -218,6 +237,8 @@ class Dataverse(BaseModel):
                 f"Dataverse version {version.version} is below the minimum required "
                 f"version {MINIMUM_MAJOR_VERSION}. Please upgrade your Dataverse instance."
             )
+
+        self._api_version_checked = True
 
     @property
     def native_api(self) -> NativeApi:
@@ -571,9 +592,9 @@ class Dataverse(BaseModel):
         )
 
         if upload_to_collection:
-            assert collection is not None, (
-                "Collection is required to upload to a collection"
-            )
+            assert (
+                collection is not None
+            ), "Collection is required to upload to a collection"
             dataset.upload_to_collection(collection)
             dataset.refresh()
 
@@ -734,14 +755,13 @@ class Dataverse(BaseModel):
         Returns:
             Dataset: A Dataset instance with metadata blocks populated from the server.
         """
-        # Fetch dataset and persistent URL in parallel
-        dataset, persistent_url = asyncio.run(
-            self._fetch_dataset_and_url(identifier, version)
-        )
+        dataset = self.native_api.get_dataset(identifier, version)
 
         nu_dataset = self._internal_create_blank_dataset()
         nu_dataset.version = version
-        nu_dataset.persistent_url = persistent_url
+        nu_dataset.persistent_url = _persistent_url_from_pid(
+            dataset.dataset_persistent_id
+        )
 
         nu_dataset.identifier = dataset.dataset_id
         nu_dataset.persistent_identifier = dataset.dataset_persistent_id
@@ -750,37 +770,6 @@ class Dataverse(BaseModel):
             nu_dataset.license = dataset.license.name
 
         return nu_dataset.from_dataverse_dict(dataset)
-
-    async def _fetch_dataset_and_url(
-        self,
-        identifier: Union[str, int],
-        version: Union[Literal[":latest", ":latest-published", ":draft"], str],
-    ) -> tuple[edit_get.GetDatasetResponse, str]:
-        """
-        Fetch dataset metadata and persistent URL in parallel using asyncify.
-
-        This internal helper method uses `asyncer.asyncify` to convert synchronous
-        API calls to async functions, then executes them concurrently using
-        `asyncio.gather` for improved performance.
-
-        Args:
-            identifier: Dataset identifier - either a persistent ID or numeric database ID.
-            version: Version to retrieve (e.g., `:latest`, `:latest-published`, `:draft`, or specific version).
-
-        Returns:
-            tuple: A tuple containing (dataset_response, persistent_url) where:
-                - dataset_response: GetDatasetResponse object with dataset metadata
-                - persistent_url: Optional[str] containing the persistent URL for the dataset
-        """
-        fetch_dataset = asyncify(self.native_api.get_dataset)
-        fetch_persistent_url = asyncify(self.native_api.get_dataset_persistent_url)
-
-        dataset, persistent_url = await asyncio.gather(
-            fetch_dataset(identifier, version),
-            fetch_persistent_url(identifier),
-        )
-
-        return dataset, persistent_url
 
     def fetch_collection(
         self,

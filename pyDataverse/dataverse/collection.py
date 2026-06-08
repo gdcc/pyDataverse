@@ -15,7 +15,7 @@ from typing import (
 
 import pandas as pd
 from asyncer import asyncify
-from pydantic import Field
+from pydantic import Field, PrivateAttr
 from rdflib import BNode, Graph
 from rich.progress import Progress
 from typing_extensions import TypedDict
@@ -143,6 +143,8 @@ class Collection(ContentBase):
         description="The identifier of the collection."
     )
 
+    _metadata: Optional[collection.Collection] = PrivateAttr(default=None)
+
     @property
     def metrics(self) -> Metrics:
         return Metrics(
@@ -157,12 +159,16 @@ class Collection(ContentBase):
     @property
     def metadata(self) -> collection.Collection:
         """
-        Retrieve fresh/remote metadata about this collection from the Dataverse native API.
+        Metadata about this collection from the Dataverse native API.
+
+        Fetched on first access and cached thereafter.
 
         Returns:
             collection.Collection: Complete metadata object for this collection.
         """
-        return self.native_api.get_collection(self.identifier)
+        if self._metadata is None:
+            self._metadata = self.native_api.get_collection(self.identifier)
+        return self._metadata
 
     @property
     def alias(self) -> str:
@@ -207,6 +213,7 @@ class Collection(ContentBase):
 
         # Update the metadata of the collection
         self.native_api.update_collection(self.alias, metadata)
+        self._metadata = None  # drop stale cache
 
         if alias is not None:
             self.identifier = alias
