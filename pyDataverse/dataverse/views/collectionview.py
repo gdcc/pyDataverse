@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Awaitable, List, Type, Union
-
-from asyncer import asyncify
+from typing import TYPE_CHECKING, List, Type, Union
 
 from ...models.collection import content as collection_content
 from .contentview import ContentView
@@ -43,16 +41,14 @@ class CollectionView(ContentView["Collection"]):
         self,
         identifier: Union[str, int],
     ) -> "Collection":
-        """Fetch a single collection by identifier."""
-        return self.dataverse.fetch_collection(identifier)
+        """Fetch a single collection and prime its metadata.
 
-    def _fetch_item_async(
-        self,
-        identifier: Union[str, int],
-    ) -> Awaitable["Collection"]:
-        """Async fetch for prefetching."""
-        fetch_collection_async = asyncify(self.dataverse.fetch_collection)
-        return fetch_collection_async(identifier)
+        ``fetch_collection`` only builds a lazy handle, so the metadata request
+        is issued here to make the view's concurrent fetch window do real work.
+        """
+        coll = self.dataverse.fetch_collection(identifier)
+        coll._metadata = self.dataverse.native_api.get_collection(identifier)
+        return coll
 
     def _get_cache_keys(
         self,

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import sys
 from io import StringIO
 from typing import (
@@ -10,17 +9,16 @@ from typing import (
     List,
     Optional,
     Sequence,
-    Tuple,
     Union,
 )
 
 import pandas as pd
-from asyncer import asyncify
 from bigtree.node.node import Node
 from bigtree.tree.export import print_tree
 from typing_extensions import TypedDict
 
 from pyDataverse.filesystem.tab import TABULAR_MIME_TYPES
+from pyDataverse.models.file import FileInfo
 
 if TYPE_CHECKING:
     from ...models.dataset.edit_get import File as ModelFile
@@ -83,9 +81,6 @@ class FilesView:
         self._file_info_by_path: Dict[str, "ModelFile"] = {}
         self._file_info_list: List["ModelFile"] = []
         self._files_loaded = False
-        self._prefetched_metadata = False
-        self.prefetch_limit: int = 25
-        self.prefetch_concurrency: int = 8
 
     def _load_files(self) -> None:
         """
@@ -118,77 +113,6 @@ class FilesView:
 
         self._files_loaded = True
 
-    def _prefetch_metadata(self) -> None:
-        """
-        Prefetch per-file metadata concurrently (best-effort).
-
-        This primes an in-memory cache on each `File` instance so that later
-        accesses to `File.metadata` don't have to block on network I/O.
-
-        Implementation details:
-            - Uses `asyncer.asyncify(...)` to run the existing synchronous API calls
-              concurrently (threaded), without relying on the API's async client.
-            - If already inside an event loop, prefetching is scheduled in the
-              background via `create_task`.
-        """
-        if self._prefetched_metadata:
-            return
-        self._prefetched_metadata = True
-
-        self._load_files()
-
-        from ..file import File
-
-        items: List[Tuple[int, File]] = []
-        for file_info in self._file_info_list:
-            if file_info.data_file is None or file_info.data_file.id is None:
-                continue
-            file_id = file_info.data_file.id
-
-            file_obj = self._cache_by_id.get(file_id)
-            if file_obj is None:
-                file_obj = File(
-                    identifier=file_id,
-                    dataset=self.dataset,
-                    dataverse=self.dataset.dataverse,
-                )
-                self._cache_by_id[file_id] = file_obj
-
-            if getattr(file_obj, "_metadata_cache", None) is None:
-                items.append((file_id, file_obj))
-                if len(items) >= self.prefetch_limit:
-                    break
-
-        if not items:
-            return
-
-        fetch_metadata = asyncify(
-            self.dataset.dataverse.native_api.get_datafile_metadata
-        )
-
-        async def _fetch_all() -> None:
-            semaphore = asyncio.Semaphore(self.prefetch_concurrency)
-
-            async def _bounded_fetch(file_id: int):
-                async with semaphore:
-                    return await fetch_metadata(file_id)
-
-            results = await asyncio.gather(
-                *[_bounded_fetch(file_id) for file_id, _ in items],
-                return_exceptions=True,
-            )
-            for (_, file_obj), result in zip(items, results):
-                if isinstance(result, Exception):
-                    continue
-                file_obj._metadata_cache = result  # type: ignore[assignment]
-
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            asyncio.run(_fetch_all())
-        else:
-            loop.create_task(_fetch_all())
-
     def _iter_files(self) -> Generator["File", None, None]:
         """
         Internal generator for iterating File objects from the cache.
@@ -212,7 +136,6 @@ class FilesView:
             >>> for file in dataset.files:
             ...     print(file.path)
         """
-        self._prefetch_metadata()
         yield from self._iter_files()
 
     def __getitem__(self, path: Union[str, int]) -> "File":
@@ -293,6 +216,7 @@ class FilesView:
                 dataset=self.dataset,
                 dataverse=self.dataset.dataverse,
             )
+            file_obj._metadata = FileInfo.model_validate(file_info.model_dump())
             self._cache_by_id[file_id] = file_obj
 
         self._cache[path] = file_obj

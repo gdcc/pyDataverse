@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Awaitable, List, Tuple, Type, Union
-
-from asyncer import asyncify
+from typing import TYPE_CHECKING, List, Tuple, Type, Union
 
 from ...models.collection import content as collection_content
 from .contentview import ContentView
@@ -42,11 +40,6 @@ class DatasetView(ContentView["Dataset"]):
     def _fetch_item(self, identifier: Union[str, int]) -> "Dataset":
         """Fetch a single dataset by identifier."""
         return self.dataverse.fetch_dataset(identifier)
-
-    def _fetch_item_async(self, identifier: Union[str, int]) -> Awaitable["Dataset"]:
-        """Async fetch for prefetching."""
-        fetch_dataset_async = asyncify(self.dataverse.fetch_dataset)
-        return fetch_dataset_async(identifier)
 
     def _get_cache_keys(self, dataset: "Dataset") -> List[Union[str, int]]:
         """Extract cache keys from a fetched dataset."""
