@@ -19,7 +19,6 @@ from typing import (
     Union,
 )
 
-from asyncer import asyncify
 from httpx import HTTPStatusError
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
 from typing_extensions import Self, TypedDict
@@ -592,9 +591,9 @@ class Dataverse(BaseModel):
         )
 
         if upload_to_collection:
-            assert (
-                collection is not None
-            ), "Collection is required to upload to a collection"
+            assert collection is not None, (
+                "Collection is required to upload to a collection"
+            )
             dataset.upload_to_collection(collection)
             dataset.refresh()
 
