@@ -11,7 +11,7 @@ export default defineConfig({
 	site: 'https://gdcc.github.io',
 	base: '/pyDataverse',
 	redirects: {
-		'/': '/getting-started',
+		'/': '/pyDataverse/getting-started',
 	},
 	integrations: [
 		mermaid(
