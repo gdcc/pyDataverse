@@ -37,4 +37,5 @@ docker run --rm \
     -e BASE_URL="${CONTAINER_BASE_URL}" \
     -e API_TOKEN="${API_TOKEN}" \
     -e API_TOKEN_SUPERUSER="${API_TOKEN_SUPERUSER}" \
-    pydataverse-tests
+    pydataverse-tests \
+    "$@"
