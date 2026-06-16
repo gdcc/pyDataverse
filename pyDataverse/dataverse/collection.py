@@ -213,7 +213,7 @@ class Collection(ContentBase):
 
         # Update the metadata of the collection
         self.native_api.update_collection(self.alias, metadata)
-        self._metadata = None  # drop stale cache
+        self._metadata = None
 
         if alias is not None:
             self.identifier = alias
@@ -468,6 +468,7 @@ class Collection(ContentBase):
         Publish this collection to make it publicly accessible.
         """
         self.native_api.publish_collection(self.alias)
+        self._metadata = None
 
     def create_collection(
         self,
