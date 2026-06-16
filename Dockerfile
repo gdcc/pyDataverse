@@ -15,5 +15,5 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install uv && \
     uv pip install --system ".[tests,mcp]"
 
-# Run tests by default.
-CMD ["pytest", "-v"]
+ENTRYPOINT ["pytest"]
+CMD ["-v"]
