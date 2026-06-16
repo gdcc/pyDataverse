@@ -2,7 +2,7 @@ name: Deploy docs to GitHub Pages
 
 on:
   push:
-    branches: [gh-pages-action]   # TODO: switch back to [main] once verified
+    branches: [main]
   workflow_dispatch:
 
 permissions:
