@@ -84,6 +84,10 @@ TABULAR_MIME_TYPES = {
         delimiter="\t",
         tab_type="text",
     ),
+    "text/tsv": TabSpecs(
+        delimiter="\t",
+        tab_type="text",
+    ),
     "text/x-comma-separated-values": TabSpecs(
         delimiter=",",
         tab_type="text",
