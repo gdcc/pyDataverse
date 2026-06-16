@@ -1,0 +1,284 @@
+---
+title: Metrics API
+description: The Metrics API provides access to usage statistics and metrics about collections, datasets, files, and downloads.
+---
+
+The `MetricsApi` class provides access to Dataverse's Metrics API endpoints. It specializes in retrieving usage statistics and metrics about your Dataverse installation, including total counts, historical data, and breakdowns by subject, category, and location. While other APIs focus on content management, `MetricsApi` helps you understand usage patterns, growth trends, and distribution of content across your installation.
+
+Compared to other APIs, `MetricsApi` is specialized for analytics and reporting. It provides methods to query aggregate statistics about collections (dataverses), datasets, files, and downloads, with support for time-based filtering and categorical breakdowns. Methods return either simple count responses or pandas DataFrames for easy analysis and visualization.
+
+## Initialization
+
+To start using the Metrics API, create a `MetricsApi` instance with the base URL of your Dataverse installation. Most metrics endpoints are publicly accessible, but some may require authentication depending on your installation's configuration.
+
+```python
+from pyDataverse.api import MetricsApi
+
+# Public access (most metrics are publicly available)
+api = MetricsApi(base_url="https://demo.dataverse.org")
+
+# Authenticated access (if required by your installation)
+api = MetricsApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+```
+
+### Understanding the Parameters
+
+`MetricsApi` supports the same core parameters as other API classes:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation, such as `"https://demo.dataverse.org"` or `"https://dataverse.harvard.edu"`. All API calls are constructed from this URL.
+- **`api_token`** (str, optional): API token used for endpoints that require authentication. Most metrics endpoints are publicly accessible, but some installations may require authentication.
+- **`api_version`** (str, optional): API version string passed to the Dataverse server. This is typically left at its default unless you have a specific reason to override it.
+
+The `MetricsApi` class automatically manages request URLs, parameters, and authentication headers for you. Most metrics methods can be called without an API token, but authentication may be required depending on your installation's security settings.
+
+## Total Metrics
+
+The Metrics API provides methods to retrieve total counts for different data types in your Dataverse installation.
+
+### Getting Total Counts
+
+Use `total` to get the total count for a specific data type: collections (dataverses), datasets, files, or downloads.
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get total number of collections
+collections = api.total("dataverses")
+print(f"Total collections: {collections.count}")
+
+# Get total number of datasets
+datasets = api.total("datasets")
+print(f"Total datasets: {datasets.count}")
+
+# Get total number of files
+files = api.total("files")
+print(f"Total files: {files.count}")
+
+# Get total number of downloads
+downloads = api.total("downloads")
+print(f"Total downloads: {downloads.count}")
+```
+
+The method returns a `MetricsResponse` object with a `count` attribute containing the total number.
+
+### Historical Metrics
+
+You can also retrieve metrics up to a specific month using the `date_to_month` parameter:
+
+```python
+from pyDataverse.api import MetricsApi
+from datetime import date
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get total datasets up to a specific month (string format)
+datasets = api.total("datasets", date_to_month="2023-12")
+print(f"Datasets up to December 2023: {datasets.count}")
+
+# Using a date object
+cutoff_date = date(2023, 6, 1)
+datasets = api.total("datasets", date_to_month=cutoff_date)
+print(f"Datasets up to June 2023: {datasets.count}")
+```
+
+This is useful for tracking growth over time and understanding historical trends in your installation.
+
+## Time-Based Metrics
+
+For analyzing recent activity, you can retrieve metrics for the past specified number of days.
+
+### Metrics for Past Days
+
+Use `past_days` to get metrics for a specific data type over the past N days:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get datasets created in the past 30 days
+recent_datasets = api.past_days("datasets", days=30)
+print(f"Datasets created in past 30 days: {recent_datasets.count}")
+
+# Get downloads in the past 7 days
+recent_downloads = api.past_days("downloads", days=7)
+print(f"Downloads in past 7 days: {recent_downloads.count}")
+
+# Get files uploaded in the past 90 days
+recent_files = api.past_days("files", days=90)
+print(f"Files uploaded in past 90 days: {recent_files.count}")
+```
+
+This method is particularly useful for monitoring recent activity and engagement on your Dataverse installation.
+
+## Collection Metrics
+
+The Metrics API provides methods to analyze collections (dataverses) by various dimensions.
+
+### Collections by Subject
+
+Use `get_collections_by_subject` to get a breakdown of collections grouped by subject area:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get collections grouped by subject
+df = api.get_collections_by_subject()
+print(df.head())
+
+# Analyze the distribution
+print(f"Total subjects: {len(df)}")
+print(f"Total collections: {df['count'].sum()}")
+```
+
+The method returns a pandas DataFrame with columns for subject and count, making it easy to analyze the distribution of collections across different subject areas.
+
+### Collections by Category
+
+Similarly, you can get collections grouped by category:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get collections grouped by category
+df = api.get_collections_by_category()
+print(df.head())
+
+# Find the category with the most collections
+max_category = df.loc[df['count'].idxmax()]
+print(f"Category with most collections: {max_category['category']} ({max_category['count']} collections)")
+```
+
+This helps you understand how collections are categorized and identify popular categories in your installation.
+
+## Dataset Metrics
+
+The Metrics API provides specialized methods for analyzing datasets.
+
+### Datasets by Subject
+
+Use `get_datasets_by_subject` to get a breakdown of datasets grouped by subject area:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get datasets grouped by subject
+df = api.get_datasets_by_subject()
+print(df.head())
+
+# Analyze distribution
+print(f"Total subjects: {len(df)}")
+print(f"Most popular subject: {df.loc[df['count'].idxmax()]['subject']}")
+```
+
+You can also filter by date to see historical distributions:
+
+```python
+from pyDataverse.api import MetricsApi
+from datetime import date
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get datasets by subject up to a specific month
+df = api.get_datasets_by_subject(date_to_month="2023-12")
+print(f"Dataset distribution as of December 2023:")
+print(df)
+```
+
+### Datasets by Data Location
+
+Use `get_datasets_by_data_location` to understand where datasets are stored:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get local datasets (stored on this instance)
+local = api.get_datasets_by_data_location("local")
+print(f"Local datasets: {local.count}")
+
+# Get remote datasets (harvested from other instances)
+remote = api.get_datasets_by_data_location("remote")
+print(f"Remote datasets: {remote.count}")
+
+# Get all datasets regardless of location
+all_datasets = api.get_datasets_by_data_location("all")
+print(f"Total datasets: {all_datasets.count}")
+```
+
+This is useful for understanding the composition of your dataset collection, especially if you harvest datasets from other Dataverse installations.
+
+## Working with Metrics Data
+
+The Metrics API returns data in two formats: simple count responses (`MetricsResponse`) and pandas DataFrames for breakdowns.
+
+### Using MetricsResponse Objects
+
+Methods like `total`, `past_days`, and `get_datasets_by_data_location` return `MetricsResponse` objects:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get a metrics response
+result = api.total("datasets")
+print(f"Count: {result.count}")
+
+# Use in calculations
+collections = api.total("dataverses")
+datasets = api.total("datasets")
+avg_datasets_per_collection = datasets.count / collections.count
+print(f"Average datasets per collection: {avg_datasets_per_collection:.2f}")
+```
+
+### Working with DataFrames
+
+Methods that return breakdowns (by subject, category, etc.) return pandas DataFrames:
+
+```python
+from pyDataverse.api import MetricsApi
+
+api = MetricsApi("https://demo.dataverse.org")
+
+# Get datasets by subject
+df = api.get_datasets_by_subject()
+
+# Sort by count
+df_sorted = df.sort_values('count', ascending=False)
+print("Top 5 subjects by dataset count:")
+print(df_sorted.head())
+
+# Calculate percentages
+total = df['count'].sum()
+df['percentage'] = (df['count'] / total) * 100
+print("\nSubject distribution:")
+print(df[['subject', 'count', 'percentage']])
+```
+
+DataFrames make it easy to perform analysis, create visualizations, and export data for reporting.
+
+## When to Use `MetricsApi`
+
+Use `MetricsApi` when you:
+
+- **need usage statistics** about your Dataverse installation for reporting or analysis.
+- **want to track growth trends** over time using historical metrics.
+- **need to understand content distribution** across subjects, categories, or locations.
+- **are building dashboards or reports** that require aggregate statistics.
+- **want to monitor recent activity** using time-based metrics.
+- **need to analyze collection or dataset patterns** for administrative or research purposes.
+
+For most everyday workflows (creating datasets, uploading files, managing content), the high-level `Dataverse` class or `NativeApi` provide the necessary functionality. When you need analytics, reporting, or insights into usage patterns and content distribution, `MetricsApi` gives you access to comprehensive metrics and statistics about your Dataverse installation.

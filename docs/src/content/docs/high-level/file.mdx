@@ -1,0 +1,335 @@
+---
+title: File
+description: The File class represents an individual file within a Dataverse dataset.
+---
+
+The `File` class represents an individual file within a Dataverse dataset. Files are the actual data content stored in datasets—the CSV files, images, code, documents, and other resources that researchers want to share and preserve. Each file has associated metadata (such as name, size, content type, description, and categories) and provides methods for accessing file contents and managing file properties.
+
+In Dataverse, files are organized hierarchically within datasets using paths, similar to a filesystem. Files can be organized into virtual directories (like "data/", "code/", "docs/") to keep related files together. Each file has a unique integer identifier assigned by the Dataverse server, which is used for API operations, and a path that describes its location within the dataset.
+
+This class provides a convenient interface for working with files, including reading file contents, downloading files to your local filesystem, updating file metadata, and working with tabular data files using pandas. It abstracts away the complexity of working with Dataverse's file API while maintaining full access to file functionality.
+
+## Overview
+
+The `File` class encapsulates all operations related to a file within a dataset, providing a unified interface for working with files throughout their lifecycle—from initial access through reading, analysis, and metadata management.
+
+The class handles several key responsibilities:
+
+- **Metadata access**: Retrieve comprehensive metadata about the file, including its name, size, content type, description, categories, and other properties. This metadata helps understand what the file contains and how it should be used.
+
+- **File reading**: Read file contents in various ways—as text or binary data, or as structured tabular data using pandas DataFrames. The class supports both loading entire files into memory and streaming large files in chunks.
+
+- **File downloading**: Download files from Dataverse to your local filesystem for offline access or backup purposes. Downloads are performed efficiently using streaming to handle large files.
+
+- **Metadata management**: Update file metadata such as description, categories, filename, and directory path. This allows you to organize and describe files after they've been uploaded.
+
+- **Tabular data operations**: Detect tabular files and provide convenient methods for loading them as pandas DataFrames, with support for custom parsing options and streaming for large files.
+
+## Attributes
+
+A `File` instance contains key attributes that identify it and connect it to its parent dataset:
+
+- **`identifier`** (int): The unique integer identifier assigned to the file by the Dataverse server. This identifier is used for all API operations involving the file and remains constant throughout the file's lifetime. It's a frozen attribute, meaning it cannot be changed after the File object is created.
+
+- **`dataset`** (Dataset): A reference to the parent [`Dataset`](/high-level/dataset/) instance that contains this file. This provides access to dataset-level operations and ensures the file knows its context within the dataset structure.
+
+The identifier is the primary way to reference a file in API calls, while the dataset reference enables file operations that require dataset context, such as reading file contents or accessing dataset-level properties.
+
+## Accessing Files
+
+Files are typically accessed through a dataset's `files` property, which provides a view of all files in the dataset:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse("https://demo.dataverse.org")
+dataset = dv.fetch_dataset("doi:10.5072/FK2/ABC123")
+
+# Access a file by path
+file = dataset.files["data/results.csv"]
+
+# Iterate over all files
+for file in dataset.files:
+    print(f"{file.path}: {file.metadata.data_file.filesize} bytes")
+
+# Access file properties
+print(file.identifier)  # Integer ID
+print(file.path)  # Path within dataset
+print(file.dataset.title)  # Parent dataset title
+```
+
+The `files` property returns a `FilesView` object that supports both iteration and dictionary-like access by file path. When you access a file by path, the view automatically creates a `File` object with the correct identifier and dataset reference.
+
+Files can also be accessed by iterating over the files view, which loads file information on demand. This lazy-loading approach is efficient for datasets with many files, as you only create File objects for files you actually need.
+
+## File Metadata
+
+Each file has comprehensive metadata that describes its properties and characteristics. You can access this metadata through the `metadata` property:
+
+```python
+# Get file metadata
+metadata = file.metadata
+
+# Access metadata fields
+print(metadata.label)  # Filename
+print(metadata.directory_label)  # Directory path
+print(metadata.description)  # File description
+print(metadata.categories)  # Category tags
+
+# Access data file information
+if metadata.data_file:
+    print(metadata.data_file.filesize)  # File size in bytes
+    print(metadata.data_file.content_type)  # MIME type
+    print(metadata.data_file.md5)  # MD5 checksum
+    print(metadata.data_file.id)  # File identifier
+```
+
+The `metadata` property fetches fresh metadata from the Dataverse server each time it's accessed, ensuring you always have up-to-date information. This is useful when metadata might have been changed by other users or through the web interface.
+
+File metadata includes:
+- **Label**: The filename of the file
+- **Directory label**: The virtual directory path within the dataset (e.g., "data/", "code/")
+- **Description**: A human-readable description of the file's contents or purpose
+- **Categories**: A list of category strings (tags) that help organize and classify the file
+- **Data file information**: Size, content type (MIME type), checksums, and other technical details
+
+The metadata is returned as a `FileInfo` object, which provides structured access to all file properties. This object validates the data structure and ensures you're working with consistent, well-formed metadata.
+
+## File Path
+
+The `path` property provides the file's full path within the dataset, combining the directory label and filename:
+
+```python
+# Get the file path
+file_path = file.path
+# Output: "data/results.csv" or "readme.txt" (if no directory)
+
+# The path combines directory_label and label
+# For a file in "data/" directory named "results.csv":
+# path = "data/results.csv"
+```
+
+The path is constructed by joining the directory label and filename with a forward slash. If the file is in the root of the dataset (no directory), the path is just the filename. This path format is consistent with filesystem paths and makes it easy to understand file organization within the dataset.
+
+The path property is computed from the metadata each time it's accessed, so it always reflects the current state of the file. If you update the file's directory or filename using `update_metadata()`, the path property will reflect those changes on the next access.
+
+## Reading Files
+
+The `File` class provides several methods for reading file contents, supporting different use cases and file types.
+
+### Reading Text and Binary Files
+
+The `open()` method provides a file-like interface for reading file contents:
+
+```python
+# Read a text file
+with file.open(mode="r") as f:
+    content = f.read()
+    print(content)
+
+# Read a binary file
+with file.open(mode="rb") as f:
+    binary_data = f.read()
+    # Process binary data...
+
+# Read line by line
+with file.open(mode="r") as f:
+    for line in f:
+        print(line.strip())
+```
+
+The `open()` method returns a `DataverseFileReader` object that supports standard file operations like `read()`, `readline()`, and iteration. It can be used with Python's context manager (`with` statement) for proper resource management, ensuring file handles are closed after use.
+
+For text mode (`mode="r"`), the file is automatically decoded using UTF-8 encoding. For binary mode (`mode="rb"`), you receive raw bytes. Choose the appropriate mode based on what you plan to do with the file—text mode for reading text files, binary mode for images, executables, or other binary data.
+
+The reader streams data from the Dataverse server, so it's efficient for large files. Data is fetched in chunks as you read, rather than loading the entire file into memory at once. This makes it suitable for processing files of any size.
+
+### Reading Tabular Files
+
+For CSV and other tabular files, the `File` class provides convenient methods that return pandas DataFrames:
+
+```python
+# Check if file is tabular
+if file.is_tabular:
+    # Load entire file as DataFrame
+    df = file.open_tabular()
+    print(df.head())
+    
+    # Load with custom options
+    df = file.open_tabular(
+        usecols=["col1", "col2"],  # Select specific columns
+        dtype={"col1": str, "col2": int},  # Specify data types
+        na_values=["N/A", "null"]  # Values to treat as NaN
+    )
+    
+    # Load without header row
+    df = file.open_tabular(no_header=True)
+```
+
+The `open_tabular()` method automatically detects tabular files based on their content type (MIME type). Common tabular formats include CSV, TSV, and SAV files. If you try to call this method on a non-tabular file, a `ValueError` is raised.
+
+The method accepts the same keyword arguments as pandas' `read_csv()` function, giving you fine-grained control over how the file is parsed. You can specify delimiters, data types, which columns to read, how to handle missing values, and many other options. This flexibility allows you to adapt the reading process to your specific data format and analysis needs.
+
+The `is_tabular` property provides a quick way to check if a file is tabular before attempting to load it. This is useful when iterating over files and only processing tabular ones, or when you want to provide different handling for different file types.
+
+### Streaming Large Tabular Files
+
+For very large tabular files that don't fit in memory, use `stream_tabular()` to process them in chunks:
+
+```python
+# Stream large file in chunks
+for chunk in file.stream_tabular(chunk_size=10000):
+    # Process each chunk (each is a DataFrame)
+    process_data(chunk)
+    print(f"Processed {len(chunk)} rows")
+
+# Stream with custom options
+for chunk in file.stream_tabular(
+    chunk_size=5000,
+    usecols=[0, 1, 2],  # Only read first 3 columns
+    dtype={"col1": str}
+):
+    analyze_chunk(chunk)
+```
+
+The `stream_tabular()` method yields the file in chunks, where each chunk is a pandas DataFrame containing a subset of the rows. This allows you to process large files incrementally without loading everything into memory at once. The `chunk_size` parameter controls how many rows are included in each chunk.
+
+This approach is particularly useful for datasets with millions of rows or when working on systems with limited memory. You can process each chunk independently, aggregate results, or write processed chunks to output files. The method accepts the same keyword arguments as `open_tabular()`, so you can apply the same parsing options to each chunk.
+
+Like `open_tabular()`, this method only works with tabular files. If you try to stream a non-tabular file, a `ValueError` is raised.
+
+## Downloading Files
+
+You can download files from Dataverse to your local filesystem using the `download()` method:
+
+```python
+# Download to a specific path
+file.download("local_copy.csv")
+
+# Download to a Path object
+from pathlib import Path
+file.download(Path("downloads") / "results.csv")
+
+# Download with custom chunk size (for very large files)
+file.download("large_file.bin", chunk_size=16384)
+```
+
+The `download()` method streams the file from the Dataverse server and writes it to the specified local path. It handles the entire download process, including creating the file, writing data in chunks, and closing the file when complete. The method prints a confirmation message showing where the file was saved.
+
+The `chunk_size` parameter controls how many bytes are read from the server per chunk. The default (8192 bytes) works well for most files, but you can increase it for very large files to improve download speed, or decrease it if you need to monitor progress more frequently.
+
+The method automatically creates parent directories if they don't exist, so you can specify paths like "downloads/data/results.csv" even if the "downloads/data/" directory doesn't exist yet. If the target file already exists, it will be overwritten.
+
+Downloads are performed efficiently using streaming, so even very large files can be downloaded without consuming excessive memory. The file is written to disk as it's downloaded, rather than being loaded into memory first.
+
+## Updating File Metadata
+
+You can update file metadata using the `update_metadata()` method:
+
+```python
+# Update file description
+file.update_metadata(description="Updated description of the file contents")
+
+# Update categories (tags)
+file.update_metadata(categories=["Data", "Results", "2024"])
+
+# Update filename
+file.update_metadata(filename="new_filename.csv")
+
+# Update directory path
+file.update_metadata(directory_label="processed_data")
+
+# Update multiple properties at once
+file.update_metadata(
+    description="Experimental results from trial 3",
+    categories=["Experimental", "Results"],
+    filename="trial3_results.csv"
+)
+```
+
+The `update_metadata()` method allows you to update any combination of metadata fields. You only need to provide the fields you want to change—omitted fields remain unchanged. This makes it easy to make targeted updates without needing to specify all fields.
+
+When you update the filename or directory label, the file's path changes accordingly. The `path` property will reflect the new path on the next access. This is useful for reorganizing files within a dataset or correcting file names.
+
+The method sends updates to the Dataverse server immediately, so changes are visible right away. If the update fails (for example, due to permission issues or validation errors), an exception is raised. After a successful update, the metadata is refreshed, so subsequent accesses to the `metadata` property will reflect the changes.
+
+Categories are particularly useful for organizing files. You can use them to tag files by type (e.g., "Data", "Code", "Documentation"), by purpose (e.g., "Raw", "Processed", "Analysis"), or by any other classification scheme that helps organize your files. Categories can be used for filtering and searching files within a dataset.
+
+## Complete Example
+
+The following example demonstrates a complete workflow for working with files:
+
+```python
+from pyDataverse import Dataverse
+from pathlib import Path
+
+# Initialize connection
+dv = Dataverse(
+    base_url="https://demo.dataverse.org",
+    api_token="your-token"
+)
+
+# Fetch a dataset
+dataset = dv.fetch_dataset("doi:10.5072/FK2/ABC123")
+
+# Browse files in the dataset
+print("Files in dataset:")
+for file in dataset.files:
+    print(f"  - {file.path} ({file.metadata.data_file.filesize} bytes)")
+
+# Access a specific file
+csv_file = dataset.files["data/results.csv"]
+
+# View file metadata
+print(f"\nFile: {csv_file.path}")
+print(f"Size: {csv_file.metadata.data_file.filesize} bytes")
+print(f"Type: {csv_file.metadata.data_file.content_type}")
+print(f"Description: {csv_file.metadata.description}")
+
+# Check if file is tabular
+if csv_file.is_tabular:
+    # Load as DataFrame
+    df = csv_file.open_tabular()
+    print(f"\nLoaded {len(df)} rows, {len(df.columns)} columns")
+    print(df.head())
+    
+    # Process large file in chunks if needed
+    if len(df) > 100000:
+        print("\nFile is large, processing in chunks...")
+        for chunk in csv_file.stream_tabular(chunk_size=10000):
+            process_chunk(chunk)
+
+# Read a text file
+readme_file = dataset.files["readme.txt"]
+with readme_file.open(mode="r") as f:
+    content = f.read()
+    print(f"\nReadme content:\n{content}")
+
+# Download files locally
+csv_file.download("local_results.csv")
+readme_file.download("local_readme.txt")
+
+# Update file metadata
+csv_file.update_metadata(
+    description="Updated: Results from all experimental trials",
+    categories=["Data", "Results", "Experimental"]
+)
+
+# Verify metadata update
+print(f"\nUpdated description: {csv_file.metadata.description}")
+print(f"Updated categories: {csv_file.metadata.categories}")
+```
+
+This example demonstrates the typical workflow: accessing files through a dataset, viewing metadata, reading file contents (both tabular and text), downloading files locally, and updating file metadata. Files provide a convenient interface for working with individual data files within datasets, making it easy to access, analyze, and manage research data.
+
+## Related Classes
+
+- **[`Dataset`](/high-level/dataset/)** - Represents a Dataverse dataset that contains files
+- **[`Dataverse`](/high-level/Dataverse/)** - Factory class for creating and managing datasets and collections
+- **[`Collection`](/high-level/collection/)** - Represents a Dataverse collection that can contain datasets with files
+
+## See Also
+
+- [Dataset Documentation](/high-level/dataset/) - Learn more about working with datasets and their files
+- [Dataverse Documentation](/high-level/Dataverse/) - Learn more about creating and managing datasets
+- [Collection Documentation](/high-level/collection/) - Learn more about collections and organizing datasets

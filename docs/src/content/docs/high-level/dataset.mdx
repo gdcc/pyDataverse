@@ -1,0 +1,758 @@
+---
+title: Dataset
+description: The Dataset class represents a Dataverse dataset with metadata blocks and files.
+---
+
+The `Dataset` class represents a Dataverse dataset, which serves as the core container for research data, metadata, and files within a Dataverse installation. A dataset combines structured metadata (organized into metadata blocks) with actual data files, providing a complete package for research data publication and preservation.
+
+In Dataverse, a dataset is more than just a collection of files—it's a structured research object that includes comprehensive metadata describing the data, its creators, its purpose, and how it should be used. This metadata makes datasets discoverable, citable, and reusable by other researchers.
+
+This class provides a convenient interface for interacting with Dataverse datasets, including reading and updating metadata, accessing files within the dataset, and supporting read operations for tabular data using pandas. It abstracts away the complexity of working with Dataverse's API while maintaining full access to dataset functionality. Whether you're creating a new dataset from scratch, modifying an existing one, or analyzing data from published datasets, the `Dataset` class provides the tools you need.
+
+## Overview
+
+The `Dataset` class encapsulates all operations related to a Dataverse dataset, providing a unified interface for working with datasets throughout their lifecycle—from initial creation through publication and ongoing maintenance.
+
+The class handles several key responsibilities:
+
+- **Metadata management**: Access and modify metadata blocks that describe the dataset. Metadata blocks are like structured forms, each containing related fields. The class automatically configures all available metadata blocks when a dataset is created, ensuring you have access to all fields supported by your Dataverse installation.
+
+- **File operations**: Read, write, and upload files to the dataset. Files can be added by writing them directly through the dataset interface or by uploading existing files from your local filesystem. The class handles file paths, metadata, and organization within the dataset.
+
+- **Tabular data access**: Load CSV and other tabular files directly as pandas DataFrames. This is particularly useful for data analysis workflows, as it eliminates the need to download files before analyzing them. The class also supports streaming large files in chunks when they don't fit in memory.
+
+- **Dataset publication**: Upload datasets to collections, publish them to make them publicly available, and update existing datasets. The class manages the upload process, including sending metadata and files to the server, handles the assignment of identifiers (like DOIs) after successful upload, and supports publishing datasets with version control.
+
+- **Export and schema generation**: Export metadata in various formats (such as Dublin Core or Dataverse JSON) and generate JSON schemas. This enables integration with other systems and tools that need to understand dataset structure.
+
+## Attributes
+
+A `Dataset` instance contains several key attributes that define its identity, licensing, metadata structure, and connection to the Dataverse installation:
+
+- **`identifier`** (Optional[int]): The unique database ID for the dataset. This is `None` for newly created datasets that haven't been uploaded yet. Once a dataset is uploaded to a Dataverse collection, it receives a numeric identifier that can be used for API operations. This is different from the persistent identifier (DOI), which is a string.
+
+- **`persistent_identifier`** (Optional[str]): The persistent identifier for the dataset, typically a DOI (Digital Object Identifier) like `"doi:10.5072/FK2/ABC123"`. This is `None` for newly created datasets that haven't been uploaded yet. Once a dataset is uploaded to a Dataverse collection, it receives a persistent identifier that can be used to fetch it later. DOIs are particularly valuable because they provide permanent, citable links to the dataset that remain stable even if the dataset moves or the server changes.
+
+- **`persistent_url`** (Optional[str]): The persistent URL for the dataset. This is automatically set when a dataset is uploaded and provides a direct link to the dataset.
+
+- **`version`** (Optional[str]): The version of the dataset (e.g., "1.0", "2.1"). This is set automatically when the dataset is uploaded or fetched from the server.
+
+- **`license`** (Union[str, info.License, None]): The license assigned to the dataset, specified as either a string (license name) or a `License` object. Common licenses include "CC0" (public domain dedication), "CC-BY" (Creative Commons Attribution), and custom institutional licenses. The license determines how others can use your data—some licenses allow unrestricted use, while others require attribution or have other restrictions. You can view available licenses for your Dataverse installation using the `Dataverse.licenses` property.
+
+- **`metadata_blocks`** (Dict[str, MetadataBlockBase]): A dictionary containing all metadata blocks associated with the dataset, keyed by block name. Common blocks include "citation" (for basic information like title, authors, and description), "geospatial" (for location and geographic data), "social science" (for survey-specific fields), and others depending on the Dataverse installation configuration. Each metadata block is a Pydantic model that validates the data you provide, ensuring it conforms to the expected structure. The blocks are automatically configured when the dataset is created, so you don't need to manually set them up.
+
+- **`dataverse`** (Dataverse): A reference to the parent `Dataverse` instance that created or fetched this dataset. This provides access to API clients and other Dataverse-level functionality. Through this reference, you can access the underlying API clients (`native_api`, `data_access_api`, etc.) if you need to perform operations not directly supported by the high-level `Dataset` interface.
+
+## Creating Datasets
+
+Datasets can be created in several ways:
+
+### Creating New Datasets
+
+Datasets are typically created using the [`Dataverse`](/high-level/Dataverse/) class's `create_dataset()` method or a [`Collection`](/high-level/collection/)'s `create_dataset()` method:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse("https://demo.dataverse.org")
+
+# Create a dataset via the Dataverse instance
+dataset = dv.create_dataset(
+    title="My Research Dataset",
+    description="A comprehensive dataset containing experimental results",
+    authors=[{"name": "Jane Smith", "affiliation": "University"}],
+    contacts=[{"name": "Jane Smith", "email": "jane@university.edu"}],
+    subjects=["Computer and Information Science"]
+)
+
+# Or create via a collection
+collection = dv.fetch_collection("my-collection")
+dataset = collection.create_dataset(
+    title="Lab Dataset",
+    description="Dataset from our lab",
+    authors=[{"name": "Researcher", "affiliation": "Lab"}],
+    contacts=[{"name": "Researcher", "email": "researcher@lab.edu"}],
+    subjects=["Physics"]
+)
+```
+
+After creation, the dataset exists locally with all metadata blocks configured, but it hasn't been uploaded to the server yet. This local-only state allows you to build up the dataset gradually—you can modify metadata, add files, and make other changes without affecting anything on the server. This is particularly useful when you're preparing a dataset for publication and want to ensure everything is correct before making it publicly available.
+
+When you're ready to publish the dataset, you can upload it to a collection using the `upload_to_collection()` method. After uploading, the dataset receives both an identifier (database ID) and a persistent identifier (typically a DOI) and becomes accessible through the Dataverse web interface and API. You can continue to modify the dataset after uploading, and changes can be pushed to the server using `update_metadata()`.
+
+### Creating from DOI URLs
+
+You can also create a `Dataset` instance directly from a DOI URL using the `from_doi_url()` class method:
+
+```python
+from pyDataverse.dataverse.dataset import Dataset
+
+# Create both Dataverse instance and Dataset from a DOI URL
+dataverse, dataset = Dataset.from_doi_url("https://doi.org/10.18419/DARUS-5539")
+
+print(dataset.persistent_identifier)
+# Output: "doi:10.18419/DARUS-5539"
+```
+
+This method automatically follows the DOI URL to extract the base Dataverse URL and persistent identifier, then creates both a `Dataverse` instance and fetches the corresponding `Dataset`. This is particularly useful when you have a DOI and want to quickly access the dataset without manually constructing the Dataverse connection.
+
+## Accessing Basic Properties
+
+The `Dataset` class provides convenient properties for accessing commonly used metadata:
+
+### Title
+
+The dataset title can be accessed and modified through the `title` property:
+
+```python
+# Get the title
+print(dataset.title)
+# Output: "My Research Dataset"
+
+# Set a new title
+dataset.title = "Updated Dataset Title"
+```
+
+The title is stored in the "citation" metadata block, which must be present for this property to work. The citation block is typically always available, as it contains the core information needed to identify and cite the dataset. If you attempt to access the title property when the citation block is not available, an assertion error will be raised. This property provides a convenient shortcut—instead of accessing `dataset.metadata_blocks["citation"]["title"]`, you can simply use `dataset.title`.
+
+### Description
+
+Similarly, the description can be accessed and modified:
+
+```python
+# Get the description
+print(dataset.description)
+# Output: "A comprehensive dataset containing experimental results"
+
+# Set a new description
+dataset.description = "Updated description of the dataset"
+```
+
+The description is stored in the "citation" metadata block's `dsDescription` field. When reading, it accesses the first description entry's value. When setting, it creates or updates the description structure. Like the title property, this provides a convenient way to access and modify the dataset description without navigating through the metadata blocks dictionary. The description typically contains an abstract or summary of what the dataset contains and how it was created, which helps other researchers understand whether the dataset is relevant to their work.
+
+### URL
+
+For datasets that have been uploaded (and thus have a persistent identifier), you can access the dataset's web URL:
+
+```python
+# Get the URL (requires persistent_identifier)
+url = dataset.url
+# Output: "https://demo.dataverse.org/dataset.xhtml?persistentId=doi:10.5072/FK2/ABC123"
+
+# Open the dataset in your default browser
+dataset.open_in_browser()
+```
+
+The `open_in_browser()` method constructs the URL and opens it in your system's default web browser, which is useful for quickly viewing the dataset on the Dataverse web interface. This is particularly helpful when you want to verify how the dataset appears to other users, check that all metadata is displayed correctly, or share the dataset URL with collaborators. The method uses Python's `webbrowser` module, which automatically detects and uses your system's default browser.
+
+### Authors
+
+The `authors` property provides convenient access to the dataset authors from the citation metadata block:
+
+```python
+# Get the authors
+authors = dataset.authors
+# Output: [{"authorName": "Jane Smith", "authorAffiliation": "University"}, ...]
+
+# Authors are automatically extracted from the citation metadata block
+```
+
+The authors are returned as a list of dictionaries containing author information. This property provides a convenient way to access author data without navigating through the metadata blocks structure.
+
+### Subjects
+
+Similarly, the `subjects` property provides access to the dataset subjects:
+
+```python
+# Get the subjects
+subjects = dataset.subjects
+# Output: ["Computer and Information Science", "Engineering"]
+```
+
+Subjects are returned as a list of strings representing the research domains or categories associated with the dataset.
+
+## Working with Metadata Blocks
+
+Metadata blocks are structured collections of related fields that organize dataset metadata into logical groups. Think of them as different sections of a form—each block contains fields specific to its purpose, and together they provide a comprehensive description of the dataset.
+
+The structure of metadata blocks is determined by your Dataverse installation's configuration. Different installations may have different blocks enabled depending on their research focus and requirements. For example, a Dataverse installation focused on social science research might have blocks for survey metadata, while one focused on geospatial data might have blocks for coordinate systems and map projections.
+
+Common metadata blocks include:
+
+- **Citation**: Contains basic information like title, authors, description, publication date, and contact information. This block is almost always present and is required for dataset creation.
+
+- **Geospatial**: Contains fields for geographic coverage, coordinates, and spatial reference systems. Useful for datasets with location-based data.
+
+- **Social Science**: Contains fields specific to social science research, such as survey methodology, sample characteristics, and data collection procedures.
+
+- **Astrophysics**: Contains fields specific to astronomy and astrophysics research, such as telescope information, observation parameters, and celestial coordinates.
+
+Each block is implemented as a Pydantic model, which means the class validates your data as you enter it, ensuring it conforms to the expected structure and catching errors early.
+
+### Accessing Metadata Blocks
+
+You can access metadata blocks using dictionary-style indexing, which provides a convenient and intuitive interface:
+
+```python
+# Access the citation metadata block using bracket notation
+citation = dataset["citation"]
+# Or equivalently using the metadata_blocks dictionary:
+citation = dataset.metadata_blocks["citation"]
+
+# Access fields within the block
+title = citation["title"]
+authors = citation["author"]
+```
+
+The bracket notation (`dataset["citation"]`) is a convenience feature that makes the code more readable. It's equivalent to accessing `dataset.metadata_blocks["citation"]` but shorter and more intuitive. Both methods return the same metadata block object, which you can then use to access and modify individual fields.
+
+When accessing fields within a metadata block, the structure depends on the field type. Simple fields like strings can be accessed directly, while compound fields (like author lists) may require list operations or dictionary access. The Pydantic models ensure that you're working with the correct data types and structures.
+
+### Modifying Metadata
+
+Metadata can be modified by directly accessing and updating the metadata blocks. Changes are made locally first, allowing you to build up or modify the dataset metadata before uploading or updating on the server:
+
+```python
+# Update the title in the citation block
+dataset.metadata_blocks["citation"]["title"] = "New Title"
+
+# Add an author to the author list
+# Note that author is typically a list, so we append to it
+dataset.metadata_blocks["citation"]["author"].append({
+    "authorName": "John Doe",
+    "authorAffiliation": "University"
+})
+
+# Update other metadata blocks if available
+# Always check if a block exists before accessing it, as not all installations have all blocks
+if "geospatial" in dataset.metadata_blocks:
+    dataset.metadata_blocks["geospatial"]["geographicCoverage"] = "North America"
+```
+
+When modifying metadata, it's important to understand the structure of each field. Some fields are simple values (like strings or numbers), while others are lists or nested dictionaries. The Pydantic models help ensure you're using the correct structure—if you try to assign an incorrect type or structure, you'll get a validation error that helps you correct the issue.
+
+For fields that are lists (like authors), you typically append new items. For fields that are dictionaries, you can update individual keys. The exact structure depends on the metadata block and field definitions, which are determined by your Dataverse installation's configuration.
+
+### Updating Metadata on the Server
+
+After modifying metadata locally, you can push the changes to the Dataverse server using the `update_metadata()` method. This is useful when you've made changes to an already-uploaded dataset and want to save those changes:
+
+```python
+# Update metadata on the server
+# This requires the dataset to have a persistent_identifier (must be uploaded first)
+dataset.update_metadata()
+```
+
+This method sends all modified metadata blocks and the license to the server, updating the dataset's metadata accordingly. It's important to note that this method requires the dataset to have a persistent identifier—in other words, the dataset must have been uploaded to a collection first. If you try to call `update_metadata()` on a local-only dataset (one that hasn't been uploaded yet), you'll get a `ValueError`.
+
+The method automatically serializes all non-empty metadata blocks and sends them to the server. Empty blocks (those with no data) are excluded from the update, which keeps the metadata clean and avoids sending unnecessary information. After a successful update, the method waits for the dataset to unlock and then refreshes the dataset to ensure you have the latest metadata and draft state. The changes are immediately visible on the Dataverse web interface and through the API.
+
+### Refreshing Dataset Data
+
+To refresh the dataset with the latest data from the Dataverse server, use the `refresh()` method:
+
+```python
+# Refresh the dataset from the server
+dataset.refresh()
+```
+
+This method fetches the latest version of the dataset from the server and updates all attributes (version, identifiers, license, and metadata blocks) with the current server state. This is useful when you suspect the dataset may have been modified on the server (by other users or processes) and you want to ensure your local object reflects the current state.
+
+### Publishing Datasets
+
+To publish a dataset (make it publicly available), use the `publish()` method:
+
+```python
+# Publish the dataset
+dataset.publish()
+
+# Publish with a specific release type
+dataset.publish(release_type="minor")  # or "major" or "updatecurrent"
+```
+
+The `publish()` method makes the dataset publicly available. It requires:
+- The dataset to have a persistent identifier (must be uploaded first)
+- The dataset to have a license assigned
+
+The `release_type` parameter controls how the version number is incremented:
+- `"major"` (default): Creates a new major version (e.g., 1.0 → 2.0)
+- `"minor"`: Creates a new minor version (e.g., 1.0 → 1.1)
+- `"updatecurrent"`: Updates the current version without creating a new version
+
+After publishing, the method waits for the dataset to unlock before returning, ensuring the publication process is complete.
+
+## Working with Files
+
+Files are the actual data content of a dataset—the CSV files, images, code, documents, and other resources that researchers want to share and preserve. The `Dataset` class provides several methods for working with files, supporting both reading existing files from uploaded datasets and adding new files to datasets you're creating or modifying.
+
+Files in Dataverse datasets are organized hierarchically using paths, similar to a filesystem. You can organize files into directories (like "data/", "code/", "docs/") to keep related files together. Each file can have associated metadata, such as a description, categories (tags), and content type, which helps organize and describe the files within the dataset.
+
+The class supports multiple ways to work with files: reading files from existing datasets, writing new files directly, and uploading files from your local filesystem. Each approach has its use cases, and you can mix them as needed for your workflow.
+
+### Accessing Files
+
+The `files` property provides a view of all files in the dataset:
+
+```python
+# Iterate over all files
+for file in dataset.files:
+    print(f"{file.path}: {file.metadata.data_file.filesize} bytes")
+
+# Access a specific file by path
+file = dataset.files["data/results.csv"]
+print(file.metadata.data_file.content_type)
+```
+
+The `files` property returns a `FilesView` object that supports both iteration and dictionary-like access by file path. This view provides a convenient interface for exploring the files in a dataset without needing to understand the underlying API structure. You can iterate over all files to see what's available, or look up specific files by their path when you know what you're looking for.
+
+The `FilesView` is lazy-loaded, meaning it doesn't fetch file information from the server until you actually access it. This makes it efficient for datasets with many files, as you only retrieve the information you need. Each file in the view is represented by a `File` object that contains metadata about the file, including its path, size, content type, and other properties.
+
+### Accessing Tabular Files
+
+For datasets with many files, you may want to filter to only tabular files (CSV, TSV, etc.). The `tabular_files` property provides a filtered view:
+
+```python
+# Get only tabular files
+for tabular_file in dataset.tabular_files:
+    print(f"{tabular_file.path}: {tabular_file.metadata.data_file.content_type}")
+```
+
+This is particularly useful when you want to process only data files and skip documentation, images, or other non-tabular content.
+
+### Reading Files
+
+Files can be read using the `open()` method, which supports both text and binary modes:
+
+```python
+# Read a text file
+with dataset.open("data/readme.txt", mode="r") as f:
+    content = f.read()
+    print(content)
+
+# Read a binary file
+with dataset.open("data/image.png", mode="rb") as f:
+    image_data = f.read()
+
+# Read using a File object
+file = dataset.files["data/readme.txt"]
+with dataset.open(file, mode="r") as f:
+    content = f.read()
+```
+
+The `open()` method returns a file-like object that can be used with Python's context manager (`with` statement) for proper resource management. This ensures that file handles are properly closed after use, even if an error occurs during reading. The returned object supports standard file operations like `read()`, `readline()`, and iteration.
+
+For text mode (`mode="r"`), the file is opened as a text stream, and content is automatically decoded using UTF-8 encoding. For binary mode (`mode="rb"`), the file is opened as a binary stream, and you receive raw bytes. Choose the appropriate mode based on what you plan to do with the file—text mode for reading text files, binary mode for images, executables, or other binary data.
+
+The method handles file paths relative to the dataset root, so "data/file.txt" refers to a file in the "data" directory within the dataset. If the file doesn't exist, a `FileNotFoundError` is raised, helping you catch errors early.
+
+### Writing Files
+
+New files can be created and written to using `open()` in write mode:
+
+```python
+# Write a text file
+with dataset.open("data/notes.txt", mode="w") as f:
+    f.write("These are my research notes.\n")
+    f.write("Additional information here.")
+
+# Write a binary file
+with dataset.open("data/results.bin", mode="wb") as f:
+    f.write(b"Binary data here")
+
+# Write with metadata (description, categories, content type)
+with dataset.open(
+    "data/results.csv",
+    mode="w",
+    description="Experimental results data",
+    categories=["Data", "Results"],
+    content_type="text/csv"
+) as f:
+    f.write("column1,column2,column3\n")
+    f.write("value1,value2,value3\n")
+```
+
+When writing files, you can optionally provide metadata such as a description, categories (tags), and content type (MIME type). This metadata helps organize and describe files within the dataset, making it easier for others to understand what each file contains and how it relates to the research.
+
+The `description` parameter allows you to provide a human-readable description of the file's contents or purpose. This is particularly useful for files that might not be self-explanatory from their names alone. For example, you might describe a CSV file as "Experimental results from trials 1-10, including accuracy and loss metrics."
+
+The `categories` parameter accepts a list of category strings that act as tags for the file. These can help organize files by type (e.g., ["Data", "Results"]) or by purpose (e.g., ["Code", "Analysis"]). Categories are useful for filtering and searching files within a dataset.
+
+The `content_type` parameter specifies the MIME type of the file (e.g., "text/csv", "image/png", "application/json"). This helps Dataverse and other systems understand how to handle the file. If not specified, Dataverse will attempt to detect the content type automatically based on the file extension, but providing it explicitly ensures accurate classification.
+
+Note that metadata can only be provided when writing files—you cannot add metadata when reading files, as that would require modifying the file on the server.
+
+### Uploading Local Files
+
+For uploading files from your local filesystem, use the `upload_file()` method:
+
+```python
+# Upload a local file (uses basename as dataset path)
+dataset.upload_file("/path/to/local/file.txt")
+
+# Upload to a specific path in the dataset
+dataset.upload_file("/path/to/local/data.csv", "data/results.csv")
+
+# Upload with custom metadata
+dataset.upload_file(
+    "/path/to/data.csv",
+    "data/results.csv",
+    description="Experimental results",
+    categories=["Data", "Research"],
+    content_type="text/csv"
+)
+```
+
+The `upload_file()` method handles the upload process, including file replacement if a file already exists at the specified path. This makes it convenient for updating files in an existing dataset—if you upload a file with the same path as an existing file, the old file is automatically replaced with the new one.
+
+The method requires the dataset to have an identifier (database ID, must be uploaded to the server first). This is because file uploads are performed through the Dataverse API, which needs to know which dataset to add the file to. If you try to upload a file to a local-only dataset (one that hasn't been uploaded yet), you'll get a `ValueError` indicating that the dataset identifier is required.
+
+The method automatically handles several aspects of the upload process: it validates that the local file exists, parses the dataset path to determine directory structure, builds the upload metadata, checks if a file already exists at that path (and replaces it if necessary), and clears the file cache to ensure fresh data on subsequent reads. This automation makes it easy to add files to datasets without worrying about the underlying API details.
+
+If you don't specify a `dataset_path`, the method uses the basename of the local file path. For example, uploading "/path/to/results.csv" without a dataset path will create the file as "results.csv" in the dataset root. This is convenient when you want to preserve the original filename.
+
+### Working with Tabular Data
+
+For CSV and other tabular files, the `Dataset` class provides convenient methods that return pandas DataFrames:
+
+```python
+# Load an entire tabular file as a DataFrame
+df = dataset.open_tabular("data/results.csv")
+print(df.head())
+
+# Load with custom options
+df = dataset.open_tabular(
+    "data/results.csv",
+    sep=",",  # Delimiter
+    usecols=["col1", "col2"],  # Select specific columns
+    dtype={"col1": str, "col2": int},  # Specify data types
+    na_values=["N/A", "null"]  # Values to treat as NaN
+)
+
+# Load without header row
+df = dataset.open_tabular("data/no_header.csv", no_header=True)
+
+# Stream large files in chunks
+for chunk in dataset.stream_tabular("data/large_file.csv", chunk_size=10000):
+    # Process each chunk
+    process_data(chunk)
+```
+
+The `open_tabular()` method loads the entire file into memory as a pandas DataFrame. This is convenient for most use cases, as it gives you immediate access to all the data and allows you to use pandas' full functionality for analysis. However, for very large files (those that don't fit in memory), this approach can cause memory issues.
+
+For large files, use `stream_tabular()` instead, which yields the file in chunks. Each chunk is a pandas DataFrame containing a subset of the rows, allowing you to process the file incrementally without loading everything into memory at once. This is particularly useful for datasets with millions of rows or when working on systems with limited memory.
+
+Both methods accept the same keyword arguments as pandas' `read_csv()` function, giving you fine-grained control over how the file is parsed. You can specify delimiters, data types, which columns to read, how to handle missing values, and many other options. This flexibility allows you to adapt the reading process to your specific data format and analysis needs.
+
+The methods automatically handle the file download and parsing, so you don't need to manually download files before analyzing them. This streamlines data analysis workflows and makes it easy to work with data directly from Dataverse datasets.
+
+## Uploading Datasets
+
+After creating a dataset locally and adding files, you can upload it to a Dataverse collection:
+
+```python
+# Upload to a collection by alias
+dataset.upload_to_collection("my-collection")
+
+# After uploading, the dataset receives both an identifier and persistent_identifier
+print(dataset.identifier)  # Database ID (integer)
+print(dataset.persistent_identifier)  # DOI (string)
+# Output: 12345
+# Output: "doi:10.5072/FK2/ABC123"
+```
+
+The `upload_to_collection()` method sends the dataset metadata and files to the specified collection. This is the final step in publishing a dataset—after creating it locally, adding metadata, and adding files, you upload it to make it available on the Dataverse server.
+
+The method requires the collection to exist (you can create it first using `Dataverse.create_collection()` if needed). You can pass either a collection alias (string) or a `Collection` object. After a successful upload, the dataset receives both an identifier (database ID, integer) and a persistent identifier (typically a DOI, string) that can be used to fetch it later. These identifiers are automatically assigned by Dataverse and stored in the dataset's `identifier` and `persistent_identifier` attributes.
+
+The upload process includes sending all metadata blocks (with their current values) and all files that have been added to the dataset. Files that were written using `open()` in write mode are uploaded as part of this process. The method handles the entire upload workflow, including API communication, error handling, and identifier assignment.
+
+After uploading, the dataset becomes accessible through the Dataverse web interface, where users can browse, download, and cite it. The dataset also becomes available through the API, allowing programmatic access. If you need to make changes after uploading, you can modify the local dataset object and use `update_metadata()` to push changes to the server.
+
+## Dataset Locks
+
+Datasets can be temporarily locked by Dataverse during various operations to prevent concurrent modifications and ensure data integrity. Common scenarios that trigger locks include publishing a dataset, ingesting files, running workflows, review processes, active edits, or validation failures. When a dataset is locked, certain operations may be unavailable until the lock is released.
+
+You can check if a dataset is currently locked using the `is_locked` property:
+
+```python
+# Check if the dataset is locked
+# Requires the dataset to have an identifier (must be uploaded first)
+if dataset.is_locked:
+    print("Dataset is currently locked")
+else:
+    print("Dataset is available for operations")
+```
+
+The `is_locked` property returns `True` if the dataset has any active locks. This requires the dataset to have an identifier (must be uploaded first). This is useful for conditional logic in your code, but for most use cases, you'll want to wait for the dataset to unlock automatically rather than checking manually.
+
+To wait for a dataset to unlock before proceeding with further operations, use the `wait_for_unlock()` method. This method polls the lock status and blocks until the dataset is unlocked, making it ideal for automated workflows:
+
+```python
+# Publish the dataset
+dataset.publish()
+
+# Wait for the dataset to unlock before proceeding
+dataset.wait_for_unlock()
+
+# Now safe to perform operations that require an unlocked dataset
+versions = dataset.dataverse.native_api.get_dataset_versions(dataset.persistent_identifier)
+```
+
+The `wait_for_unlock()` method automatically handles the waiting logic, checking the lock status every 0.5 seconds and logging progress. This is particularly useful after operations like publishing, where the dataset may be locked while Dataverse processes the publication and assigns version numbers or DOIs.
+
+For more advanced scenarios where you need detailed information about locks, you can access the native API directly to inspect lock details:
+
+```python
+# Get detailed lock information
+# Requires the dataset to have an identifier
+lock_response = dataset.dataverse.native_api.get_dataset_lock(dataset.identifier)
+locks = lock_response.root
+
+# Inspect each lock
+for lock in locks:
+    print(f"Lock type: {lock.lock_type}")
+    print(f"Date: {lock.date}")
+    print(f"User: {lock.user}")
+```
+
+Lock types include `Ingest` (file ingestion), `Workflow` (workflow processing), `InReview` (review processes), `finalizePublication` (publication finalization), `EditInProgress` (active edits), and `FileValidationFailed` (validation failures). Understanding the specific lock type can help you implement more sophisticated error handling or provide better user feedback in your applications.
+
+## Bundling Files
+
+You can bundle one or more files from a dataset into a ZIP archive:
+
+```python
+# Bundle all files into a ZIP (streaming mode for large bundles)
+with dataset.bundle_datafiles(stream=True) as resp:
+    with open("dataset.zip", "wb") as f:
+        for chunk in resp.iter_bytes():
+            f.write(chunk)
+
+# Bundle all files (non-streaming mode for small bundles)
+resp = dataset.bundle_datafiles(stream=False)
+with open("dataset.zip", "wb") as f:
+    f.write(resp.read())
+
+# Bundle specific files by path
+resp = dataset.bundle_datafiles(files=["data/file1.csv", "data/file2.csv"])
+with open("bundle.zip", "wb") as f:
+    f.write(resp.read())
+
+# Bundle files by File objects
+files = [dataset.files["data/file1.csv"], dataset.files["data/file2.csv"]]
+resp = dataset.bundle_datafiles(files=files)
+with open("bundle.zip", "wb") as f:
+    f.write(resp.read())
+
+# Bundle files by file IDs
+resp = dataset.bundle_datafiles(files=[12345, 12346])
+```
+
+The `bundle_datafiles()` method supports bundling all files or a specific subset, and can return either a complete response or a streaming context manager for large bundles. This is useful when you want to download multiple files at once or create a backup of dataset files.
+
+When bundling all files (the default behavior when `files="all"`), the method creates a ZIP archive containing every file in the dataset. This is convenient for downloading entire datasets or creating local backups. When bundling specific files, you provide a list of file paths (strings), File objects, or file IDs (integers), and only those files are included in the bundle.
+
+The method has two modes:
+
+- **Non-streaming mode** (`stream=False`, default): Returns a complete `httpx.Response` object that you can read entirely. Use this for small bundles that fit comfortably in memory.
+
+- **Streaming mode** (`stream=True`): Returns a context manager that yields an `httpx.Response` object for streaming. Use this for large bundles (which might be hundreds of megabytes or larger) to avoid loading the entire ZIP file into memory. The streaming mode allows you to write the file incrementally without consuming excessive memory.
+
+The method is particularly useful for data sharing and backup purposes. Researchers often want to download entire datasets or specific subsets for local analysis, and bundling provides an efficient way to do this. The ZIP format also compresses the files, reducing download size and transfer time.
+
+**Note**: The dataset must have an identifier (must be uploaded first) before you can bundle files. If you try to bundle files from a local-only dataset, you'll get a `ValueError`.
+
+## Exporting Metadata
+
+Dataset metadata can be exported in various formats:
+
+```python
+# Export as Dataverse JSON format
+metadata_json = dataset.export("dataverse_json")
+
+# Export as Dublin Core
+dublin_core = dataset.export("DublinCore")
+
+# Export using the semantic API (returns a dictionary)
+semantic_data = dataset.export("semantic_api")
+
+# Export in other supported formats
+# Available formats depend on the Dataverse installation
+```
+
+The `export()` method supports multiple metadata formats, allowing integration with other systems and tools that understand these standards. Different formats serve different purposes—some are designed for human readability, while others are optimized for machine processing or specific metadata standards.
+
+Common export formats include:
+
+- **dataverse_json**: Dataverse's native JSON format, which preserves all metadata blocks and their structure exactly as stored in Dataverse.
+
+- **DublinCore**: A widely-used metadata standard that provides a simplified, standardized representation of dataset metadata. Useful for integration with systems that understand Dublin Core.
+
+- **semantic_api**: Returns metadata in JSON-LD format via the Dataverse Semantic API, which is optimized for semantic web applications and linked data.
+
+- **schema.org**: JSON-LD format following schema.org conventions, which is useful for semantic web applications and search engine optimization.
+
+- **oai_dc**: Open Archives Initiative Dublin Core format, commonly used in digital library systems.
+
+The available formats depend on your Dataverse installation's configuration—not all installations support all formats. The method returns the exported metadata as either a string (for XML-based formats) or a dictionary (for JSON-based formats), depending on the format requested.
+
+Exporting metadata is useful for several scenarios: integrating datasets with other systems, generating citations in specific formats, creating metadata records for other repositories, or analyzing metadata across multiple datasets. The standardized formats ensure compatibility with a wide range of tools and systems.
+
+## Working with RDF Graphs
+
+For semantic web applications and linked data workflows, you can convert dataset metadata into an RDF graph:
+
+```python
+# Get RDF graph using a single format
+graph = dataset.graph("OAI_ORE")
+
+# Get RDF graph using multiple formats (merged)
+graph = dataset.graph(["OAI_ORE", "JSON-LD"])
+
+# Query the resulting graph
+for subj, pred, obj in graph:
+    print(f"{subj} {pred} {obj}")
+```
+
+The `graph()` method retrieves the dataset's metadata in one or more semantic formats (such as JSON-LD, RDF/XML, Turtle, etc.) and converts them into an RDF graph using rdflib. The method validates that the requested formats are available and support semantic data representation.
+
+When multiple formats are provided, the resulting graphs are merged into a single RDF graph, combining information from all sources. This is useful for comprehensive semantic analysis or when you need to work with multiple metadata representations simultaneously.
+
+The method only accepts formats that have semantic media types (like `application/ld+json` or `application/json`). If you request an invalid format, a `ValueError` is raised with information about available formats.
+
+## JSON Schema Generation
+
+You can access a JSON schema that describes all metadata blocks in the dataset:
+
+```python
+# Access JSON schema (cached property)
+schema = dataset.json_schema
+
+# The schema can be used for validation, documentation, or UI generation
+print(schema["properties"]["citation"])
+```
+
+The `json_schema` property is a cached property that generates a JSON schema describing all metadata blocks in the dataset, including their fields, data types, and validation rules. This is useful for validation, documentation generation, or building user interfaces that need to understand the dataset structure. JSON Schema is a standard format for describing data structures, and many tools and libraries understand it.
+
+The generated schema makes it possible to:
+
+- **Validate metadata**: Use JSON Schema validators to ensure that metadata conforms to the expected structure before submitting it to Dataverse.
+
+- **Generate documentation**: Automatically create documentation that describes what fields are available in each metadata block and what types of values they accept.
+
+- **Build user interfaces**: Create forms or other UI components that dynamically adapt to the dataset structure, ensuring users can only enter valid data.
+
+- **Integrate with other systems**: Share schema information with other tools that need to understand the dataset structure, such as data analysis tools or metadata harvesters.
+
+The schema follows the JSON Schema Draft 7 specification, which is widely supported by validation libraries and tools across many programming languages. This ensures broad compatibility and makes it easy to work with the schema in various contexts.
+
+## Dictionary Representation
+
+You can generate a dictionary representation of the dataset:
+
+```python
+# Get dictionary representation (excludes None values)
+dataset_dict = dataset.dict()
+
+# Get dictionary with only specific metadata blocks
+dataset_dict = dataset.dict(include=["citation", "geospatial"])
+```
+
+The `dict()` method generates a dictionary representation of the dataset, omitting fields that are unset (have `None` values). This is useful for serialization, inspection, or passing dataset data to other functions.
+
+You can optionally specify which metadata blocks to include using the `include` parameter. If not specified, all metadata blocks are included. This allows you to create lightweight representations when you only need specific blocks.
+
+## File System Interface
+
+For advanced file operations, the `Dataset` class provides access to a file system interface through the `fs` property:
+
+```python
+# Access the file system interface
+fs = dataset.fs
+
+# Use filesystem operations
+files = fs.listdir("data")
+if fs.exists("data/results.csv"):
+    with fs.openbin("data/results.csv", "rb") as f:
+        data = f.read()
+```
+
+The file system interface provides lower-level access to files and supports operations like listing directories, checking file existence, and binary file operations. This interface implements the PyFilesystem2 API, which provides a consistent interface for working with various file systems.
+
+The file system interface is useful when you need more control over file operations than the high-level `open()` method provides. For example, you might want to:
+
+- **List directory contents**: See what files and subdirectories exist in a particular directory within the dataset.
+
+- **Check file existence**: Determine whether a file exists at a given path before attempting to read it, avoiding errors.
+
+- **Perform batch operations**: Work with multiple files in a directory, such as processing all CSV files or copying files between directories.
+
+- **Access advanced features**: Use filesystem features not exposed by the high-level interface, such as getting file information or performing complex directory operations.
+
+The interface caches file information to improve performance, so repeated operations on the same files are faster. However, if files are modified on the server (outside of your current session), you may need to clear the cache to see the changes. The cache is automatically cleared when you upload or modify files through the dataset interface.
+
+While the high-level `open()` method is sufficient for most use cases, the file system interface provides additional flexibility for advanced workflows and integration with tools that expect a filesystem-like interface.
+
+## Complete Example
+
+The following example demonstrates a complete workflow for creating a dataset, adding files, and uploading it:
+
+```python
+from pyDataverse import Dataverse
+
+# Initialize connection
+dv = Dataverse(
+    base_url="https://demo.dataverse.org",
+    api_token="your-token"
+)
+
+# Create a dataset
+dataset = dv.create_dataset(
+    title="Experimental Results 2024",
+    description="Results from machine learning experiments",
+    authors=[{"name": "Dr. Jane Smith", "affiliation": "Research Lab"}],
+    contacts=[{"name": "Dr. Jane Smith", "email": "jane@lab.edu"}],
+    subjects=["Computer and Information Science", "Engineering"]
+)
+
+# Add files by writing them
+with dataset.open("data/results.csv", mode="w", description="Main results") as f:
+    f.write("experiment,accuracy,loss\n")
+    f.write("exp1,0.95,0.05\n")
+    f.write("exp2,0.92,0.08\n")
+
+with dataset.open("data/readme.txt", mode="w") as f:
+    f.write("This dataset contains experimental results.\n")
+
+# Upload the dataset to a collection (files written via open() are included)
+dataset.upload_to_collection("research-lab")
+
+# Upload additional local files after the dataset is uploaded
+dataset.upload_file("/path/to/analysis.py", "code/analysis.py")
+
+# Verify the upload
+print(f"Dataset uploaded with identifier: {dataset.identifier}")
+print(f"Dataset persistent identifier: {dataset.persistent_identifier}")
+
+# Later, fetch and work with the dataset
+fetched_dataset = dv.fetch_dataset(dataset.persistent_identifier)
+
+# Read tabular data
+df = fetched_dataset.open_tabular("data/results.csv")
+print(df.head())
+
+# Open in browser to view
+fetched_dataset.open_in_browser()
+```
+
+## Related Classes
+
+- **[`Dataverse`](/high-level/Dataverse/)** - Factory class for creating and managing datasets
+- **[`Collection`](/high-level/collection/)** - Represents a Dataverse collection that can contain datasets
+- **[`File`](/high-level/file/)** - Represents an individual file within a dataset
+
+## See Also
+
+- [Dataverse Documentation](/high-level/Dataverse/) - Learn more about creating and managing datasets
+- [Collection Documentation](/high-level/collection/) - Learn more about collections and organizing datasets
+- [File Documentation](/high-level/file/) - Learn more about working with individual files

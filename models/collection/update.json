@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UpdateCollection",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "alias": {
+      "type": "string"
+    },
+    "dataverseContacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "contactEmail": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": ["contactEmail"]
+      }
+    },
+    "affiliation": {
+      "type": "string",
+      "example": "Scientific Research University"
+    },
+    "description": {
+      "type": "string"
+    },
+    "dataverseType": {
+      "type": "string"
+    }
+  }
+}

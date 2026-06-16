@@ -1,0 +1,41 @@
+---
+title: Overview
+description: Overview of the high-level API classes for working with Dataverse installations, collections, datasets, and files.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+The pyDataverse high-level API follows the structure of a Dataverse installation. It models the same building blocks that exist on the server and provides Python classes for each of them. Once you understand these concepts, the rest of the library becomes much easier to use.
+
+## Understanding the Hierarchy
+
+Dataverse organizes research data in a hierarchical structure that mirrors how research institutions and projects are organized. At the top level is the **Dataverse installation**—the entire server that hosts all content. Within an installation, **collections** (also called sub-dataverses) serve as organizational containers that group related datasets together. Collections can contain both datasets and other collections, creating a flexible tree structure that can represent departments, research groups, projects, or any organizational scheme.
+
+Each **dataset** belongs to exactly one collection and serves as a container for research outputs. A dataset combines structured metadata (organized into metadata blocks) with actual data files, creating a complete, citable research object. Finally, **files** are the actual research artifacts—data files, documentation, code, notebooks, or any other digital content—that live within a dataset.
+
+## Available Classes
+
+pyDataverse provides four main classes that correspond to the Dataverse hierarchy. Each class provides a convenient, Pythonic interface for working with its corresponding Dataverse concept, handling authentication, API calls, and data transformation automatically.
+
+<CardGrid>
+  <LinkCard
+    title="Dataverse"
+    href="/high-level/dataverse/"
+    description="Main entry point connecting to a Dataverse installation. Factory for creating datasets and accessing collections, metrics, and API clients."
+  />
+  <LinkCard
+    title="Collection"
+    href="/high-level/collection/"
+    description="Organizational containers that group related datasets. Support hierarchical nesting and have their own metadata and permissions."
+  />
+  <LinkCard
+    title="Dataset"
+    href="/high-level/dataset/"
+    description="Containers for research outputs with structured metadata blocks and files. Independently citable research objects with persistent identifiers."
+  />
+  <LinkCard
+    title="File"
+    href="/high-level/file/"
+    description="Individual research artifacts within datasets. Support reading, downloading, metadata management, and pandas integration for tabular data."
+  />
+</CardGrid>

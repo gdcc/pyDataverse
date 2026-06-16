@@ -1,0 +1,302 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "definitions": {
+    "EditMetadataBody": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        }
+      },
+      "required": ["fields"]
+    },
+    "GetDatasetResponse": {
+      "type": "object",
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "datasetType": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer"
+            },
+            "identifier": {
+              "type": "string"
+            },
+            "persistentUrl": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": "string"
+            },
+            "authority": {
+              "type": "string"
+            },
+            "publisher": {
+              "type": "string"
+            },
+            "storageIdentifier": {
+              "type": "string"
+            },
+            "latestVersion": {
+              "$ref": "#/definitions/Dataset"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/Dataset"
+        }
+      ]
+    },
+    "Dataset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "datasetType": {
+          "type": "string"
+        },
+        "datasetId": {
+          "type": "integer"
+        },
+        "datasetPersistentId": {
+          "type": "string"
+        },
+        "storageIdentifier": {
+          "type": "string"
+        },
+        "versionState": {
+          "type": "string"
+        },
+        "latestVersionPublishingState": {
+          "type": "string"
+        },
+        "lastUpdateTime": {
+          "type": "string"
+        },
+        "createTime": {
+          "type": "string"
+        },
+        "fileAccessRequest": {
+          "type": "boolean"
+        },
+        "license": {
+          "$ref": "#/definitions/License"
+        },
+        "metadataBlocks": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "$ref": "#/definitions/MetadataBlock"
+          }
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/File"
+          }
+        }
+      }
+    },
+    "MetadataBlock": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MetadataField"
+          },
+          "default": []
+        }
+      },
+      "required": [
+        "displayName",
+        "name",
+        "fields"
+      ]
+    },
+    "MetadataField": {
+      "type": "object",
+      "properties": {
+        "typeName": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "typeClass": {
+          "type": "string",
+          "enum": [
+            "primitive",
+            "compound",
+            "controlledVocabulary"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/Compound"
+            },
+            {
+              "type": "array",
+              "default": [],
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "#/definitions/Compound"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "typeName",
+        "value"
+      ]
+    },
+    "Compound": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/MetadataField"
+      }
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "restricted": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "datasetVersionId": {
+          "type": "integer"
+        },
+        "dataFile": {
+          "$ref": "#/definitions/DataFile"
+        },
+        "directoryLabel": {
+          "type": "string"
+        }
+      }
+    },
+    "DataFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "persistentId": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "friendlyType": {
+          "type": "string"
+        },
+        "filesize": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "storageIdentifier": {
+          "type": "string"
+        },
+        "rootDataFileId": {
+          "type": "integer"
+        },
+        "md5": {
+          "type": "string"
+        },
+        "checksum": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        "tabularData": {
+          "type": "boolean"
+        },
+        "creationDate": {
+          "type": "string"
+        },
+        "fileAccessRequest": {
+          "type": "boolean"
+        }
+      }
+    },
+    "License": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "iconUri": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

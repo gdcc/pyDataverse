@@ -1,0 +1,93 @@
+---
+title: Reading files
+description: Stream file content from a dataset in text or binary mode, including byte-range reads.
+---
+
+`DataverseFS` reads are **lazy**. Opening a file does not download it; bytes are
+fetched from the Data Access API with HTTP Range requests only as you read them.
+This means you can open a multi-gigabyte file, read its first kilobyte, and never
+transfer the rest.
+
+## Text and binary modes
+
+Open a file in text (`"r"`) or binary (`"rb"`) mode, just like the built-in
+`open`:
+
+```python
+# Text mode — bytes are decoded as UTF-8
+with fs.open("data/notes.txt", "r") as f:
+    text = f.read()
+
+# Binary mode — raw bytes, for images, archives, parquet, etc.
+with fs.open("data/image.png", "rb") as f:
+    data = f.read()
+```
+
+Text mode returns a handle that still exposes the underlying Dataverse file's
+attributes (see [Writing files](/filesystem/writing/#reading-back-the-uploaded-files-id)),
+so you don't lose anything by working with text.
+
+## Seeking and partial reads
+
+Because reads are Range-backed, seeking is cheap — you only pay for the bytes you
+actually request:
+
+```python
+with fs.open("data/large.csv", "rb") as f:
+    header = f.read(64)   # first 64 bytes
+    f.seek(0)             # jump back — no re-download of the body
+    f.seek(-128, 2)       # 128 bytes before the end
+    tail = f.read()
+```
+
+### Slice notation
+
+A reader also supports slice indexing as a shorthand for an explicit byte range,
+without downloading anything outside it:
+
+```python
+with fs.open("data/large.csv", "rb") as f:
+    chunk = f[1024:4096]   # bytes 1024–4095
+    start = f[:512]        # first 512 bytes
+    rest  = f[1_000_000:]  # from an offset to the end
+    one   = f[0]           # a single byte
+```
+
+Steps other than `1` and negative indices are not supported.
+
+## Whole-file helpers
+
+When you just want the bytes, fsspec's convenience helpers avoid the
+context-manager boilerplate:
+
+```python
+raw = fs.cat("data/notes.txt")          # bytes of one file
+many = fs.cat(["a.txt", "b.txt"])       # {path: bytes, ...}
+head = fs.head("data/large.csv", 1024)  # first 1 KB
+```
+
+## Downloading to local disk
+
+Use fsspec's `get` to copy a file (or many) from the dataset to your local
+filesystem, streaming as it goes:
+
+```python
+fs.get("data/file.csv", "local_copy.csv")
+fs.get("data/", "local_dir/", recursive=True)
+```
+
+:::tip
+Reading an **ingested tabular** file (a `.tab` produced by Dataverse) returns the
+reconstructed tab-delimited text, including the header row Dataverse stores
+separately. If you want the data as a DataFrame rather than raw bytes, use the
+helpers on the [Tabular data](/filesystem/tabular/) page instead.
+:::
+
+## How it works
+
+Each open file is backed by a `DataverseFileReader`, an fsspec
+`AbstractBufferedFile`. It keeps a small read-ahead cache and translates reads and
+seeks into Range requests against `/api/access/datafile/{id}`. A full `read()`
+streams the response body to its true end, so content is never truncated even
+when a file's stored size differs from what the server sends (as happens with
+ingested tabular files).

@@ -4,8 +4,6 @@ from typing import Generator
 
 from httpx import Auth, Request, Response
 
-from pyDataverse.exceptions import ApiAuthorizationError
-
 
 class ApiTokenAuth(Auth):
     """An authentication handler to add an API token as the X-Dataverse-key
@@ -34,7 +32,7 @@ class ApiTokenAuth(Auth):
 
         """
         if not isinstance(api_token, str):
-            raise ApiAuthorizationError("API token passed is not a string.")
+            raise ValueError("API token passed is not a string.")
         self.api_token = api_token
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
@@ -82,7 +80,7 @@ class BearerTokenAuth(Auth):
 
         """
         if not isinstance(bearer_token, str):
-            raise ApiAuthorizationError("API token passed is not a string.")
+            raise ValueError("API token passed is not a string.")
         self.bearer_token = bearer_token
 
     def auth_flow(self, request: Request) -> Generator[Request, Response, None]:

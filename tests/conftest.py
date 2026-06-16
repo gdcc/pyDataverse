@@ -1,182 +1,357 @@
 """Find out more at https://github.com/GDCC/pyDataverse."""
 
+import json
 import os
+from typing import Callable
+
 import pytest
-from pyDataverse.api import NativeApi
+from pydantic import BaseModel
+
+from pyDataverse import Collection, Dataverse
+from pyDataverse.api.data_access import DataAccessApi
+from pyDataverse.api.metrics import MetricsApi
+from pyDataverse.api.native import NativeApi
+from pyDataverse.api.search import SearchApi
+from pyDataverse.api.semantic import SemanticApi
+from pyDataverse.api.sword import SwordApi
+from pyDataverse.dataverse.dataset import Dataset
+from pyDataverse.models.dataset.create import DatasetCreateBody
+
+DatasetFactory = Callable[[], Dataset]
+CollectionFactory = Callable[[str], Collection]
+REQUIRED_TEST_ENV_VARS = ("BASE_URL", "API_TOKEN", "API_TOKEN_SUPERUSER")
 
 
-def test_config():
-    test_dir = os.path.dirname(os.path.realpath(__file__))
-    root_dir = os.path.dirname(test_dir)
-    test_data_dir = os.path.join(test_dir, "data")
-    json_schemas_dir = os.path.join(root_dir, "pyDataverse/schemas/json")
-    test_data_output_dir = os.path.join(test_data_dir, "output")
-    invalid_filename_strings = ["wrong", ""]
-    invalid_filename_types = [(), [], 12, 12.12, set(), True, False]
-
-    return {
-        "root_dir": root_dir,
-        "test_dir": test_dir,
-        "test_data_dir": test_data_dir,
-        "json_schemas_dir": json_schemas_dir,
-        "test_data_output_dir": test_data_output_dir,
-        "dataverse_upload_min_filename": os.path.join(
-            test_data_dir, "dataverse_upload_min.json"
-        ),
-        "dataverse_upload_full_filename": os.path.join(
-            test_data_dir, "dataverse_upload_full.json"
-        ),
-        "dataverse_upload_schema_filename": os.path.join(
-            json_schemas_dir, "dataverse_upload_schema.json"
-        ),
-        "dataverse_json_output_filename": os.path.join(
-            test_data_output_dir, "dataverse_pytest.json"
-        ),
-        "dataset_upload_min_filename": os.path.join(
-            test_data_dir, "dataset_upload_min_default.json"
-        ),
-        "dataset_upload_full_filename": os.path.join(
-            test_data_dir, "dataset_upload_full_default.json"
-        ),
-        "dataset_upload_schema_filename": os.path.join(
-            json_schemas_dir, "dataset_upload_default_schema.json"
-        ),
-        "dataset_json_output_filename": os.path.join(
-            test_data_output_dir, "dataset_pytest.json"
-        ),
-        "datafile_upload_min_filename": os.path.join(
-            test_data_dir, "datafile_upload_min.json"
-        ),
-        "datafile_upload_full_filename": os.path.join(
-            test_data_dir, "datafile_upload_full.json"
-        ),
-        "datafile_upload_schema_filename": os.path.join(
-            json_schemas_dir, "datafile_upload_schema.json"
-        ),
-        "datafile_json_output_filename": os.path.join(
-            test_data_output_dir, "datafile_pytest.json"
-        ),
-        "tree_filename": os.path.join(test_data_dir, "tree.json"),
-        "invalid_filename_strings": ["wrong", ""],
-        "invalid_filename_types": [(), [], 12, 12.12, set(), True, False],
-        "invalid_validate_types": [None, "wrong", {}, []],
-        "invalid_json_data_types": [[], (), 12, set(), True, False, None],
-        "invalid_set_types": invalid_filename_types + ["", "wrong"],
-        "invalid_json_strings": invalid_filename_strings,
-        "invalid_data_format_types": invalid_filename_types,
-        "invalid_data_format_strings": invalid_filename_strings,
-        "base_url": os.getenv("BASE_URL").rstrip("/"),
-        "api_token": os.getenv("API_TOKEN"),
-        "travis": os.getenv("TRAVIS") or False,
-        "wait_time": 1,
-    }
+def _missing_required_test_env_vars() -> list[str]:
+    return [env_var for env_var in REQUIRED_TEST_ENV_VARS if not os.environ.get(env_var)]
 
 
-test_config = test_config()
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionstart(session):
+    missing_required = _missing_required_test_env_vars()
+    if missing_required:
+        raise pytest.UsageError(
+            "Missing required environment variables for integration tests: "
+            f"{', '.join(missing_required)}. "
+            "Set BASE_URL, API_TOKEN, and API_TOKEN_SUPERUSER to run the test suite "
+            "against a Dataverse instance."
+        )
 
 
-@pytest.fixture()
-def native_api(monkeypatch):
-    """Fixture, so set up an Api connection.
+class Credentials(BaseModel):
+    base_url: str
+    api_token: str
+    api_token_superuser: str
 
-    Returns
-    -------
-    Api
-        Api object.
 
+@pytest.fixture(scope="session")
+def credentials():
     """
+    Retrieves the base URL and API token from the environment variables.
+    Created once per test session and reused across all tests.
 
-    BASE_URL = os.getenv("BASE_URL").rstrip("/")
-
-    monkeypatch.setenv("BASE_URL", BASE_URL)
-    return NativeApi(BASE_URL)
-
-
-def import_dataverse_min_dict():
-    """Import minimum Dataverse dict.
-
-    Returns
-    -------
-    dict
-        Minimum Dataverse metadata.
-
+    Returns:
+        tuple: A tuple containing the base URL and API token.
     """
-    return {
-        "alias": "test-pyDataverse",
-        "name": "Test pyDataverse",
-        "dataverseContacts": [{"contactEmail": "info@aussda.at"}],
-    }
+    base_url = os.environ.get("BASE_URL")
+    api_token = os.environ.get("API_TOKEN")
+    api_token_superuser = os.environ.get("API_TOKEN_SUPERUSER")
 
+    missing_required = _missing_required_test_env_vars()
+    if missing_required:
+        pytest.fail(
+            "Missing required environment variables for integration tests: "
+            f"{', '.join(missing_required)}. "
+            "Set BASE_URL, API_TOKEN, and API_TOKEN_SUPERUSER to run against a "
+            "Dataverse instance."
+        )
+    assert base_url is not None
+    assert api_token is not None
+    assert api_token_superuser is not None
 
-def import_dataset_min_dict():
-    """Import dataset dict.
-
-    Returns
-    -------
-    dict
-        Dataset metadata.
-
-    """
-    return {
-        "license": "CC0",
-        "termsOfUse": "CC0 Waiver",
-        "termsOfAccess": "Terms of Access",
-        "citation_displayName": "Citation Metadata",
-        "title": "Replication Data for: Title",
-    }
-
-
-def import_datafile_min_dict():
-    """Import minimum Datafile dict.
-
-    Returns
-    -------
-    dict
-        Minimum Datafile metadata.
-
-    """
-    return {
-        "pid": "doi:10.11587/EVMUHP",
-        "filename": "tests/data/datafile.txt",
-    }
-
-
-def import_datafile_full_dict():
-    """Import full Datafile dict.
-
-    Returns
-    -------
-    dict
-        Full Datafile metadata.
-
-    """
-    return {
-        "pid": "doi:10.11587/EVMUHP",
-        "filename": "tests/data/datafile.txt",
-        "description": "Test datafile",
-        "restrict": False,
-    }
+    return Credentials(
+        base_url=base_url.rstrip("/"),
+        api_token=api_token,
+        api_token_superuser=api_token_superuser,
+    )
 
 
 @pytest.fixture
-def create_mock_file():
-    """Returns a function that creates a mock file."""
+def metrics_api(credentials: Credentials) -> MetricsApi:
+    """Fixture to provide an initialized MetricsApi instance.
 
-    def _create_mock_file(filename: str, dir: str, size: int):
-        """Create a mock file.
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
 
-        Args:
-            filename (str): Filename.
-            dir (str): Directory.
-            size (int): Size.
+    Returns:
+        MetricsApi: An initialized MetricsApi instance for testing.
+    """
+    return MetricsApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
 
-        Returns:
-            str: Path to the file.
-        """
-        path = os.path.join(dir, filename)
-        with open(path, "wb") as f:
-            f.write(os.urandom(size))
 
-        return path
+@pytest.fixture
+def semantic_api(credentials: Credentials) -> SemanticApi:
+    """Fixture to provide an initialized SemanticApi instance.
 
-    return _create_mock_file
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return SemanticApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def native_api(credentials: Credentials) -> NativeApi:
+    """Fixture to provide an initialized NativeApi instance.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return NativeApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def native_api_superuser(credentials: Credentials) -> NativeApi:
+    """Fixture to provide an initialized NativeApi instance with superuser privileges.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return NativeApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token_superuser,
+    )
+
+
+@pytest.fixture
+def search_api(credentials: Credentials) -> SearchApi:
+    """Fixture to provide an initialized SearchApi instance.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return SearchApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def data_access_api(credentials: Credentials) -> DataAccessApi:
+    """Fixture to provide an initialized DataAccessApi instance.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return DataAccessApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def sword_api(credentials: Credentials) -> SwordApi:
+    """Fixture to provide an initialized SwordApi instance.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return SwordApi(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def dataset_upload_min_default():
+    """Fixture to provide an initialized DataverseUploadMin instance.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return DatasetCreateBody.model_validate(
+        json.load(open("tests/data/dataset_upload_min_default.json"))
+    )
+
+
+@pytest.fixture(scope="session")
+def dataverse(credentials: Credentials) -> Dataverse:
+    """Fixture to provide an initialized Dataverse instance.
+    Created once per test session and reused across all tests to avoid
+    reconnecting on every test.
+
+    Args:
+        credentials: Fixture providing base URL and API token credentials.
+    """
+    return Dataverse(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+    )
+
+
+@pytest.fixture
+def dataset(minimal_dataset: Dataset) -> DatasetFactory:
+    """Fixture to provide a factory function for creating test datasets.
+
+    Returns a lambda function that creates a dataset with standard test metadata
+    and uploads it to the root collection. This allows tests to control when
+    the dataset is actually created, preventing ID misalignment issues.
+
+    Args:
+        dataverse: Session-scoped Dataverse instance to reuse.
+
+    Returns:
+        Callable: A lambda function that creates and returns a Dataset instance.
+    """
+
+    def create_dataset():
+        dataset = minimal_dataset
+        dataset.upload_to_collection("root")
+
+        return dataset
+
+    return create_dataset
+
+
+@pytest.fixture
+def minimal_dataset(dataverse: Dataverse):
+    return dataverse.create_dataset(
+        title="Test Dataset",
+        description="This is a test dataset",
+        authors=[{"name": "Test Author"}],
+        contacts=[{"name": "Test Author", "email": "test@test.com"}],
+        subjects=["Computer and Information Science"],
+        license=dataverse.default_license,
+        upload_to_collection=False,
+    )
+
+
+def _create_mcp_server(credentials: Credentials):
+    """
+    Create and configure a Dataverse MCP server using credentials.
+
+    Used by both session-scoped and standalone fixtures. Inspired by server.py
+    but uses credentials from the fixture instead of hardcoded values.
+
+    Args:
+        credentials: Credentials containing base_url and api_token.
+
+    Returns:
+        Configured FastMCP instance with Dataverse tools registered.
+    """
+    from fastmcp import FastMCP
+
+    from pyDataverse.mcp import DataverseMCP
+
+    mcp = FastMCP(name="PyDataverse MCP Test")
+    dataverse = Dataverse(
+        base_url=credentials.base_url,
+        api_token=credentials.api_token,
+        verbose=0,
+    )
+    DataverseMCP(dataverse=dataverse).to_mcp(mcp)
+    return mcp
+
+
+@pytest.fixture(scope="session")
+def mcp_server(credentials: Credentials):
+    """
+    Session-scoped MCP server instance.
+
+    Creates the FastMCP server once per test session and reuses it across all
+    tests. Use this when tests can share the same server state.
+
+    Args:
+        credentials: Session-scoped credentials fixture.
+
+    Returns:
+        Configured FastMCP instance with Dataverse tools.
+    """
+    return _create_mcp_server(credentials)
+
+
+@pytest.fixture
+def mcp_server_fixture(credentials: Credentials):
+    """
+    Function-scoped MCP server instance.
+
+    Creates a fresh server for each test. Use when the session-scoped server
+    may not be suitable (e.g. tests that modify server state, need isolation,
+    or require different configuration).
+
+    Args:
+        credentials: Credentials fixture.
+
+    Returns:
+        Configured FastMCP instance with Dataverse tools.
+    """
+    return _create_mcp_server(credentials)
+
+
+@pytest.fixture
+async def mcp_client(mcp_server):
+    """
+    MCP client connected to the shared server.
+
+    Each test gets its own client instance; all connect to the same
+    session-scoped server. Use this fixture to emulate a client calling tools
+    via the server (which provides the required context).
+    """
+    pytest.importorskip("fastmcp.client")
+    from fastmcp.client import Client
+
+    async with Client(transport=mcp_server) as client:
+        yield client
+
+
+@pytest.fixture
+async def mcp_client_isolated(mcp_server_fixture):
+    """
+    Function-scoped MCP client with isolated server.
+
+    Use when tests need an isolated server (e.g. state-modifying tests).
+    """
+    pytest.importorskip("fastmcp.client")
+    from fastmcp.client import Client
+
+    async with Client(transport=mcp_server_fixture) as client:
+        yield client
+
+
+@pytest.fixture
+def collection(dataverse: Dataverse) -> CollectionFactory:
+    """Fixture to provide a factory function for creating test collections.
+
+    Returns a lambda function that creates a collection with standard test metadata
+    and uploads it to the root collection. This allows tests to control when
+    the collection is actually created, preventing ID misalignment issues.
+
+    Args:
+        dataverse: Session-scoped Dataverse instance to reuse.
+
+    Returns:
+        Callable: A lambda function that creates and returns a Collection instance.
+    """
+
+    def create_collection(alias: str):
+        collection = dataverse.create_collection(
+            alias=alias,
+            name="Test Collection",
+            affiliation="Test Affiliation",
+            dataverse_type="DEPARTMENT",
+            dataverse_contacts=["test@test.com"],
+            parent="root",
+            description="This is a test collection",
+        )
+
+        return collection
+
+    return create_collection

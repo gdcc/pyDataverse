@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CreateUser",
+  "type": "object",
+  "properties": {
+    "authenticationProviderId": {
+      "type": "string",
+      "description": "Authentication provider identifier"
+    },
+    "persistentUserId": {
+      "type": "string",
+      "description": "Persistent identifier for the user"
+    },
+    "identifier": {
+      "type": "string",
+      "description": "User identifier (username)"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "First name of the user"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Last name of the user"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the user"
+    }
+  },
+  "required": ["authenticationProviderId", "persistentUserId", "identifier", "firstName", "lastName", "email"]
+}

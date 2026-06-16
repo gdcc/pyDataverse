@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RedetectedFileType",
+  "description": "Schema for the response from the file redetect API endpoint",
+  "type": "object",
+  "properties": {
+    "dryRun": {
+      "type": "boolean",
+      "description": "Whether this was a dry run operation"
+    },
+    "oldContentType": {
+      "type": "string",
+      "description": "The previous content type of the file"
+    },
+    "newContentType": {
+      "type": "string",
+      "description": "The new detected content type of the file"
+    }
+  },
+  "required": ["dryRun", "oldContentType", "newContentType"],
+  "additionalProperties": false
+}

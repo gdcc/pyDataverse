@@ -1,0 +1,457 @@
+---
+title: Search API
+description: The Search API provides full-text search capabilities across collections, datasets, and files using Solr.
+---
+
+The `SearchApi` class provides access to Dataverse's Search API endpoints. It specializes in full-text search across all Dataverse content, including collections (dataverses), datasets, and files. The Search API uses Solr under the hood, providing powerful query capabilities including faceted search, relevance scoring, and complex filtering.
+
+Compared to other APIs, `SearchApi` focuses on discovery and exploration. It enables users to find content using natural language queries, advanced Solr query syntax, and sophisticated filtering options. Search results include relevance scores, faceted navigation options, and rich metadata to help users understand and filter results.
+
+## Initialization
+
+To start using the Search API, create a `SearchApi` instance with the base URL of your Dataverse installation. Search endpoints are typically publicly accessible, but authentication may be required for searching restricted content.
+
+```python
+from pyDataverse.api import SearchApi
+
+# Public access (searches public content)
+api = SearchApi(base_url="https://demo.dataverse.org")
+
+# Authenticated access (searches include restricted content)
+api = SearchApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+```
+
+### Understanding the Parameters
+
+`SearchApi` supports the same core parameters as other API classes:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation, such as `"https://demo.dataverse.org"` or `"https://dataverse.harvard.edu"`. All API calls are constructed from this URL.
+- **`api_token`** (str, optional): API token used for endpoints that require authentication. Required for searching restricted content or when your installation requires authentication for search.
+- **`api_version`** (str, optional): API version string passed to the Dataverse server. This is typically left at its default unless you have a specific reason to override it.
+
+The `SearchApi` class automatically manages request URLs, parameters, and authentication headers for you. Public searches can be performed without an API token, while searching restricted content requires authentication.
+
+## Basic Search
+
+The Search API provides a simple `search` method that accepts a query string and optional configuration options.
+
+### Simple Keyword Search
+
+The most basic usage is a simple keyword search:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Simple keyword search
+results = api.search("climate change")
+print(f"Found {results.total_count} results")
+
+# Iterate through results
+for item in results.items or []:
+    print(f"{item.type}: {item.name}")
+    if item.description:
+        print(f"  {item.description[:100]}...")
+```
+
+The search returns a `SearchResponse` object containing:
+- **`total_count`**: Total number of matching results
+- **`items`**: List of search result items (collections, datasets, or files)
+- **`count_in_response`**: Number of items in the current response (for pagination)
+- **`start`**: Starting index of results
+- **`facets`**: Facet information for filtering (if requested)
+
+### Understanding Search Results
+
+Each item in the search results contains rich metadata:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+results = api.search("climate")
+
+for item in results.items or []:
+    print(f"Type: {item.type}")
+    print(f"Name: {item.name}")
+    print(f"Identifier: {item.identifier}")
+    
+    if item.type == "dataset":
+        print(f"Published: {item.published_at}")
+        print(f"Authors: {item.authors}")
+        print(f"File count: {item.file_count}")
+    elif item.type == "file":
+        print(f"File type: {item.file_type}")
+        print(f"Dataset: {item.dataset_name}")
+        print(f"Size: {item.size_in_bytes} bytes")
+```
+
+## Advanced Query Syntax
+
+The Search API uses Solr's powerful query syntax, supporting various search patterns.
+
+### Phrase Searches
+
+Use quotes to search for exact phrases:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Search for exact phrase
+results = api.search('"global warming"')
+```
+
+### Boolean Operators
+
+Combine terms using AND, OR, and NOT:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Must contain both terms
+results = api.search("climate AND temperature")
+
+# Contains either term
+results = api.search("climate OR weather")
+
+# Excludes a term
+results = api.search("climate NOT politics")
+```
+
+### Wildcard Searches
+
+Use `*` for multiple characters or `?` for single characters:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Match any word starting with "climat"
+results = api.search("climat*")
+
+# Match single character variations
+results = api.search("climat?")
+```
+
+### Field-Specific Searches
+
+Search within specific fields using the `field:value` syntax:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Search in title field
+results = api.search("title:climate")
+
+# Search in author field
+results = api.search("author:Smith")
+```
+
+## Search Options
+
+The `QueryOptions` class provides extensive configuration for customizing search behavior.
+
+### Filtering by Content Type
+
+Limit results to specific content types:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Search only datasets
+options = QueryOptions(type="dataset")
+results = api.search("climate", options)
+
+# Search only files
+options = QueryOptions(type="file")
+results = api.search("data", options)
+
+# Search only collections (dataverses)
+options = QueryOptions(type="dataverse")
+results = api.search("research", options)
+```
+
+### Limiting to a Subtree
+
+Search within a specific collection and its sub-collections:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Search only within a specific collection
+options = QueryOptions(subtree="harvard")
+results = api.search("climate", options)
+```
+
+### Sorting Results
+
+Control how results are sorted:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Sort by date, newest first
+options = QueryOptions(
+    sort="date",
+    order="desc",
+)
+results = api.search("climate", options)
+
+# Sort by name, alphabetical
+options = QueryOptions(
+    sort="name",
+    order="asc",
+)
+results = api.search("climate", options)
+```
+
+### Pagination
+
+Handle large result sets with pagination:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# First page (default: 10 results)
+options = QueryOptions(per_page=20, start=0)
+results = api.search("climate", options)
+print(f"Results {results.start} to {results.start + results.count_in_response} of {results.total_count}")
+
+# Second page
+options = QueryOptions(per_page=20, start=20)
+results = api.search("climate", options)
+```
+
+You can request up to 1000 results per page, but smaller page sizes (10-50) are typically more efficient.
+
+### Advanced Filtering
+
+Use Solr filter query syntax for complex filtering:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Filter by publication date range
+options = QueryOptions(
+    filter_query="publicationDate:[2020 TO 2023]",
+)
+results = api.search("climate", options)
+
+# Combine multiple filters
+options = QueryOptions(
+    filter_query="subject:Social Sciences AND fileType:csv",
+)
+results = api.search("survey", options)
+```
+
+### Including Additional Information
+
+Request additional metadata in search results:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Include entity IDs
+options = QueryOptions(show_entity_ids=True)
+results = api.search("climate", options)
+
+# Include relevance scores
+options = QueryOptions(show_relevance=True)
+results = api.search("climate", options)
+for item in results.items or []:
+    if item.score:
+        print(f"{item.name}: score={item.score}")
+
+# Include facet information for filtering
+options = QueryOptions(show_facets=True)
+results = api.search("climate", options)
+if results.facets:
+    for facet in results.facets:
+        print(f"Facet: {facet.name}")
+```
+
+### Geographic Search
+
+Search by geographic location (if your installation supports it):
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Search within a geographic radius
+options = QueryOptions(
+    geo_radius="10km",
+    # Note: geo_point would typically be set via filter_query
+)
+results = api.search("climate", options)
+```
+
+## Working with Search Results
+
+The `SearchResponse` object provides rich information about search results and metadata.
+
+### Accessing Results
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+results = api.search("climate change")
+
+# Total number of matching results
+print(f"Total results: {results.total_count}")
+
+# Number of results in this response
+print(f"Results in page: {results.count_in_response}")
+
+# Starting index
+print(f"Starting at: {results.start}")
+
+# Iterate through results
+if results.items:
+    for item in results.items:
+        print(f"\n{item.type.upper()}: {item.name}")
+        if item.description:
+            print(f"  {item.description}")
+        if item.url:
+            print(f"  URL: {item.url}")
+```
+
+### Understanding Result Types
+
+Different result types contain different metadata:
+
+```python
+from pyDataverse.api import SearchApi
+
+api = SearchApi("https://demo.dataverse.org")
+results = api.search("research")
+
+for item in results.items or []:
+    if item.type == "dataverse":
+        print(f"Collection: {item.name}")
+        print(f"  Affiliation: {item.affiliation}")
+        print(f"  Description: {item.description}")
+        
+    elif item.type == "dataset":
+        print(f"Dataset: {item.name}")
+        print(f"  Published: {item.published_at}")
+        print(f"  Authors: {item.authors}")
+        print(f"  Files: {item.file_count}")
+        print(f"  Citation: {item.citation}")
+        
+    elif item.type == "file":
+        print(f"File: {item.name}")
+        print(f"  Type: {item.file_type}")
+        print(f"  Size: {item.size_in_bytes} bytes")
+        print(f"  Dataset: {item.dataset_name}")
+        print(f"  MD5: {item.md5}")
+```
+
+### Using Facets
+
+Facets help users understand result distributions and refine searches:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+# Request facets
+options = QueryOptions(show_facets=True)
+results = api.search("climate", options)
+
+# Explore facet information
+if results.facets:
+    for facet in results.facets:
+        print(f"\nFacet: {facet.name}")
+        if facet.publication_date:
+            labels = facet.publication_date.labels
+            if labels:
+                for label in labels:
+                    for key, count in label.items():
+                        print(f"  {key}: {count} results")
+```
+
+### Handling Pagination
+
+For large result sets, implement pagination:
+
+```python
+from pyDataverse.api import SearchApi
+from pyDataverse.api.search import QueryOptions
+
+api = SearchApi("https://demo.dataverse.org")
+
+def get_all_results(query, per_page=50):
+    """Retrieve all results for a query using pagination."""
+    all_items = []
+    start = 0
+    
+    while True:
+        options = QueryOptions(per_page=per_page, start=start)
+        results = api.search(query, options)
+        
+        if not results.items:
+            break
+            
+        all_items.extend(results.items)
+        
+        # Check if we've retrieved all results
+        if start + len(results.items) >= (results.total_count or 0):
+            break
+            
+        start += per_page
+    
+    return all_items
+
+# Get all results
+all_results = get_all_results("climate change")
+print(f"Retrieved {len(all_results)} total results")
+```
+
+## When to Use `SearchApi`
+
+Use `SearchApi` when you:
+
+- **need to discover content** across your Dataverse installation using full-text search.
+- **want to implement search functionality** in your own applications or tools.
+- **need advanced query capabilities** using Solr syntax for complex searches.
+- **want to provide faceted navigation** to help users filter and explore results.
+- **need to search across multiple content types** (collections, datasets, files) simultaneously.
+- **want relevance-ranked results** to surface the most relevant content first.
+- **are building discovery interfaces** that need flexible search and filtering options.
+
+For most everyday workflows (accessing specific datasets or files you already know about), the high-level `Dataverse` class or `NativeApi` provide direct access methods. When you need to help users discover content, implement search interfaces, or perform exploratory queries, `SearchApi` provides powerful full-text search capabilities backed by Solr.

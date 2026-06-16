@@ -1,0 +1,365 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "SearchResponse",
+  "type": "object",
+  "properties": {
+    "q": {
+      "type": "string"
+    },
+    "total_count": {
+      "type": "integer"
+    },
+    "start": {
+      "type": "integer"
+    },
+    "spelling_alternatives": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/definitions/Item"
+      }
+    },
+    "count_in_response": {
+      "type": "integer"
+    },
+    "facets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Facet"
+      }
+    }
+  },
+  "required": [
+    "items",
+    "total_count"
+  ],
+  "definitions": {
+    "Item": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "image_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "publicationStatuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "parentDataverseName": {
+          "type": "string"
+        },
+        "parentDataverseIdentifier": {
+          "type": "string"
+        },
+        "file_id": {
+          "type": "string"
+        },
+        "file_type": {
+          "type": "string"
+        },
+        "file_content_type": {
+          "type": "string"
+        },
+        "size_in_bytes": {
+          "type": "integer"
+        },
+        "md5": {
+          "type": "string"
+        },
+        "file_persistent_id": {
+          "type": "string"
+        },
+        "dataset_name": {
+          "type": "string"
+        },
+        "dataset_id": {
+          "type": "string"
+        },
+        "dataset_persistent_id": {
+          "type": "string"
+        },
+        "dataset_citation": {
+          "type": "string"
+        },
+        "releaseOrCreateDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "global_id": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "citationHtml": {
+          "type": "string"
+        },
+        "identifier_of_dataverse": {
+          "type": "string"
+        },
+        "name_of_dataverse": {
+          "type": "string"
+        },
+        "citation": {
+          "type": "string"
+        },
+        "storageIdentifier": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fileCount": {
+          "type": "integer"
+        },
+        "versionId": {
+          "type": "integer"
+        },
+        "versionState": {
+          "type": "string"
+        },
+        "majorVersion": {
+          "type": "integer"
+        },
+        "minorVersion": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          }
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Match"
+          }
+        },
+        "score": {
+          "type": "number"
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "producers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadataBlocks": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MetadataBlock"
+          }
+        }
+      }
+    },
+    "Contact": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "affiliation": {
+          "type": "string"
+        }
+      }
+    },
+    "Match": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/Snippet"
+        },
+        "name": {
+          "$ref": "#/definitions/Snippet"
+        },
+        "authorName": {
+          "$ref": "#/definitions/Snippet"
+        },
+        "dsDescriptionValue": {
+          "$ref": "#/definitions/Snippet"
+        },
+        "title": {
+          "$ref": "#/definitions/Snippet"
+        }
+      }
+    },
+    "Snippet": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "snippets": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Facet": {
+      "type": "object",
+      "properties": {
+        "subject_ss": {
+          "$ref": "#/definitions/FacetLabel"
+        },
+        "authorName_ss": {
+          "$ref": "#/definitions/FacetLabel"
+        },
+        "publicationDate": {
+          "$ref": "#/definitions/FacetLabel"
+        }
+      }
+    },
+    "FacetLabel": {
+      "type": "object",
+      "properties": {
+        "friendly": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "MetadataBlock": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        }
+      }
+    },
+    "Field": {
+      "type": "object",
+      "properties": {
+        "typeName": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "typeClass": {
+          "type": "string",
+          "enum": [
+            "primitive",
+            "compound",
+            "controlledVocabulary"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/Compound"
+            },
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "#/definitions/Compound"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "Compound": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Field"
+      }
+    }
+  }
+}

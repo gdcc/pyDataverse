@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "DatasetReview",
+    "definitions": {
+        "ReviewResponse": {
+            "type": "object",
+            "properties": {
+                "inReview": { "type": "boolean" },
+                "message": { "type": "string" }
+            },
+            "required": ["inReview", "message"]
+        },
+        "ReturnToAuthorBody": {
+            "type": "object",
+            "properties": {
+                "reasonForReturn": { "type": "string" }
+            },
+            "required": ["reasonForReturn"]
+        }
+    }
+}

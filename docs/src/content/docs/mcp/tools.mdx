@@ -1,0 +1,382 @@
+---
+title: Available Tools
+description: Discover what you can do with the pyDataverse MCP server—from searching repositories to analyzing datasets, all through natural conversation.
+---
+
+import { Card, CardGrid, Aside, Badge, Icon } from '@astrojs/starlight/components';
+
+The pyDataverse MCP server transforms your Dataverse repository into a conversational interface. Instead of clicking through web pages or writing API calls, you simply ask questions and get answers. Behind the scenes, specialized tools handle the complexity of querying Dataverse, fetching data, and presenting results in a format that's easy to understand.
+
+Think of these tools as your research assistant's capabilities—each one handles a specific type of task, from discovering datasets to reading file contents. The real magic happens when an LLM combines these tools intelligently to answer your complex questions.
+
+## Discovery & Search
+
+These tools help you find what you're looking for across the entire Dataverse installation. Whether you're searching for specific datasets, exploring collections, or understanding the scale of a repository, these tools are your starting point.
+
+### Search Dataverse
+
+Your gateway to discovering content across the entire Dataverse installation. This tool performs full-text searches across all metadata fields, finding datasets and collections that match your query.
+
+**What makes it powerful:**
+
+- **Natural language search**: Ask for "climate change datasets" or "COVID-19 research"—no need for complex query syntax
+- **Smart filtering**: Automatically filter results by type (datasets or collections) based on your question
+- **Scoped search**: Focus your search on specific collections when you know where to look
+- **Pagination**: Efficiently browse through large result sets without overwhelming the LLM
+
+**Try asking:**
+- *"Find all datasets about machine learning published in 2024"*
+- *"Search for CSV files containing temperature measurements"*
+- *"What collections focus on social science research?"*
+- *"Show me recent datasets about climate change"*
+
+### Get Metrics
+
+Get a bird's-eye view of the entire Dataverse installation. This tool reveals the scale, composition, and recent activity of the repository—perfect for understanding what you're working with.
+
+**What you'll discover:**
+
+- Total counts of datasets, files, and downloads
+- Activity trends over the past 7 days
+- Subject distribution (what research areas are most represented)
+- Collection organization and size
+- Download patterns and data usage
+
+**Try asking:**
+- *"How big is this Dataverse repository?"*
+- *"What's been happening in the last week?"*
+- *"Which subject areas have the most datasets?"*
+- *"Show me the overall statistics for this installation"*
+
+---
+
+## Collection Navigation
+
+Collections are the organizational backbone of Dataverse—they group related datasets and can contain sub-collections, creating a hierarchical structure. These tools help you navigate and understand this structure.
+
+### Get Collection Metadata
+
+Dive into the details of a specific collection. Learn what it's about, who manages it, and how it's organized.
+
+**What you'll learn:**
+
+- Collection name, alias, and persistent identifier
+- Description explaining the collection's purpose and scope
+- Affiliation and institutional context
+- Contact information for collection curators
+- Access policies and permissions
+
+**Try asking:**
+- *"Tell me about the 'Social Science' collection"*
+- *"Who manages the root collection?"*
+- *"What's the purpose of this collection?"*
+- *"Show me the metadata for collection XYZ"*
+
+### List Collection Content
+
+Explore what's inside a collection—all the datasets and sub-collections it contains. This is your map for navigating large repositories.
+
+**What you'll see:**
+
+- All datasets in the collection with their titles and identifiers
+- Sub-collections and their hierarchical relationships
+- Content type distribution (how many datasets vs. sub-collections)
+- Quick navigation paths to interesting content
+
+**Filtering options:**
+- Show only datasets
+- Show only sub-collections
+- Show everything together
+
+**Try asking:**
+- *"What datasets are in the Medical Research collection?"*
+- *"List all sub-collections under the root"*
+- *"Show me everything in this collection"*
+- *"How many datasets does this collection contain?"*
+
+---
+
+## Knowledge Graph Exploration
+
+Dataverse can export dataset metadata as RDF knowledge graphs, creating semantic representations of your data. These tools let you explore and query these graphs to discover relationships and patterns that aren't obvious from browsing alone.
+
+### Knowledge Graph Summary
+
+Before you can query a knowledge graph, you need to know what's in it. This tool analyzes the graph structure and gives you a comprehensive overview.
+
+**What you'll discover:**
+
+- **All RDF classes** present in the graph (what types of entities exist)
+- **Predicates and relationships** connecting entities (how things relate to each other)
+- **Usage statistics** showing how frequently each class and predicate appears
+- **Sample values** giving you concrete examples of the data
+- **Structural patterns** revealing the graph's organization
+
+**Knowledge graph formats:**
+
+<CardGrid>
+  <Card title="Croissant" icon="document">
+    A format designed for ML-ready dataset descriptions, including distribution formats, record sets, and fields.
+  </Card>
+  <Card title="OAI-ORE" icon="puzzle">
+    Resource description format for aggregated web resources, focusing on metadata and resource relationships.
+  </Card>
+</CardGrid>
+
+**Try asking:**
+- *"What's in this collection's knowledge graph?"*
+- *"Show me the structure of the Croissant graph"*
+- *"What types of entities exist in this collection?"*
+- *"What relationships connect datasets in this collection?"*
+
+<Aside type="tip" title="Start Here First">
+Always explore the graph summary before writing SPARQL queries. Understanding the available classes and predicates is essential for crafting effective queries.
+</Aside>
+
+### Query Knowledge Graph
+
+Execute custom SPARQL queries against collection knowledge graphs. This unlocks powerful semantic exploration—finding datasets by relationships, extracting specific patterns, and analyzing metadata connections.
+
+**What you can do:**
+
+- Run custom SPARQL queries with full syntax support
+- Find datasets based on semantic relationships (same author, related topics, shared distributions)
+- Extract specific metadata fields using graph traversal
+- Analyze patterns across multiple datasets simultaneously
+- Discover connections that aren't visible through traditional search
+
+**SPARQL enables questions like:**
+- *"Find all datasets by authors affiliated with Stanford"*
+- *"What datasets share the same license as dataset X?"*
+- *"List all CSV distributions in this collection"*
+- *"Show me datasets that cite other datasets"*
+
+**Example workflow:**
+
+1. Use **Knowledge Graph Summary** to understand what classes and predicates exist
+2. Identify the relationships you want to query (e.g., `schema:author`, `dcat:distribution`)
+3. Craft a SPARQL query using those predicates
+4. Execute with **Query Knowledge Graph** to get results
+
+**Try asking:**
+- *"Query the graph for all datasets with geospatial information"*
+- *"Use SPARQL to find datasets by the same author"*
+- *"Find all tabular distributions in Croissant format"*
+- *"Show me datasets connected to external resources"*
+
+---
+
+## Dataset Exploration
+
+Once you've found interesting datasets through search or collection browsing, these tools let you inspect them in detail—from basic metadata to complete file listings.
+
+### Get Dataset Metadata
+
+Retrieve comprehensive information about a dataset. You control the level of detail—get a quick summary or fetch complete metadata blocks.
+
+**Two-stage approach for efficiency:**
+
+1. **Quick summary**: Get title, authors, description, and see which metadata blocks are available
+2. **Full fetch**: Request specific metadata blocks when you need detailed information
+
+This saves time and tokens—you only fetch what you actually need.
+
+**What's available:**
+
+- **Basic info**: Title, authors, description, version, persistent identifier
+- **Citation metadata**: Publication date, keywords, related publications
+- **Specialized metadata**: Geospatial coords, social science methods, astrophysics parameters
+- **Administrative info**: Access restrictions, terms of use, provenance
+
+**Try asking:**
+- *"What is this dataset about?"*
+- *"Show me the authors and their affiliations"*
+- *"Get the full geospatial metadata for dataset doi:10.5072/..."*
+- *"What metadata blocks are available for this dataset?"*
+
+<Aside type="note" title="Efficient Metadata Fetching">
+Always start with `full=False` to see what metadata blocks exist. Then request `full=True` with specific blocks to get just what you need. This dramatically reduces response time and token usage.
+</Aside>
+
+### List Files in Dataset
+
+See everything inside a dataset—all files with their metadata, types, and access restrictions. Apply filters to find exactly what you're looking for.
+
+**What you'll see for each file:**
+
+- File path and name within the dataset
+- MIME type and format (CSV, JSON, PDF, image, etc.)
+- File description (if provided by the dataset creator)
+- Access status (public or restricted)
+- Tabular file identification (automatically detected)
+
+**Powerful filtering:**
+
+- **By MIME type**: Show only CSV files (`text/csv`), images (`image/*`), or any specific format
+- **By tabular status**: List only files that contain structured data
+- **By access level**: Focus on public or restricted files
+
+**Try asking:**
+- *"What files are in this dataset?"*
+- *"Show me all CSV files"*
+- *"List only restricted files"*
+- *"Find tabular data files in this dataset"*
+- *"Are there any images in this dataset?"*
+
+---
+
+## File Access & Analysis
+
+The most powerful capability—directly read and analyze file contents without downloading anything. Perfect for data exploration, validation, and quick analysis.
+
+### Read Tabular File
+
+Open and analyze CSV, Excel, or TSV files directly. Get statistical summaries, preview data, or extract specific rows—all handled automatically by pandas.
+
+**Capabilities:**
+
+- **Smart format detection**: Automatically handles different delimiters and formats
+- **Data preview**: See the first N rows to understand structure
+- **Statistical summary**: Get mean, std, min, max, and quartiles using pandas `describe()`
+- **Efficient sampling**: Read just what you need from large files (capped at 1000 rows for performance)
+- **Custom options**: Pass pandas read options for special cases
+
+**Two modes of operation:**
+
+<CardGrid>
+  <Card title="Preview Mode" icon="magnifier">
+    Specify `n_rows` to see the first N rows of data. Perfect for understanding file structure and verifying data quality.
+  </Card>
+  <Card title="Summary Mode" icon="bars">
+    Use `summarize=True` to get statistical descriptions of all numerical columns—no need to see raw data.
+  </Card>
+</CardGrid>
+
+**Try asking:**
+- *"Show me the first 10 rows of data.csv"*
+- *"Summarize the statistics for measurements.xlsx"*
+- *"What columns are in this CSV file?"*
+- *"Preview the temperature data"*
+- *"Give me summary stats for all numerical columns"*
+
+### Read File Content
+
+Access the raw content of any file type. Perfect for text files, configuration files, JSON, XML, or any non-tabular content.
+
+**What you can read:**
+
+- Text files (README, documentation, notes)
+- Structured data (JSON, XML, YAML)
+- Code files (Python, R, scripts)
+- Configuration files
+- Any UTF-8 encoded content
+
+**Try asking:**
+- *"Show me the contents of README.md"*
+- *"Read the configuration.json file"*
+- *"What's in the metadata.xml file?"*
+- *"Display the analysis script"*
+
+### Get Tabular File Schema
+
+Understand the structure of tabular files without reading all the data. Get column names, data types, variable definitions, and metadata.
+
+**What you'll learn:**
+
+- **Column names and types**: What fields exist and what they contain
+- **Variable labels**: Human-readable descriptions (if defined in Dataverse)
+- **Categorical mappings**: Value labels for coded variables (e.g., 1="Male", 2="Female")
+- **Missing value codes**: How missing data is represented
+- **Measurement units**: Units for numerical measurements
+
+**Try asking:**
+- *"What's the schema for this CSV file?"*
+- *"Show me the column types for data.xlsx"*
+- *"What variables are defined in this tabular file?"*
+- *"Explain the structure of this dataset file"*
+
+---
+
+## Customizing Your MCP Server
+
+The MCP server can be configured to enable or disable specific tool categories. This gives you control over what operations are available and helps you align the server with your security requirements.
+
+### Configuration Categories
+
+**Installation Level** (`dataverse`):
+- `metrics` — Repository statistics and analytics
+
+**Collection Level** (`collection`):
+- `read` — Collection metadata and content listings
+- `graph` — Knowledge graph exploration and SPARQL queries
+
+**Dataset Level** (`dataset`):
+- `read` — Dataset metadata and file listings
+
+**File Level** (`file`):
+- `read` — File content access
+- `metadata` — File schemas and metadata
+
+### Default Configuration
+
+By default, the server enables **comprehensive read-only access**:
+
+```python
+MCPConfiguration(
+    dataverse=["metrics"],
+    collection=["read", "graph"],
+    dataset=["read"],
+    file=["read", "metadata"]
+)
+```
+
+This provides full exploration capabilities while preventing any modifications to your repositories. Perfect for safe, powerful research assistance.
+
+---
+
+## Multi-Dataverse Installations
+
+When your MCP server connects to multiple Dataverse installations, tools automatically adapt to support multi-repository operations.
+
+**What changes:**
+
+- **Search tools** gain a `dataverse_name` parameter
+- Tool descriptions list available installation names
+- The LLM intelligently routes requests to the correct installation
+
+**You can ask cross-repository questions:**
+
+- *"Search Harvard Dataverse for climate datasets"*
+- *"Compare metrics between DaRUS and demo Dataverse"*
+- *"Find genomics datasets in any connected Dataverse"*
+- *"Which installation has more social science data?"*
+
+The LLM handles the routing automatically based on your question—you just ask naturally and it figures out where to look.
+
+---
+
+## Behind the Scenes
+
+All tools return data in **TOON format**, a token-efficient encoding optimized for LLM consumption. TOON dramatically reduces the number of tokens needed to represent structured data, making responses faster and more cost-effective.
+
+You don't need to worry about TOON formatting—the LLM handles all parsing and presents results as natural language. It's an invisible optimization that makes the entire system more efficient.
+
+---
+
+## Putting It All Together
+
+The real power emerges when tools work together. Here's how a typical exploration session might flow:
+
+1. **Search** for datasets matching your research interest
+2. **Get metrics** to understand the repository's scale
+3. **List collection content** to see what's available in relevant collections
+4. **Get dataset metadata** to understand what you found
+5. **List files** to see what data is available
+6. **Read tabular files** to preview or analyze the data
+7. **Query knowledge graphs** to discover relationships
+
+The LLM orchestrates this workflow automatically based on your questions. You focus on your research—the tools handle the complexity.
+
+---
+
+Ready to set up your own server? Head to [Creating a Server](/mcp/server/) to get started.

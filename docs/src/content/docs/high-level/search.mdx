@@ -1,0 +1,205 @@
+---
+title: Search
+description: Search for datasets and collections across a Dataverse installation using full-text search.
+---
+
+The `SearchResult` class represents search results from the Dataverse search API. It provides convenient access to datasets and collections found in search results, similar to how `Collection` provides access to its child content.
+
+Search results differ from direct collection/dataset access in that they:
+- Are read-only (no `update_metadata` support)
+- Only contain identifiers (DOIs for datasets, aliases for collections), not database IDs
+- Represent a snapshot at search time
+- Items are fetched lazily when accessed
+
+## Overview
+
+The `SearchResult` class encapsulates search results from the Dataverse search API, providing a unified interface for working with datasets and collections found through search. It abstracts away the complexity of working with search API responses while maintaining full access to the found content.
+
+The class handles several key responsibilities:
+
+- **Result access**: Access datasets and collections found in search results through convenient view objects that support both iteration and dictionary-like access
+- **Lazy loading**: Fetch datasets and collections on-demand when accessed, optimizing for performance
+- **Identifier-based access**: Work with identifiers (DOIs, aliases) rather than database IDs, which search results don't provide
+
+## Performing Searches
+
+The `Dataverse` class provides a `search()` method for searching across collections, datasets, and files:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse("https://demo.dataverse.org")
+
+# Perform a search
+results = dv.search("climate change")
+print(f"Found {results._search_response.total_count} results")
+```
+
+The `search()` method returns a `SearchResult` object that provides convenient access to datasets and collections found in the search results.
+
+### Searching Within a Collection
+
+Collections also provide a `search()` method that searches within the collection and its sub-collections:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# Access a specific collection
+simtech = dv.collections["simtech"]
+
+# Search within the collection
+for dataset in simtech.search("Deactivation").datasets:
+    print(dataset.title)
+```
+
+When you call `search()` on a collection, the search is automatically scoped to that collection and its nested sub-collections. This provides a convenient way to search within a specific organizational unit without having to manually configure search filters.
+
+For advanced search options such as filtering by type, pagination, faceted search, or using Solr query syntax, you can use the `search_api` property directly. See the [Search API documentation](/apis/search/) for more details.
+
+## Accessing Datasets from Search Results
+
+The `datasets` property provides a view of all datasets in the search results:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# Perform a search and iterate over datasets
+for dataset in dv.search("climate change").datasets:
+    print(dataset.title)
+
+# You can also store the results first
+results = dv.search("climate change")
+
+# Iterate over all datasets in search results
+for dataset in results.datasets:
+    print(f"{dataset.title}: {dataset.identifier}")
+
+# Access a specific dataset by identifier (DOI)
+dataset = results.datasets["doi:10.5072/FK2/ABC123"]
+
+# Check how many datasets are in the results
+dataset_count = sum(1 for _ in results.datasets)
+```
+
+The `datasets` property returns a `DatasetView` object that supports both iteration and dictionary-like access. Datasets are fetched on-demand using their `global_id` (DOI) from the search results. Note that search results only contain identifiers, not database IDs, so all dataset access uses identifier-based lookups.
+
+## Accessing Collections from Search Results
+
+The `collections` property provides a view of all collections (dataverses) in the search results:
+
+```python
+from pyDataverse import Dataverse
+
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# Perform a search and iterate over collections
+for collection in dv.search("research").collections:
+    print(collection.alias)
+
+# You can also store the results first
+results = dv.search("research")
+
+# Iterate over all collections in search results
+for collection in results.collections:
+    print(f"{collection.metadata.name}: {collection.identifier}")
+
+# Access a specific collection by identifier (alias)
+collection = results.collections["harvard"]
+```
+
+Like `datasets`, the `collections` property returns a `CollectionView` object with lazy-loading and caching behavior. Collections are fetched using their identifier or alias from the search results.
+
+## Complete Example
+
+The following example demonstrates searching at the Dataverse level and within a specific collection:
+
+```python
+from pyDataverse import Dataverse
+
+# Initialize connection
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# Search across the entire Dataverse installation
+# Iterate through datasets found in search results
+for dataset in dv.search("climate change").datasets:
+    print(dataset.title)
+
+# Iterate through collections found in search results
+for collection in dv.search("climate change").collections:
+    print(collection.alias)
+
+# Search within a specific collection
+simtech = dv.collections["simtech"]
+for dataset in simtech.search("climate change").datasets:
+    print(dataset.title)
+```
+
+You can also store search results and work with them in more detail:
+
+```python
+from pyDataverse import Dataverse
+
+# Initialize connection
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# Perform a search and store results
+results = dv.search("climate change")
+print(f"Found {results._search_response.total_count} total results")
+
+# Iterate through datasets
+print("\nDatasets:")
+for dataset in results.datasets:
+    print(f"  - {dataset.title} ({dataset.identifier})")
+
+# Iterate through collections
+print("\nCollections:")
+for collection in results.collections:
+    print(f"  - {collection.metadata.name} ({collection.identifier})")
+
+# Access a specific dataset by identifier
+if results.datasets:
+    first_dataset = next(iter(results.datasets))
+    if first_dataset:
+        print(f"\nFirst dataset: {first_dataset.title}")
+        citation_block = first_dataset.metadata_blocks.get("citation")
+        if citation_block:
+            description = getattr(citation_block, "dsDescriptionValue", None)
+            if description:
+                print(f"Description: {description[0].value if description else 'N/A'}")
+
+# Access a specific collection by identifier
+if results.collections:
+    first_collection = next(iter(results.collections))
+    if first_collection:
+        print(f"\nFirst collection: {first_collection.metadata.name}")
+        print(f"Description: {first_collection.metadata.description or 'N/A'}")
+```
+
+These examples demonstrate the typical workflow: performing a search, browsing datasets and collections found in the results, and accessing specific items by identifier. Search results provide a convenient way to discover and access content across a Dataverse installation or within a specific collection.
+
+## Key Differences from Collection
+
+Search results differ from direct `Collection` access in several important ways:
+
+- **Read-only**: Search results are read-only. You cannot call `update_metadata()` on a `SearchResult` object.
+- **Identifier-only**: Search results only contain identifiers (DOIs for datasets, aliases for collections), not database IDs. All access uses identifier-based lookups.
+- **Snapshot**: Search results represent a snapshot at the time of the search. The results don't automatically update if content changes.
+- **Lazy loading**: Items are fetched lazily when accessed, optimizing for performance when you only need specific items.
+
+## Related Classes
+
+- **[`Dataverse`](/high-level/Dataverse/)** - Factory class that provides the `search()` method
+- **[`Collection`](/high-level/collection/)** - Represents a Dataverse collection with direct access to its content
+- **[`Dataset`](/high-level/dataset/)** - Represents a Dataverse dataset that can be accessed from search results
+- **[Search API](/apis/search/)** - Low-level search API for advanced search options
+
+## See Also
+
+- [Dataverse Documentation](/high-level/Dataverse/) - Learn more about the Dataverse factory class
+- [Collection Documentation](/high-level/collection/) - Learn more about working with collections directly
+- [Dataset Documentation](/high-level/dataset/) - Learn more about working with datasets
+- [Search API Documentation](/apis/search/) - Learn about advanced search options and Solr query syntax

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "CollectionContent",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "$ref": "#/definitions/Collection"
+      },
+      {
+        "$ref": "#/definitions/Dataset"
+      }
+    ]
+  },
+  "definitions": {
+    "Collection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "title", "type"]
+    },
+    "Dataset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "persistentUrl": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        },
+        "separator": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "publicationDate": {
+          "type": "string"
+        },
+        "storageIdentifier": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": ["identifier", "persistentUrl", "protocol", "authority", "separator", "publisher", "storageIdentifier", "type"]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+---
+title: Installation
+description: Installation guide for pyDataverse
+---
+
+pyDataverse is a Python library for interacting with Dataverse installations. It provides a high-level interface for creating datasets, managing collections, working with files, and accessing Dataverse APIs.
+
+## Requirements
+
+pyDataverse requires Python 3.10 or higher. You can check your Python version by running `python --version` in your terminal. If you need to install or upgrade Python, visit [python.org](https://www.python.org/downloads/).
+
+## Installation
+
+Create and activate a virtual environment first:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Choose one package manager (`pip`, `uv`, or `poetry`) for this environment.
+
+### pip
+
+Install from PyPI:
+
+```bash
+python -m pip install pyDataverse
+```
+
+Install from local source (repository checkout):
+
+```bash
+python -m pip install .
+```
+
+Install with test dependencies:
+
+```bash
+python -m pip install ".[tests]"
+```
+
+### uv
+
+Install from PyPI:
+
+```bash
+uv pip install pyDataverse
+```
+
+Install from local source (repository checkout):
+
+```bash
+uv pip install .
+```
+
+Install with test dependencies:
+
+```bash
+uv sync --extra tests
+```
+
+### poetry
+
+Install runtime dependencies:
+
+```bash
+poetry install
+```
+
+Install with test dependencies:
+
+```bash
+poetry install --extras tests
+```
+
+## Next Steps
+
+After installation, you're ready to start using pyDataverse. Here's what to do next:
+
+- Read the [Dataverse documentation](/high-level/Dataverse/) to learn how to create datasets and manage collections
+- Try connecting to a public Dataverse installation to explore what's available
+- For authenticated operations like creating datasets or uploading files, you'll need an API token from your Dataverse installation (available in your account settings)
+
+## Getting Help
+
+If you encounter issues or have questions:
+
+- Check the [documentation](/high-level/Dataverse/) for usage examples and API reference
+- Report bugs or ask questions on the [GitHub repository](https://github.com/gdcc/pyDataverse)
+- Join the [Dataverse Zulip channel](https://dataverse.zulipchat.com/#narrow/stream/377090-python) for community support
+
+## See Also
+
+- [Dataverse Documentation](/high-level/Dataverse/) - Learn how to use pyDataverse
+- [Dataset Documentation](/high-level/dataset/) - Working with datasets
+- [Collection Documentation](/high-level/collection/) - Managing collections
+- [File Documentation](/high-level/file/) - Working with files

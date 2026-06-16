@@ -1,0 +1,86 @@
+---
+title: MCP Overview
+description: Overview of the Model Context Protocol (MCP) integration for pyDataverse, enabling LLM-powered exploration of Dataverse repositories.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+The Model Context Protocol (MCP) integration for pyDataverse brings a powerful new way to explore and interact with Dataverse repositories. Instead of writing Python code or making direct API calls, you can use Large Language Models (LLMs) to explore datasets, query metadata, analyze files, and navigate collections—all through natural language.
+
+## What is MCP?
+
+The Model Context Protocol is an open protocol that standardizes how LLMs connect to external data sources and tools. Think of it as a bridge between conversational AI and your research data infrastructure. When you set up an MCP server for pyDataverse, you're creating a standardized interface that LLMs can use to explore your Dataverse installation.
+
+This integration transforms Dataverse from a web-based repository into a conversational research assistant. You can ask questions like "What datasets are in this collection?", "Show me the first 10 rows of this CSV file", or "What's the metadata for this dataset?"—and get immediate, structured answers.
+
+## Why MCP for Dataverse?
+
+Dataverse repositories contain rich, structured research data that can be difficult to explore programmatically. Researchers often need to:
+
+- **Discover relevant datasets** across large collections with hundreds or thousands of entries
+- **Inspect metadata** to understand what data contains before downloading
+- **Preview file contents** to verify data quality and structure
+- **Navigate hierarchical collections** to find related research outputs
+- **Query knowledge graphs** to understand semantic relationships between datasets
+
+Traditionally, these tasks require either navigating web interfaces manually or writing custom scripts using the Dataverse API. The MCP integration provides a third path: natural language exploration powered by LLMs. This is particularly valuable for:
+
+- **Data exploration**: Quickly browse and understand the structure of unfamiliar repositories
+- **Automated workflows**: Let AI agents handle repetitive data discovery and analysis tasks
+- **Interactive analysis**: Ask follow-up questions and refine your search iteratively
+- **Knowledge extraction**: Use semantic queries to find connections between datasets
+
+## How It Works
+
+The pyDataverse MCP integration works by exposing a set of specialized tools that LLMs can call. When you ask a question, the LLM decides which tools to use and in what order, then interprets the results to answer your question.
+
+Here's what happens under the hood:
+
+1. **Server Setup**: You create an MCP server configured with your Dataverse connection
+2. **Tool Registration**: The server exposes tools for searching, reading datasets, listing files, and more
+3. **LLM Connection**: An LLM (like Claude or GPT-4) connects to your MCP server
+4. **Natural Interaction**: You ask questions in plain language
+5. **Tool Execution**: The LLM calls appropriate tools with the right parameters
+6. **Response Formatting**: Results are formatted in TOON (a token-efficient format) and interpreted by the LLM
+
+The beauty of this approach is that you don't need to know the exact API endpoints or parameter names. The LLM handles the translation from your natural language questions to the appropriate tool calls.
+
+## What You Can Do
+
+With the pyDataverse MCP integration, you can:
+
+- **Search and discover** datasets and collections across your Dataverse installation
+- **Read and inspect** dataset metadata, including all metadata blocks
+- **List and filter** files within datasets by MIME type or other properties
+- **Preview tabular data** with automatic schema detection and summary statistics
+- **Read file contents** directly without downloading
+- **Navigate collections** and understand their hierarchical structure
+- **Query knowledge graphs** using SPARQL for semantic exploration
+- **Get repository metrics** to understand the scale and composition of content
+
+All of these capabilities are available through conversational interaction—no code required.
+
+## Multi-Dataverse Support
+
+The MCP integration supports connecting to multiple Dataverse installations simultaneously. This is particularly useful for:
+
+- **Cross-repository search**: Compare datasets across different institutions
+- **Federated analysis**: Work with data distributed across multiple servers
+- **Repository comparison**: Understand differences in metadata standards and content organization
+
+When configured for multiple Dataverse instances, the LLM can intelligently route requests to the appropriate server based on your questions.
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard
+    title="Available Tools"
+    href="/mcp/tools/"
+    description="Explore the complete set of tools available through the MCP server and what you can do with each one."
+  />
+  <LinkCard
+    title="Creating a Server"
+    href="/mcp/server/"
+    description="Learn how to set up your own Dataverse MCP server and configure it for your needs."
+  />
+</CardGrid>

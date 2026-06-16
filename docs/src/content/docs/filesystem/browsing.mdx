@@ -1,0 +1,106 @@
+---
+title: Browsing & metadata
+description: List, glob, and inspect the files of a dataset, and read rich Dataverse metadata.
+---
+
+`DataverseFS` presents a dataset's files as a directory tree and supports the
+full fsspec listing surface, plus Dataverse-specific helpers for richer metadata.
+
+## The path model
+
+Dataverse files have a *directory label* and a *name*. `DataverseFS` joins them
+into a path, so a file with directory label `data` and name `file.csv` lives at
+`data/file.csv`. Files without a directory label sit at the dataset root.
+
+Directories are **implicit**: they exist only because files reference them. There
+is no separate "create directory" operation — a directory appears as soon as a
+file is uploaded with that directory label, and disappears when the last file in
+it is removed.
+
+## Listing files
+
+`ls` returns the immediate children of a path. With `detail=True` (the default)
+it returns info dicts; with `detail=False` it returns just the path strings:
+
+```python
+# Info dicts for everything at the dataset root
+fs.ls("/")
+
+# Just the names under the "data" directory
+fs.ls("data", detail=False)
+# ['data/file.csv', 'data/notes.txt']
+```
+
+The standard recursive helpers, inherited from fsspec, work too:
+
+```python
+fs.find("/")            # every file, recursively
+fs.glob("data/*.csv")   # shell-style globbing
+fs.walk("/")            # os.walk-style traversal
+```
+
+## Existence and type checks
+
+```python
+fs.exists("data/file.csv")   # True / False
+fs.isfile("data/file.csv")   # True
+fs.isdir("data")             # True
+```
+
+## File info
+
+`info` returns a lightweight fsspec info dict for a single entry:
+
+```python
+fs.info("data/file.csv")
+# {'name': 'data/file.csv', 'size': 20, 'type': 'file',
+#  'id': 42, 'content_type': 'text/plain'}
+```
+
+| Key            | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| `name`         | The file's path within the dataset.                          |
+| `size`         | File size in bytes (`0` for directories).                    |
+| `type`         | `"file"` or `"directory"`.                                   |
+| `id`           | Dataverse database ID of the file (files only).              |
+| `content_type` | MIME type of the file (files only).                          |
+
+## Rich Dataverse metadata
+
+For more than the fsspec basics, `getinfo` returns the full Dataverse `DataFile`
+model — checksums, persistent ID, storage identifier, ingest status, and more:
+
+```python
+info = fs.getinfo("data/file.csv")
+
+print(info.filesize)         # 20
+print(info.content_type)     # 'text/plain'
+print(info.checksum)         # Checksum(type='MD5', value='...')
+print(info.persistent_id)    # the file's own PID, if assigned
+print(info.tabular_data)     # True if Dataverse ingested it as tabular
+print(info.raw)              # the full metadata as a plain dict
+```
+
+## Listing directory names
+
+`listdir` is a convenience wrapper that returns the sorted immediate child names
+(files and subdirectories) at a path:
+
+```python
+fs.listdir("/")      # ['data', 'README.txt']
+fs.listdir("data")   # ['file1.csv', 'file2.csv']
+```
+
+## A note on caching
+
+To avoid re-fetching the dataset's file listing on every call, `DataverseFS`
+caches it for `cache_ttl` seconds (default `60`). Writes through the filesystem
+clear this cache automatically, so newly written files appear immediately. If you
+change the dataset out-of-band (for example via the low-level
+[Native API](/apis/native/)) and want the filesystem to see it right away, call:
+
+```python
+fs.invalidate_cache()
+```
+
+Set `cache_ttl=0` when constructing the filesystem to disable caching entirely.

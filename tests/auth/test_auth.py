@@ -4,7 +4,6 @@ import pytest
 from httpx import Request
 
 from pyDataverse.auth import ApiTokenAuth, BearerTokenAuth
-from pyDataverse.exceptions import ApiAuthorizationError
 
 
 class TestApiTokenAuth:
@@ -21,7 +20,7 @@ class TestApiTokenAuth:
         "non_str_token", (123, object(), lambda x: x, 1.423, b"123", uuid.uuid4())
     )
     def test_raise_if_token_is_not_str(self, non_str_token):
-        with pytest.raises(ApiAuthorizationError):
+        with pytest.raises(ValueError):
             ApiTokenAuth(non_str_token)
 
 
@@ -40,5 +39,5 @@ class TestBearerTokenAuth:
         "non_str_token", (123, object(), lambda x: x, 1.423, b"123", uuid.uuid4())
     )
     def test_raise_if_token_is_not_str(self, non_str_token):
-        with pytest.raises(ApiAuthorizationError):
+        with pytest.raises(ValueError):
             BearerTokenAuth(non_str_token)

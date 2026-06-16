@@ -1,0 +1,280 @@
+---
+title: Dataverse
+description: The main factory class for creating and managing Dataverse datasets and collections.
+---
+
+The `Dataverse` class is the main entry point for working with a Dataverse installation. It establishes a connection to a Dataverse server and provides methods to create new datasets, retrieve existing ones, browse collections, and access all available features.
+
+When you instantiate a `Dataverse` object, it automatically connects to the server and retrieves information about available metadata blocks. This eliminates the need to manually configure complex metadata structures. The class handles this configuration automatically. It functions as a factory for creating [`Dataset`](/high-level/dataset/) instances with properly configured metadata blocks and provides convenient access to collections, metrics, and various API clients.
+
+## Overview
+
+The `Dataverse` class connects to a Dataverse installation and supports several important tasks.
+
+- **Creating new datasets**: When creating a dataset, the class automatically fetches all available metadata blocks from the server and configures them accordingly. Metadata blocks are structured collections of related fields. For example, a "citation" block contains fields for title, author, and description, while a "geospatial" block contains fields for coordinates and location data.
+
+- **Fetching existing datasets and collections**: You can retrieve datasets and collections that already exist on the server by their identifier, such as a DOI or database ID.
+
+- **Accessing metrics and statistics**: The class provides easy access to statistics about the Dataverse installation, such as how many datasets it contains and how collections are organized by subject area.
+
+- **Managing collections**: Collections (also called "sub-dataverses") are organizational units that group related datasets. The class enables you to create new collections and browse existing ones.
+
+- **Providing access to underlying API clients**: For advanced users who need more control, the class exposes the underlying API clients that communicate directly with the Dataverse server.
+
+## Initialization
+
+To begin working with a Dataverse installation, create a `Dataverse` instance by specifying the server URL and optionally providing authentication credentials for operations that require them.
+
+Create a `Dataverse` instance by providing the base URL of your Dataverse installation:
+
+```python
+from pyDataverse import Dataverse
+
+# Connect to a Dataverse instance (read-only access)
+# This works for browsing public datasets and reading metadata
+dv = Dataverse(base_url="https://demo.dataverse.org")
+
+# With API token for authenticated operations
+# You need this if you want to create, modify, or delete datasets
+dv = Dataverse(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here"
+)
+```
+
+### Understanding the Parameters
+
+When creating a `Dataverse` instance, you need to provide:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation to connect to. Examples include `"https://demo.dataverse.org"` and `"https://dataverse.harvard.edu"`. This parameter specifies the target server for all API requests.
+
+- **`api_token`** (str, optional): An authentication token that authorizes operations requiring permissions. It is required for creating, modifying, or deleting datasets or collections. It is not required for browsing or reading public data. You can generate API tokens in your Dataverse account settings.
+
+- **`verbose`** (int, optional): Controls the verbosity of logging output for debugging purposes. The default is 1, which provides moderate logging. Increase the value for more detailed output or decrease it for quieter operation.
+
+## Creating Datasets
+
+One of the most common tasks you'll do with the `Dataverse` class is creating new datasets. A dataset in Dataverse is a container that holds your research data files along with metadata (information about the data, like who created it, when, and what it contains).
+
+The `Dataverse` class simplifies dataset creation by automatically configuring all available metadata blocks. Metadata blocks are structured collections of related fields that organize dataset metadata. Each Dataverse installation may have different metadata blocks enabled. Common examples include "citation" for basic information such as title and authors, "geospatial" for location data, and "social science" for survey-specific fields. The class automatically discovers available blocks on the server and configures them accordingly.
+
+Here's how to create a new dataset:
+
+```python
+from pyDataverse import Dataverse
+
+# First, connect to your Dataverse installation
+dv = Dataverse("https://demo.dataverse.org")
+
+# Create a new dataset with basic information
+dataset = dv.create_dataset(
+    title="My Research Dataset",
+    description="A comprehensive dataset containing experimental results from our study on machine learning algorithms",
+    authors=[
+        {
+            "name": "Jane Smith",
+            "affiliation": "University of Science",
+            "identifier_scheme": "ORCID",  # Optional: identifies the author using ORCID
+            "identifier": "0000-0000-0000-0000"  # Optional: the actual ORCID number
+        }
+    ],
+    contacts=[
+        {
+            "name": "Jane Smith",
+            "email": "jane.smith@university.edu",
+            "affiliation": "University of Science"  # Optional: where they work
+        }
+    ],
+    subjects=["Computer and Information Science", "Engineering"]  # Categories for the dataset
+)
+
+# The dataset is now ready to use with all metadata blocks configured
+# You can access the citation metadata block like this:
+print(dataset.metadata_blocks["citation"].title)
+# Output: 'My Research Dataset'
+```
+
+Authors and contacts are provided as Python dictionaries that use curly braces `{}`. Each author dictionary can include the author's name and affiliation. It can also include an identifier scheme, such as ORCID, together with the corresponding identifier value.
+
+The `subjects` parameter accepts a list of predefined subject categories that organize datasets by research area. Common subjects include "Agricultural Sciences", "Physics", and "Social Sciences". You can specify multiple subjects for datasets that span multiple research areas.
+
+After creating the dataset, it is ready to use locally, but it has not yet been uploaded to the server. You can add files to it, modify its metadata, and upload it when you are ready. See the [`Dataset`](/high-level/dataset/) documentation for more details on working with datasets after they are created.
+
+## Accessing Collections and Datasets
+
+The `Dataverse` class provides convenient properties that let you access collections and datasets directly from the root level of the installation. These properties return special view objects that support both iteration (looping through items) and dictionary-like access (looking up items by identifier).
+
+### Collections
+
+The `collections` property provides access to all collections at the root level of the Dataverse installation. It supports two access patterns.
+
+```python
+# Iterative access: iterate over all collections
+for collection in dv.collections:
+    print(collection.identifier)
+
+# Direct access: retrieve a specific collection by identifier
+harvard_collection = dv.collections["harvard"]  # Access by alias
+collection = dv.collections[123]  # Access by database ID
+```
+
+This property is useful for browsing available collections and for accessing a specific collection when its identifier is known.
+
+### Datasets
+
+Similarly, the `datasets` property provides access to all datasets at the root level.
+
+```python
+# Iterative access: iterate over all datasets
+for dataset in dv.datasets:
+    print(dataset.title)
+
+# Direct access: retrieve a specific dataset by identifier
+dataset = dv.datasets["doi:10.5072/FK2/ABC123"]  # Access by DOI
+dataset = dv.datasets[12345]  # Access by database ID
+```
+
+These properties access datasets and collections at the root level only. To access datasets within a specific collection, first fetch that collection and then use its `datasets` property.
+
+## Creating Collections
+
+Collections (sub-dataverses) are organizational units that structure a Dataverse installation by grouping related datasets. Common use cases include collections for research labs, departments, or projects.
+
+Creating a collection requires several pieces of information.
+
+```python
+collection = dv.create_collection(
+    alias="research-lab",  # Short, unique identifier (no spaces allowed)
+    name="Research Laboratory",  # Human-readable display name
+    description="A collection for research lab datasets and publications",  # What this collection is for
+    affiliation="Department of Science",  # Which organization this belongs to
+    dataverse_type="LABORATORY",  # What kind of collection this is
+    dataverse_contacts=["lab@university.edu", "admin@university.edu"],  # Who to contact about this collection
+    parent="root"  # Where to create it (usually "root" for top-level, or another collection's alias)
+)
+```
+
+Parameter descriptions:
+
+- **`alias`**: A short, unique identifier for the collection. It must not contain spaces and should be memorable. This identifier is used to reference the collection in code and URLs.
+
+- **`name`**: The display name visible to users. It can be longer and more descriptive than the alias.
+
+- **`description`**: A text description that explains the purpose of the collection and helps users understand what types of datasets it contains.
+
+- **`affiliation`**: The organization or department that owns the collection. This is typically a university, department, or research institution.
+
+- **`dataverse_type`**: This field categorizes the type of collection. Common types include:
+  - `"DEPARTMENT"`: for academic departments
+  - `"LABORATORY"`: for research labs
+  - `"RESEARCH_PROJECTS"`: for specific research projects
+  - `"JOURNALS"`: for journal related collections
+  - `"ORGANIZATIONS_INSTITUTIONS"`: for larger organizations
+  - `"RESEARCHERS"`: for individual researchers
+  - `"RESEARCH_GROUP"`: for research groups
+  - `"TEACHING_COURSES"`: for course related content
+  - `"UNCATEGORIZED"`: for collections that do not fit other categories
+
+- **`dataverse_contacts`**: A list of email addresses for collection administrators or maintainers who can be contacted regarding the collection.
+
+- **`parent`**: The parent location for the collection. Use `"root"` to create it at the top level, or provide another collection alias to create it as a sub-collection.
+
+After creating a collection, you can start adding datasets or create sub-collections within it.
+
+## Metrics
+
+The `Dataverse` class provides easy access to metrics and statistics about the Dataverse installation. Metrics are useful for understanding how much content is in the installation, how it is organized, and how it is used.
+
+You can access metrics through the `metrics` property:
+
+```python
+# Get total counts for different content types
+total_datasets = dv.metrics.total("datasets")  # How many datasets exist
+total_collections = dv.metrics.total("dataverses")  # How many collections exist
+total_files = dv.metrics.total("files")  # How many files exist
+total_downloads = dv.metrics.total("downloads")  # How many times files have been downloaded
+
+# Get collections grouped by subject area
+# This returns a pandas DataFrame showing how many collections exist in each subject category
+collections_by_subject = dv.metrics.collections_by_subject
+
+# Get a summary DataFrame with all key metrics
+# This is convenient when you want an overview of everything
+summary = dv.metrics.df
+```
+
+Metrics are particularly useful for:
+- **Administrators**: understanding the size and scope of their Dataverse installation
+- **Researchers**: finding out what kind of content is available
+- **Analysts**: tracking usage and growth over time
+
+The metrics are fetched from the Dataverse server, so they reflect the current state of the installation.
+
+## Available Licenses
+
+Dataverse installations can be configured with different license options that dataset creators can choose from. Common licenses include Creative Commons licenses, custom institutional licenses, and installation specific licenses. The `licenses` property gives you access to the list of licenses available on your Dataverse installation.
+
+```python
+# Get all available licenses
+licenses = dv.licenses
+
+# Iterate through them to see what's available
+for license in licenses:
+    print(f"{license.name}: {license.uri}")
+```
+
+This is useful when you create datasets and need to determine available license options. It is also useful when you write code that must handle different license types.
+
+## Metadata Blocks
+
+One of the key features of the `Dataverse` class is its automatic handling of metadata blocks. Metadata blocks are structured collections of related fields. For example, a "citation" block contains fields for title, author, and publication date. A "geospatial" block contains fields for coordinates and map projections.
+
+The `Dataverse` class automatically fetches information about all available metadata blocks from your Dataverse installation and creates Pydantic models for them. Pydantic is a Python library that provides data validation. These models ensure that the metadata you provide is in the correct format.
+
+Here's how you can work with metadata blocks:
+
+```python
+# Get Pydantic model classes for all metadata blocks
+# This returns a dictionary mapping block names to their model classes
+blocks = dv.to_pydantic()
+
+# Access a specific block model
+# For example, get the model for the citation block
+citation_block = blocks["citation"]
+
+# Now you can create instances of this model or inspect its structure
+```
+
+This automatic discovery eliminates the need to manually configure metadata blocks or determine which fields are available. When you create a dataset, all available metadata blocks are automatically included and configured for use.
+
+## Model Conversion
+
+The `Dataverse` class can convert dataset structures to JSON schema format. JSON schema is a standard way of describing data structures and is useful for documentation, validation, or integration with other tools.
+
+```python
+# Get the JSON schema for datasets
+schema = dv.json_schema()
+
+# This schema describes the structure of all metadata blocks
+# You can use it for validation, documentation, or tooling
+```
+
+This is primarily useful for advanced users who need to work with JSON schemas or integrate Dataverse datasets with other systems that understand JSON schema.
+
+## Related Classes
+
+The `Dataverse` class works closely with several other classes in the pyDataverse library:
+
+- **[`Dataset`](/high-level/dataset/)**: Represents a Dataverse dataset with metadata blocks and files. This is what you get when you create or fetch a dataset. It provides methods for adding files, modifying metadata, and uploading to the server.
+
+- **[`Collection`](/high-level/collection/)**: Represents a Dataverse collection (sub-dataverse). Collections organize datasets into groups. You can browse datasets within a collection, create new datasets, and manage collection metadata.
+
+- **[`File`](/high-level/file/)**: Represents a file within a dataset. Files are the actual data files (like CSV files, images, code, and similar content) that are stored in datasets. The `File` class provides methods for reading, downloading, and managing files.
+
+- **[`NativeApi`](/apis/native-api/)**: Low level API client for direct Dataverse API calls. This is what the `Dataverse` class uses internally, but you can also use it directly if you need more control or want to perform operations that are not yet wrapped in high level methods.
+
+## See Also
+
+- **[Dataset Documentation](/high-level/dataset/)**: Learn more about working with datasets, including adding files, modifying metadata, and uploading content to the server.
+- **[Collection Documentation](/high-level/collection/)**: Learn more about collections, including browsing content and managing collection metadata.
+- **[Native API Documentation](/apis/native-api/)**: Detailed reference for advanced users who need direct API access.

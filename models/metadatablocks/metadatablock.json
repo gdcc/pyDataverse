@@ -1,0 +1,108 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "MetadatablockSpecification",
+    "type": "object",
+    "properties": {
+        "id": { 
+            "type": "integer" 
+        },
+        "name": {
+            "type": "string"
+        },
+        "displayName": {
+            "type": "string"
+        },
+        "displayOnCreate": {
+            "type": "boolean"
+        },
+        "fields": {
+            "type": "object",
+            "default": {},
+            "additionalProperties": {
+                "$ref": "#/definitions/MetadataField"
+            }
+        }
+    },
+    "required": ["id", "name", "displayName", "fields"],
+    "definitions": {
+        "MetadataField": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "type": "string"
+                },
+                "displayOnCreate": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "TEXT", 
+                        "TEXTBOX",
+                        "STRING",
+                        "DATE",
+                        "EMAIL",
+                        "URL",
+                        "FLOAT",
+                        "INT",
+                        "NONE"
+                    ]
+                },
+                "typeClass": {
+                    "type": "string",
+                    "enum": ["primitive", "compound", "controlledVocabulary"]
+                },
+                "watermark": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "multiple": {
+                    "type": "boolean"
+                },
+                "isControlledVocabulary": {
+                    "type": "boolean"
+                },
+                "displayFormat": {
+                    "type": "string"
+                },
+                "displayOrder": {
+                    "type": "integer"
+                },
+                "isRequired": {
+                    "type": "boolean"
+                },
+                "childFields": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/MetadataField"
+                    }
+                },
+                "controlledVocabularyValues": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "displayName",
+                "title",
+                "type",
+                "typeClass",
+                "multiple",
+                "isControlledVocabulary", "displayFormat",
+                "displayOrder",
+                "isRequired"
+            ]
+        }
+    }
+}

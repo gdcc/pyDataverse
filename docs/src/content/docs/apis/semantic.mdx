@@ -1,0 +1,315 @@
+---
+title: Semantic API
+description: The Semantic API provides access to dataset metadata in JSON-LD format for semantic web applications and linked data workflows.
+---
+
+The `SemanticApi` class provides access to Dataverse's Semantic/Linked Data API endpoints. It specializes in retrieving dataset metadata in JSON-LD (JSON for Linking Data) format, which enables semantic web applications, knowledge graphs, and linked data workflows. While other APIs return structured metadata models, `SemanticApi` returns JSON-LD dictionaries that can be converted to RDF graphs for advanced semantic processing.
+
+Compared to other APIs, `SemanticApi` focuses on semantic web standards and linked data. It supports converting JSON-LD responses to RDFLib Graph objects, enabling SPARQL queries, RDF serialization, and integration with semantic web tools. Each method returns JSON-LD dictionaries that include semantic context and can be processed as linked data.
+
+## Initialization
+
+To start using the Semantic API, create a `SemanticApi` instance with the base URL of your Dataverse installation and, if needed, an API token for authenticated operations.
+
+```python
+from pyDataverse.api import SemanticApi
+
+# Read-only access (public datasets)
+api = SemanticApi(base_url="https://demo.dataverse.org")
+
+# Authenticated access for private datasets
+api = SemanticApi(
+    base_url="https://dataverse.example.edu",
+    api_token="your-api-token-here",
+)
+```
+
+### Understanding the Parameters
+
+`SemanticApi` supports the same core parameters as other API classes:
+
+- **`base_url`** (str, required): The base URL of the Dataverse installation, such as `"https://demo.dataverse.org"` or `"https://dataverse.harvard.edu"`. All API calls are constructed from this URL.
+- **`api_token`** (str, optional): API token used for endpoints that require authentication, such as accessing private datasets.
+- **`api_version`** (str, optional): API version string passed to the Dataverse server. This is typically left at its default unless you have a specific reason to override it.
+
+The `SemanticApi` class automatically manages request URLs, parameters, and authentication headers for you. Methods that retrieve public dataset metadata can be called without an API token, while accessing private datasets requires authentication.
+
+## Retrieving Dataset Metadata
+
+The Semantic API provides methods for retrieving dataset metadata in JSON-LD format, supporting both single and batch operations.
+
+### Fetching a Single Dataset
+
+Use `get_dataset` to retrieve metadata for a single dataset by its persistent identifier (PID) or numeric database ID. The method returns a dictionary containing the dataset metadata in JSON-LD format.
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+# Fetch by persistent identifier (DOI)
+metadata = api.get_dataset("doi:10.11587/8H3N93")
+print(metadata["@context"])  # JSON-LD context
+print(metadata.get("name"))   # Dataset title
+
+# Fetch by numeric ID
+metadata = api.get_dataset(42)
+print(metadata["@type"])      # Dataset type
+```
+
+JSON-LD is a lightweight syntax for encoding linked data using JSON. The response includes standard JSON-LD fields like `@context` (which defines the vocabulary), `@type`, and dataset-specific metadata fields.
+
+### Accessing Metadata Fields
+
+The JSON-LD response contains structured metadata that you can access programmatically:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+metadata = api.get_dataset("doi:10.11587/8H3N93")
+
+# Access dataset title
+title = metadata.get("name")
+print(f"Title: {title}")
+
+# Access authors
+authors = metadata.get("author", [])
+for author in authors:
+    print(f"Author: {author.get('name')}")
+
+# Access description
+description = metadata.get("description")
+print(f"Description: {description}")
+```
+
+The `@context` field is essential for properly interpreting the semantic meaning of the data fields, as it defines the vocabulary and mappings used in the metadata.
+
+### Fetching Multiple Datasets
+
+For bulk operations, use `get_datasets` to retrieve metadata for multiple datasets efficiently. The method processes datasets in concurrent batches for improved performance.
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+# Fetch multiple datasets
+identifiers = [
+    "doi:10.11587/8H3N93",
+    "doi:10.11587/ABC123",
+    42,  # numeric ID also supported
+]
+
+all_metadata = api.get_datasets(identifiers)
+print(f"Retrieved {len(all_metadata)} datasets")
+
+# Process each dataset
+for metadata in all_metadata:
+    title = metadata.get("name", "Unknown")
+    author_count = len(metadata.get("author", []))
+    print(f"Dataset: {title}, Authors: {author_count}")
+```
+
+The method automatically handles concurrent API requests within batches, proper async client lifecycle management, and error handling. Results are returned in the same order as the input identifiers.
+
+### Customizing Batch Size
+
+For large collections, you can adjust the batch size to balance performance and resource usage:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+# Process a large collection with smaller batch size
+large_collection = [f"doi:10.11587/ID{i}" for i in range(1000)]
+metadata = api.get_datasets(large_collection, batch_size=25)
+```
+
+The default batch size is 50, which provides a good balance for most use cases. Consider using smaller batch sizes (10-25) when processing very large collections or when working with slower networks.
+
+### Converting Directly to a Graph
+
+You can convert multiple datasets directly to a single RDF graph by setting `as_graph=True`:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+identifiers = [
+    "doi:10.11587/8H3N93",
+    "doi:10.11587/ABC123",
+    "doi:10.11587/XYZ789",
+]
+
+# Get datasets and convert directly to a merged graph
+combined_graph = api.get_datasets(identifiers, as_graph=True)
+print(f"Combined graph has {len(combined_graph)} triples")
+
+# Query across all datasets
+query = '''
+    SELECT ?title WHERE {
+        ?dataset <http://schema.org/name> ?title .
+    }
+'''
+results = combined_graph.query(query)
+for row in results:
+    print(f"Title: {row.title}")
+```
+
+This is a convenient shortcut that combines fetching multiple datasets and merging them into a single graph in one step.
+
+## Working with RDF Graphs
+
+The Semantic API provides utilities for converting JSON-LD responses to RDFLib Graph objects, enabling advanced semantic data processing, SPARQL queries, and RDF serialization.
+
+### Converting to RDF Graphs
+
+Use `response_to_graph` to convert a single JSON-LD response to an RDFLib Graph object:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+# Get dataset metadata
+metadata = api.get_dataset("doi:10.11587/8H3N93")
+
+# Convert to RDF graph
+graph = api.response_to_graph(metadata)
+print(f"Graph contains {len(graph)} triples")
+```
+
+RDFLib is a Python library for working with RDF (Resource Description Framework) data. By converting JSON-LD to an RDFLib Graph, you can perform advanced semantic operations.
+
+### Querying with SPARQL
+
+Once converted to a graph, you can execute SPARQL queries on the metadata:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+metadata = api.get_dataset("doi:10.11587/8H3N93")
+graph = api.response_to_graph(metadata)
+
+# Execute a SPARQL query
+query = '''
+    SELECT ?title WHERE {
+        ?dataset a ?type .
+        ?dataset <http://schema.org/name> ?title .
+    }
+'''
+
+results = graph.query(query)
+for row in results:
+    print(f"Title: {row.title}")
+```
+
+SPARQL queries allow you to extract specific information from the semantic graph using a powerful query language designed for RDF data.
+
+### Serializing to RDF Formats
+
+RDFLib graphs can be serialized to various RDF formats:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+metadata = api.get_dataset("doi:10.11587/8H3N93")
+graph = api.response_to_graph(metadata)
+
+# Serialize to Turtle format
+turtle_data = graph.serialize(format='turtle')
+print(turtle_data)
+
+# Serialize to RDF/XML
+rdf_xml = graph.serialize(format='xml')
+print(rdf_xml)
+
+# Serialize to N-Triples
+ntriples = graph.serialize(format='nt')
+print(ntriples)
+```
+
+This enables integration with other semantic web tools and workflows that work with different RDF serialization formats.
+
+### Merging Multiple Datasets
+
+You can merge multiple datasets into a single knowledge graph for combined analysis:
+
+```python
+from pyDataverse.api import SemanticApi
+from rdflib import Graph
+
+api = SemanticApi("https://demo.dataverse.org")
+
+identifiers = ["doi:10.11587/8H3N93", "doi:10.11587/ABC123"]
+
+# Method 1: Convert individually and merge
+combined_graph = Graph()
+for metadata in api.get_datasets(identifiers):
+    dataset_graph = api.response_to_graph(metadata)
+    combined_graph += dataset_graph
+
+print(f"Combined graph has {len(combined_graph)} triples")
+
+# Method 2: Use responses_to_graph for direct conversion
+all_metadata = api.get_datasets(identifiers)
+combined_graph = api.responses_to_graph(all_metadata)
+print(f"Combined graph has {len(combined_graph)} triples")
+```
+
+The `responses_to_graph` method provides a convenient way to convert multiple JSON-LD responses directly into a single merged graph.
+
+### Converting Multiple Datasets to a Single Graph
+
+For batch operations, you can convert multiple datasets directly to a single graph:
+
+```python
+from pyDataverse.api import SemanticApi
+
+api = SemanticApi("https://demo.dataverse.org")
+
+identifiers = [
+    "doi:10.11587/8H3N93",
+    "doi:10.11587/ABC123",
+    "doi:10.11587/XYZ789",
+]
+
+# Get all datasets and convert to a single graph
+all_metadata = api.get_datasets(identifiers)
+combined_graph = api.responses_to_graph(all_metadata)
+
+# Now you can query across all datasets
+query = '''
+    SELECT ?title ?author WHERE {
+        ?dataset <http://schema.org/name> ?title .
+        ?dataset <http://schema.org/author> ?author .
+    }
+'''
+
+results = combined_graph.query(query)
+for row in results:
+    print(f"{row.title} by {row.author}")
+```
+
+This approach is useful when you need to perform cross-dataset queries or build a unified knowledge graph from multiple sources.
+
+## When to Use `SemanticApi`
+
+Use `SemanticApi` when you:
+
+- **need JSON-LD format** for semantic web applications or linked data workflows.
+- **want to build knowledge graphs** from dataset metadata and need RDF graph structures.
+- **need to execute SPARQL queries** on dataset metadata to extract specific information.
+- **are integrating with semantic web tools** that require RDF or JSON-LD formats.
+- **want to merge multiple datasets** into a unified semantic graph for combined analysis.
+- **are building linked data applications** that need to understand semantic relationships between datasets.
+
+For most everyday workflows (accessing dataset metadata, creating datasets, uploading files), the high-level `Dataverse` class or `NativeApi` provide convenient methods that return structured Pydantic models. When you need semantic web capabilities, linked data processing, or RDF graph operations, `SemanticApi` gives you access to JSON-LD formatted metadata and RDF graph conversion utilities.

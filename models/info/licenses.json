@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "License",
+    "type": "object",
+    "properties": {
+        "id": { 
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "shortDescription": {
+            "type": "string"
+        },
+        "uri": {
+            "type": "string"
+        },
+        "iconUrl": {
+            "type": "string"
+        },
+        "active": {
+            "type": "boolean"
+        },
+        "isDefault": {
+            "type": "boolean"
+        },
+        "sortOrder": {
+            "type": "integer"
+        },
+        "rightsIdentifier": {
+            "type": "string"
+        },
+        "rightsIdentifierScheme": {
+            "type": "string"
+        },
+        "schemeUri": {
+            "type": "string"
+        },
+        "languageCode": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "shortDescription",
+        "uri",
+        "active",
+        "isDefault",
+        "sortOrder"
+    ]
+}

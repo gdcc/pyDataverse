@@ -1,0 +1,102 @@
+---
+title: Writing files
+description: Create, replace, and delete dataset files, and attach metadata on upload.
+---
+
+Writing requires an `api_token` with permission to edit the dataset. Like reads,
+writes are **streamed**: data is uploaded to Dataverse in bounded chunks as you
+write, so even very large files never need to fit in memory.
+
+## Creating a file
+
+Open a path in write mode (`"w"` for text, `"wb"` for binary). The upload starts
+as you write and completes when the `with` block exits:
+
+```python
+# Text
+with fs.open("data/notes.txt", "w") as f:
+    f.write("These are my research notes.\n")
+    f.write("A second line.\n")
+
+# Binary
+with fs.open("results/model.bin", "wb") as f:
+    f.write(some_bytes)
+```
+
+If a file already exists at that path, it is **replaced**; otherwise a new file is
+created. The directory portion of the path becomes the file's directory label.
+
+## Attaching metadata on write
+
+Pass an `UploadBody` as `metadata` to set the description, categories, and other
+file metadata as part of the same upload:
+
+```python
+from pyDataverse.models.file import UploadBody
+
+with fs.open(
+    "data/results.csv",
+    "w",
+    metadata=UploadBody(
+        description="Experimental results",
+        categories=["Data", "Results"],
+    ),
+) as f:
+    f.write("column1,column2\n1,2\n")
+```
+
+When you omit `metadata`, the filename and directory label are derived from the
+path automatically.
+
+## Reading back the uploaded file's ID
+
+After the `with` block closes, the write handle exposes the new file's
+identifiers — useful when you need to act on the file immediately (restrict it,
+fetch its metadata, link to it):
+
+```python
+with fs.open("data/results.csv", "w") as f:
+    f.write("column1,column2\n1,2\n")
+
+print(f.id)             # numeric database ID of the uploaded file
+print(f.persistent_id)  # its persistent identifier
+print(f.metadata)       # the UploadBody that was sent
+```
+
+This works in both text and binary mode — a text handle transparently forwards
+these attributes to the underlying writer.
+
+## Updating metadata without re-uploading
+
+To change a file's metadata without sending its bytes again, use `setinfo` with
+an `UpdateBody`:
+
+```python
+from pyDataverse.models.file.update import UpdateBody
+
+fs.setinfo(
+    "data/results.csv",
+    UpdateBody(description="Revised description", categories=["Final"]),
+)
+```
+
+## Deleting files
+
+```python
+fs.rm("data/old.csv")          # delete one file
+fs.rm(["a.csv", "b.csv"])      # delete several
+```
+
+`removedir` removes an (implicit) directory once it is empty. Because Dataverse
+directories only exist through their files, removing all files in a directory is
+what makes the directory disappear.
+
+## How it works
+
+A write handle is a `DataverseFileWriter`, an fsspec `AbstractBufferedFile`.
+fsspec buffers at most one block at a time and hands each block to a background
+upload thread, which streams it to Dataverse's add-file (or replace-file)
+endpoint. Memory use is bounded by the block size, not the file size. When the
+handle closes, the writer waits for the upload to finish, captures the new file's
+ID and persistent ID, and clears the filesystem's listing cache so the file shows
+up immediately in `ls` and friends.

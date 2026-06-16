@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Collection",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "alias": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "affiliation": {
+        "type": "string"
+      },
+      "permissionRoot": {
+        "type": "boolean"
+      },
+      "description": {
+        "type": "string"
+      },
+      "dataverseType": {
+        "type": "string"
+      },
+      "isMetadataBlockRoot": {
+        "type": "boolean"
+      },
+      "isFacetRoot": {
+        "type": "boolean"
+      },
+      "ownerId": {
+        "type": "integer"
+      },
+      "creationDate": {
+        "type": "string"
+      },
+      "effectiveRequiresFilesToPublishDataset": {
+        "type": "boolean"
+      },
+      "isReleased": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "id",
+      "alias",
+      "name"
+    ]
+  }

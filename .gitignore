@@ -75,9 +75,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-
 # PyBuilder
 .pybuilder/
 target/
@@ -158,7 +155,6 @@ internal
 .python-version
 devel.py
 test_manual.py
-/docs
 src/pyDataverse/docs/build
 src/pyDataverse/docs/source/_build
 src/pyDataverse/docs/Makefile
@@ -173,3 +169,13 @@ poetry.lock
 
 # JetBrains
 .idea/
+
+# VSCode
+.vscode/
+**/**/.vscode
+
+# Cursor
+.cursor/
+
+# Virtaul documents
+.virtual_documents/

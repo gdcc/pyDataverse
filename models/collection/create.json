@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Create",
+  "type": "object",
+  "definitions": {
+    "CollectionCreateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "alias": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "dataverseType": {
+          "type": "string",
+          "enum": [
+            "DEPARTMENT",
+            "JOURNALS",
+            "LABORATORY",
+            "ORGANIZATIONS_INSTITUTIONS",
+            "RESEARCHERS",
+            "RESEARCH_GROUP",
+            "RESEARCH_PROJECTS",
+            "TEACHING_COURSES",
+            "UNCATEGORIZED"
+          ]
+        },
+        "dataverseContacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Contact"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "alias",
+        "description",
+        "affiliation",
+        "dataverseType",
+        "dataverseContacts"
+      ]
+    },
+    "CollectionCreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "alias": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "dataverseContacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          }
+        },
+        "permissionRoot": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "dataverseType": {
+          "type": "string",
+          "enum": [
+            "DEPARTMENT",
+            "JOURNALS",
+            "LABORATORY",
+            "ORGANIZATIONS_INSTITUTIONS",
+            "RESEARCHERS",
+            "RESEARCH_GROUP",
+            "RESEARCH_PROJECTS",
+            "TEACHING_COURSES",
+            "UNCATEGORIZED"
+          ]
+        },
+        "isMetadataBlockRoot": {
+          "type": "boolean"
+        },
+        "isFacetRoot": {
+          "type": "boolean"
+        },
+        "ownerId": {
+          "type": "integer"
+        },
+        "creationDate": {
+          "type": "string"
+        },
+        "effectiveRequiresFilesToPublishDataset": {
+          "type": "boolean"
+        },
+        "isReleased": {
+          "type": "boolean"
+        }
+      },
+      "required": ["id", "alias", "name"]
+    },
+    "Contact": {
+      "type": "object",
+      "properties": {
+        "contactEmail": {
+          "type": "string"
+        },
+        "displayOrder": {
+          "type": "integer"
+        }
+      },
+      "required": ["contactEmail"]
+    }
+  }
+}
