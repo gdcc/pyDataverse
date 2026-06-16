@@ -94,6 +94,10 @@ class FilesView:
         if self.dataset.identifier is None:
             raise ValueError("Dataset identifier is required")
 
+        # A fresh view should reflect current server state, even after changes
+        # made out-of-band (e.g. via the low-level native API).
+        self.dataset.fs.invalidate_cache()
+
         # Build a fast path->file-info index once to avoid repeated O(n) scans
         # via `dataset.fs._find_file(...)` during indexing/iteration.
         self._file_info_list = list(self._get_all_file_info())
