@@ -1,0 +1,94 @@
+---
+title: Tabular data
+description: Load ingested tabular files from a dataset straight into pandas DataFrames.
+---
+
+Dataverse has first-class support for tabular data. When you upload a CSV, TSV,
+or supported spreadsheet, Dataverse **ingests** it: the values are stored in a
+normalized tab-delimited `.tab` file and the column names and types are recorded
+as variable metadata. `DataverseFS` provides helpers that turn these files back
+into pandas DataFrames in one call.
+
+## How ingest affects file paths and sizes
+
+After ingest, a file you uploaded as `data/table.csv` is served as
+`data/table.tab`. Two consequences are worth knowing:
+
+- **Path.** Refer to the ingested file by its `.tab` path when reading it as
+  tabular data.
+- **Size.** Dataverse stores the tab data without its header row (the column
+  names live in metadata) but *reconstructs* the header when you download the
+  file. The reported `filesize` therefore describes the stored bytes, not the
+  downloaded ones. `DataverseFS` handles this for you — a full read returns the
+  complete, header-included content — but it's why a tabular file's `size` may
+  look smaller than the bytes you receive.
+
+## Loading a whole file
+
+`open_tabular` downloads a tabular file and parses it into a DataFrame, choosing
+the delimiter from the file's MIME type automatically:
+
+```python
+df = fs.open_tabular("data/table.tab", api_token=None)
+```
+
+Pass `api_token` when the file is restricted; `None` is fine for public files.
+
+It forwards any keyword arguments to `pandas.read_csv` / `read_excel`, so you can
+shape the read as usual:
+
+```python
+df = fs.open_tabular(
+    "data/table.tab",
+    api_token=None,
+    usecols=["name", "r2", "aic"],
+    nrows=100,
+    dtype={"r2": "float64"},
+)
+```
+
+Set `no_header=True` for files without a header row — columns are then named by
+integer position (`0`, `1`, `2`, ...).
+
+## Streaming a large file in chunks
+
+For files too large to hold in memory, `stream_tabular` yields row-chunked
+DataFrames:
+
+```python
+total = 0
+for chunk in fs.stream_tabular("data/table.tab", api_token=None, chunk_size=10_000):
+    total += len(chunk)
+print(total)
+```
+
+`stream_tabular` accepts the same `read_csv` keyword arguments as `open_tabular`,
+plus `chunk_size` (rows per chunk) and `sep` (delimiter override).
+
+## Which files are tabular?
+
+A file is treated as tabular when its MIME type is one Dataverse ingests —
+`text/csv`, `text/tab-separated-values`, `text/tsv`, the Excel types, and a few
+common variants. You can check a file's type via its metadata:
+
+```python
+info = fs.getinfo("data/table.tab")
+print(info.tabular_data)   # True once Dataverse has ingested it
+print(info.content_type)   # e.g. 'text/tab-separated-values'
+```
+
+Calling `open_tabular` or `stream_tabular` on a non-tabular file raises a
+`ValueError`.
+
+:::note
+Ingest is asynchronous. Immediately after uploading a CSV, Dataverse may still be
+processing it, in which case the `.tab` form is not yet available. Re-list the
+dataset (or call `fs.invalidate_cache()`) once ingest has completed.
+:::
+
+## Reading tabular files in other tools
+
+Everything above goes through pyDataverse. If you'd rather hand a URL to pandas,
+Dask, or Polars and let them read it directly, see
+[pandas & the fsspec ecosystem](/filesystem/pandas/) — including a complete,
+runnable example against a public dataset.

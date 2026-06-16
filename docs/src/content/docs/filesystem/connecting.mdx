@@ -1,0 +1,118 @@
+---
+title: Connecting
+description: Create a DataverseFS instance for a dataset — directly, from a URL, or from a high-level Dataset.
+---
+
+A `DataverseFS` always targets one dataset version. There are three ways to
+create one, depending on what you already have in hand.
+
+## Direct initialization
+
+The most explicit form — pass the installation URL and the dataset identifier:
+
+```python
+from pyDataverse.filesystem import DataverseFS
+
+fs = DataverseFS(
+    base_url="https://demo.dataverse.org",
+    identifier="doi:10.5072/FK2/ABCDEF",
+    api_token="your-token",  # optional; required for writes & restricted files
+)
+```
+
+The `identifier` may be a persistent identifier (a DOI string such as
+`"doi:10.5072/FK2/ABCDEF"`) or the numeric database ID of the dataset.
+
+## From a dataset URL
+
+`from_url` parses a standard Dataverse dataset page URL — the kind you copy from
+your browser — and extracts the connection details for you:
+
+```python
+fs = DataverseFS.from_url(
+    "https://demo.dataverse.org/dataset.xhtml?persistentId=doi:10.5072/FK2/ABCDEF",
+    api_token="your-token",
+)
+```
+
+The URL may identify the dataset by `persistentId=doi:...` or by `id=12345`, and
+may include `&version=1.0` (or `:draft`, `:latest`, `:latest-published`). It must
+use an `http`/`https` scheme and contain exactly one of `persistentId` or `id`,
+otherwise a `ValueError` is raised.
+
+## From a high-level `Dataset`
+
+If you are already working with the [high-level API](/high-level/dataset/), every
+`Dataset` exposes a ready-to-use filesystem via its `fs` property. This reuses the
+dataset's existing API clients and credentials, so you don't repeat the base URL
+or token:
+
+```python
+dataverse = Dataverse("https://demo.dataverse.org", api_token="your-token")
+dataset = dataverse.datasets["doi:10.5072/FK2/ABCDEF"]
+
+fs = dataset.fs
+```
+
+## Constructor parameters
+
+| Parameter          | Description                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| `base_url`         | Base URL of the Dataverse installation, e.g. `"https://demo.dataverse.org"`.                |
+| `identifier`       | Dataset identifier — a DOI string (`"doi:10.5072/FK2/ABCDEF"`) or numeric database ID.       |
+| `version`          | Dataset version to access (see below). Defaults to `":latest"`.                             |
+| `api_token`        | API token for authenticated operations (writes, restricted files). Optional.                |
+| `cache_ttl`        | Seconds to cache the dataset's file listing (default `60`; set `0` to disable).             |
+| `native_api`       | Reuse an existing `NativeApi` instance instead of creating one.                             |
+| `data_access_api`  | Reuse an existing `DataAccessApi` instance instead of creating one.                         |
+
+## Choosing a dataset version
+
+The `version` argument selects which version of the dataset the filesystem reads
+from. It accepts a specific version number or one of the special tags:
+
+```python
+fs = DataverseFS(
+    base_url="https://demo.dataverse.org",
+    identifier="doi:10.5072/FK2/ABCDEF",
+    version=":draft",   # unpublished working copy
+)
+```
+
+| Value                  | Meaning                                                  |
+| ---------------------- | -------------------------------------------------------- |
+| `":latest"` (default)  | The latest version, whether published or a draft.        |
+| `":latest-published"`  | The most recent *published* version only.                |
+| `":draft"`             | The unpublished draft version.                           |
+| `"1.0"`, `"2.1"`, ...  | A specific published version number.                     |
+
+## Authentication
+
+An `api_token` is optional for reading public files, but required to:
+
+- write, replace, or delete files,
+- read restricted files,
+- access an unpublished `:draft` version.
+
+You can pass the token directly (as above) or let it come from a high-level
+`Dataverse`/`Dataset` when you use `dataset.fs`.
+
+## Via the fsspec registry
+
+Because `DataverseFS` registers itself under the `dataverse` protocol, you can
+also obtain an instance through fsspec's generic factory — handy when code is
+written against fsspec rather than pyDataverse directly:
+
+```python
+import fsspec
+
+fs = fsspec.filesystem(
+    "dataverse",
+    base_url="https://demo.dataverse.org",
+    identifier="doi:10.5072/FK2/ABCDEF",
+    api_token="your-token",
+)
+```
+
+See [pandas & the fsspec ecosystem](/filesystem/pandas/) for the URL-based form
+that lets tools open dataset files without constructing a filesystem at all.

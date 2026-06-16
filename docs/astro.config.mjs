@@ -71,6 +71,12 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{ label: 'Overview', slug: 'filesystem/overview' },
+						{ label: 'Connecting', slug: 'filesystem/connecting' },
+						{ label: 'Browsing & Metadata', slug: 'filesystem/browsing' },
+						{ label: 'Reading Files', slug: 'filesystem/reading' },
+						{ label: 'Writing Files', slug: 'filesystem/writing' },
+						{ label: 'Tabular Data', slug: 'filesystem/tabular' },
+						{ label: 'pandas & fsspec', slug: 'filesystem/pandas' },
 					],
 				},
 				{

@@ -1,0 +1,158 @@
+---
+title: pandas & the fsspec ecosystem
+description: Read dataset files by URL from pandas, Dask, Polars, and the command line via the dataverse:// protocol.
+---
+
+Importing `pyDataverse` registers a `dataverse://` URL protocol with fsspec (a
+packaging entry point also registers it on install). From then on, any
+fsspec-aware library can open a dataset file directly from a URL — no filesystem
+object to construct, no download step to manage.
+
+## The `dataverse://` URL
+
+A URL carries the dataset's connection details in its query string; the path
+component is the file's path *inside* the dataset:
+
+```
+dataverse://<host>/<file/path>?persistentId=doi:...&version=:latest
+dataverse://<host>/<file/path>?id=12345
+```
+
+| Query parameter | Purpose                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| `persistentId`  | Dataset DOI (e.g. `doi:10.5072/FK2/ABCDEF`).                         |
+| `id`            | Dataset numeric database ID (alternative to `persistentId`).         |
+| `version`       | Dataset version (`:latest`, `:draft`, `1.0`, ...). Optional.         |
+| `scheme`        | Transport for the host, `https` (default) or `http`. Optional.       |
+
+The API token is **not** read from the URL. Pass it — when needed — through the
+reading library's `storage_options`:
+
+```python
+storage_options = {"api_token": "your-token"}
+```
+
+## Reading with pandas
+
+For a tabular file, point `read_csv` at the URL. Dataverse serves ingested files
+as tab-delimited, so use `sep="\t"`:
+
+```python
+import pandas as pd
+import pyDataverse  # registers the dataverse:// protocol
+
+url = (
+    "dataverse://demo.dataverse.org/data/table.tab"
+    "?persistentId=doi:10.5072/FK2/ABCDEF"
+)
+
+df = pd.read_csv(url, sep="\t")
+
+# Restricted dataset? Add the token:
+# df = pd.read_csv(url, sep="\t", storage_options={"api_token": "your-token"})
+```
+
+:::tip
+If you'd rather not remember the delimiter, use
+[`fs.open_tabular(...)`](/filesystem/tabular/) instead — it detects the format
+from the file's MIME type and returns a DataFrame directly.
+:::
+
+## Other fsspec-aware libraries
+
+Any tool that delegates path handling to fsspec accepts `dataverse://` URLs the
+same way:
+
+```python
+# Dask — lazy, parallel reads
+import dask.dataframe as dd
+ddf = dd.read_csv(url, sep="\t", storage_options={"api_token": "your-token"})
+
+# Polars (via fsspec)
+import fsspec, polars as pl
+with fsspec.open(url, "rb", api_token="your-token") as f:
+    df = pl.read_csv(f, separator="\t")
+
+# Plain fsspec — open any file, tabular or not
+with fsspec.open(url, "rb") as f:
+    raw = f.read()
+```
+
+## From the command line
+
+fsspec has no standalone CLI, but because the protocol is registered, any
+fsspec-aware command-line tool — and a short `python -c` one-liner — can read a
+dataset by URL. The `import pyDataverse` is what triggers registration:
+
+```bash
+# Print the first lines of a file
+python -c "import pyDataverse, fsspec; \
+print(fsspec.open('dataverse://demo.dataverse.org/data/notes.txt?persistentId=doi:10.5072/FK2/ABCDEF', \
+'rt').open().read())"
+```
+
+```bash
+# List the files in a dataset
+python -c "import pyDataverse, fsspec; \
+fs = fsspec.filesystem('dataverse', base_url='https://demo.dataverse.org', \
+identifier='doi:10.5072/FK2/ABCDEF'); \
+print('\n'.join(fs.ls('/', detail=False)))"
+```
+
+## Worked example: a public DaRUS dataset
+
+This reads a real, public tabular file from
+[DaRUS](https://darus.uni-stuttgart.de) — no token required. The dataset is
+[doi:10.18419/DARUS-5539](https://doi.org/10.18419/DARUS-5539), a kinetic-modeling
+study; `results/summary.tab` is a model-comparison table.
+
+```python
+import pandas as pd
+import pyDataverse  # registers the dataverse:// protocol
+
+url = (
+    "dataverse://darus.uni-stuttgart.de/results/summary.tab"
+    "?persistentId=doi:10.18419/DARUS-5539"
+)
+
+df = pd.read_csv(url, sep="\t")
+print(df[["name", "n_parameters", "r2", "aic", "bic"]])
+```
+
+```text
+       name  n_parameters        r2         aic         bic
+0  model_04            12  0.997071  214.849030  260.068878
+1  model_07            10  0.998349   27.439997   65.123207
+2  model_06             9  0.996706  246.452515  280.367401
+3  model_08             9  0.998378   19.794846   53.709736
+```
+
+The equivalent through a filesystem instance, letting pyDataverse pick the
+delimiter for you:
+
+```python
+from pyDataverse.filesystem import DataverseFS
+
+fs = DataverseFS(
+    base_url="https://darus.uni-stuttgart.de",
+    identifier="doi:10.18419/DARUS-5539",
+)
+df = fs.open_tabular("results/summary.tab", api_token=None)
+```
+
+## Writing back with pandas
+
+With a token and edit permission, the protocol also works for writing — for
+example, `DataFrame.to_csv` to a `dataverse://` URL streams a new (or replacement)
+file into the dataset:
+
+```python
+df.to_csv(
+    "dataverse://demo.dataverse.org/results/out.csv?persistentId=doi:10.5072/FK2/ABCDEF",
+    index=False,
+    storage_options={"api_token": "your-token"},
+)
+```
+
+See [Writing files](/filesystem/writing/) for the details of how uploads stream
+and how to attach metadata.
