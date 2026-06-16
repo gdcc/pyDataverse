@@ -13,7 +13,7 @@ from ..models.dataset.edit_get import DataFile, File, GetDatasetResponse
 from ..models.file.filemeta import UploadBody
 from .reader import DataverseFileReader
 from .tab import TABULAR_MIME_TYPES, TabSpecs
-from .writer import DataverseFileWriter
+from .writer import DataverseFileWriter, DataverseTextIO
 
 
 class Info(DataFile):
@@ -435,6 +435,51 @@ class DataverseFS(AbstractFileSystem):
             "Cannot create directories in DataverseFS. "
             "Directories are created implicitly when uploading files with directory paths."
         )
+
+    def open(  # type: ignore[override]
+        self,
+        path: str,
+        mode: str = "rb",
+        block_size=None,
+        cache_options=None,
+        compression=None,
+        metadata: Optional[UploadBody] = None,
+        **kwargs,
+    ):
+        """Open a file, returning a Dataverse-aware handle.
+
+        Binary modes defer to fsspec, which returns the
+        :class:`DataverseFileReader` / :class:`DataverseFileWriter` directly.
+        Text modes are wrapped in :class:`DataverseTextIO` instead of a plain
+        :class:`io.TextIOWrapper` so the Dataverse-specific surface
+        (``id``, ``persistent_id``, ``metadata``) stays reachable on the handle.
+        """
+        if "b" in mode:
+            return super().open(
+                path,
+                mode,
+                block_size=block_size,
+                cache_options=cache_options,
+                compression=compression,
+                metadata=metadata,
+                **kwargs,
+            )
+
+        text_kwargs = {
+            key: kwargs.pop(key)
+            for key in ("encoding", "errors", "newline")
+            if key in kwargs
+        }
+        binary = super().open(
+            path,
+            mode.replace("t", "") + "b",
+            block_size=block_size,
+            cache_options=cache_options,
+            compression=compression,
+            metadata=metadata,
+            **kwargs,
+        )
+        return DataverseTextIO(binary, **text_kwargs)
 
     @overload
     def openbin(

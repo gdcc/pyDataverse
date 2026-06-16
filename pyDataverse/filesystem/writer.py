@@ -1,4 +1,5 @@
 import io
+import time
 from queue import Queue
 from threading import Thread
 from typing import TYPE_CHECKING, Optional, Union
@@ -12,6 +13,32 @@ if TYPE_CHECKING:
 
 # How long to wait for the background upload thread to finish on close.
 _UPLOAD_TIMEOUT_SECONDS = 300
+
+# How long to wait for tabular ingest to finish after an upload, and how often
+# to poll the dataset's ingest lock while waiting.
+_INGEST_TIMEOUT_SECONDS = 120
+_INGEST_POLL_INTERVAL_SECONDS = 0.5
+
+
+class DataverseTextIO(io.TextIOWrapper):
+    """Text wrapper that exposes the underlying Dataverse file's attributes.
+
+    fsspec serves text-mode opens by wrapping the binary file object in a
+    plain :class:`io.TextIOWrapper`, which hides the Dataverse-specific
+    surface (``id``, ``persistent_id``, ``metadata``) living on the wrapped
+    :class:`DataverseFileWriter` / :class:`DataverseFileReader`. This subclass
+    forwards any otherwise-unknown attribute to that underlying object so a
+    text-mode handle behaves the same as a binary one::
+
+        >>> with dataset.open("data/file.csv", "w") as f:
+        ...     f.write("a,b\\n")
+        >>> f.id          # resolved on the wrapped DataverseFileWriter
+    """
+
+    def __getattr__(self, name: str):
+        # __getattr__ only runs when normal lookup fails, so this never
+        # shadows TextIOWrapper's own attributes (including ``buffer``).
+        return getattr(self.buffer, name)
 
 
 class _UploadStream(io.RawIOBase):
@@ -201,7 +228,33 @@ class DataverseFileWriter(AbstractBufferedFile):
             raise IOError(f"Upload failed: {self._error}")
 
         self._capture_result()
+        self._wait_for_ingest()
         self.fs._cache.clear()
+
+    def _wait_for_ingest(self) -> None:
+        """Block until any tabular-ingest lock on the dataset clears.
+
+        Uploading an ingestable file (CSV, TSV, spreadsheet, ...) triggers
+        asynchronous ingest, during which Dataverse locks the dataset and the
+        ingested ``.tab`` artifacts (and bundle/DDI/citation files) do not yet
+        exist. Waiting here lets a caller read those artifacts immediately after
+        the ``with`` block, instead of racing the server.
+
+        Non-ingestable uploads acquire no ingest lock, so this returns after a
+        single lock check. The wait is best-effort: it gives up after
+        ``_INGEST_TIMEOUT_SECONDS`` rather than blocking indefinitely.
+        """
+        deadline = time.monotonic() + _INGEST_TIMEOUT_SECONDS
+        while time.monotonic() < deadline:
+            try:
+                locks = self.native_api.get_dataset_lock(
+                    self.ds_identifier, type="Ingest"
+                )
+            except Exception:  # noqa: BLE001 - best-effort; upload already done
+                return
+            if not locks.root:
+                return
+            time.sleep(_INGEST_POLL_INTERVAL_SECONDS)
 
     def _capture_result(self) -> None:
         """Extract the new file's ID/PID from the upload response."""

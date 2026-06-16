@@ -50,6 +50,8 @@ class DataverseFileReader(AbstractBufferedFile):
         """
         self.data_access_api = fs.data_access_api
         self.file_identifier = file_identifier
+        self._known_end: Optional[int] = None
+
         super().__init__(
             fs,
             path,
@@ -60,6 +62,35 @@ class DataverseFileReader(AbstractBufferedFile):
             size=size,
             **kwargs,
         )
+
+    def read(self, length: int = -1) -> bytes:
+        """Read ``length`` bytes, or the rest of the file when ``length < 0``.
+
+        A full read streams to the actual end of the HTTP body rather than
+        stopping at the metadata-reported ``size``, which can be too small for
+        ingested tabular files (see ``_known_end``). Sized reads keep fsspec's
+        efficient, cached, range-based behavior.
+        """
+        if length is None or length < 0:
+            if self._known_end is not None and self.loc >= self._known_end:
+                return b""
+            return self._read_to_end()
+        return super().read(length)
+
+    def _read_to_end(self) -> bytes:
+        """Stream from the current position to the true end of the file."""
+        start = self.loc
+        with self.data_access_api.stream_datafile(
+            self.file_identifier,
+            range_start=start or None,
+        ) as response:
+            data = b"".join(response.iter_bytes())
+
+        self.loc = start + len(data)
+        self._known_end = self.loc
+        if self.loc > self.size:
+            self.size = self.loc
+        return data
 
     def _fetch_range(self, start: int, end: int) -> bytes:
         """Fetch a byte range ``[start, end)`` via a Range request.
