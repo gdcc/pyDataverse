@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Annotated, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Model(BaseModel):
@@ -65,6 +65,16 @@ class FileInfo(BaseModel):
     dataset_version_id: Annotated[Optional[int], Field(alias='datasetVersionId')] = None
     categories: Optional[List[str]] = None
     data_file: Annotated[Optional[DataFile], Field(alias='dataFile')] = None
+
+    @model_validator(mode='after')
+    def _backfill_categories(self) -> 'FileInfo':
+        # Some Dataverse endpoints return a file's categories on the nested
+        # ``dataFile`` rather than at the file-metadata level. Surface them at
+        # the top level when the file-metadata categories are absent so callers
+        # have a single, reliable place to read them.
+        if not self.categories and self.data_file and self.data_file.categories:
+            self.categories = self.data_file.categories
+        return self
 
 
 class UploadBody(DataFile):
