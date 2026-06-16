@@ -7,7 +7,7 @@
 
 pyDataverse is a Python client library for [Dataverse](https://dataverse.org). It gives you a modern, Pythonic interface to work with Dataverse collections, datasets, and files without dealing with raw HTTP requests for common workflows.
 
-Read the full documentation: [pydataverse.readthedocs.io](https://pydataverse.readthedocs.io/en/latest/)
+Read the full documentation: [gdcc.github.io/pyDataverse](https://gdcc.github.io/pyDataverse/)
 
 ## Why pyDataverse
 
