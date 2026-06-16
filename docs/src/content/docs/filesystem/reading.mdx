@@ -24,7 +24,7 @@ with fs.open("data/image.png", "rb") as f:
 ```
 
 Text mode returns a handle that still exposes the underlying Dataverse file's
-attributes (see [Writing files](/filesystem/writing/#reading-back-the-uploaded-files-id)),
+attributes (see [Writing files](../writing/#reading-back-the-uploaded-files-id)),
 so you don't lose anything by working with text.
 
 ## Seeking and partial reads
@@ -80,7 +80,7 @@ fs.get("data/", "local_dir/", recursive=True)
 Reading an **ingested tabular** file (a `.tab` produced by Dataverse) returns the
 reconstructed tab-delimited text, including the header row Dataverse stores
 separately. If you want the data as a DataFrame rather than raw bytes, use the
-helpers on the [Tabular data](/filesystem/tabular/) page instead.
+helpers on the [Tabular data](../tabular/) page instead.
 :::
 
 ## How it works

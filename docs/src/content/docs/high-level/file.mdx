@@ -31,7 +31,7 @@ A `File` instance contains key attributes that identify it and connect it to its
 
 - **`identifier`** (int): The unique integer identifier assigned to the file by the Dataverse server. This identifier is used for all API operations involving the file and remains constant throughout the file's lifetime. It's a frozen attribute, meaning it cannot be changed after the File object is created.
 
-- **`dataset`** (Dataset): A reference to the parent [`Dataset`](/high-level/dataset/) instance that contains this file. This provides access to dataset-level operations and ensures the file knows its context within the dataset structure.
+- **`dataset`** (Dataset): A reference to the parent [`Dataset`](../dataset/) instance that contains this file. This provides access to dataset-level operations and ensures the file knows its context within the dataset structure.
 
 The identifier is the primary way to reference a file in API calls, while the dataset reference enables file operations that require dataset context, such as reading file contents or accessing dataset-level properties.
 
@@ -324,12 +324,12 @@ This example demonstrates the typical workflow: accessing files through a datase
 
 ## Related Classes
 
-- **[`Dataset`](/high-level/dataset/)** - Represents a Dataverse dataset that contains files
-- **[`Dataverse`](/high-level/Dataverse/)** - Factory class for creating and managing datasets and collections
-- **[`Collection`](/high-level/collection/)** - Represents a Dataverse collection that can contain datasets with files
+- **[`Dataset`](../dataset/)** - Represents a Dataverse dataset that contains files
+- **[`Dataverse`](../dataverse/)** - Factory class for creating and managing datasets and collections
+- **[`Collection`](../collection/)** - Represents a Dataverse collection that can contain datasets with files
 
 ## See Also
 
-- [Dataset Documentation](/high-level/dataset/) - Learn more about working with datasets and their files
-- [Dataverse Documentation](/high-level/Dataverse/) - Learn more about creating and managing datasets
-- [Collection Documentation](/high-level/collection/) - Learn more about collections and organizing datasets
+- [Dataset Documentation](../dataset/) - Learn more about working with datasets and their files
+- [Dataverse Documentation](../dataverse/) - Learn more about creating and managing datasets
+- [Collection Documentation](../collection/) - Learn more about collections and organizing datasets

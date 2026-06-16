@@ -5,7 +5,7 @@ description: The main factory class for creating and managing Dataverse datasets
 
 The `Dataverse` class is the main entry point for working with a Dataverse installation. It establishes a connection to a Dataverse server and provides methods to create new datasets, retrieve existing ones, browse collections, and access all available features.
 
-When you instantiate a `Dataverse` object, it automatically connects to the server and retrieves information about available metadata blocks. This eliminates the need to manually configure complex metadata structures. The class handles this configuration automatically. It functions as a factory for creating [`Dataset`](/high-level/dataset/) instances with properly configured metadata blocks and provides convenient access to collections, metrics, and various API clients.
+When you instantiate a `Dataverse` object, it automatically connects to the server and retrieves information about available metadata blocks. This eliminates the need to manually configure complex metadata structures. The class handles this configuration automatically. It functions as a factory for creating [`Dataset`](../dataset/) instances with properly configured metadata blocks and provides convenient access to collections, metrics, and various API clients.
 
 ## Overview
 
@@ -98,7 +98,7 @@ Authors and contacts are provided as Python dictionaries that use curly braces `
 
 The `subjects` parameter accepts a list of predefined subject categories that organize datasets by research area. Common subjects include "Agricultural Sciences", "Physics", and "Social Sciences". You can specify multiple subjects for datasets that span multiple research areas.
 
-After creating the dataset, it is ready to use locally, but it has not yet been uploaded to the server. You can add files to it, modify its metadata, and upload it when you are ready. See the [`Dataset`](/high-level/dataset/) documentation for more details on working with datasets after they are created.
+After creating the dataset, it is ready to use locally, but it has not yet been uploaded to the server. You can add files to it, modify its metadata, and upload it when you are ready. See the [`Dataset`](../dataset/) documentation for more details on working with datasets after they are created.
 
 ## Accessing Collections and Datasets
 
@@ -265,16 +265,16 @@ This is primarily useful for advanced users who need to work with JSON schemas o
 
 The `Dataverse` class works closely with several other classes in the pyDataverse library:
 
-- **[`Dataset`](/high-level/dataset/)**: Represents a Dataverse dataset with metadata blocks and files. This is what you get when you create or fetch a dataset. It provides methods for adding files, modifying metadata, and uploading to the server.
+- **[`Dataset`](../dataset/)**: Represents a Dataverse dataset with metadata blocks and files. This is what you get when you create or fetch a dataset. It provides methods for adding files, modifying metadata, and uploading to the server.
 
-- **[`Collection`](/high-level/collection/)**: Represents a Dataverse collection (sub-dataverse). Collections organize datasets into groups. You can browse datasets within a collection, create new datasets, and manage collection metadata.
+- **[`Collection`](../collection/)**: Represents a Dataverse collection (sub-dataverse). Collections organize datasets into groups. You can browse datasets within a collection, create new datasets, and manage collection metadata.
 
-- **[`File`](/high-level/file/)**: Represents a file within a dataset. Files are the actual data files (like CSV files, images, code, and similar content) that are stored in datasets. The `File` class provides methods for reading, downloading, and managing files.
+- **[`File`](../file/)**: Represents a file within a dataset. Files are the actual data files (like CSV files, images, code, and similar content) that are stored in datasets. The `File` class provides methods for reading, downloading, and managing files.
 
-- **[`NativeApi`](/apis/native-api/)**: Low level API client for direct Dataverse API calls. This is what the `Dataverse` class uses internally, but you can also use it directly if you need more control or want to perform operations that are not yet wrapped in high level methods.
+- **[`NativeApi`](../../apis/native/)**: Low level API client for direct Dataverse API calls. This is what the `Dataverse` class uses internally, but you can also use it directly if you need more control or want to perform operations that are not yet wrapped in high level methods.
 
 ## See Also
 
-- **[Dataset Documentation](/high-level/dataset/)**: Learn more about working with datasets, including adding files, modifying metadata, and uploading content to the server.
-- **[Collection Documentation](/high-level/collection/)**: Learn more about collections, including browsing content and managing collection metadata.
-- **[Native API Documentation](/apis/native-api/)**: Detailed reference for advanced users who need direct API access.
+- **[Dataset Documentation](../dataset/)**: Learn more about working with datasets, including adding files, modifying metadata, and uploading content to the server.
+- **[Collection Documentation](../collection/)**: Learn more about collections, including browsing content and managing collection metadata.
+- **[Native API Documentation](../../apis/native/)**: Detailed reference for advanced users who need direct API access.

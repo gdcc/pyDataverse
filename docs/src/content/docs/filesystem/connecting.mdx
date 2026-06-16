@@ -42,7 +42,7 @@ otherwise a `ValueError` is raised.
 
 ## From a high-level `Dataset`
 
-If you are already working with the [high-level API](/high-level/dataset/), every
+If you are already working with the [high-level API](../../high-level/dataset/), every
 `Dataset` exposes a ready-to-use filesystem via its `fs` property. This reuses the
 dataset's existing API clients and credentials, so you don't repeat the base URL
 or token:
@@ -114,5 +114,5 @@ fs = fsspec.filesystem(
 )
 ```
 
-See [pandas & the fsspec ecosystem](/filesystem/pandas/) for the URL-based form
+See [pandas & the fsspec ecosystem](../pandas/) for the URL-based form
 that lets tools open dataset files without constructing a filesystem at all.

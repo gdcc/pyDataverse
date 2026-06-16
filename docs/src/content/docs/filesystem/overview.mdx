@@ -11,7 +11,7 @@ instance, you can browse, read, write, and delete files using the standard
 fsspec interface (`ls`, `info`, `open`, `cat`, `rm`, `find`, `glob`, ...) plus a
 few Dataverse-specific helpers for tabular data.
 
-It is the same machinery that powers the high-level [`Dataset`](/high-level/dataset/)
+It is the same machinery that powers the high-level [`Dataset`](../../high-level/dataset/)
 file operations — `dataset.open(...)`, `dataset.files`, `dataset.upload_file(...)`
 all delegate to a `DataverseFS` under the hood — but you can also use it directly
 whenever you want a filesystem-style view of a dataset.
@@ -55,32 +55,32 @@ with fs.open("data/notes.txt", "r") as f:   # stream a file
 <CardGrid>
   <LinkCard
     title="Connecting"
-    href="/filesystem/connecting"
+    href="../connecting/"
     description="Create a DataverseFS — directly, from a URL, or from a high-level Dataset."
   />
   <LinkCard
     title="Browsing & metadata"
-    href="/filesystem/browsing"
+    href="../browsing/"
     description="List, glob, and inspect files; read rich Dataverse metadata."
   />
   <LinkCard
     title="Reading files"
-    href="/filesystem/reading"
+    href="../reading/"
     description="Stream file content in text or binary, including byte-range reads."
   />
   <LinkCard
     title="Writing files"
-    href="/filesystem/writing"
+    href="../writing/"
     description="Create, replace, and delete files; attach metadata on upload."
   />
   <LinkCard
     title="Tabular data"
-    href="/filesystem/tabular"
+    href="../tabular/"
     description="Load ingested tabular files straight into pandas DataFrames."
   />
   <LinkCard
     title="pandas & the fsspec ecosystem"
-    href="/filesystem/pandas"
+    href="../pandas/"
     description="Read datasets by URL from pandas, Dask, Polars, and the command line."
   />
 </CardGrid>

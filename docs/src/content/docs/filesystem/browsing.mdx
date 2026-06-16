@@ -97,7 +97,7 @@ To avoid re-fetching the dataset's file listing on every call, `DataverseFS`
 caches it for `cache_ttl` seconds (default `60`). Writes through the filesystem
 clear this cache automatically, so newly written files appear immediately. If you
 change the dataset out-of-band (for example via the low-level
-[Native API](/apis/native/)) and want the filesystem to see it right away, call:
+[Native API](../../apis/native/)) and want the filesystem to see it right away, call:
 
 ```python
 fs.invalidate_cache()

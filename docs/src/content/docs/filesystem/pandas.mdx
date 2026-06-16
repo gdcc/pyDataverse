@@ -54,7 +54,7 @@ df = pd.read_csv(url, sep="\t")
 
 :::tip
 If you'd rather not remember the delimiter, use
-[`fs.open_tabular(...)`](/filesystem/tabular/) instead — it detects the format
+[`fs.open_tabular(...)`](../tabular/) instead — it detects the format
 from the file's MIME type and returns a DataFrame directly.
 :::
 
@@ -154,5 +154,5 @@ df.to_csv(
 )
 ```
 
-See [Writing files](/filesystem/writing/) for the details of how uploads stream
+See [Writing files](../writing/) for the details of how uploads stream
 and how to attach metadata.
