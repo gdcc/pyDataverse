@@ -47,6 +47,7 @@ mcp = [
 
 [project.urls]
 repository = "https://github.com/gdcc/pyDataverse"
+Documentation = "https://gdcc.github.io/pyDataverse/"
 
 [project.entry-points."fsspec.specs"]
 dataverse = "pyDataverse.filesystem.dvfs:DataverseFS"
