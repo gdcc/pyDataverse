@@ -1,0 +1,685 @@
+---
+title: "dataset"
+description: "API reference for `pyDataverse.dataverse.dataset`."
+---
+
+`pyDataverse.dataverse.dataset`
+
+
+## `class Dataset`
+
+
+A Dataverse Dataset object, representing the core container of data, metadata, and files within a Dataverse instance.
+
+This class provides a convenient interface for interacting with Dataverse datasets, including reading and updating metadata,
+accessing files in the dataset, and supporting read operations for tabular data using pandas.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Optional[str]` | The unique identifier (such as DOI or database ID) for the dataset. |
+| `license` | `Union[str, info.License, None]` | The assigned license for the dataset, as a string or License object. |
+| `metadata_blocks` | `Dict[str, MetadataBlockBase]` | All metadata blocks associated with the dataset, keyed by block name. |
+| `dataverse` | `Dataverse` | The parent Dataverse object this dataset belongs to. |
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `is_locked` | `bool` | Check if the dataset is locked. |
+| `is_in_review` | `bool` | Check if the dataset is in review. |
+| `locks` | `List[locks.Lock]` | Get the locks of the dataset. |
+| `url` | `str` | Get the URL of the dataset. |
+| `title` | `str` | Get the title of the dataset from the citation metadata block. |
+| `description` | `str` | Retrieve the dataset's description from the citation block. |
+| `authors` | `List[Dict[str, Any]]` | Get the authors of the dataset from the citation metadata block. |
+| `subjects` | `List[str]` | Get the subjects of the dataset from the citation metadata block. |
+| `fs` | `DataverseFS` | Get a file system interface (DataverseFS) for this dataset to access its files. |
+| `files` |  | Obtain a view of files in the dataset, with both iterator and dict-like access. |
+| `tabular_files` |  | Get a view of tabular files in the dataset. |
+| `json_schema` | `Dict[str, Any]` | Generate a JSON schema validating all metadata blocks of the dataset. |
+
+
+**Methods**
+
+### `from_doi_url` _classmethod_
+
+```python
+from_doi_url(cls, doi_url: str) -> Tuple[Dataverse, Dataset]
+```
+
+Create a Dataset instance from a DOI URL.
+
+This method follows the DOI URL to extract the base Dataverse URL and persistent identifier,
+then creates both a Dataverse instance and fetches the corresponding Dataset.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `doi_url` | `str` | The DOI URL pointing to a dataset (e.g., "https://doi.org/10.18419/DARUS-5539") |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Tuple[Dataverse, Dataset]` | Tuple[Dataverse, Dataset]: A tuple containing the Dataverse instance and the Dataset object |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If the URL doesn't lead to a valid Dataverse instance or if the persistent identifier cannot be extracted from the URL parameters |
+| `httpx.HTTPStatusError` | If the HTTP request to the DOI URL fails |
+
+
+**Example**
+
+&gt;&gt;&gt; dataverse, dataset = Dataset.from_doi_url("https://doi.org/10.18419/DARUS-5539")
+&gt;&gt;&gt; print(dataset.persistent_identifier)
+doi:10.18419/DARUS-5539
+
+
+### `wait_for_unlock`
+
+```python
+wait_for_unlock(self) -> None
+```
+
+Wait for the dataset to be unlocked.
+
+
+### `refresh`
+
+```python
+refresh(self, version: Union[Literal[':latest', ':latest-published', ':draft'], str] = ':latest') -> Dataset
+```
+
+Refresh the dataset from the Dataverse server.
+
+
+### `checkout`
+
+```python
+checkout(self, version: Union[Literal[':latest', ':latest-published', ':draft'], str] = ':latest') -> Dataset
+```
+
+Checkout the dataset to the specified version.
+
+
+### `open_in_browser`
+
+```python
+open_in_browser(self) -> None
+```
+
+Open the dataset in your system's default web browser.
+
+This method constructs the dataset's persistent URL
+and launches it using Python's ``webbrowser`` module.
+
+
+**Example**
+
+&gt;&gt;&gt; dataset.open_in_browser()
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If the dataset identifier is not set. |
+
+
+### `dict`
+
+```python
+dict(self, include: Optional[Sequence[str]] = None) -> Dict[str, Any]
+```
+
+Generate a dictionary representation of this Dataset, omitting fields that are unset.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `include` | `Optional[Sequence[str]]` | Optional list of metadata block names to include. If not specified, all metadata blocks will be included. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dict[str, Any]` | Dict[str, Any]: A dict containing dataset fields with non-None values. |
+
+
+### `export`
+
+```python
+export(self, format: Union[str, SemanticApiFormat]) -> Union[str, Dict[str, Any]]
+```
+
+Export the dataset's metadata in the specified format via the Dataverse API.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `format` | `str` | The export format (e.g., 'dataverse_json', 'DublinCore', etc.) |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[str, Dict[str, Any]]` | Union[str, Dict[str, Any]]: The exported metadata, as a string or parsed dict. |
+
+
+### `graph`
+
+```python
+graph(self, format: GraphFormat) -> Graph
+```
+
+Get the RDF graph of the dataset by exporting metadata in semantic formats.
+
+This method retrieves the dataset's metadata in one or more semantic formats
+(such as JSON-LD, RDF/XML, Turtle, etc.) and converts them into an RDF graph
+using rdflib. The method validates that the requested formats are available
+and support semantic data representation.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `format` | `GraphFormat` | A single format string or list of format strings specifying the semantic export formats to use. Valid formats are those available in the Dataverse instance that have semantic media types. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Graph` | An rdflib Graph object containing the merged RDF triples from all requested export formats. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If any of the requested formats are not available in the Dataverse instance or do not support semantic data representation. |
+
+
+**Examples**
+
+```python
+>>> # Get graph using a single format
+>>> graph = dataset.graph("OAI_ORE")
+```
+
+```python
+>>> # Get graph using multiple formats
+>>> graph = dataset.graph(["OAI_ORE", "JSON-LD"])
+```
+
+```python
+>>> # Query the resulting graph
+>>> for subj, pred, obj in graph:
+...     print(f"{subj} {pred} {obj}")
+```
+
+
+### `serialize_metadata_blocks`
+
+```python
+serialize_metadata_blocks(self, metadata_blocks: Dict[str, MetadataBlockBase]) -> Dict[str, Any]
+```
+
+Serialize non-empty metadata blocks for this dataset for export or storage.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `metadata_blocks` | `Dict[str, MetadataBlockBase]` | Map of block names to block objects. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dict[str, Any]` | Dict[str, Any]: Dictionary mapping block names to their serializable form, excluding empty blocks. |
+
+
+### `validate_license` _classmethod_
+
+```python
+validate_license(cls, value: Union[info.License, str]) -> Optional[str]
+```
+
+Converts a License object into its string name, or returns the string if already provided.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `value` | `Union[info.License, str, None]` | License value to validate/convert. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Optional[str]` | Optional[str]: The license name as a string, or None if not set. |
+
+
+**Example**
+
+&gt;&gt;&gt; dataset.license = License(name="CC0", uri="...")
+&gt;&gt;&gt; dataset.license = "MIT"
+
+
+### `update_metadata`
+
+```python
+update_metadata(self)
+```
+
+Update the dataset metadata on the Dataverse server using the native API.
+Pushes all changes (metadata blocks and license) from this object to Dataverse.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If this dataset does not have an identifier. |
+
+
+### `publish`
+
+```python
+publish(self, release_type: Literal['minor', 'major', 'updatecurrent'] = 'major')
+```
+
+Publishes a dataset within its collection.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If the dataset has no persistent identifier. |
+
+
+### `submit_to_review`
+
+```python
+submit_to_review(self)
+```
+
+Submit the dataset to review.
+
+
+### `return_to_author`
+
+```python
+return_to_author(self, reason: str)
+```
+
+Return the dataset to author.
+
+
+### `upload_to_collection`
+
+```python
+upload_to_collection(self, collection: Union[str, Collection])
+```
+
+Create (upload) this dataset to a Dataverse collection using the native API.
+
+This method sends the current state of this Dataset object as a new dataset
+into the target Dataverse (collection). The metadata sent includes all
+metadata blocks and the license as set in this object.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `collection` | `str` | The dataverse alias or identifier into which this dataset will be created/uploaded. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | None |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `httpx.HTTPStatusError` | If the Dataverse API returns an error |
+| `ValueError` | If required dataset metadata is missing |
+
+
+**Example**
+
+&gt;&gt;&gt; ds = Dataset(...)
+&gt;&gt;&gt; ds.upload("mydataverse")
+
+
+### `to_dataverse_create_dict`
+
+```python
+to_dataverse_create_dict(self, dataset_type: Optional[str] = None, license: Optional[str] = None) -> DatasetCreateBody
+```
+
+Convert this dataset instance into a Dataverse-compatible dict (for API creation/upload).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `dataset_type` | `Optional[str]` | The dataset type tag (e.g., "dataset"). *(default: `None`)* |
+| `license` | `Optional[str]` | License name, overrides self.license if specified. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `DatasetCreateBody` | Pydantic model ready for Dataverse API interaction. |
+
+
+### `to_dataverse_edit_dict`
+
+```python
+to_dataverse_edit_dict(self) -> edit_get.EditMetadataBody
+```
+
+Convert this dataset instance into a Dataverse-compatible dict (for API editing).
+
+
+### `from_dataverse_dict`
+
+```python
+from_dataverse_dict(self, metadata: Union[edit_get.GetDatasetResponse, create.DatasetCreateBody]) -> Self
+```
+
+Update in-place this Dataset's metadata_blocks from a Dataverse API metadata dict or model.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `metadata` | `edit_get.GetDatasetResponse or create.DatasetCreateBody` | Metadata dict/model from Dataverse. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Self` | Self, but with updated metadata blocks loaded from the input. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `AssertionError` | If input lacks metadata blocks. |
+
+
+**Note**
+
+Metadata blocks from Dataverse are loaded into self.metadata_blocks using
+each block's own from_dataverse_dict method.
+
+
+### `open`
+
+```python
+open(self, path: Union[str, File], mode: Literal['r', 'rb', 'w', 'wb'] = 'r', *, description: Optional[str] = None, categories: Optional[List[str]] = None, content_type: Optional[str] = None, tab_ingest: Optional[bool] = None) -> Union[DataverseFileReader, DataverseFileWriter]
+```
+
+Open a file from the dataset for reading or writing, in binary or text mode.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `Union[str, File]` | The file path within the dataset (e.g., "data/file.txt" or "subdir/notes.csv") or a File object. |
+| `mode` | `Literal['r', 'rb', 'w', 'wb']` | File open mode. - "r" or "rb": Read mode (default, "r" is text, "rb" is binary). - "w" or "wb": Write mode ("w" is text, "wb" is binary; creates/replaces file). *(default: `'r'`)* |
+| `description` | `Optional[str]` | Optional file description (only available in write mode "w" or "wb"). *(default: `None`)* |
+| `categories` | `Optional[List[str]]` | Optional list of category strings (only available in write mode "w" or "wb"). *(default: `None`)* |
+| `content_type` | `Optional[str]` | Optional MIME type (only available in write mode "w" or "wb"). *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[DataverseFileReader, DataverseFileWriter]` | DataverseFileReader or DataverseFileWriter: - Reader-like object if opened in read mode. - Writer-like object if opened in write mode. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If specified file does not exist (in read mode). |
+| `ValueError` | If mode is invalid or metadata is provided in read mode. |
+
+
+**Examples**
+
+```python
+>>> # Read a file as text
+>>> with dataset.open("data/readme.txt") as f:
+...     text = f.read()
+>>> # Read using a File object
+>>> file = dataset.files[0]
+>>> with dataset.open(file) as f:
+...     text = f.read()
+>>> # Write a new file as binary
+>>> with dataset.open("outputs/results.bin", mode="wb") as f:
+...     f.write(b"result data")
+>>> # Write with metadata
+>>> with dataset.open("outputs/results.bin", mode="wb", description="My file") as f:
+...     f.write(b"result data")
+```
+
+
+### `upload_file`
+
+```python
+upload_file(self, local_file_path: Union[str, Path], dataset_path: Optional[str] = None, *, description: Optional[str] = None, categories: Optional[List[str]] = None, content_type: Optional[str] = None) -> UploadResponse
+```
+
+Upload a local file to the dataset.
+
+This method uploads a file from the local filesystem to the dataset.
+It reuses the same path and metadata handling as the `open()` method
+but uploads the file directly instead of streaming writes.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `local_file_path` | `Union[str, Path]` | Path to the local file to upload (string or Path object). |
+| `dataset_path` | `Optional[str]` | Optional path where the file should be stored in the dataset (e.g., "data/file.txt" or "subdir/notes.csv"). If not provided, uses the basename of the local file path. *(default: `None`)* |
+| `description` | `Optional[str]` | Optional file description. *(default: `None`)* |
+| `categories` | `Optional[List[str]]` | Optional list of category strings. *(default: `None`)* |
+| `content_type` | `Optional[str]` | Optional MIME type. *(default: `None`)* |
+| `friendly_type` |  | Optional friendly type name. |
+| `storage_identifier` |  | Optional storage identifier. |
+| `md5` |  | Optional MD5 checksum. |
+| `checksum` |  | Optional checksum dict with "type" and "value" keys. |
+| `tabular_data` |  | Optional flag indicating if file is tabular. |
+| `file_access_request` |  | Optional flag for file access request. |
+| `force_replace` |  | Optional flag to force replacement if file exists. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `UploadResponse` | Response object with upload confirmation and file information. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If the local file does not exist. |
+| `ValueError` | If the dataset identifier is not set. |
+
+
+**Example**
+
+&gt;&gt;&gt; # Upload a local file (uses basename as dataset path)
+&gt;&gt;&gt; dataset.upload_file("/path/to/local/file.txt")
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Upload to specific dataset path
+&gt;&gt;&gt; dataset.upload_file("/path/to/local/file.txt", "data/file.txt")
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Upload with custom metadata
+&gt;&gt;&gt; dataset.upload_file(
+...     "/path/to/data.csv",
+...     "data/data.csv",
+...     description="My data file",
+...     categories=["Data", "Research"]
+... )
+
+
+### `open_tabular`
+
+```python
+open_tabular(self, path: str, no_header: bool = False, **kwargs) -> pd.DataFrame
+```
+
+Load an entire tabular file (CSV, TSV, etc.) from the dataset as a pandas DataFrame.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file in the dataset. |
+| `sep` | `str` | Delimiter to use (default: ','). |
+| `no_header` | `bool` | If True, use integer columns instead of header row. *(default: `False`)* |
+| `**kwargs` |  | Additional keyword arguments for pandas.read_csv(). *(default: `&#123;&#125;`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pd.DataFrame: The loaded data. |
+
+
+**Examples**
+
+```python
+>>> df = dataset.open_tabular("data/file.csv")
+>>> df = dataset.open_tabular("data/file.csv", no_header=True)
+>>> df = dataset.open_tabular(
+...     "data/file.csv",
+...     usecols=["col1", "col2"],
+...     dtype={"col1": str, "col2": int},
+...     na_values=["N/A", "null"],
+... )
+```
+
+
+### `stream_tabular`
+
+```python
+stream_tabular(self, path: str, chunk_size: int = 10000, no_header: bool = False, sep: str = ',', **kwargs) -> Iterator[pd.DataFrame]
+```
+
+Stream a tabular file as multiple pandas DataFrames (chunked reads).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | File path in the dataset. |
+| `chunk_size` | `int` | Number of rows per yielded chunk (default: 10000). *(default: `10000`)* |
+| `no_header` | `bool` | If True, use integer columns. *(default: `False`)* |
+| `sep` | `str` | Field delimiter (default: ','). *(default: `','`)* |
+| `**kwargs` |  | Passed through to pandas.read_csv(). *(default: `&#123;&#125;`)* |
+
+
+**Examples**
+
+```python
+>>> for chunk in dataset.stream_tabular("data/file.csv"):
+...     print(chunk.head())
+>>> for chunk in dataset.stream_tabular("data/file.csv", no_header=True):
+...     print(chunk.columns)
+>>> for chunk in dataset.stream_tabular(
+...     "data/file.csv", usecols=[0, 1, 2], dtype={"col1": str}
+... ):
+...     process(chunk)
+```
+
+
+### `bundle_datafiles`
+
+```python
+bundle_datafiles(self, files: Union[Literal['all'], List[Union[File, str, int]]] = 'all', stream: bool = False) -> Union[bytes, _GeneratorContextManager[httpx.Response, None, None]]
+```
+
+Bundle one or multiple datafiles in the dataset together as a ZIP file (Dataverse "datafiles-bundle" API).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `files` | `Union[Literal['all'], List[Union[File, str, int]]]` | Files to include in the bundle. "all" (default) bundles all files. You can also provide a list of File objects, file paths, or file IDs. *(default: `'all'`)* |
+| `stream` | `bool` | If True, return a context manager to stream the ZIP response. *(default: `False`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[bytes, _GeneratorContextManager[httpx.Response, None, None]]` | httpx.Response or contextlib._GeneratorContextManager[httpx.Response]: The HTTP response object containing the ZIP, or a stream context. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If any file reference is not recognized. |
+
+
+**Examples**
+
+```python
+>>> with dataset.bundle_datafiles(files="all", stream=True) as resp:
+...     with open("dataset.zip", "wb") as f:
+...         for chunk in resp.iter_bytes():
+...             f.write(chunk)
+>>> resp = dataset.bundle_datafiles(files=["mytab1.tab", "mytab2.tab"])
+>>> with open("some.zip", "wb") as f:
+...     f.write(resp.read())
+```

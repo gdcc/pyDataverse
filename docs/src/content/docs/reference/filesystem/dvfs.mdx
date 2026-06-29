@@ -1,0 +1,488 @@
+---
+title: "dvfs"
+description: "API reference for `pyDataverse.filesystem.dvfs`."
+---
+
+`pyDataverse.filesystem.dvfs`
+
+
+## `class Info`
+
+
+## `class DataverseFS`
+
+
+An fsspec filesystem implementation for Dataverse datasets.
+
+Provides filesystem-like access to a single Dataverse dataset version,
+allowing you to browse, read, write, and manage files using the standard
+fsspec interface (``ls``, ``info``, ``open``, ``cat``, ``rm``, ...) as well
+as a set of Dataverse-specific convenience helpers (``open_tabular``,
+``stream_tabular``).
+
+Reads stream lazily via HTTP Range requests, and writes stream to Dataverse
+in bounded chunks, so neither path holds an entire file in memory.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url` |  | The base URL of the Dataverse instance |
+| `identifier` |  | Dataset identifier (DOI or numeric ID) |
+| `version` |  | Dataset version to access |
+| `native_api` |  | Native API client for Dataverse operations |
+| `data_access_api` |  | Data Access API client for file downloads |
+
+
+**Example**
+
+&gt;&gt;&gt; # Using from_url
+&gt;&gt;&gt; fs = DataverseFS.from_url(
+...     "https://demo.dataverse.org/dataset.xhtml?persistentId=doi:10.5072/FK2/ABCDEF",
+...     api_token="your-token"
+... )
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Using direct initialization
+&gt;&gt;&gt; fs = DataverseFS(
+...     base_url="https://demo.dataverse.org",
+...     identifier="doi:10.5072/FK2/ABCDEF",
+...     api_token="your-token"
+... )
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Read a file
+&gt;&gt;&gt; with fs.open("data/file.csv", "rb") as f:
+...     data = f.read()
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Write a file
+&gt;&gt;&gt; with fs.open("data/newfile.csv", "wb") as f:
+...     f.write(b"column1,column2\n")
+...     f.write(b"value1,value2\n")
+
+
+**Methods**
+
+### `__init__`
+
+```python
+__init__(self, base_url: str, identifier: Union[str, int], version: Union[str, Literal[':latest', ':latest-published', ':draft']] = ':latest', api_token: Optional[str] = None, cache_ttl: int = 60, native_api: Optional[NativeApi] = None, data_access_api: Optional[DataAccessApi] = None, **kwargs)
+```
+
+Initialize a DataverseFS instance.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url` | `str` | Base URL of the Dataverse instance (e.g., "https://demo.dataverse.org") |
+| `identifier` | `Union[str, int]` | Dataset identifier (DOI string or numeric database ID) |
+| `version` | `Union[str, Literal[':latest', ':latest-published', ':draft']]` | Dataset version to access. Can be a version number, or one of: ":latest" (default) - latest published or draft version ":latest-published" - latest published version only ":draft" - draft version *(default: `':latest'`)* |
+| `api_token` | `Optional[str]` | Optional API token for authentication *(default: `None`)* |
+| `cache_ttl` | `int` | Cache TTL in seconds (default: 60, set to 0 to disable) *(default: `60`)* |
+| `native_api` | `Optional[NativeApi]` | Optional existing NativeApi instance to reuse *(default: `None`)* |
+| `data_access_api` | `Optional[DataAccessApi]` | Optional existing DataAccessApi instance to reuse *(default: `None`)* |
+| `**kwargs` |  | Forwarded to fsspec's AbstractFileSystem. *(default: `&#123;&#125;`)* |
+
+
+### `from_url` _classmethod_
+
+```python
+from_url(cls, url: str, api_token: Optional[str] = None) -> Self
+```
+
+Create a DataverseFS instance from a Dataverse dataset URL.
+
+Parses standard Dataverse dataset URLs to extract connection details.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `url` | `str` | Dataverse dataset URL. Supported formats: - https://host/dataset.xhtml?persistentId=doi:10.xxxxx - https://host/dataset.xhtml?id=12345 - Optional: &version=1.0 or &version=:draft |
+| `api_token` | `Optional[str]` | Optional API token for authentication *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Self` | DataverseFS instance configured for the specified dataset |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If URL format is invalid, scheme is not http/https, hostname is missing, or neither persistentId nor id is provided |
+
+
+**Example**
+
+&gt;&gt;&gt; fs = DataverseFS.from_url(
+...     "https://demo.dataverse.org/dataset.xhtml?persistentId=doi:10.5072/FK2/ABC",
+...     api_token="token"
+... )
+
+
+### `info`
+
+```python
+info(self, path: str, **kwargs) -> Dict[str, Any]
+```
+
+Return an fsspec info dict for a file or (implicit) directory.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path within the dataset ("" or "/" for the root). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dict[str, Any]` | Dict with at least ``name``, ``size`` and ``type`` keys. Files also |
+| `Dict[str, Any]` | carry ``id`` and ``content_type``. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If no file or directory matches the path. |
+
+
+### `ls`
+
+```python
+ls(self, path: str, detail: bool = True, **kwargs) -> Union[List[Dict[str, Any]], List[str]]
+```
+
+List the immediate children of a path.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Directory path ("" or "/" for the root). If ``path`` points at a file, a single-entry listing for that file is returned (standard fsspec behavior). |
+| `detail` | `bool` | If True, return info dicts; if False, return path strings. *(default: `True`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[List[Dict[str, Any]], List[str]]` | List of info dicts (or names) for the immediate children. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If the path does not exist. |
+
+
+### `invalidate_cache`
+
+```python
+invalidate_cache(self, path: Optional[str] = None) -> None
+```
+
+Clear cached dataset metadata in addition to fsspec's dir cache.
+
+
+### `mkdir`
+
+```python
+mkdir(self, path: str, create_parents: bool = True, **kwargs) -> None
+```
+
+No-op: Dataverse directories are implicit in file paths.
+
+
+### `makedirs`
+
+```python
+makedirs(self, path: str, exist_ok: bool = False) -> None
+```
+
+No-op: Dataverse directories are implicit in file paths.
+
+
+### `getinfo`
+
+```python
+getinfo(self, path: str, namespace: Optional[str] = None) -> Info
+```
+
+Get rich Dataverse metadata about a file.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file (e.g., "data/file.csv") |
+| `namespace` | `Optional[str]` | Optional namespace for additional info (not currently used) *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Info` | Info object with file metadata |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If file doesn't exist |
+
+
+**Example**
+
+&gt;&gt;&gt; info = fs.getinfo("data/myfile.csv")
+&gt;&gt;&gt; print(info.filesize)
+
+
+### `listdir`
+
+```python
+listdir(self, path: str) -> List[str]
+```
+
+List immediate child names (files and directories) at a path.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Directory path to list ("/" or "" for root) |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[str]` | Sorted list of immediate child names |
+
+
+**Example**
+
+&gt;&gt;&gt; fs.listdir("/")
+['data', 'README.txt']
+&gt;&gt;&gt; fs.listdir("data")
+['file1.csv', 'file2.csv']
+
+
+### `makedir`
+
+```python
+makedir(self, path: str, permissions: Optional[int] = None, recreate: bool = False)
+```
+
+Create a directory.
+
+Note: Directories in Dataverse are implicit (based on file paths).
+This operation is not supported as a standalone action.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `NotImplementedError` | Always raised (directories are implicit) |
+
+
+### `open`
+
+```python
+open(self, path: str, mode: str = 'rb', block_size = None, cache_options = None, compression = None, metadata: Optional[UploadBody] = None, **kwargs)
+```
+
+Open a file, returning a Dataverse-aware handle.
+
+Binary modes defer to fsspec, which returns the
+:class:`DataverseFileReader` / :class:`DataverseFileWriter` directly.
+Text modes are wrapped in :class:`DataverseTextIO` instead of a plain
+:class:`io.TextIOWrapper` so the Dataverse-specific surface
+(``id``, ``persistent_id``, ``metadata``) stays reachable on the handle.
+
+
+### `openbin`
+
+```python
+openbin(self, path: str, mode: Literal['r', 'rb', 'w', 'wb'] = 'r', buffering: int = -1, metadata: Optional[UploadBody] = None)
+```
+
+Open a file. ``r``/``w`` return text streams, ``rb``/``wb`` binary.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file in the dataset |
+| `mode` | `Literal['r', 'rb', 'w', 'wb']` | 'r'/'rb' to read (default), 'w'/'wb' to create or replace *(default: `'r'`)* |
+| `buffering` | `int` | Accepted for compatibility (ignored) *(default: `-1`)* |
+| `metadata` | `Optional[UploadBody]` | Optional upload metadata (write mode only) *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | A readable or writable file-like object. |
+
+
+**Example**
+
+&gt;&gt;&gt; with fs.openbin("data/file.csv") as f:
+...     content = f.read()
+&gt;&gt;&gt; with fs.openbin("data/newfile.csv", mode="wb") as f:
+...     f.write(b"data")
+
+
+### `stream_tabular`
+
+```python
+stream_tabular(self, path: str, api_token: Optional[str], chunk_size: int = 10000, no_header: bool = False, sep: str = ',', **kwargs)
+```
+
+Stream a tabular file as a chunked pandas DataFrame iterator.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file. |
+| `chunk_size` | `int` | Number of rows per chunk. *(default: `10000`)* |
+| `no_header` | `bool` | If True, the file has no header row. Column names will be integers (0, 1, 2, ...). Default is False. *(default: `False`)* |
+| `sep` | `str` | Delimiter to use. Default is ",". *(default: `','`)* |
+| `**kwargs` |  | Additional keyword arguments passed to pandas.read_csv(). Common options include: - usecols: List of column names or indices to read - dtype: Dictionary of column names to data types - na_values: Values to recognize as NA/NaN - skiprows: Number of rows to skip at the start - nrows: Number of rows to read - encoding: File encoding (e.g., 'utf-8', 'latin-1') - delimiter: Alternative to sep - header: Override header behavior (overrides no_header if provided) See pandas.read_csv() documentation for full list. *(default: `&#123;&#125;`)* |
+
+
+**Example**
+
+&gt;&gt;&gt; for chunk in fs.stream_tabular("data/file.csv", api_token=None):
+...     print(chunk.columns)
+
+
+### `open_tabular`
+
+```python
+open_tabular(self, path: str, api_token: Optional[str], no_header: bool = False, **kwargs)
+```
+
+Open the entire tabular file as a pandas DataFrame.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file. |
+| `api_token` | `Optional[str]` | Optional Dataverse API token for authenticated access. |
+| `no_header` | `bool` | If True, the file has no header row. Column names will be integers (0, 1, 2, ...). Default is False. *(default: `False`)* |
+| `**kwargs` |  | Additional keyword arguments passed to pandas.read_csv(). Common options include: - usecols: List of column names or indices to read - dtype: Dictionary of column names to data types - na_values: Values to recognize as NA/NaN - skiprows: Number of rows to skip at the start - nrows: Number of rows to read - encoding: File encoding (e.g., 'utf-8', 'latin-1') - delimiter: Alternative to sep - header: Override header behavior (overrides no_header if provided) See pandas.read_csv() documentation for full list. *(default: `&#123;&#125;`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | pd.DataFrame: The loaded DataFrame. |
+
+
+**Example**
+
+&gt;&gt;&gt; df = fs.open_tabular("data/file.csv", api_token=None)
+
+
+### `remove`
+
+```python
+remove(self, path: str)
+```
+
+Delete a file from the dataset.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file to delete |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If file doesn't exist |
+| `ValueError` | If file has no ID |
+
+
+**Example**
+
+&gt;&gt;&gt; fs.remove("data/old_file.csv")
+
+
+### `removedir`
+
+```python
+removedir(self, path: str)
+```
+
+Remove a directory.
+
+Note: Directories in Dataverse are implicit and cannot be deleted directly.
+Files must be removed individually.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `NotImplementedError` | Always raised (directories cannot be deleted) |
+
+
+### `setinfo`
+
+```python
+setinfo(self, path: str, info: update.UpdateBody)
+```
+
+Update file metadata.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `str` | Path to the file |
+| `info` | `update.UpdateBody` | File metadata to update |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `FileNotFoundError` | If file doesn't exist |
+| `ValueError` | If file has no ID |
+
+
+**Example**
+
+&gt;&gt;&gt; from pyDataverse.models.file.filemeta import UploadBody
+&gt;&gt;&gt; metadata = UploadBody(description="Updated description")
+&gt;&gt;&gt; fs.setinfo("data/file.csv", metadata)

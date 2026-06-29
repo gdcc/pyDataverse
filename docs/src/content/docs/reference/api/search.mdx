@@ -1,0 +1,171 @@
+---
+title: "search"
+description: "API reference for `pyDataverse.api.search`."
+---
+
+`pyDataverse.api.search`
+
+
+## `class QueryOptions`
+
+
+Configuration options for search queries.
+
+This class defines all available parameters that can be used to customize
+search behavior, including filtering, sorting, pagination, and result formatting.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | `Optional[Literal['dataverse', 'dataset', 'file']]` | Filter results by content type (dataverse, dataset, or file). |
+| `subtree` | `Optional[str]` | Limit search to a specific dataverse and its sub-dataverses. |
+| `sort` | `Optional[str]` | Field to sort results by (e.g., 'name', 'date'). |
+| `per_page` | `int` | Number of results to return per page (1-1000, default 10). |
+| `start` | `int` | Starting index for pagination (default 0). |
+| `order` | `Literal['asc', 'desc']` | Sort order, either ascending or descending (default 'desc'). |
+| `filter_query` | `Optional[str]` | Advanced filter using Solr query syntax. |
+| `show_entity_ids` | `bool` | Whether to include entity IDs in the response. |
+| `show_relevance` | `bool` | Whether to include relevance scores in the response. |
+| `show_facets` | `bool` | Whether to include facet information for result filtering. |
+| `geo_point` | `bool` | Geographic point for spatial search (latitude,longitude format). |
+| `geo_radius` | `Optional[str]` | Radius for geographic search (e.g., '10km', '5mi'). |
+
+
+## `class SearchApi`
+
+
+Class to access Dataverse's Search API.
+
+This class provides methods to search through Dataverse content including
+dataverses, datasets, and files. It supports advanced search features like
+filtering, sorting, pagination, and geographic search.
+
+The Search API uses Solr under the hood, allowing for powerful query capabilities
+including faceted search, relevance scoring, and complex filtering.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `api_base_url` |  | The base URL for search API endpoints. |
+
+
+**Examples**
+
+Basic search:
+
+```python
+>>> search_api = SearchApi.from_api(native_api)
+>>> results = search_api.search("climate change")
+```
+
+Advanced search with options:
+
+```python
+>>> options = QueryOptions(
+...     type="dataset",
+...     per_page=20,
+...     sort="date",
+...     order="desc"
+... )
+>>> results = search_api.search("climate", options)
+```
+
+
+**Methods**
+
+### `api_base_url`
+
+```python
+api_base_url(self)
+```
+
+Construct the base URL for search API endpoints.
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | The complete URL path for search API requests. |
+
+
+### `search`
+
+```python
+search(self, query: str, options: Optional[QueryOptions] = None) -> SearchResponse
+```
+
+Search through Dataverse content.
+
+Performs a search across dataverses, datasets, and files using the provided
+query string. Supports advanced filtering, sorting, and pagination options.
+
+The search uses Solr's full-text search capabilities, allowing for:
+- Simple keyword searches
+- Phrase searches (using quotes)
+- Boolean operators (AND, OR, NOT)
+- Wildcard searches (* and ?)
+- Field-specific searches
+
+HTTP: GET /api/search
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `query` | `str` | The search query string. Can include keywords, phrases in quotes, boolean operators, and field-specific searches. |
+| `options` | `Optional[QueryOptions]` | Optional configuration for search behavior including filtering, sorting, pagination, and result formatting options. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `SearchResponse` | SearchResponse object containing search results, metadata, and facet |
+| `SearchResponse` | information if requested. |
+
+
+**Examples**
+
+Simple keyword search:
+
+```python
+>>> results = search_api.search("climate change")
+```
+
+Phrase search:
+
+```python
+>>> results = search_api.search('"global warming"')
+```
+
+Boolean search:
+
+```python
+>>> results = search_api.search("climate AND temperature")
+```
+
+Field-specific search:
+
+```python
+>>> results = search_api.search("title:climate")
+```
+
+Search with options:
+
+```python
+>>> options = QueryOptions(type="dataset", per_page=50)
+>>> results = search_api.search("climate", options)
+```
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ApiRequestError` | If the search request fails or returns an error. |

@@ -1,0 +1,361 @@
+---
+title: "semantic"
+description: "API reference for `pyDataverse.api.semantic`."
+---
+
+`pyDataverse.api.semantic`
+
+
+## `class SemanticApi`
+
+
+Class to access Dataverse's Semantic/Linked Data API.
+
+This class provides methods to retrieve and work with dataset metadata in semantic
+formats like JSON-LD (JSON for Linking Data). The semantic API allows you to access
+structured metadata that can be used for semantic web applications, knowledge graphs,
+and linked data workflows.
+
+The SemanticApi extends the base Api class and provides specialized methods for:
+- Retrieving individual dataset metadata in JSON-LD format
+- Batch retrieval of multiple datasets with concurrent processing
+- Converting JSON-LD responses to RDFLib Graph objects for further processing
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url` |  | Base URL of the Dataverse instance (e.g., "https://demo.dataverse.org"). |
+| `api_token` |  | Optional API token for authentication. Required for accessing private datasets or performing operations that require authentication. |
+| `api_version` |  | Version of the Dataverse API to use. Defaults to the latest version. |
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url_api_native` | `str` | The base URL for native API endpoints. |
+| `base_url_api` | `str` | The base URL for API endpoints. |
+
+
+**Examples**
+
+Basic usage with public datasets::
+
+    &gt;&gt;&gt; api = SemanticApi(base_url="https://demo.dataverse.org")
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+    &gt;&gt;&gt; print(metadata["@context"])
+
+Authenticated usage::
+
+    &gt;&gt;&gt; api = SemanticApi(
+    ...     base_url="https://your-dataverse.org",
+    ...     api_token="your-api-token"
+    ... )
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+
+Batch processing multiple datasets::
+
+    &gt;&gt;&gt; identifiers = ["doi:10.11587/8H3N93", "doi:10.11587/ABC123"]
+    &gt;&gt;&gt; all_metadata = api.get_datasets(identifiers, batch_size=10)
+    &gt;&gt;&gt; print(f"Retrieved &#123;len(all_metadata)&#125; datasets")
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url_api_native` | `str` | Get the base URL for native API endpoints. |
+| `api_base_url` | `str` | Get the base URL for API endpoints. |
+
+
+**Methods**
+
+### `get_dataset`
+
+```python
+get_dataset(self, identifier: str | int, as_graph: bool = False) -> Union[Dict[str, Any], Graph]
+```
+
+Get dataset metadata in JSON-LD format.
+
+Retrieves the semantic metadata for a dataset using its persistent identifier
+or numeric ID. The response is returned in JSON-LD (JSON for Linking Data) format,
+which provides structured data that can be used for semantic web applications,
+knowledge graphs, and linked data workflows.
+
+JSON-LD is a lightweight syntax for encoding linked data using JSON. It allows
+data to be serialized in a way that is both human-readable and machine-processable,
+making it ideal for semantic web applications.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    # For persistent identifiers:
+    GET http://$SERVER/api/datasets/:persistentId/metadata?persistentId=$PID
+    Accept: application/ld+json
+
+    # For numeric IDs:
+    GET http://$SERVER/api/datasets/$ID/metadata
+    Accept: application/ld+json
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str | int` | Dataset identifier. Can be either: - Persistent identifier (str): e.g., "doi:10.11587/8H3N93", "hdl:1902.1/21919" - Numeric database ID (int): e.g., 42 |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[Dict[str, Any], Graph]` | Dict[str, Any]: A dictionary containing the dataset metadata in JSON-LD format. |
+| `Union[Dict[str, Any], Graph]` | The dictionary includes standard JSON-LD fields like "@context", "@type", and |
+| `Union[Dict[str, Any], Graph]` | dataset-specific metadata fields such as title, authors, description, etc. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `httpx.HTTPStatusError` | If the API request fails (e.g., dataset not found, authentication required, server error). |
+| `ValueError` | If the identifier format is invalid. |
+
+
+**Examples**
+
+Get dataset metadata using a DOI::
+
+    &gt;&gt;&gt; api = SemanticApi(base_url="https://demo.dataverse.org")
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+    &gt;&gt;&gt; print(metadata["@context"])
+    &gt;&gt;&gt; print(metadata.get("name"))  # Dataset title
+
+Get dataset metadata using a numeric ID::
+
+    &gt;&gt;&gt; metadata = api.get_dataset(42)
+    &gt;&gt;&gt; print(metadata["@type"])
+
+Access specific metadata fields::
+
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+    &gt;&gt;&gt; authors = metadata.get("author", [])
+    &gt;&gt;&gt; for author in authors:
+    ...     print(author.get("name"))
+
+
+**Note**
+
+The JSON-LD format includes a "@context" field that defines the vocabulary
+and mappings used in the metadata. This context is essential for properly
+interpreting the semantic meaning of the data fields.
+
+
+### `get_datasets`
+
+```python
+get_datasets(self, identifiers: Sequence[str | int | collection.content.Dataset], batch_size: int = 50, as_graph: bool = False) -> Sequence[Dict[str, Any]] | Graph
+```
+
+Get metadata for multiple datasets in JSON-LD format with concurrent processing.
+
+This method efficiently retrieves semantic metadata for multiple datasets by
+processing them in concurrent batches. It's designed for bulk operations where
+you need to collect metadata from many datasets while managing system resources
+and API rate limits.
+
+The method automatically handles:
+- Concurrent API requests within each batch for improved performance
+- Proper async client lifecycle management
+- Error handling and cleanup
+- Memory-efficient batch processing
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifiers` | `Sequence[str | int | collection.content.Dataset]` | A sequence of dataset identifiers. Each identifier can be either: - Persistent identifier (str): e.g., "doi:10.11587/8H3N93" - Numeric database ID (int): e.g., 42 |
+| `batch_size` | `int` | Number of datasets to process concurrently in each batch. Defaults to 50. Larger batch sizes can improve performance but may consume more memory and potentially hit API rate limits. Smaller batch sizes are more conservative and suitable for large collections. *(default: `50`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Sequence[Dict[str, Any]] | Graph` | Sequence[Dict[str, Any]]: A sequence of dictionaries, each containing |
+| `Sequence[Dict[str, Any]] | Graph` | dataset metadata in JSON-LD format. The order of results corresponds |
+| `Sequence[Dict[str, Any]] | Graph` | to the order of input identifiers. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `httpx.HTTPStatusError` | If any API request fails. The method will stop processing and raise the first encountered error. |
+| `ValueError` | If any identifier format is invalid. |
+| `asyncio.TimeoutError` | If requests exceed the configured timeout. |
+
+
+**Examples**
+
+Process a small list of datasets::
+
+    &gt;&gt;&gt; api = SemanticApi(base_url="https://demo.dataverse.org")
+    &gt;&gt;&gt; identifiers = [
+    ...     "doi:10.11587/8H3N93",
+    ...     "doi:10.11587/ABC123",
+    ...     42
+    ... ]
+    &gt;&gt;&gt; all_metadata = api.get_datasets(identifiers)
+    &gt;&gt;&gt; print(f"Retrieved &#123;len(all_metadata)&#125; datasets")
+
+Process a large collection with custom batch size::
+
+    &gt;&gt;&gt; # For processing 1000+ datasets, use smaller batch size
+    &gt;&gt;&gt; large_collection = [f"doi:10.11587/ID&#123;i&#125;" for i in range(1000)]
+    &gt;&gt;&gt; metadata = api.get_datasets(large_collection, batch_size=25)
+
+Extract specific information from all datasets::
+
+    &gt;&gt;&gt; identifiers = ["doi:10.11587/8H3N93", "doi:10.11587/ABC123"]
+    &gt;&gt;&gt; all_metadata = api.get_datasets(identifiers)
+    &gt;&gt;&gt; for metadata in all_metadata:
+    ...     title = metadata.get("name", "Unknown")
+    ...     authors = len(metadata.get("author", []))
+    ...     print(f"Dataset: &#123;title&#125;, Authors: &#123;authors&#125;")
+
+
+**Performance Notes**
+
+- The optimal batch_size depends on your system resources, network latency,
+  and the Dataverse instance's performance characteristics
+- For most use cases, the default batch size of 50 provides a good balance
+  between performance and resource usage
+- Consider using smaller batch sizes (10-25) when processing very large
+  collections or when working with slower networks
+
+
+### `response_to_graph`
+
+```python
+response_to_graph(self, response: Dict[str, Any], normalize_uris: bool = True) -> Graph
+```
+
+Convert a JSON-LD response dictionary to an RDFLib Graph object.
+
+This utility method transforms JSON-LD metadata returned by the Dataverse API
+into an RDFLib Graph object, which enables advanced semantic data processing,
+querying with SPARQL, serialization to different RDF formats, and integration
+with other semantic web tools and workflows.
+
+RDFLib is a Python library for working with RDF (Resource Description Framework)
+data. By converting JSON-LD to an RDFLib Graph, you can:
+- Execute SPARQL queries on the metadata
+- Serialize the data to various RDF formats (Turtle, N-Triples, RDF/XML, etc.)
+- Merge multiple datasets into a single knowledge graph
+- Perform graph-based analysis and reasoning
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `response` | `Dict[str, Any]` | A dictionary containing dataset metadata in JSON-LD format, typically obtained from get_dataset() or get_datasets() methods. The dictionary should contain valid JSON-LD with appropriate "@context" and semantic markup. |
+| `normalize_uris` | `bool` | If True (default), normalize HTTP schema.org URIs to HTTPS to consolidate prefixes in Turtle serialization. This prevents duplicate prefixes like `schema:` and `schema1:` from appearing in the output. *(default: `True`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Graph` | An RDFLib Graph object containing the parsed RDF triples from |
+| `Graph` | the JSON-LD input. The graph can be queried, serialized, or further |
+| `Graph` | processed using RDFLib's extensive API. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If the input dictionary is not valid JSON-LD or cannot be parsed by RDFLib. |
+| `TypeError` | If the response is not a dictionary. |
+
+
+**Examples**
+
+Convert dataset metadata to RDF graph::
+
+    &gt;&gt;&gt; api = SemanticApi(base_url="https://demo.dataverse.org")
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+    &gt;&gt;&gt; graph = api.response_to_graph(metadata)
+    &gt;&gt;&gt; print(f"Graph contains &#123;len(graph)&#125; triples")
+
+Query the graph with SPARQL::
+
+    &gt;&gt;&gt; metadata = api.get_dataset("doi:10.11587/8H3N93")
+    &gt;&gt;&gt; graph = api.response_to_graph(metadata)
+    &gt;&gt;&gt; query = '''
+    ...     SELECT ?title WHERE &#123;
+    ...         ?dataset a ?type .
+    ...         ?dataset &lt;http://schema.org/name&gt; ?title .
+    ...     &#125;
+    ... '''
+    &gt;&gt;&gt; results = graph.query(query)
+    &gt;&gt;&gt; for row in results:
+    ...     print(f"Title: &#123;row.title&#125;")
+
+Serialize to different RDF formats::
+
+    &gt;&gt;&gt; graph = api.response_to_graph(metadata)
+    &gt;&gt;&gt; turtle_data = graph.serialize(format='turtle')
+    &gt;&gt;&gt; print(turtle_data)
+
+Merge multiple datasets into one graph::
+
+    &gt;&gt;&gt; identifiers = ["doi:10.11587/8H3N93", "doi:10.11587/ABC123"]
+    &gt;&gt;&gt; combined_graph = Graph()
+    &gt;&gt;&gt; for metadata in api.get_datasets(identifiers):
+    ...     dataset_graph = api.response_to_graph(metadata)
+    ...     combined_graph += dataset_graph
+    &gt;&gt;&gt; print(f"Combined graph has &#123;len(combined_graph)&#125; triples")
+
+
+**Note**
+
+The resulting Graph object preserves all the semantic relationships
+and context from the original JSON-LD, making it suitable for advanced
+semantic web applications and linked data workflows.
+
+
+### `responses_to_graph`
+
+```python
+responses_to_graph(self, responses: Sequence[Dict[str, Any]], normalize_uris: bool = True) -> Graph
+```
+
+Convert a sequence of JSON-LD responses to an RDFLib Graph object.
+
+This method efficiently converts a sequence of JSON-LD responses into an RDFLib
+Graph object, which enables advanced semantic data processing, querying with
+SPARQL, serialization to different RDF formats, and integration with other
+semantic web tools and workflows.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `responses` | `Sequence[Dict[str, Any]]` | A sequence of JSON-LD response dictionaries. |
+| `normalize_uris` | `bool` | If True (default), normalize HTTP schema.org URIs to HTTPS to consolidate prefixes in Turtle serialization. This prevents duplicate prefixes like `schema:` and `schema1:` from appearing in the output. *(default: `True`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Graph` | An RDFLib Graph object containing all triples from the responses. |

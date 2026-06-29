@@ -44,6 +44,23 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+## 📚 API Reference
+
+The pages under `src/content/docs/reference/` are **auto-generated** from the
+`pyDataverse` source code and docstrings using [griffe](https://mkdocstrings.github.io/griffe/).
+Do not edit them by hand — regenerate them from the repository root:
+
+```sh
+pip install -e ".[docs]"          # or: uv pip install griffe
+python docs/scripts/gen_reference.py
+```
+
+The generator mirrors the package layout into `reference/` and the sidebar picks
+the pages up via the `autogenerate` entries in `astro.config.mjs`. Internal
+machinery (model-building, views, MCP server impl, base classes, …) is excluded
+via the `IGNORE_PREFIXES` / `IGNORE_EXACT` lists near the top of the script —
+edit those to change what is documented.
+
 ## 👀 Want to learn more?
 
 Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).

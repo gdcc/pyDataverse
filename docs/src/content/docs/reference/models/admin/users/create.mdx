@@ -1,0 +1,21 @@
+---
+title: "create"
+description: "API reference for `pyDataverse.models.admin.users.create`."
+---
+
+`pyDataverse.models.admin.users.create`
+
+
+## `class CreateUser`
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `authentication_provider_id` | `Annotated[str, Field(alias='authenticationProviderId')]` | Authentication provider identifier |
+| `persistent_user_id` | `Annotated[str, Field(alias='persistentUserId')]` | Persistent identifier for the user |
+| `identifier` | `str` | User identifier (username) |
+| `first_name` | `Annotated[str, Field(alias='firstName')]` | First name of the user |
+| `last_name` | `Annotated[str, Field(alias='lastName')]` | Last name of the user |
+| `email` | `EmailStr` | Email address of the user |

@@ -1,0 +1,304 @@
+---
+title: "collection"
+description: "API reference for `pyDataverse.dataverse.collection`."
+---
+
+`pyDataverse.dataverse.collection`
+
+
+## `class Content`
+
+
+## `class Collection`
+
+
+Represents a Dataverse collection and provides methods to manage its metadata, fetch its sub-collections and datasets,
+and interact with its child and related content.
+
+This class encapsulates the core operations for working with a Dataverse collection, including:
+  - Reading and updating collection metadata.
+  - Accessing enabled metadatablocks.
+  - Retrieving lists/views of datasets or sub-collections (with dict-like and iterator access).
+  - Creating new datasets within the collection.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[Literal["` | root"], str, int]): Alias, handle, or DB ID of the collection. |
+
+
+**Example**
+
+&gt;&gt;&gt; coll = dataverse["sample-collection"]
+&gt;&gt;&gt; print(coll.metadata.name)
+&gt;&gt;&gt; for ds in coll.datasets:
+...     print(ds.title)
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `metadata` | `collection.Collection` | Metadata about this collection from the Dataverse native API. |
+| `overview` | `pd.DataFrame` | Get a structured list of all content (datasets and collections) in this collection. |
+| `metadatablocks` | `Dict[str, MetadatablockSpecification]` | Get specifications for all enabled and available metadatablocks for this collection. |
+| `collections` |  | Return a view of all subcollections within this collection, with both iterator and dict-like access. |
+| `datasets` |  | Return a view of all datasets within this collection, with both iterator and dict-like access. |
+
+
+**Methods**
+
+### `update_metadata`
+
+```python
+update_metadata(self, name: Optional[str] = None, alias: Optional[str] = None, affiliation: Optional[str] = None, description: Optional[str] = None, dataverse_type: Optional[str] = None, dataverse_contacts: Optional[List[str]] = None)
+```
+
+Update collection metadata/properties through the native API.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `name` | `Optional[str]` | Display name of the collection. *(default: `None`)* |
+| `alias` | `Optional[str]` | Short name/alias for the collection. *(default: `None`)* |
+| `affiliation` | `Optional[str]` | Affiliation text. *(default: `None`)* |
+| `description` | `Optional[str]` | Detailed collection description. *(default: `None`)* |
+| `dataverse_type` | `Optional[str]` | Collection type. *(default: `None`)* |
+| `dataverse_contacts` | `Optional[List[str]]` | List of contact email addresses. *(default: `None`)* |
+
+
+Updates the remote collection and updates the local `identifier` if alias is changed.
+
+
+### `create_dataset`
+
+```python
+create_dataset(self, title: str, description: str, authors: List[Author], contacts: List[Contact], subjects: List[Subject], upload_to_collection: bool = False, license: Optional[Union[str, info.License]] = None) -> Dataset
+```
+
+Create a new dataset within this collection.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `title` | `str` | Title of the new dataset. |
+| `description` | `str` | Dataset description/abstract. |
+| `authors` | `List[Author]` | List of dataset author objects. |
+| `contacts` | `List[Contact]` | List of dataset contacts. |
+| `subjects` | `List[Subject]` | List of controlled vocabulary subjects. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dataset` | The created dataset object (not yet persisted on server until uploaded). |
+
+
+### `search`
+
+```python
+search(self, query: str, per_page: int = 10, type: Optional[Literal['dataset', 'collection', 'dataverse']] = None, options: Optional[QueryOptions] = None) -> SearchResult
+```
+
+Search for content within this collection and its sub-collections.
+
+This method performs a search scoped to the current collection, automatically
+setting the subtree parameter to limit results to this collection and any
+nested sub-collections. It provides a convenient way to search within a
+specific collection without having to manually configure the search scope.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `query` | `str` | The search query string. Can include keywords, phrases in quotes, boolean operators (AND, OR, NOT), wildcards (* and ?), and field-specific searches (e.g., "title:climate"). |
+| `options` | `Optional[QueryOptions]` | Optional search configuration including filtering, sorting, pagination, and result formatting. If provided, the subtree parameter will be automatically set to this collection's alias. If None, default options with subtree set to this collection will be used. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `SearchResult` | Object containing search results, metadata, and facet information |
+| `SearchResult` | scoped to this collection and its sub-collections. |
+
+
+**Examples**
+
+Basic search within collection:
+
+```python
+>>> results = collection.search("climate change")
+```
+
+Search with custom options:
+
+```python
+>>> options = QueryOptions(type="dataset", per_page=20, sort="date")
+>>> results = collection.search("temperature", options)
+```
+
+Boolean search:
+
+```python
+>>> results = collection.search("climate AND temperature")
+```
+
+Field-specific search:
+
+```python
+>>> results = collection.search("title:climate")
+```
+
+
+**Note**
+
+The search will automatically be scoped to this collection by setting
+the subtree parameter, regardless of whether options are provided or not.
+
+
+### `publish`
+
+```python
+publish(self)
+```
+
+Publish this collection to make it publicly accessible.
+
+
+### `create_collection`
+
+```python
+create_collection(self, alias: str, name: str, description: str, affiliation: str, dataverse_contacts: List[str], dataverse_type: Literal['DEPARTMENT', 'JOURNALS', 'LABORATORY', 'ORGANIZATIONS_INSTITUTIONS', 'RESEARCHERS', 'RESEARCH_GROUP', 'RESEARCH_PROJECTS', 'TEACHING_COURSES', 'UNCATEGORIZED']) -> Collection
+```
+
+Create a new (sub-)Dataverse collection within this collection.
+
+Creates and returns a new sub-collection (child Dataverse) under the current collection,
+using the provided metadata. The parent for the new collection is this collection's alias.
+
+
+**Note**
+
+This method only creates the collection metadata. The new collection must still be
+populated with datasets or further subcollections as needed.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `str` | Unique, non-whitespace string identifier for the new collection. |
+| `name` | `str` | Human-readable display name for the collection. |
+| `description` | `str` | Brief description of the collection's contents or purpose. |
+| `affiliation` | `str` | Affiliation or institution related to the collection. |
+| `dataverse_type` | `Literal` | Category/type of the collection (see Dataverse documentation for allowed values). |
+| `dataverse_contacts` | `List[str]` | List of contact email addresses for this collection. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Collection` | The created collection as a local Collection object (the server-side alias is used). |
+
+
+**Example**
+
+&gt;&gt;&gt; new_coll = collection.create_collection(
+...     alias="astro-data",
+...     name="Astrophysics Data",
+...     description="A collection for astrophysical datasets.",
+...     affiliation="Department of Astronomy",
+...     dataverse_type="LABORATORY",
+...     dataverse_contacts=["astro@university.edu", "info@astro.org"],
+... )
+&gt;&gt;&gt; print(new_coll.identifier)
+
+
+### `graph`
+
+```python
+graph(self, format: GraphFormat, depth: int = 2, max_workers: int = 10) -> Graph
+```
+
+Get the RDF graph of this collection by combining graphs from all child content.
+
+This method recursively retrieves RDF graphs from all datasets and subcollections
+within this collection and combines them into a single unified graph. It provides
+a comprehensive semantic view of all the metadata contained within the collection
+hierarchy.
+
+The method works by:
+1. Iterating through all child collections and retrieving their graphs recursively
+2. Iterating through all datasets in this collection and retrieving their graphs
+3. Combining all individual graphs into a single merged RDF graph
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `format` | `GraphFormat` | A single format string or list of format strings specifying the semantic export formats to use for datasets. Valid formats are those available in the Dataverse instance that have semantic media types. This format is passed down to all child datasets when generating their graphs. |
+| `depth` | `int` | The depth of the graph to retrieve. 1 means only the current collection, 2 means the current collection and all child collections, 3 means the current collection and all child collections and all child datasets, etc. *(default: `2`)* |
+| `max_workers` | `int` | Maximum number of concurrent graph retrieval operations. Controls parallelization when fetching graphs from multiple datasets and subcollections. Defaults to 10. Higher values increase parallelism but may overwhelm the server or consume more resources. Lower values provide more conservative resource usage. *(default: `10`)* |
+
+
+Returns:
+    Graph: An rdflib Graph object containing the merged RDF triples from
+        all datasets and subcollections within this collection.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `ValueError` | If the specified format is not available in the Dataverse instance or does not support semantic data representation. |
+| `IndexError` | If the collection contains no child content (empty collection). |
+
+
+**Examples**
+
+Get a comprehensive graph of all content in a collection::
+
+    &gt;&gt;&gt; collection = dataverse.get_collection("my-collection")
+    &gt;&gt;&gt; graph = collection.graph("OAI_ORE")
+    &gt;&gt;&gt; print(f"Collection graph contains &#123;len(graph)&#125; triples")
+
+Use multiple formats for richer metadata::
+
+    &gt;&gt;&gt; graph = collection.graph(["OAI_ORE", "JSON-LD"])
+    &gt;&gt;&gt; # Query across all datasets in the collection
+    &gt;&gt;&gt; query = '''
+    ...     SELECT ?dataset ?title WHERE &#123;
+    ...         ?dataset a &lt;http://schema.org/Dataset&gt; .
+    ...         ?dataset &lt;http://schema.org/name&gt; ?title .
+    ...     &#125;
+    ... '''
+    &gt;&gt;&gt; results = graph.query(query)
+    &gt;&gt;&gt; for row in results:
+    ...     print(f"Dataset: &#123;row.title&#125;")
+
+Control parallelization for large collections::
+
+    &gt;&gt;&gt; # Use more workers for faster processing
+    &gt;&gt;&gt; graph = collection.graph("OAI_ORE", max_workers=20)
+    &gt;&gt;&gt; # Use fewer workers for conservative resource usage
+    &gt;&gt;&gt; graph = collection.graph("OAI_ORE", max_workers=5)
+
+
+**Note**
+
+This method can be resource-intensive for large collections with many
+datasets, as it fetches and processes metadata for all child content.
+Consider the size of your collection when using this method. The method
+uses async/await internally with a semaphore to control concurrency,
+allowing efficient parallel processing while preventing resource exhaustion.

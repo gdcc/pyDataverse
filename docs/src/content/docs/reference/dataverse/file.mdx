@@ -1,0 +1,205 @@
+---
+title: "file"
+description: "API reference for `pyDataverse.dataverse.file`."
+---
+
+`pyDataverse.dataverse.file`
+
+
+## `class File`
+
+
+Represents a Dataverse file instance, including its metadata and data access methods.
+
+Provides convenient methods to retrieve, update, and access file contents,
+as well as utilities for tabular file operations.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `int` | The unique integer identifier for the Dataverse file. |
+| `dataset` | `Dataset` | The parent dataset this file belongs to. |
+
+
+**Examples**
+
+```python
+>>> file = dataset.files["data/file.csv"]
+>>> print(file.metadata.data_file.filesize)
+>>> df = file.open_tabular()
+>>> file.download("local_copy.csv")
+```
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `int` | The database ID of the file. |
+| `persistent_id` | `str` | The persistent ID of the file. |
+| `metadata` | `FileInfo` | Returns the full FileInfo metadata for this file. |
+| `content_type` | `str` | The content type of the file. |
+| `size` | `int` | The size of the file in bytes. |
+| `path` | `str` | The file's path within the dataset, e.g. "data/table.csv" or "myfile.txt". |
+| `is_tabular` | `bool` | Returns True if the file is a tabular file, False otherwise. |
+| `tabular_schema` | `Dict[str, str]` | Get the schema (column names and data types) of a tabular file. |
+| `is_restricted` | `bool` | Returns True if the file is restricted, False otherwise. |
+| `url` | `str` | The URL of the file. |
+
+
+**Methods**
+
+### `update_metadata`
+
+```python
+update_metadata(self, description: Optional[str] = None, categories: Optional[List[str]] = None, prov_freeform: Optional[str] = None, restrict: Optional[bool] = None)
+```
+
+Update the file's metadata in Dataverse.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `filename` | `Optional[str]` | New name for the file (optional). |
+| `directory_label` | `Optional[str]` | Directory label (for virtual paths) (optional). |
+| `description` | `Optional[str]` | File description (optional). *(default: `None`)* |
+| `categories` | `Optional[List[str]]` | List of category strings (optional). *(default: `None`)* |
+| `prov_freeform` | `Optional[str]` | Prov freeform (optional). *(default: `None`)* |
+| `restrict` | `Optional[bool]` | Restrict the file (optional). *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | Updated file metadata object. |
+
+
+### `open_in_browser`
+
+```python
+open_in_browser(self) -> None
+```
+
+Open the file in the default browser.
+
+
+### `open`
+
+```python
+open(self, mode: Literal['r', 'rb'] = 'r') -> DataverseFileReader
+```
+
+Open the file for binary reading with a streaming reader.
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `DataverseFileReader` | File-like object supporting .read() chunks. |
+
+
+### `open_tabular`
+
+```python
+open_tabular(self, no_header: bool = False, **kwargs) -> pd.DataFrame
+```
+
+Open a tabular Dataverse file (e.g., CSV, TSV) and load it as a pandas DataFrame.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `no_header` | `bool` | If True, do not treat the first row as column names (default False). *(default: `False`)* |
+| `**kwargs` |  | Additional arguments forwarded to pandas.read_csv. *(default: `&#123;&#125;`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pd.DataFrame: DataFrame containing file contents. |
+
+
+### `stream_tabular`
+
+```python
+stream_tabular(self, chunk_size: int = 10000, no_header: bool = False, **kwargs) -> Iterator[pd.DataFrame]
+```
+
+Read a tabular file as a stream of pandas DataFrames (chunks) for large files.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `chunk_size` | `int` | Number of rows per DataFrame chunk (default 10,000). *(default: `10000`)* |
+| `no_header` | `bool` | If True, do not treat the first row as column names. *(default: `False`)* |
+| `**kwargs` |  | Additional keyword arguments to pandas.read_csv. *(default: `&#123;&#125;`)* |
+
+
+### `download`
+
+```python
+download(self, path: Union[str, Path], chunk_size: int = 8192) -> None
+```
+
+Download the file from Dataverse and save it to a local file.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `path` | `Union[str, Path]` | Local path to save the downloaded file to. |
+| `chunk_size` | `int` | Number of bytes to read per chunk (default 8192). *(default: `8192`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `None` | None |
+
+
+### `replace`
+
+```python
+replace(self, file: Union[str, Path, IO[str], IO[bytes]], description: Optional[str] = None, categories: Optional[List[str]] = None, restrict: Optional[bool] = None) -> None
+```
+
+Replace the file with a new file.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `file` | `Union[str, Path, IO[str], IO[bytes]]` | The new file to replace the current file with. |
+| `description` | `Optional[str]` | The new description for the file. *(default: `None`)* |
+| `categories` | `Optional[List[str]]` | The new categories for the file. *(default: `None`)* |
+| `restrict` | `Optional[bool]` | Whether to restrict the file. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `None` | None |
+
+
+### `delete`
+
+```python
+delete(self) -> None
+```
+
+Delete the file from Dataverse.

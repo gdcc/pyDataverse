@@ -1,0 +1,190 @@
+---
+title: "metrics"
+description: "API reference for `pyDataverse.api.metrics`."
+---
+
+`pyDataverse.api.metrics`
+
+
+## `class MetricsApi`
+
+
+Class to access Dataverse's Metrics API.
+
+This class provides methods to retrieve various metrics from a Dataverse instance,
+including total counts, historical data, and breakdowns by subject, category, and location.
+
+
+**Methods**
+
+### `api_base_url`
+
+```python
+api_base_url(self)
+```
+
+Get the base URL for API endpoints.
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | The base URL for metrics API endpoints. |
+
+
+### `total`
+
+```python
+total(self, data_type: Annotated[Literal['dataverses', 'datasets', 'files', 'downloads'], 'The data type to filter by.'], date_to_month: Annotated[Optional[Union[str, date]], 'Optional date in YYYY-MM format (string) or date object for monthly data up to that month.'] = None, parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> MetricsResponse
+```
+
+Get total metrics for a specific data type.
+
+GET https://$SERVER/api/info/metrics/$type
+GET https://$SERVER/api/info/metrics/$type/toMonth/$YYYY-MM
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_type` | `Annotated[Literal['dataverses', 'datasets', 'files', 'downloads'], 'The data type to filter by.']` | Can be set to dataverses, datasets, files or downloads. |
+| `date_to_month` | `Annotated[Optional[Union[str, date]], 'Optional date in YYYY-MM format (string) or date object for monthly data up to that month.']` | Optional date in YYYY-MM format (string) or date object for monthly data up to that month. *(default: `None`)* |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `MetricsResponse` | Response containing the count for the specified data type. |
+
+
+### `past_days`
+
+```python
+past_days(self, data_type: Annotated[Literal['dataverses', 'datasets', 'files', 'downloads'], 'The data type to filter by.'], days: Annotated[Union[int, str], 'Number of days to look back (integer or string).'], parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> MetricsResponse
+```
+
+Get metrics for past specified number of days.
+
+http://guides.dataverse.org/en/4.20/api/metrics.html
+GET https://$SERVER/api/info/metrics/$type/pastDays/$days
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_type` | `Annotated[Literal['dataverses', 'datasets', 'files', 'downloads'], 'The data type to filter by.']` | Can be set to dataverses, datasets, files or downloads. |
+| `days` | `Annotated[Union[int, str], 'Number of days to look back (integer or string).']` | Number of days to look back (integer or string). |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `MetricsResponse` | Response containing the count for the specified data type over the past days. |
+
+
+### `get_collections_by_subject`
+
+```python
+get_collections_by_subject(self, parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> pd.DataFrame
+```
+
+Get dataverses grouped by subject.
+
+GET https://$SERVER/api/info/metrics/dataverses/bySubject
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pd.DataFrame: DataFrame containing dataverses grouped by subject with counts. |
+
+
+### `get_collections_by_category`
+
+```python
+get_collections_by_category(self, parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> pd.DataFrame
+```
+
+Get dataverses grouped by category.
+
+GET https://$SERVER/api/info/metrics/dataverses/byCategory
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pd.DataFrame: DataFrame containing dataverses grouped by category with counts. |
+
+
+### `get_datasets_by_subject`
+
+```python
+get_datasets_by_subject(self, parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> pd.DataFrame
+```
+
+Get datasets grouped by subject.
+
+GET https://$SERVER/api/info/metrics/datasets/bySubject
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pd.DataFrame: DataFrame containing datasets grouped by subject with counts. |
+
+
+### `get_datasets_by_data_location`
+
+```python
+get_datasets_by_data_location(self, data_location: Annotated[Literal['local', 'remote', 'all'], 'The data location to filter by.'], parent_alias: Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.'] = None) -> MetricsResponse
+```
+
+Get datasets by data location.
+
+GET https://$SERVER/api/info/metrics/datasets/?dataLocation=$location
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_location` | `Annotated[Literal['local', 'remote', 'all'], 'The data location to filter by.']` | The data location to filter by. Can be 'local' (this instance), 'remote' (harvested from other instances), or 'all'. |
+| `parent_alias` | `Annotated[Optional[str], 'Optional Dataverse collection alias to scope the query to a specific sub-collection.']` | Optional Dataverse collection alias to scope the query to a specific sub-collection. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `MetricsResponse` | Response containing the count of datasets for the specified location. |

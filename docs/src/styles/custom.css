@@ -1,0 +1,12 @@
+/* Widen the overall documentation layout.
+ *
+ * Starlight derives the page width from a handful of custom properties.
+ * Increasing the main content column and the sidebar gives the docs more
+ * horizontal room, which is especially helpful for the wide signature blocks
+ * and tables in the API reference. */
+:root {
+	/* Main reading column (default ~45rem). */
+	--sl-content-width: 60rem;
+	/* Left navigation sidebar (default 18.75rem). */
+	--sl-sidebar-width: 19.5rem;
+}

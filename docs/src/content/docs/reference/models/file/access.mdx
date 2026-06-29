@@ -1,0 +1,31 @@
+---
+title: "access"
+description: "API reference for `pyDataverse.models.file.access`."
+---
+
+`pyDataverse.models.file.access`
+
+
+## `class AccessRequest`
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `int` | Unique identifier for the access request |
+| `identifier` | `str` | User identifier |
+| `display_name` | `Annotated[str, Field(alias='displayName')]` | Display name of the user |
+| `first_name` | `Annotated[str, Field(alias='firstName')]` | First name of the user |
+| `last_name` | `Annotated[str, Field(alias='lastName')]` | Last name of the user |
+| `email` | `EmailStr` | Email address of the user |
+| `superuser` | `bool` | Whether the user is a superuser |
+| `deactivated` | `bool` | Whether the user account is deactivated |
+| `persistent_user_id` | `Annotated[str, Field(alias='persistentUserId')]` | Persistent user identifier |
+| `created_time` | `Annotated[datetime, Field(alias='createdTime')]` | Timestamp when the user was created |
+| `last_login_time` | `Annotated[datetime, Field(alias='lastLoginTime')]` | Timestamp of the user's last login |
+| `last_api_use_time` | `Annotated[datetime, Field(alias='lastApiUseTime')]` | Timestamp of the user's last API usage |
+| `authentication_provider_id` | `Annotated[str, Field(alias='authenticationProviderId')]` | Authentication provider identifier |
+
+
+## `class AccessRequests`

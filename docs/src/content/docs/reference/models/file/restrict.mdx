@@ -1,0 +1,21 @@
+---
+title: "restrict"
+description: "API reference for `pyDataverse.models.file.restrict`."
+---
+
+`pyDataverse.models.file.restrict`
+
+
+## `class RestrictFileBody`
+
+
+Restrict or unrestrict a datafile.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `restrict` | `bool` | Whether to restrict access to the file |
+| `enable_access_request` | `Annotated[Optional[bool], Field(alias='enableAccessRequest')]` | Whether to enable access requests for the restricted file |
+| `terms_of_access` | `Annotated[Optional[str], Field(alias='termsOfAccess')]` | Reason or terms for the restricted access |

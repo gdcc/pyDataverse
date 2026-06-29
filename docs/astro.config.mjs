@@ -27,6 +27,7 @@ export default defineConfig({
 		),
 		starlight({
 			title: 'pyDataverse',
+			customCss: ['./src/styles/custom.css'],
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/gdcc/pyDataverse' }],
 			plugins: [starlightHeadingBadges(), starlightThemeObsidian(
 				{
@@ -89,6 +90,19 @@ export default defineConfig({
 						{ label: 'Overview', slug: 'mcp/overview' },
 						{ label: 'Available Tools', slug: 'mcp/tools' },
 						{ label: 'Creating a Server', slug: 'mcp/server' },
+					],
+				},
+				{
+					label: 'API Reference',
+					badge: 'New',
+					collapsed: true,
+					items: [
+						{ label: 'Overview', slug: 'reference/overview' },
+						{ label: 'auth', slug: 'reference/auth' },
+						{ label: 'api', collapsed: true, autogenerate: { directory: 'reference/api' } },
+						{ label: 'dataverse', collapsed: true, autogenerate: { directory: 'reference/dataverse' } },
+						{ label: 'filesystem', collapsed: true, autogenerate: { directory: 'reference/filesystem' } },
+						{ label: 'models', collapsed: true, autogenerate: { directory: 'reference/models' } },
 					],
 				},
 				{

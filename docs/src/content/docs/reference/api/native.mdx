@@ -1,0 +1,1824 @@
+---
+title: "native"
+description: "API reference for `pyDataverse.api.native`."
+---
+
+`pyDataverse.api.native`
+
+
+## `class NativeApi`
+
+
+Class to access Dataverse's Native API.
+
+Provides methods to interact with Dataverse collections, datasets, files, and metadata
+through the Native API endpoints.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url` |  | Base URL of the Dataverse instance. |
+| `api_token` |  | API token for authentication. |
+| `api_version` |  | API version to use. |
+
+
+**Methods**
+
+### `get_collection`
+
+```python
+get_collection(self, identifier: Union[str, int]) -> collection.Collection
+```
+
+Retrieve complete metadata about a specific dataverse.
+
+This endpoint returns detailed information about a dataverse including its name,
+alias, description, creation date, and other metadata properties.
+
+HTTP: GET /api/dataverses/&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataverse ID (numeric), alias, or the special value `:root` for the root dataverse. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `collection.Collection` | Collection object containing complete dataverse metadata. |
+
+
+### `create_collection`
+
+```python
+create_collection(self, parent: Union[Literal['root'], str], metadata: Payload[collection.CollectionCreateBody]) -> collection.CollectionCreateResponse
+```
+
+Create a new dataverse collection under a specified parent.
+
+This endpoint generates a new dataverse as a child of the specified parent dataverse.
+The new dataverse is created in DRAFT status and requires the fields name, alias, and
+dataverseContacts to be provided in the metadata. See the example dataverse.json file
+for complete metadata structure.
+
+HTTP: POST /api/dataverses/&#123;parent&#125;
+Docs: http://guides.dataverse.org/en/latest/_downloads/dataverse-complete.json
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `parent` | `Union[Literal['root'], str]` | Parent dataverse identifier (alias or ID) where the new dataverse will be created. |
+| `metadata` | `Payload[collection.CollectionCreateBody]` | Dataverse metadata including required fields (name, alias, dataverseContacts). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `collection.CollectionCreateResponse` | CollectionCreateResponse with the created dataverse information including its ID and persistent identifier. |
+
+
+### `update_collection`
+
+```python
+update_collection(self, identifier: str, metadata: Payload[collection.UpdateCollection])
+```
+
+Update the metadata of a collection.
+
+This endpoint updates the metadata of a collection.
+
+HTTP: PUT /api/dataverses/&#123;identifier&#125;
+
+
+### `publish_dataverse`
+
+```python
+publish_dataverse(self, identifier: str) -> collection.CollectionCreateResponse
+```
+
+Publish a dataverse to make it publicly accessible.
+
+THIS METHOD IS DEPRECATED. USE publish_collection INSTEAD.
+
+This endpoint changes the status of a dataverse from DRAFT to PUBLISHED, making it
+visible to all users. Once published, the dataverse and its contents become discoverable
+through search and browsing.
+
+
+### `publish_collection`
+
+```python
+publish_collection(self, identifier: str) -> collection.CollectionCreateResponse
+```
+
+Publish a dataverse to make it publicly accessible.
+
+This endpoint changes the status of a dataverse from DRAFT to PUBLISHED, making it
+visible to all users. Once published, the dataverse and its contents become discoverable
+through search and browsing.
+
+HTTP: POST /api/dataverses/&#123;identifier&#125;/actions/:publish
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Dataverse ID (numeric) or alias to publish. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `collection.CollectionCreateResponse` | CollectionCreateResponse with the published dataverse information and status. |
+
+
+### `delete_dataverse`
+
+```python
+delete_dataverse(self, identifier: str) -> message.Message
+```
+
+Delete an unpublished dataverse.
+
+THIS METHOD IS DEPRECATED. USE delete_collection INSTEAD.
+
+This endpoint permanently removes a dataverse from the system. Only unpublished
+dataverses can be deleted through the API. The dataverse must be empty (no datasets
+or child dataverses) before deletion.
+
+
+### `delete_collection`
+
+```python
+delete_collection(self, identifier: str) -> message.Message
+```
+
+Delete an unpublished collection.
+
+This endpoint permanently removes a dataverse from the system. Only unpublished
+dataverses can be deleted through the API. The dataverse must be empty (no datasets
+or child dataverses) before deletion.
+
+HTTP: DELETE /api/dataverses/&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Dataverse ID (numeric) or alias to delete. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Message object confirming the deletion. |
+
+
+### `get_dataverse_contents`
+
+```python
+get_dataverse_contents(self, alias: Annotated[Union[Literal[':root'], str], 'Collection alias or :root for the root collection.'] = ':root') -> List[collection.content.Collection | collection.content.Dataset]
+```
+
+Retrieve the immediate contents of a dataverse.
+
+THIS METHOD IS DEPRECATED. USE get_collection_contents INSTEAD.
+
+This endpoint returns a list of all datasets and child dataverses (sub-collections)
+directly contained within the specified dataverse. It does not recursively list
+contents of child dataverses.
+
+
+### `get_collection_contents`
+
+```python
+get_collection_contents(self, alias: Union[Literal[':root'], str, int] = ':root') -> List[Union[collection.content.Collection, collection.content.Dataset]]
+```
+
+Retrieve the immediate contents of a collection.
+
+This endpoint returns a list of all datasets and child dataverses (sub-collections)
+directly contained within the specified collection. It does not recursively list
+contents of child dataverses.
+
+HTTP: GET /api/dataverses/&#123;alias&#125;/contents
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `Union[Literal[':root'], str, int]` | Collection alias. *(default: `':root'`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[Union[collection.content.Collection, collection.content.Dataset]]` | CollectionContent object containing lists of datasets and child dataverses. |
+
+
+### `get_dataverse_assignments`
+
+```python
+get_dataverse_assignments(self, identifier: str) -> List[collection.Assignee]
+```
+
+Retrieve all role assignments for a collection.
+
+THIS METHOD IS DEPRECATED. USE get_collection_assignments INSTEAD.
+
+This endpoint returns a list of all users and groups assigned to roles within the
+specified collection, along with their role information. Role assignments control
+who has permission to perform various actions on the collection.
+
+
+### `get_collection_assignments`
+
+```python
+get_collection_assignments(self, alias: str) -> List[collection.Assignee]
+```
+
+Retrieve all role assignments for a collection.
+
+This endpoint returns a list of all users and groups assigned to roles within the
+specified collection, along with their role information. Role assignments control
+who has permission to perform various actions on the collection.
+
+HTTP: GET /api/dataverses/&#123;alias&#125;/assignments
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `str` | Collection alias. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[collection.Assignee]` | List of Assignee objects containing user/group information and their assigned roles. |
+
+
+### `get_dataverse_facets`
+
+```python
+get_dataverse_facets(self, alias: str) -> List[str]
+```
+
+Retrieve the configured facets for a collection.
+
+THIS METHOD IS DEPRECATED. USE get_collection_facets INSTEAD.
+
+This endpoint returns a list of metadata fields configured as facets for browsing
+and filtering datasets within the collection. Facets help users narrow down search
+results based on specific metadata criteria.
+
+
+### `get_collection_facets`
+
+```python
+get_collection_facets(self, alias: str) -> List[str]
+```
+
+Retrieve the configured facets for a collection.
+
+This endpoint returns a list of metadata fields configured as facets for browsing
+and filtering datasets within the collection. Facets help users narrow down search
+results based on specific metadata criteria.
+
+HTTP: GET /api/dataverses/&#123;alias&#125;/facets
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `str` | Collection alias. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[str]` | List of facet field names configured for the collection. |
+
+
+### `dataverse_id2alias`
+
+```python
+dataverse_id2alias(self, dataverse_id: str) -> str
+```
+
+Convert a numeric dataverse ID to its alias.
+
+This helper method fetches the dataverse metadata using its numeric ID and extracts
+the alias string, which is often more user-friendly and stable than the numeric identifier.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `dataverse_id` | `str` | Numeric dataverse ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `str` | The dataverse alias string. |
+
+
+### `get_dataset`
+
+```python
+get_dataset(self, identifier: Union[str, int], version: Optional[Union[Literal[':latest', ':latest-published', ':draft'], str]] = ':latest') -> dataset.GetDatasetResponse
+```
+
+Retrieve complete metadata for a specific dataset version.
+
+This endpoint returns detailed metadata including citation information, files,
+version history, and all custom metadata fields for the specified dataset version.
+It automatically detects whether the identifier is a persistent ID (DOI/Handle) or
+numeric database ID.
+
+If you do not specify the version, the function will return the latest version of the dataset.
+
+If you specify the version, the function will return the metadata for the specified version of the dataset.
+The version can be a specific version like 1.0, a major version like 1, or a draft version like :draft.
+The version can also be a published version like :latest-published, a draft version like :draft, or a specific version like 1.0.
+
+HTTP: GET /api/datasets/&#123;identifier&#125;/versions/&#123;version&#125;
+HTTP: GET /api/datasets/:persistentId/versions/&#123;version&#125;?persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+| `version` | `Optional[Union[Literal[':latest', ':latest-published', ':draft'], str]]` | Version to retrieve. Options are `:latest-published` (latest published), `:latest` (draft if exists, otherwise latest published), `:draft` (draft only), `x.y` (specific version like 1.0), or `x` (major version like 1). Optional, defaults to `:latest`. *(default: `':latest'`)* |
+| `is_pid` |  | Legacy parameter, no longer used. Identifier type is auto-detected. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.GetDatasetResponse` | GetDatasetResponse object containing complete dataset metadata and version information. |
+
+
+### `get_datasets`
+
+```python
+get_datasets(self, identifiers: Sequence[str | int]) -> Sequence[dataset.GetDatasetResponse]
+```
+
+Retrieve metadata for multiple datasets concurrently.
+
+Makes concurrent API calls to efficiently fetch dataset metadata for multiple
+identifiers. Automatically handles both persistent IDs and numeric database IDs.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifiers` | `Sequence[str | int]` | Sequence of dataset identifiers (persistent IDs or numeric IDs). |
+| `batch_size` |  | Maximum concurrent requests (default: 50). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Sequence[dataset.GetDatasetResponse]` | Sequence of GetDatasetResponse objects for successfully retrieved datasets. |
+
+
+**Examples**
+
+```python
+>>> api = NativeApi(base_url="https://demo.dataverse.org")
+>>> datasets = api.get_datasets([123, 456, "doi:10.11587/8H3N93"])
+```
+
+
+### `get_dataset_persistent_url`
+
+```python
+get_dataset_persistent_url(self, identifier: Union[str, int]) -> str
+```
+
+Retrieve the persistent URL for a dataset.
+
+This endpoint returns the persistent URL for a dataset. We use a separate endpoint for
+two reasons:
+
+1) When fetching a specific version, the persistent URL is not available in the dataset metadata.
+2) When use the non-versioned `get_dataset` method, we essentially waste compute due to fetching the entire dataset metadata, when we only need the persistent URL.
+
+Hence, this endpoint this endpoint has its own JSON schema and response model.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `str` | The persistent URL for the dataset. |
+
+
+### `get_dataset_versions`
+
+```python
+get_dataset_versions(self, identifier: Union[str, int]) -> List[dataset.GetDatasetResponse]
+```
+
+Retrieve all versions of a dataset.
+
+This endpoint returns a list of all published versions of a dataset, including
+version numbers, release dates, and a summary of changes. Each version contains
+complete metadata as it existed at the time of publication.
+
+HTTP: GET /api/datasets/&#123;identifier&#125;/versions
+HTTP: GET /api/datasets/:persistentId/versions?persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+| `is_pid` |  | Legacy parameter, no longer used. Identifier type is auto-detected. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[dataset.GetDatasetResponse]` | List of GetDatasetResponse objects, one for each version of the dataset. |
+
+
+### `get_dataset_version`
+
+```python
+get_dataset_version(self, identifier: Union[str, int], version: Version) -> dataset.GetDatasetResponse
+```
+
+Retrieve a specific version of a dataset.
+
+This is an alias method that calls get_dataset() with the specified version parameter.
+It returns the complete metadata for the requested dataset version.
+
+HTTP: GET /api/datasets/&#123;identifier&#125;/versions/&#123;version&#125;
+HTTP: GET /api/datasets/:persistentId/versions/&#123;version&#125;?persistentId=&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+| `version` | `Version` | Version string (e.g. `1.0`, `2.1`, `:draft`, `:latest`). Can be a specific version number or a version string. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.GetDatasetResponse` | GetDatasetResponse object containing the dataset metadata for the specified version. |
+
+
+### `get_dataset_export`
+
+```python
+get_dataset_export(self, identifier: Union[str, collection.content.Dataset, Dataset], export_format: str, version: Optional[str] = None) -> Union[str, Dict[str, Any]]
+```
+
+Export dataset metadata in various standardized formats.
+
+This endpoint exports the metadata of the currently published version of a dataset
+in different metadata schemas. The exported format can be used for metadata harvesting,
+citation management, or integration with other systems.
+
+HTTP: GET /api/datasets/export?exporter=&#123;format&#125;&persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, collection.content.Dataset, Dataset]` | Persistent identifier of the dataset (e.g. `doi:10.11587/8H3N93`). |
+| `export_format` | `str` | Metadata export format. Available formats include `ddi`, `oai_ddi`, `dcterms`, `oai_dc`, `schema.org`, and `dataverse_json`. |
+| `as_dict` |  | If True, parse the exported metadata as a dictionary. If False, return as string. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[str, Dict[str, Any]]` | String containing the exported metadata in the requested format, or dictionary if as_dict=True. |
+
+
+### `get_datasets_export`
+
+```python
+get_datasets_export(self, identifiers: Sequence[str | collection.content.Dataset | Dataset], export_format: str, as_dict: bool = False, version: Union[Literal[':draft', ':latest', ':latest-published'], str] = ':latest') -> Sequence[str | Dict[str, Any]]
+```
+
+Export metadata for multiple datasets in various standardized formats.
+
+This method exports metadata for multiple datasets in the specified format.
+For large collections (20+ datasets), it uses asynchronous processing for better performance.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifiers` | `Sequence[str | collection.content.Dataset | Dataset]` | Sequence of dataset identifiers - can be persistent IDs (strings), Dataset objects, or collection.content.Dataset objects. |
+| `export_format` | `str` | Metadata export format. Available formats include `ddi`, `oai_ddi`, `dcterms`, `oai_dc`, `schema.org`, and `dataverse_json`. |
+| `as_dict` | `bool` | If True, parse the exported metadata as dictionaries. If False, return as strings. *(default: `False`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Sequence[str | Dict[str, Any]]` | Sequence of exported metadata, either as strings or dictionaries depending on as_dict parameter. |
+
+
+### `download_all_datafiles`
+
+```python
+download_all_datafiles(self, identifier: Union[str, int]) -> bytes
+```
+
+Download a dataset bundle containing all files.
+
+Downloads a ZIP archive containing all files in a dataset. This is a convenience
+method for bulk downloading all files from a dataset at once, which is more
+efficient than downloading files individually.
+
+HTTP: GET /api/access/dataset/&#123;identifier&#125;/bundle
+HTTP: GET /api/access/dataset/:persistentId/bundle?persistentId=&#123;identifier&#125;
+Docs: https://guides.dataverse.org/en/latest/api/dataaccess.html#dataset-level-access
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `bytes` | The ZIP archive content containing all dataset files. |
+
+
+### `stream_all_datafiles`
+
+```python
+stream_all_datafiles(self, identifier: Union[str, int]) -> Generator[httpx.Response, Any, Any]
+```
+
+Stream a dataset bundle containing all files.
+
+Downloads a ZIP archive containing all files in a dataset using streaming
+for efficient handling of large datasets. This is recommended for datasets
+with many files or large total file sizes to avoid memory issues.
+
+HTTP: GET /api/access/dataset/&#123;identifier&#125;/bundle
+HTTP: GET /api/access/dataset/:persistentId/bundle?persistentId=&#123;identifier&#125;
+Docs: https://guides.dataverse.org/en/latest/api/dataaccess.html#dataset-level-access
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Any` | Generator yielding httpx.Response: Context manager that yields the streaming |
+| `Any` | HTTP response for the ZIP archive. |
+
+
+### `create_dataset`
+
+```python
+create_dataset(self, dataverse: str, metadata: Payload[dataset.DatasetCreateBody], identifier: Optional[str | int] = None, publish: bool = False) -> dataset.DatasetCreateResponse
+```
+
+Create a new dataset or import an existing dataset with a persistent identifier.
+
+This endpoint creates a new dataset in DRAFT status within the specified dataverse.
+Alternatively, it can import a dataset with an existing PID (DOI or Handle), optionally
+publishing it immediately. The metadata must be in Dataverse's native JSON format.
+
+HTTP: POST /api/dataverses/&#123;dataverse&#125;/datasets
+HTTP: POST /api/dataverses/&#123;dataverse&#125;/datasets/:import?pid=&#123;identifier&#125;&release=&#123;yes|no&#125;
+Docs: http://guides.dataverse.org/en/latest/api/native-api.html#create-a-dataset-in-a-dataverse
+Example: http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `dataverse` | `str` | Target dataverse identifier (alias like `root` or numeric ID like `1`). |
+| `metadata` | `Payload[dataset.DatasetCreateBody]` | Complete dataset metadata in Dataverse native JSON format. |
+| `identifier` | `Optional[str | int]` | Optional persistent or numeric identifier for importing an existing dataset (DOI or Handle format). *(default: `None`)* |
+| `publish` | `bool` | If True and a PID is provided, the dataset will be published immediately. Otherwise, it will remain in DRAFT status. Only applies when importing with a PID. *(default: `False`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.DatasetCreateResponse` | DatasetCreateResponse containing the created dataset's ID, persistent identifier, and URL. |
+
+
+### `edit_dataset_metadata`
+
+```python
+edit_dataset_metadata(self, identifier: Union[str, int], metadata: Payload[dataset.EditMetadataBody], replace: bool = False) -> dataset.edit_get.GetDatasetResponse
+```
+
+Edit or update metadata fields of a draft dataset.
+
+This endpoint allows you to modify metadata for a dataset that is in DRAFT status.
+By default, it adds values to empty fields or appends to multi-value fields. If
+replace=True, it completely replaces existing metadata with the provided values.
+Only the fields you want to change need to be included in the metadata parameter.
+
+HTTP: PUT /api/datasets/&#123;id&#125;/editMetadata
+HTTP: PUT /api/datasets/:persistentId/editMetadata?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+| `metadata` | `Payload[dataset.EditMetadataBody]` | Metadata fields to edit (only include fields you want to change). |
+| `is_pid` |  | If True, treat identifier as a persistent ID. If False, treat as numeric ID. |
+| `replace` | `bool` | If True, completely replace existing metadata. If False, add to or append values. *(default: `False`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.edit_get.GetDatasetResponse` | GetDatasetResponse containing the updated dataset metadata. |
+
+
+### `create_dataset_private_url`
+
+```python
+create_dataset_private_url(self, identifier: str) -> dataset.PrivateUrl
+```
+
+Create a private URL for sharing an unpublished dataset.
+
+This endpoint generates a unique, anonymous URL that allows users to preview a draft
+dataset without requiring authentication. The private URL can be shared with reviewers
+or collaborators before the dataset is published.
+
+HTTP: POST /api/datasets/&#123;id&#125;/privateUrl
+HTTP: POST /api/datasets/:persistentId/privateUrl?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/4.16/api/native-api.html#create-a-private-url-for-a-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Dataset identifier - either a persistent ID or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.PrivateUrl` | PrivateUrl object containing the generated private URL and token. |
+
+
+### `get_dataset_private_url`
+
+```python
+get_dataset_private_url(self, identifier: str) -> dataset.PrivateUrl
+```
+
+Retrieve the existing private URL for a dataset.
+
+This endpoint returns the private URL information if one has been previously created
+for the dataset. Private URLs allow anonymous access to unpublished datasets for
+review purposes.
+
+HTTP: GET /api/datasets/&#123;id&#125;/privateUrl
+HTTP: GET /api/datasets/:persistentId/privateUrl?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/4.16/api/native-api.html#get-the-private-url-for-a-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Dataset identifier - either a persistent ID or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.PrivateUrl` | PrivateUrl object containing the private URL and token, if one exists. |
+
+
+### `delete_dataset_private_url`
+
+```python
+delete_dataset_private_url(self, identifier: str) -> str
+```
+
+Delete the private URL for a dataset.
+
+This endpoint permanently removes the private URL for a dataset, revoking anonymous
+access to the unpublished dataset. Any previously shared private URL will no longer
+work after deletion.
+
+HTTP: DELETE /api/datasets/&#123;id&#125;/privateUrl
+HTTP: DELETE /api/datasets/:persistentId/privateUrl?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/4.16/api/native-api.html#delete-the-private-url-from-a-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Dataset identifier - either a persistent ID or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `str` | Confirmation message string. |
+
+
+### `publish_dataset`
+
+```python
+publish_dataset(self, pid: str, release_type: Literal['minor', 'major', 'updatecurrent'] = 'major') -> dataset.DatasetPublishResponse
+```
+
+Publish a dataset to make it publicly accessible with version control.
+
+This endpoint publishes a draft dataset, assigning it a version number and making it
+discoverable. For the first publication, version 1.0 is assigned. Subsequent publications
+increment the version based on the release_type: 'minor' for minor changes (2.3 → 2.4),
+'major' for significant changes (2.3 → 3.0), or 'updatecurrent' (superusers only) to
+update without changing the version. When workflows are configured, the endpoint returns
+202 ACCEPTED and publication occurs asynchronously.
+
+HTTP: POST /api/datasets/:persistentId/actions/:publish?type=&#123;type&#125;&persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `pid` | `str` | Persistent identifier of the dataset (e.g. `doi:10.11587/8H3N93`). |
+| `release_type` | `Literal['minor', 'major', 'updatecurrent']` | Version increment type - `minor` (x.y → x.y+1), `major` (x.y → x+1.0), or `updatecurrent` (no version change, superusers only). *(default: `'major'`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `dataset.DatasetPublishResponse` | DatasetPublishResponse containing the published dataset information and persistent URL. |
+
+
+### `submit_dataset_to_review`
+
+```python
+submit_dataset_to_review(self, pid: str) -> message.Message
+```
+
+Submit a dataset to review.
+
+
+### `return_dataset_to_author`
+
+```python
+return_dataset_to_author(self, pid: str, reason_for_return: str) -> None
+```
+
+Return a dataset to author.
+
+
+### `get_dataset_lock`
+
+```python
+get_dataset_lock(self, identifier: Union[str, int], type: Optional[Literal['Ingest', 'Workflow', 'InReview', 'finalizePublication', 'EditInProgress', 'FileValidationFailed']] = None) -> locks.LockResponse
+```
+
+Check if a dataset is currently locked and retrieve lock information.
+
+This endpoint returns information about any locks currently placed on the dataset.
+Datasets can be locked during ingest, workflow processing, or by administrators.
+The lock API was introduced in Dataverse 4.9.3.
+
+HTTP: GET /api/datasets/:persistentId/locks?persistentId=&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `locks.LockResponse` | Response containing lock status and details. |
+
+
+### `set_dataset_assignment`
+
+```python
+set_dataset_assignment(self, identifier: Union[str, int], assignee: str, role: str)
+```
+
+Set the role assignments for a dataset.
+
+This endpoint sets the role assignments for a dataset.
+
+
+### `get_dataset_assignments`
+
+```python
+get_dataset_assignments(self, identifier: Union[str, int]) -> List[dataset.DatasetAssignment]
+```
+
+Retrieve all role assignments for a dataset.
+
+This endpoint returns a list of all users and groups assigned to roles within the
+specified dataset, along with their permission details. Role assignments determine
+who can view, edit, or manage the dataset.
+
+HTTP: GET /api/datasets/&#123;id&#125;/assignments
+HTTP: GET /api/datasets/:persistentId/assignments?persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[dataset.DatasetAssignment]` | Response containing list of role assignments for the dataset. |
+
+
+### `delete_dataset`
+
+```python
+delete_dataset(self, identifier: Union[str, int])
+```
+
+Delete an unpublished draft dataset.
+
+This endpoint permanently removes a dataset that has never been published. Published
+datasets cannot be deleted through the API - they must be deleted through the GUI or
+destroyed using the destroy_dataset method (superusers only).
+
+HTTP: DELETE /api/datasets/&#123;id&#125;
+HTTP: DELETE /api/datasets/:persistentId?persistentId=&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | Response object confirming deletion or raising an error if the dataset is published. |
+
+
+### `destroy_dataset`
+
+```python
+destroy_dataset(self, identifier: Union[str, int]) -> message.Message
+```
+
+Permanently and irreversibly destroy a dataset (superusers only).
+
+This endpoint is a destructive operation that completely removes a dataset and all
+its datafiles from the system, even if it has been published. The dataset is deleted
+from the database and the parent dataverse is re-indexed. This operation is permanent
+and cannot be undone. Only superusers can use this endpoint.
+
+HTTP: DELETE /api/datasets/&#123;id&#125;/destroy
+HTTP: DELETE /api/datasets/:persistentId/destroy?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/4.16/api/native-api.html#delete-published-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Response object confirming the dataset was destroyed. |
+
+
+### `datafiles_table`
+
+```python
+datafiles_table(self, identifier: Union[str, int], filter_mime_types: List[str] = []) -> pd.DataFrame
+```
+
+List all files in a dataset as a structured pandas DataFrame.
+
+Retrieves comprehensive file metadata for all files in a dataset and returns
+it as a pandas DataFrame for easy analysis and manipulation. This is the
+recommended starting point for file discovery and analysis workflows.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93`) or numeric database ID. |
+| `filter_mime_types` | `List[str]` | Optional list of MIME types to filter files by (e.g. ['text/csv', 'application/pdf']). If provided, only files matching these content types will be included. *(default: `[]`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `pd.DataFrame` | pandas.DataFrame: DataFrame with columns: - id: File database ID - persistentId: File persistent identifier - path: Full file path including directory structure - description: File description - mime_type: File MIME/content type - restricted: Boolean indicating if file access is restricted |
+
+
+### `get_datafiles_metadata`
+
+```python
+get_datafiles_metadata(self, identifier: Union[str, int], version: Version = ':latest', filter_mime_types: List[str] = []) -> List[file.FileInfo]
+```
+
+Retrieve metadata for all files in a specific dataset version.
+
+This endpoint returns a list of all datafiles contained in the specified version
+of a dataset, including file names, sizes, types, descriptions, and other metadata
+associated with each file.
+
+HTTP: GET /api/datasets/:persistentId/versions/&#123;version&#125;/files?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/latest/api/native-api.html#list-files-in-a-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `pid` |  | Persistent identifier of the dataset (e.g. `doi:10.11587/8H3N93`). |
+| `version` | `Version` | Dataset version string (e.g. `:latest`, `:draft`, `1.0`). *(default: `':latest'`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[file.FileInfo]` | Response containing list of file metadata objects for all files in the dataset version. |
+
+
+### `get_datafile_metadata`
+
+```python
+get_datafile_metadata(self, identifier: Union[str, int]) -> file.FileInfo
+```
+
+Retrieve metadata for a specific datafile.
+
+This endpoint returns detailed metadata for a single file, including its name, size,
+content type, description, tags, and other file-level metadata.
+
+HTTP: GET /api/files/&#123;id&#125;
+HTTP: GET /api/files/:persistentId/?persistentId=&#123;identifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | File identifier - either a file ID (numeric) or file persistent ID. |
+| `is_draft` |  | If True, retrieve draft version metadata. If False, retrieve published metadata. |
+| `auth` |  | If True, send API token for authentication. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `file.FileInfo` | Response containing file metadata object. |
+
+
+### `upload_datafile`
+
+```python
+upload_datafile(self, identifier: Union[str, int], file: Union[str, Path, IO[str], IO[bytes]], metadata: Payload[file.UploadBody]) -> file.UploadResponse
+```
+
+Upload a file to an existing dataset.
+
+This endpoint adds a new file to a dataset. The upload process includes automatic
+duplicate detection by comparing file content hashes. Optionally, you can provide
+metadata such as description, tags, and directory label for the file.
+
+HTTP: POST /api/datasets/&#123;id&#125;/add
+HTTP: POST /api/datasets/:persistentId/add?persistentId=&#123;identifier&#125;
+Docs: http://guides.dataverse.org/en/latest/api/native-api.html#adding-files
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Dataset identifier - either a persistent ID or numeric database ID. |
+| `filename` |  | Full path to the file to upload. |
+| `metadata` | `Payload[file.UploadBody]` | Optional JSON string containing file metadata (description, tags, directoryLabel, etc.). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `file.UploadResponse` | Response object with upload confirmation and file information. |
+
+
+### `update_datafile_metadata`
+
+```python
+update_datafile_metadata(self, identifier: Union[str, int], metadata: Payload[update.UpdateBody])
+```
+
+Update datafile metadata.
+
+metadata such as description, directoryLabel (File Path) and tags are not carried over from the file being replaced:
+Updates the file metadata for an existing file where ID is the
+database id of the file to update or PERSISTENT_ID is the persistent id
+(DOI or Handle) of the file. Requires a jsonString expressing the new
+metadata. No metadata from the previous version of this file will be
+persisted, so if you want to update a specific field first get the
+json with the above command and alter the fields you want.
+
+
+Also note that dataFileTags are not versioned and changes to these will update the published version of the file.
+
+This functions needs CURL to work!
+
+HTTP Request:
+
+.. code-block:: bash
+
+    POST -F 'file=@file.extension' -F 'jsonData=&#123;json&#125;' http://$SERVER/api/files/&#123;id&#125;/metadata?key=&#123;apiKey&#125;
+    curl -H "X-Dataverse-key:$API_TOKEN" -X POST -F 'jsonData=&#123;"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false&#125;' $SERVER_URL/api/files/$ID/metadata
+    curl -H "X-Dataverse-key:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -X POST -F 'jsonData=&#123;"description":"My description bbb.","provFreeform":"Test prov freeform","categories":["Data"],"restrict":false&#125;' "https://demo.dataverse.org/api/files/:persistentId/metadata?persistentId=doi:10.5072/FK2/AAA000"
+
+`Docs &lt;http://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata&gt;`_.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the dataset. |
+| `json_str` |  | Metadata as JSON string. |
+| `is_filepid` |  | ``True`` to use persistent identifier for datafile. ``False``, if not. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | The json string responded by the CURL request, converted to a |
+|  | dict(). |
+
+
+### `delete_datafile`
+
+```python
+delete_datafile(self, identifier: Union[str, int])
+```
+
+Delete a datafile from a dataset.
+
+The behavior of this operation depends on whether the dataset has been published:
+
+- **Unpublished Dataset**: The file will be permanently deleted from the dataset.
+- **Published Dataset**: The file is removed from the draft and future versions,
+  but remains accessible in previously published versions.
+
+HTTP: DELETE /api/files/&#123;id&#125;
+HTTP: DELETE /api/files/:persistentId?persistentId=&#123;identifier&#125;
+
+See: https://guides.dataverse.org/en/latest/api/native-api.html#delete-files-from-a-dataset
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | File identifier - either a persistent ID (e.g. `doi:10.11587/8H3N93/ABCDEF`) or numeric database ID. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | Message object confirming deletion with a success message. |
+
+
+**Example**
+
+&gt;&gt;&gt; api = NativeApi('https://demo.dataverse.org', 'API_TOKEN')
+&gt;&gt;&gt; # Delete by database ID
+&gt;&gt;&gt; result = api.delete_datafile(12345)
+&gt;&gt;&gt; # Delete by persistent ID
+&gt;&gt;&gt; result = api.delete_datafile('doi:10.11587/8H3N93/ABCDEF')
+
+
+### `replace_datafile`
+
+```python
+replace_datafile(self, identifier: Union[str, int], file: Union[str, Path, IO[str], IO[bytes]], metadata: Payload[file.UploadBody])
+```
+
+Replace datafile.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    POST -F 'file=@file.extension' -F 'jsonData=&#123;json&#125;' http://$SERVER/api/files/&#123;id&#125;/replace?key=&#123;apiKey&#125;
+
+`replacing-files &lt;http://guides.dataverse.org/en/latest/api/native-api.html#replacing-files&gt;`_.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the file to be replaced. |
+| `file` | `Union[str, Path, IO[str], IO[bytes]]` | Full filename with path. |
+| `json_str` |  | Metadata as JSON string. |
+| `is_filepid` |  | ``True`` if ``identifier`` is a persistent identifier for the datafile. ``False``, if not. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+|  | The json string responded by the CURL request, converted to a |
+|  | dict(). |
+
+
+### `get_info_version`
+
+```python
+get_info_version(self) -> info.VersionResponse
+```
+
+Get the Dataverse version and build number.
+
+The response contains the version and build numbers. Requires no api
+token.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/info/version
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `info.VersionResponse` | Response object of httpx library. |
+
+
+### `get_export_formats`
+
+```python
+get_export_formats(self) -> Dict[str, info.Exporter]
+```
+
+Get available export formats.
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dict[str, info.Exporter]` | List of available export formats. |
+
+
+### `get_info_server`
+
+```python
+get_info_server(self) -> info.ServerResponse
+```
+
+Get dataverse server name.
+
+This is useful when a Dataverse system is composed of multiple Java EE
+servers behind a load balancer.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/info/server
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `info.ServerResponse` | Response object of httpx library. |
+
+
+### `get_info_api_terms_of_use`
+
+```python
+get_info_api_terms_of_use(self) -> info.TermsOfUseResponse
+```
+
+Get API Terms of Use url.
+
+The response contains the text value inserted as API Terms of use which
+uses the database setting :ApiTermsOfUse.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/info/apiTermsOfUse
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `info.TermsOfUseResponse` | Response object of httpx library. |
+
+
+### `get_metadatablocks`
+
+```python
+get_metadatablocks(self, full: bool = False, collection_alias: Optional[Union[str, int]] = None) -> Union[List[metadatablocks.MetadatablockMeta], Dict[str, metadatablocks.MetadatablockSpecification]]
+```
+
+Get info about all metadata blocks.
+
+Lists brief info about all metadata blocks registered in the system.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/metadatablocks
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Union[List[metadatablocks.MetadatablockMeta], Dict[str, metadatablocks.MetadatablockSpecification]]` | Response object of httpx library. |
+
+
+### `get_metadatablock`
+
+```python
+get_metadatablock(self, identifier: str) -> metadatablocks.MetadatablockSpecification
+```
+
+Get info about single metadata block.
+
+Returns data about the block whose identifier is passed. identifier can
+either be the block's id, or its name.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/metadatablocks/$identifier
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Can be block's id, or it's name. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `metadatablocks.MetadatablockSpecification` | MetadatablockSpecification object. |
+
+
+### `get_user_api_token_expiration_date`
+
+```python
+get_user_api_token_expiration_date(self) -> message.Message
+```
+
+Get the expiration date of an Users's API token.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    curl -H X-Dataverse-key:$API_TOKEN -X GET $SERVER_URL/api/users/token
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Response object of httpx library. |
+
+
+### `recreate_user_api_token`
+
+```python
+recreate_user_api_token(self) -> message.Message
+```
+
+Recreate an Users API token.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    curl -H X-Dataverse-key:$API_TOKEN -X POST $SERVER_URL/api/users/token/recreate
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Response object of httpx library. |
+
+
+### `delete_user_api_token`
+
+```python
+delete_user_api_token(self) -> message.Message
+```
+
+Delete an Users API token.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    curl -H X-Dataverse-key:$API_TOKEN -X POST $SERVER_URL/api/users/token/recreate
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Response object of httpx library. |
+
+
+### `get_dataverse_roles`
+
+```python
+get_dataverse_roles(self, identifier: str) -> List[collection.Role]
+```
+
+All the roles defined directly in the dataverse by identifier.
+
+`Docs &lt;https://guides.dataverse.org/en/latest/api/native-api.html#list-roles-defined-in-a-dataverse&gt;`_
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/dataverses/$id/roles
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `str` | Can either be a dataverse id (long), a dataverse alias (more robust), or the special value ``:root``. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[collection.Role]` | Response object of httpx library. |
+
+
+### `create_role`
+
+```python
+create_role(self, dataverse_id: str, role: Payload[collection.Role]) -> collection.Role
+```
+
+Create a new role in a dataverse.
+
+If no dataverse_id is provided, the role will be created in the root dataverse.
+
+`Docs &lt;https://guides.dataverse.org/en/latest/api/native-api.html#id2&gt;`_
+
+HTTP Request:
+
+.. code-block:: bash
+
+    POST http://$SERVER/api/roles?dvo=$dataverseIdtf&key=$apiKey
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `role` | `Payload[collection.Role]` | Role to create. |
+| `dataverse_id` | `str` | Can be alias or id of a Dataverse. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `collection.Role` | Response object of httpx library. |
+
+
+### `show_role`
+
+```python
+show_role(self, role_id: int) -> collection.Role
+```
+
+Show role.
+
+`Docs &lt;https://guides.dataverse.org/en/latest/api/native-api.html#show-role&gt;`_
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET http://$SERVER/api/roles/$id
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` |  | Can be alias or id of a Dataverse. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `collection.Role` | Response object of httpx library. |
+
+
+### `delete_role`
+
+```python
+delete_role(self, role_id: int) -> message.Message
+```
+
+Delete role.
+
+`Docs &lt;https://guides.dataverse.org/en/latest/api/native-api.html#delete-role&gt;`_
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `role_id` | `int` | Can be alias or id of a Role. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Response object of httpx library. |
+
+
+### `crawl_collection`
+
+```python
+crawl_collection(self, alias: Annotated[Union[Literal[':root'], str, int], 'The alias of the dataverse/collection to crawl. Can be a dataverse alias (e.g., "harvard").'] = ':root', filter_by: Optional[Literal['collections', 'datasets']] = None, recursive: bool = True) -> Sequence[Union[collection.content.Collection, collection.content.Dataset]]
+```
+
+Crawl a collection and return all datasets and dataverses within it.
+
+This method provides a synchronous wrapper around the asynchronous
+crawl_collection function. It recursively traverses a Dataverse collection
+hierarchy and returns a flattened list of all child items. The method can
+optionally filter the results to return only specific types of children
+(collections or datasets).
+
+The method automatically sets up an async client internally to perform
+concurrent API calls when recursive traversal is enabled, improving
+performance when dealing with large collection hierarchies. The async
+client is properly cleaned up after the operation completes or if an
+error occurs.
+
+
+**Note**
+
+This method runs the asynchronous crawling operation in a new event
+loop using asyncio.run(). If you're already in an async context,
+consider using the async crawl_collection function directly instead.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `collection_id` |  | The identifier (alias or numeric ID) of the dataverse/collection to crawl. Can be a dataverse alias (e.g., "harvard") or numeric ID. Supports the special value ":root" for the root dataverse. |
+| `filter_by` | `Optional[Literal['collections', 'datasets']]` | Optional filter to specify which types of children to return. Defaults to None. - "collections": Returns only collection children (sub-dataverses) - "datasets": Returns only dataset children - None: Returns all children (both collections and datasets) *(default: `None`)* |
+| `recursive` | `bool` | If True (default), recursively crawls all sub-collections within the specified collection. If False, only returns immediate children of the specified collection. *(default: `True`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Sequence[Union[collection.content.Collection, collection.content.Dataset]]` | A sequence containing the requested child items. Each item is either a |
+| `Sequence[Union[collection.content.Collection, collection.content.Dataset]]` | Collection object (for dataverses) or a Dataset object (for datasets). |
+| `Sequence[Union[collection.content.Collection, collection.content.Dataset]]` | The list is flattened, meaning all items from all hierarchy levels |
+| `Sequence[Union[collection.content.Collection, collection.content.Dataset]]` | are returned in a single sequence when recursive=True. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `Exception` | Any exception that occurs during the crawling operation is re-raised after properly cleaning up the async client. This could include network errors, authentication errors, or API response parsing errors. |
+
+
+**Examples**
+
+Get all children from a collection::
+
+    &gt;&gt;&gt; api = NativeApi(base_url="https://demo.dataverse.org")
+    &gt;&gt;&gt; all_children = api.crawl_collection("harvard")
+    &gt;&gt;&gt; print(f"Found &#123;len(all_children)&#125; items")
+
+Get only datasets from a collection::
+
+    &gt;&gt;&gt; datasets = api.crawl_collection(
+    ...     "harvard", filter_by="datasets"
+    ... )
+    &gt;&gt;&gt; for dataset in datasets:
+    ...     print(dataset.title)
+
+Get only sub-dataverses from a collection::
+
+    &gt;&gt;&gt; collections = api.crawl_collection(
+    ...     "harvard", filter_by="collections"
+    ... )
+    &gt;&gt;&gt; for collection in collections:
+    ...     print(collection.alias)
+
+Non-recursive crawl (immediate children only)::
+
+    &gt;&gt;&gt; immediate_children = api.crawl_collection(
+    ...     "harvard", recursive=False
+    ... )
+    &gt;&gt;&gt; print(f"Found &#123;len(immediate_children)&#125; immediate children")
+
+Crawl with numeric collection ID::
+
+    &gt;&gt;&gt; children = api.crawl_collection("42", filter_by="datasets")
+
+
+**See Also**
+
+- :func:`pyDataverse.api.crawler.crawl_collection`: The underlying
+  async function that performs the actual crawling operation.
+- :meth:`get_dataverse_contents`: For getting immediate contents
+  of a single dataverse without recursion.
+
+
+### `get_children`
+
+```python
+get_children(self, **_)
+```
+
+Get children of a collection.
+
+This method is deprecated. Use crawl_collection instead.
+
+
+### `get_user`
+
+```python
+get_user(self) -> User
+```
+
+Get details of the current authenticated user.
+
+Auth must be ``true`` for this to work. API endpoint is available for Dataverse &gt;= 5.3.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#get-user-information-in-json-format
+
+
+### `redetect_file_type`
+
+```python
+redetect_file_type(self, identifier: Union[str, int], dry_run: bool = False) -> file.RedetectedFileType
+```
+
+Redetect file type.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#redetect-file-type
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Datafile id (fileid) or file PID. |
+| `is_pid` |  | Is the identifier a PID, by default False. |
+| `dry_run` | `bool` | [description], by default False *(default: `False`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `file.RedetectedFileType` | Request Response() object. |
+
+
+### `reingest_datafile`
+
+```python
+reingest_datafile(self, identifier: Union[str, int]) -> message.Message
+```
+
+Reingest datafile.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#reingest-a-file
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Datafile id (fileid) or file PID. |
+| `is_pid` |  | Is the identifier a PID, by default False. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Request Response() object. |
+
+
+### `uningest_datafile`
+
+```python
+uningest_datafile(self, identifier: Union[str, int]) -> message.Message
+```
+
+Uningest datafile.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#uningest-a-file
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Datafile id (fileid) or file PID. |
+| `is_pid` |  | Is the identifier a PID, by default False. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Request Response() object. |
+
+
+### `restrict_datafile`
+
+```python
+restrict_datafile(self, identifier: Union[str, int], restrict: bool, enable_access_request: Optional[bool] = None, terms_of_access: Optional[str] = None) -> message.Message
+```
+
+Restrict or unrestrict a datafile.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#restrict-files
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Datafile id (fileid) or file PID. |
+| `is_pid` |  | Is the identifier a PID, by default False. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Request Response() object. |
+
+
+### `get_available_licenses`
+
+```python
+get_available_licenses(self) -> List[info.License]
+```
+
+Get available licenses.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#get-available-licenses
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[info.License]` | List of available licenses. |
+
+
+### `get_license`
+
+```python
+get_license(self, license_id: int | str) -> info.License
+```
+
+Get license.
+
+https://guides.dataverse.org/en/latest/api/native-api.html#get-a-license
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `info.License` | List of available licenses. |

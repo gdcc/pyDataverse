@@ -1,0 +1,425 @@
+---
+title: "data_access"
+description: "API reference for `pyDataverse.api.data_access`."
+---
+
+`pyDataverse.api.data_access`
+
+
+## `class DataAccessApi`
+
+
+Class to access Dataverse's Data Access API.
+
+This class provides methods to download datafiles, request access to restricted files,
+and manage file access permissions through the Dataverse Data Access API.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url_api_data_access` |  | Description of attribute `base_url_api_data_access`. |
+| `base_url` | `str` | Description of attribute `base_url`. |
+
+
+**Methods**
+
+### `get_datafile`
+
+```python
+get_datafile(self, identifier: Union[str, int], data_format: Optional[str] = None, no_var_header: Optional[bool] = None, image_thumb: Optional[bool] = None) -> bytes
+```
+
+Download a datafile via the Dataverse Data Access API.
+
+This method retrieves a datafile using either its database identifier or a persistent
+identifier (PID). If a PID (such as a DOI) is provided, the API handles constructing
+the correct endpoint and query parameters.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | The identifier for the datafile. Can be the numeric datafile database ID or a persistent identifier (such as a DOI). |
+| `data_format` | `Optional[str], default=None` | Format conversion for the downloaded data (e.g., 'original', 'bundle', 'tabular', etc.), if supported by the Dataverse API. *(default: `None`)* |
+| `no_var_header` | `Optional[bool], default=None` | Whether to exclude variable header in tabular data format. Pass True to remove the variable header. *(default: `None`)* |
+| `image_thumb` | `Optional[bool], default=None` | Whether to request an image thumbnail instead of the full image. Pass True for thumbnail. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `bytes` | httpx.Response: The HTTP response object containing the datafile content. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `httpx.HTTPError` | If the request fails for network or HTTP reasons. |
+
+
+**Example**
+
+&gt;&gt;&gt; api = DataAccessApi(base_url="https://demo.dataverse.org/")
+&gt;&gt;&gt; response = api.get_datafile(1234567)
+&gt;&gt;&gt; with open("out.dat", "wb") as f:
+...     f.write(response.content)
+
+
+### `get_datafile_download_url`
+
+```python
+get_datafile_download_url(self, identifier: Union[str, int], data_format: Optional[str] = None, no_var_header: Optional[bool] = None, image_thumb: Optional[bool] = None) -> str
+```
+
+Get the direct download URL for a datafile, with redirects disabled.
+
+This method returns the direct download URL as provided in the HTTP Location header
+after requesting the datafile from the Dataverse Data Access API. This is useful for
+workflows that need to follow or manage redirects manually (for example, in federated
+storage setups).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | The identifier for the datafile. Can be the numeric datafile database ID or a persistent identifier (such as a DOI). |
+| `data_format` | `Optional[str], default=None` | Format conversion for the downloaded data, if supported by Dataverse for this type of file. *(default: `None`)* |
+| `no_var_header` | `Optional[bool], default=None` | Whether to exclude variable header in tabular data format. Pass True to remove the variable header. *(default: `None`)* |
+| `image_thumb` | `Optional[bool], default=None` | Whether to request an image thumbnail instead of the full image. Pass True for thumbnail. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `str` | The direct download URL from the Location response header. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `AssertionError` | If the Location header is not found in the response. |
+| `httpx.HTTPError` | If the request fails for network or HTTP reasons. |
+
+
+**Example**
+
+&gt;&gt;&gt; api = DataAccessApi(base_url="https://demo.dataverse.org/")
+&gt;&gt;&gt; download_url = api.get_datafile_download_url(1234567)
+
+
+### `stream_datafile`
+
+```python
+stream_datafile(self, identifier: Union[str, int], data_format: Optional[str] = None, no_var_header: Optional[bool] = None, image_thumb: Optional[bool] = None, range_start: Optional[int] = None, range_end: Optional[int] = None) -> Generator[httpx.Response, Any, Any]
+```
+
+Download a datafile via streaming using the Dataverse Data Access API.
+
+This method returns a context manager for streaming large files efficiently.
+Supports both database IDs and persistent identifiers (PIDs) for file access.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+| `data_format` | `Optional[str]` | Optional data format parameter for format conversion. *(default: `None`)* |
+| `no_var_header` | `Optional[bool]` | Optional parameter to exclude variable header from tabular data. *(default: `None`)* |
+| `image_thumb` | `Optional[bool]` | Optional parameter to request image thumbnail instead of full image. *(default: `None`)* |
+| `range_start` | `Optional[int]` | Optional start byte position for Range request (inclusive). *(default: `None`)* |
+| `range_end` | `Optional[int]` | Optional end byte position for Range request (inclusive). If range_start is provided but range_end is None, reads from range_start to end. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Any` | Context manager that yields the streaming HTTP response. |
+
+
+### `get_datafiles`
+
+```python
+get_datafiles(self, identifiers: Sequence[Union[str, int]]) -> bytes
+```
+
+Download multiple datafiles via the Dataverse Data Access API.
+
+Downloads multiple files as a single ZIP archive. This is useful for
+batch downloading when you need several files from the same dataset.
+Note that this endpoint only supports database IDs, not persistent identifiers.
+
+Get by file id (HTTP Request).
+
+.. code-block:: bash
+
+    GET /api/access/datafiles/$id1,$id2,...$idN
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifiers` | `Sequence[Union[str, int]]` | Sequence of datafile identifiers. Can be datafile ids or persistent identifiers of the datafiles (e. g. doi). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `bytes` | The ZIP archive content. |
+
+
+### `stream_datafiles`
+
+```python
+stream_datafiles(self, identifiers: Sequence[Union[str, int]]) -> Generator[httpx.Response, Any, Any]
+```
+
+Download multiple datafiles via streaming using the Dataverse Data Access API.
+
+Downloads multiple files as a single ZIP archive using streaming for efficient
+handling of large archives. This is useful for batch downloading when you need
+several files from the same dataset. Note that this endpoint only supports
+database IDs, not persistent identifiers.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifiers` | `Sequence[Union[str, int]]` | Sequence of datafile identifiers. Can be datafile ids or persistent identifiers of the datafiles (e. g. doi). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Any` | Context manager that yields the streaming HTTP response. |
+
+
+### `get_datafile_bundle`
+
+```python
+get_datafile_bundle(self, identifier: Union[str, int], file_metadata_id: Optional[int] = None) -> bytes
+```
+
+Download a datafile in all its formats.
+
+This is a convenience packaging method available for tabular data files.
+It returns a zipped bundle containing the data in multiple formats, which is
+particularly useful for researchers who need the data in different formats
+for various analysis tools.
+
+HTTP Request:
+
+.. code-block:: bash
+
+    GET /api/access/datafile/bundle/$id
+
+Data Access API calls can now be made using persistent identifiers (in
+addition to database ids). This is done by passing the constant
+:persistentId where the numeric id of the file is expected, and then
+passing the actual persistent id as a query parameter with the name
+persistentId.
+
+This is a convenience packaging method available for tabular data
+files. It returns a zipped bundle that contains the data in the
+following formats:
+- Tab-delimited;
+- "Saved Original", the proprietary (SPSS, Stata, R, etc.) file
+from which the tabular data was ingested;
+- Generated R Data frame (unless the "original" above was in R);
+- Data (Variable) metadata record, in DDI XML;
+- File citation, in Endnote and RIS formats.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+| `file_metadata_id` | `Optional[int]` | Optional file metadata ID parameter for specific versions. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `bytes` | Response object of httpx library containing the ZIP bundle. |
+
+
+### `stream_datafiles_bundle`
+
+```python
+stream_datafiles_bundle(self, identifier: Union[str, int], file_metadata_id: Optional[int] = None) -> Generator[httpx.Response, Any, Any]
+```
+
+Download a datafile in all its formats via streaming.
+
+This is a convenience packaging method available for tabular data files.
+It returns a zipped bundle containing the data in multiple formats using
+streaming for efficient handling of large bundles.
+
+The bundle contains the data in the following formats:
+- Tab-delimited;
+- "Saved Original", the proprietary (SPSS, Stata, R, etc.) file
+from which the tabular data was ingested;
+- Generated R Data frame (unless the "original" above was in R);
+- Data (Variable) metadata record, in DDI XML;
+- File citation, in Endnote and RIS formats.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+| `file_metadata_id` | `Optional[int]` | Optional file metadata ID parameter for specific versions. *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Any` | Context manager that yields the streaming HTTP response. |
+
+
+### `request_access`
+
+```python
+request_access(self, identifier: Union[str, int]) -> message.Message
+```
+
+Request datafile access.
+
+Submits an access request for a restricted datafile on behalf of the authenticated user.
+This is typically used when files are restricted and require permission from the dataset
+owner or administrator. Note that not all datasets allow access requests to restricted files.
+
+This method requests access to the datafile whose id is passed on the behalf of an authenticated user whose key is passed. Note that not all datasets allow access requests to restricted files.
+
+https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#request-access
+
+/api/access/datafile/$id/requestAccess
+
+curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/&#123;id&#125;/requestAccess
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Message object containing the response status and details. |
+
+
+### `allow_access_request`
+
+```python
+allow_access_request(self, identifier: Union[str, int], do_allow: bool = True) -> message.Message
+```
+
+Allow or deny access requests for datafiles.
+
+Enables or disables the ability for users to request access to restricted files.
+This is an administrative function that controls whether the "Request Access"
+button appears for restricted files in the dataset.
+
+https://guides.dataverse.org/en/latest/api/dataaccess.html#allow-access-requests
+
+curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/&#123;id&#125;/allowAccessRequest
+curl -H "X-Dataverse-key:$API_TOKEN" -X PUT -d true http://$SERVER/api/access/:persistentId/allowAccessRequest?persistentId=&#123;pid&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+| `do_allow` | `bool` | Whether to allow access requests (True) or disable them (False). *(default: `True`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Message object containing the response status and details. |
+
+
+### `grant_file_access`
+
+```python
+grant_file_access(self, identifier: Union[str, int], user: Union[str, int]) -> message.Message
+```
+
+Grant datafile access to a specific user.
+
+Grants access to a restricted datafile for a specific user. This is typically
+used by dataset administrators to approve access requests or proactively grant
+access to specific users.
+
+https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#grant-file-access
+
+curl -H "X-Dataverse-key:$API_TOKEN" -X PUT http://$SERVER/api/access/datafile/&#123;id&#125;/grantAccess/&#123;@userIdentifier&#125;
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+| `user` | `Union[str, int]` | User identifier to grant access to (username or user ID). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `message.Message` | Message object containing the response status and details. |
+
+
+### `list_file_access_requests`
+
+```python
+list_file_access_requests(self, identifier: Union[str, int]) -> List[access.AccessRequest]
+```
+
+List datafile access requests.
+
+Retrieves a list of all pending access requests for a specific datafile.
+This is useful for dataset administrators to review and manage access requests.
+Each request includes user information and timestamps.
+
+https://guides.dataverse.org/en/4.18.1/api/dataaccess.html#list-file-access-requests
+
+curl -H "X-Dataverse-key:$API_TOKEN" -X GET http://$SERVER/api/access/datafile/&#123;id&#125;/listRequests
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `identifier` | `Union[str, int]` | Identifier of the datafile. Can be datafile id or persistent identifier of the datafile (e. g. doi). |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `List[access.AccessRequest]` | List of AccessRequest objects containing user details and request information. |

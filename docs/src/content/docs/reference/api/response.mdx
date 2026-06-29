@@ -1,0 +1,52 @@
+---
+title: "response"
+description: "API reference for `pyDataverse.api.response`."
+---
+
+`pyDataverse.api.response`
+
+
+## `class Status`
+
+
+Enumeration of API response status values.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `OK` |  | Indicates a successful API response. |
+| `ERROR` |  | Indicates an error occurred during the API request. |
+
+
+## `class APIResponse`
+
+
+Base model for API responses from the Dataverse API.
+
+This class represents the standard structure of responses returned by
+the Dataverse API, containing status information, data payload, and
+optional error messages.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `status` | `Status` | The status of the API response (OK or ERROR). |
+| `data` | `dict` | The data payload returned by the API. |
+| `message` | `Optional[str]` | Optional message, typically used for error descriptions. |
+
+
+**Methods**
+
+### `from_out_of_format` _classmethod_
+
+```python
+from_out_of_format(cls, data: dict | list, status_code: int) -> Self
+```
+
+Create an APIResponse from a dictionary or list.
+
+This method is used to create an APIResponse from a dictionary or list.

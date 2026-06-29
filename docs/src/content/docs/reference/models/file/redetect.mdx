@@ -1,0 +1,21 @@
+---
+title: "redetect"
+description: "API reference for `pyDataverse.models.file.redetect`."
+---
+
+`pyDataverse.models.file.redetect`
+
+
+## `class RedetectedFileType`
+
+
+Schema for the response from the file redetect API endpoint
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `dry_run` | `Annotated[bool, Field(alias='dryRun')]` | Whether this was a dry run operation |
+| `old_content_type` | `Annotated[str, Field(alias='oldContentType')]` | The previous content type of the file |
+| `new_content_type` | `Annotated[str, Field(alias='newContentType')]` | The new detected content type of the file |

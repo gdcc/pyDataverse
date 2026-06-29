@@ -1,0 +1,146 @@
+---
+title: "metrics"
+description: "API reference for `pyDataverse.dataverse.metrics`."
+---
+
+`pyDataverse.dataverse.metrics`
+
+
+## `class Metrics`
+
+
+Provides access to Dataverse-level metrics.
+
+This class fetches and aggregates usage/content metrics from a Dataverse instance using its Metrics API.
+It exposes key metrics and summaries as DataFrames and direct counters, with clear interface and documentation.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `metrics_api` | `MetricsApi` | The MetricsApi instance used for all metrics API calls. |
+
+
+**Example**
+
+&gt;&gt;&gt; dv = Dataverse("https://demo.dataverse.org")
+&gt;&gt;&gt; dv.metrics.total("datasets")
+&gt;&gt;&gt; dv.metrics.df  # Summary DataFrame of all core metrics
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `collections_by_subject` | `pd.DataFrame` | DataFrame of Dataverse collections grouped by subject. |
+| `collections_by_category` | `pd.DataFrame` | DataFrame of collections grouped by category. |
+| `df` | `pd.DataFrame` | DataFrame with a summary of all top-level, site-wide metrics. |
+| `datasets_by_subject` | `pd.DataFrame` | DataFrame of datasets grouped by subject. |
+
+
+**Methods**
+
+### `total`
+
+```python
+total(self, data_type: DataType, date_to_month: Optional[Union[str, date]] = None) -> int
+```
+
+Get the total count for a type of entity (e.g., all datasets, files, downloads, dataverses).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_type` | `DataType` | One of 'dataverses', 'datasets', 'files', or 'downloads'. |
+| `date_to_month` | `Optional[Union[str, date]]` | Optional (str or date) - If provided, gives the value for a given month ('YYYY-MM' or date object). *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `int` | Total count for the given type and period. |
+
+
+**Example**
+
+&gt;&gt;&gt; dv.metrics.total("datasets")
+&gt;&gt;&gt; dv.metrics.total("downloads", "2024-01")  # For a specific month
+
+
+### `past_days`
+
+```python
+past_days(self, data_type: DataType, days: Union[int, str]) -> int
+```
+
+Number of objects/events for the past number of days.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_type` | `DataType` | Which type ('dataverses', 'datasets', 'files', 'downloads'). |
+| `days` | `Union[int, str]` | Integer or string (e.g., 7, 30) – period to consider. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `int` | Count for the given period. |
+
+
+**Example**
+
+&gt;&gt;&gt; dv.metrics.past_days("datasets", days=30)
+
+
+### `datasets_by_data_location`
+
+```python
+datasets_by_data_location(self, data_location: DataLocation) -> int
+```
+
+Number of datasets by storage location (local, remote, or all).
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `data_location` | `DataLocation` | One of 'local', 'remote', or 'all'. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `int` | Dataset count for the location. |
+
+
+**Example**
+
+&gt;&gt;&gt; dv.metrics.datasets_by_data_location("local")
+
+
+### `dict`
+
+```python
+dict(self) -> Dict[str, Any]
+```
+
+Dictionary of all metrics.
+
+
+### `json`
+
+```python
+json(self, indent: Optional[int] = 4) -> str
+```
+
+JSON string of all metrics.

@@ -1,0 +1,211 @@
+---
+title: "dataverse"
+description: "Dataverse factory class for creating Dataset instances."
+---
+
+`pyDataverse.dataverse.dataverse`
+
+
+Dataverse factory class for creating Dataset instances.
+
+
+## `class Author`
+
+
+## `class Contact`
+
+
+## `class Dataverse`
+
+
+Factory class for creating Dataset instances with metadata blocks.
+
+The Dataverse class connects to a Dataverse installation and provides
+methods to create Dataset objects with properly configured metadata blocks.
+It handles the fetching of metadata block specifications and creates
+properly typed Dataset instances with all available metadata blocks.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `base_url` | `Union[str, Literal['https://demo.dataverse.org']]` | Base URL of the Dataverse installation |
+| `api_token` | `Optional[str]` | Optional API token for authentication |
+
+
+**Example**
+
+&gt;&gt;&gt; # Create a Dataverse instance
+&gt;&gt;&gt; dv = Dataverse(base_url="https://demo.dataverse.org")
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Create a dataset with all available metadata blocks
+&gt;&gt;&gt; dataset = dv.create_dataset()
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Access metadata blocks
+&gt;&gt;&gt; dataset.metadata_blocks["citation"].title = "My Dataset Title"
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `native_api` | `NativeApi` | Access the NativeApi instance. |
+| `data_access_api` | `DataAccessApi` | Access the DataAccessApi instance. |
+| `semantic_api` | `SemanticApi` | Access the SemanticApi instance. |
+| `metrics_api` | `MetricsApi` | Access the MetricsApi instance. |
+| `version` | `info.VersionResponse` | Return the version of the Dataverse instance. |
+| `licenses` | `Sequence[info.License]` | Return the list of available licenses from the Dataverse instance. |
+| `default_license` | `info.License` | Return the default license from the Dataverse instance. |
+| `metrics` | `Metrics` | Access the Metrics instance for retrieving Dataverse metrics. |
+| `collections` |  | Return collections from the root collection. |
+| `datasets` |  | Return datasets from the root collection. |
+| `export_formats` | `Dict[str, info.Exporter]` | Return the list of available export formats. |
+| `metadatablocks` | `Dict[str, MetadatablockSpecification]` | Return the list of available metadata blocks. |
+
+
+**Methods**
+
+### `search`
+
+```python
+search(self, query: str, per_page: int = 10, type: Optional[Literal['dataset', 'collection', 'dataverse']] = None, options: Optional[QueryOptions] = None) -> SearchResult
+```
+
+Search for datasets in the Dataverse instance.
+
+
+### `create_collection`
+
+```python
+create_collection(self, alias: str, name: str, description: str, affiliation: str, dataverse_type: Literal['DEPARTMENT', 'JOURNALS', 'LABORATORY', 'ORGANIZATIONS_INSTITUTIONS', 'RESEARCHERS', 'RESEARCH_GROUP', 'RESEARCH_PROJECTS', 'TEACHING_COURSES', 'UNCATEGORIZED'], dataverse_contacts: List[str], parent: Union[Literal['root'], str] = 'root') -> Collection
+```
+
+Create a new Dataverse collection (sub-dataverse) at the root level.
+
+This method allows you to create a new collection inside the Dataverse installation
+by specifying the required metadata fields, including name, alias, affiliation, and
+the type of dataverse. Contacts for the collection should be passed as a list of email
+addresses (`dataverse_contacts`), which will be converted to the appropriate metadata objects.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `str` | The unique, non-whitespace string identifier for the new collection (sub-dataverse). |
+| `name` | `str` | The human-readable name for the collection. |
+| `description` | `str` | Description for the collection. |
+| `affiliation` | `str` | The affiliation of the collection. |
+| `dataverse_type` | `Literal` | The type/category of the collection. |
+| `dataverse_contacts` | `List[str]` | List of emails for collection contacts. |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Collection` | collection.CollectionCreateResponse: The server response containing details about the newly created collection. |
+
+
+**Example**
+
+&gt;&gt;&gt; response = dataverse.create_collection(
+...     alias="astro-data",
+...     name="Astrophysics Data",
+...     description="A collection for astrophysical datasets.",
+...     affiliation="Department of Astronomy",
+...     dataverse_type="LABORATORY",
+...     dataverse_contacts=["astro@university.edu", "info@astro.org"],
+... )
+&gt;&gt;&gt; print(response.id, response.name)
+
+
+### `create_dataset`
+
+```python
+create_dataset(self, title: str, description: str, authors: List[Author], contacts: List[Contact], subjects: List[Subject], upload_to_collection: bool = True, collection: Optional[Union[Literal['root'], str]] = None, license: Optional[Union[str, info.License]] = None) -> Dataset
+```
+
+Create a new Dataset with metadata blocks, ready to be uploaded to a Dataverse collection.
+
+This method initializes a Dataset instance with the specified core metadata fields,
+and includes all available metadata blocks from the Dataverse installation.
+Metadata blocks are constructed dynamically from API-provided specifications at runtime.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `title` | `str` | The title of the dataset (required, citation metadata block). |
+| `description` | `str` | The dataset’s description/abstract (citation block). |
+| `authors` | `List[Author]` | List of dataset authors (each must be an `Author` object). |
+| `contacts` | `List[Contact]` | List of contact persons for the dataset. |
+| `subjects` | `List[Subject]` | Subjects to categorize the dataset (controlled vocabulary). |
+| `upload_to_collection` | `bool` | If True, the dataset will also be uploaded to the collection upon creation. Defaults to True. *(default: `True`)* |
+| `collection` | `Optional[Union[Literal['root'], str]]` | Alias of the collection (dataverse) to upload to. Defaults to None (root dataverse). *(default: `None`)* |
+
+
+**Returns**
+
+| Type | Description |
+| --- | --- |
+| `Dataset` | The created Dataset instance with metadata blocks populated. |
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `Exception` | If unable to fetch metadata block specifications from the server. |
+
+
+**Example**
+
+&gt;&gt;&gt; dv = Dataverse("https://demo.dataverse.org")
+&gt;&gt;&gt; ds = dv.create_dataset(
+...     title="Neural Network Results",
+...     description="Results and code for the paper.",
+...     authors=[Author(name="Jane Smith", affiliation="UniX")],
+...     contacts=[Contact(email="jane.smith@unix.edu")],
+...     subjects=["Computer Science"]
+... )
+&gt;&gt;&gt; ds.metadata_blocks["citation"].title
+'Neural Network Results'
+
+
+### `fetch_collection`
+
+```python
+fetch_collection(self, identifier: Union[str, int])
+```
+
+Load a collection from the Dataverse instance.
+
+
+### `from_dataverse_dict`
+
+```python
+from_dataverse_dict(self, dataset: Union[edit_get.GetDatasetResponse, create.DatasetCreateBody]) -> Dataset
+```
+
+Create a new dataset from a dictionary of data.
+
+
+### `to_pydantic`
+
+```python
+to_pydantic(self, enum_limit: Optional[int] = None) -> Dict[str, Type[BaseModel]]
+```
+
+Return a Pydantic model for the Dataverse instance.
+
+
+### `json_schema`
+
+```python
+json_schema(self) -> Dict[str, Any]
+```
+
+Return the JSON schema for the Dataverse instance.

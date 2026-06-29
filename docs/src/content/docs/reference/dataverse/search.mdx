@@ -1,0 +1,60 @@
+---
+title: "search"
+description: "API reference for `pyDataverse.dataverse.search`."
+---
+
+`pyDataverse.dataverse.search`
+
+
+## `class SearchResult`
+
+
+A search result from the Dataverse search API.
+
+
+**Attributes**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `datasets` | `DatasetView` | Return a view of all datasets in the search results. |
+| `collections` | `CollectionView` | Return a view of all collections (dataverses) in the search results. |
+
+
+**Methods**
+
+### `__init__`
+
+```python
+__init__(self, search_response: SearchResponse, dataverse: 'Dataverse', **kwargs)
+```
+
+Initialize SearchResult from a SearchResponse.
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `search_response` | `SearchResponse` | The SearchResponse object containing search results. |
+| `dataverse` | `'Dataverse'` | The Dataverse instance. |
+| `**kwargs` |  | Additional arguments passed to ContentBase. *(default: `&#123;&#125;`)* |
+
+
+### `update_metadata`
+
+```python
+update_metadata(self, **kwargs) -> None
+```
+
+Update metadata for the search result.
+
+This method is not implemented because SearchResult objects are read-only
+representations of search results from the Dataverse API. To update metadata,
+access the underlying dataset or collection objects and update them directly.
+
+
+**Raises**
+
+| Exception | Description |
+| --- | --- |
+| `NotImplementedError` | Always raised, as this operation is not supported for search results. |
