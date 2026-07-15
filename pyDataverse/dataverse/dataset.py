@@ -37,6 +37,7 @@ from pydantic import (
 from rdflib import Graph
 from typing_extensions import Self
 
+from ..api.utilities.async_run import run_async
 from ..filesystem.dvfs import DataverseFS
 from ..filesystem.reader import DataverseFileReader
 from ..filesystem.writer import DataverseFileWriter
@@ -484,7 +485,7 @@ class Dataset(ContentBase):
         else:
             exported = [
                 self._add_missing_id(export)
-                for export in asyncio.run(self._batch_format_export(format))
+                for export in run_async(self._batch_format_export(format))
                 if isinstance(export, dict)
             ]
 

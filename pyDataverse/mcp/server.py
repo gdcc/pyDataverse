@@ -5,6 +5,7 @@ from asyncer import asyncify
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
+from ..api.utilities.async_run import run_async
 from ..dataverse import Dataverse
 from .collection import (
     get_collection_metadata,
@@ -301,7 +302,7 @@ class DataverseMCP:
         if isinstance(self.dataverse, Dataverse):
             return list(self.dataverse.metadatablocks.keys())
         else:
-            return asyncio.run(self._async_metadatablocks())
+            return run_async(self._async_metadatablocks())
 
     async def _async_metadatablocks(self) -> List[str]:
         """

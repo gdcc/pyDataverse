@@ -24,6 +24,7 @@ from pydantic import BaseModel, Field, PrivateAttr, model_validator
 from typing_extensions import Self, TypedDict
 
 from pyDataverse.api.search import QueryOptions, SearchApi
+from pyDataverse.api.utilities.async_run import run_async
 from pyDataverse.dataverse.search import SearchResult
 
 from ..api import DataAccessApi, MetricsApi, NativeApi, SemanticApi
@@ -403,7 +404,7 @@ class Dataverse(BaseModel):
 
         self.native_api.logger.info("Fetching metadata blocks...")
 
-        metadata_blocks = asyncio.run(self._get_metadata_blocks())
+        metadata_blocks = run_async(self._get_metadata_blocks())
 
         blocks = {}
 

@@ -1,4 +1,3 @@
-import asyncio
 import json
 from contextlib import contextmanager
 from pathlib import Path
@@ -38,6 +37,7 @@ from ..models.dataset.review import ReturnToAuthorBody
 from ..models.file.filemeta import UploadBody, UploadResponse
 from .api import Api, Payload
 from .utilities import crawl_collection
+from .utilities.async_run import run_async
 from .utilities.ds_fetcher import conc_get_datasets
 from .utilities.fileinput import file_input
 
@@ -500,7 +500,7 @@ class NativeApi(Api):
         self._setup_async_client()
 
         try:
-            result = asyncio.run(conc_get_datasets(self, identifiers))
+            result = run_async(conc_get_datasets(self, identifiers))
             self.client = None
             return result
         except Exception as e:
@@ -2062,9 +2062,12 @@ class NativeApi(Api):
         error occurs.
 
         Note:
-            This method runs the asynchronous crawling operation in a new event
-            loop using asyncio.run(). If you're already in an async context,
-            consider using the async crawl_collection function directly instead.
+            This method runs the asynchronous crawling operation via the
+            loop-aware ``run_async`` helper: when no event loop is running it
+            uses ``asyncio.run`` directly, and when called from within a running
+            loop it offloads the coroutine to a dedicated worker thread. If
+            you're already in an async context, consider using the async
+            crawl_collection function directly instead.
 
         Args:
             collection_id: The identifier (alias or numeric ID) of the
@@ -2141,7 +2144,7 @@ class NativeApi(Api):
             )
 
             self._setup_async_client()
-            response = asyncio.run(crawl_collection(self, alias, filter_by, recursive))
+            response = run_async(crawl_collection(self, alias, filter_by, recursive))
 
             self.client = None
             self.logger.info(
