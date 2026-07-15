@@ -234,6 +234,10 @@
           <strong>Lint and static checks pass</strong>
           <span>Ruff, diff formatting, dependency and call-site checks</span>
         </div>
+        <div class="badge pass">
+          <strong>Full CI matrix passed</strong>
+          <span>Python 3.10, 3.11, 3.12, 3.13, and 3.14</span>
+        </div>
       </div>
     </div>
   </header>
@@ -255,12 +259,13 @@
     <section id="verdict">
       <h2>1. Verification verdict</h2>
       <div class="callout success">
-        <strong>The original exception is fixed for the tested path.</strong>
+        <strong>The original exception and the supported Python matrix are verified.</strong>
         The reported commit was reproduced in an isolated Python 3.14.5 environment and raised
         <code>sniffio._impl.AsyncLibraryNotFoundError</code>. Under the same Python release,
-        the working-tree fix constructed <code>Dataverse</code>, fetched metadata from
+        the fix constructed <code>Dataverse</code>, fetched metadata from
         <code>https://demo.dataverse.org</code>, initialized the dataset factory, and reported
-        18 metadata blocks.
+        18 metadata blocks. GitHub Actions then ran the complete repository suite with an
+        action-provisioned Dataverse on Python 3.10–3.14; all five jobs passed.
       </div>
       <table>
         <tbody>
@@ -269,7 +274,16 @@
           <tr><th>Exact issue interpreter</th><td>CPython 3.14.5, macOS 26.3.1, arm64</td></tr>
           <tr><th>Live endpoint used</th><td><code>https://demo.dataverse.org</code></td></tr>
           <tr><th>Verification date</th><td>2026-07-15</td></tr>
-          <tr><th>Repository state</th><td>Working-tree changes; not committed or pushed</td></tr>
+          <tr><th>Fix commit</th><td><code>de3b37eb13213f5403e1299e97b80085a83bf01b</code></td></tr>
+          <tr>
+            <th>Repository state</th>
+            <td>
+              Branch pushed to
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/tree/fix/240-python-3.14-asynclibrarynotfound">
+                <code>youseihuayu-wonderful/pyDataverse</code>
+              </a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </section>
@@ -628,8 +642,13 @@ PASS: git diff --check</code></pre>
           </tr>
           <tr>
             <td>Python 3.14 continuously tested</td>
-            <td>3.14 added to the GitHub Actions matrix</td>
-            <td><span class="status pass">CONFIGURED</span></td>
+            <td>
+              3.14 added to the matrix and its
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540/job/87500075231">
+                CI job passed
+              </a>
+            </td>
+            <td><span class="status pass">VERIFIED</span></td>
           </tr>
           <tr>
             <td>Focused issue regression tests</td>
@@ -638,15 +657,40 @@ PASS: git diff --check</code></pre>
           </tr>
           <tr>
             <td>Entire repository suite on Python 3.10–3.14</td>
-            <td>Requires CI/live Dataverse with valid regular and superuser credentials</td>
-            <td><span class="status pending">CI PENDING</span></td>
+            <td>
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540">
+                Unit tests run 29459587540
+              </a>:
+              all five Dataverse-backed matrix jobs passed
+            </td>
+            <td><span class="status pass">VERIFIED</span></td>
           </tr>
         </tbody>
       </table>
+      <div class="callout success">
+        <strong>Final GitHub Actions evidence for commit <code>de3b37e</code>:</strong>
+        <ul>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540">
+              Unit tests
+            </a> — success on Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+          </li>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587493">
+              Build PyDataverse
+            </a> — success.
+          </li>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587550">
+              Ruff
+            </a> — success.
+          </li>
+        </ul>
+      </div>
     </section>
 
     <section id="limits">
-      <h2>8. Scope and remaining verification</h2>
+      <h2>8. Scope and residual notes</h2>
       <ul>
         <li>
           <strong>Issue #240 itself is verified fixed.</strong> The constructor exception and both
@@ -655,8 +699,9 @@ PASS: git diff --check</code></pre>
         <li>
           <strong>The full repository suite was not run locally.</strong>
           <code>tests/conftest.py</code> requires a live Dataverse plus valid
-          <code>API_TOKEN</code> and <code>API_TOKEN_SUPERUSER</code>. CI supplies these through
-          <code>gdcc/dataverse-action</code>.
+          <code>API_TOKEN</code> and <code>API_TOKEN_SUPERUSER</code>. This verification is now
+          complete in GitHub Actions, which supplied those values through
+          <code>gdcc/dataverse-action</code> for every Python 3.10–3.14 job.
         </li>
         <li>
           <strong>The complete issue example goes beyond this exception.</strong> This report
@@ -671,11 +716,11 @@ PASS: git diff --check</code></pre>
           cleanup stay on the worker loop.
         </li>
         <li>
-          <strong>No release action has occurred.</strong> The branch is uncommitted, unpushed,
-          and has no pull request yet.
+          <strong>No upstream pull request or release has occurred.</strong> The branch is committed
+          and pushed to the authenticated user's fork; upstream review remains a separate next step.
         </li>
       </ul>
-      <h3>CI command for final repository-wide validation</h3>
+      <h3>Command for future local repository-wide validation</h3>
       <pre><code>uv pip install --system ".[tests,mcp]"
 BASE_URL="$BASE_URL" \
 API_TOKEN="$API_TOKEN" \
