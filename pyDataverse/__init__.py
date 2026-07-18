@@ -10,8 +10,6 @@ from __future__ import absolute_import
 import warnings
 from importlib.metadata import PackageNotFoundError, version
 
-import nest_asyncio
-
 from .api.search import QueryOptions
 from .dataverse import Collection, Dataset, Dataverse, File
 
@@ -24,8 +22,6 @@ warnings.filterwarnings(
     category=DeprecationWarning,
 )
 
-
-nest_asyncio.apply()
 
 __author__ = "Stefan Kasberger"
 __email__ = "stefan.kasberger@univie.ac.at"

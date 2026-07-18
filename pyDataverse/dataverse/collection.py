@@ -20,6 +20,7 @@ from rdflib import BNode, Graph
 from rich.progress import Progress
 from typing_extensions import TypedDict
 
+from pyDataverse.api.utilities.async_run import run_async
 from pyDataverse.dataverse.dataset import GraphFormat
 from pyDataverse.models import info
 
@@ -624,7 +625,7 @@ class Collection(ContentBase):
             uses async/await internally with a semaphore to control concurrency,
             allowing efficient parallel processing while preventing resource exhaustion.
         """
-        return asyncio.run(
+        return run_async(
             self._graph_async(
                 format=format,
                 depth=depth,

@@ -10,6 +10,7 @@ from asyncer import asyncify
 from pydantic import BaseModel, Field, model_serializer
 
 from ..api.metrics import MetricsApi
+from ..api.utilities.async_run import run_async
 
 DataType = Literal["dataverses", "datasets", "files", "downloads"]
 DataLocation = Literal["local", "remote", "all"]
@@ -82,7 +83,7 @@ class Metrics(BaseModel):
         Returns:
             Dict[str, Any]: Dictionary containing summary metrics, with metric names as keys.
         """
-        return asyncio.run(self._serialize_metrics_async())
+        return run_async(self._serialize_metrics_async())
 
     async def _serialize_metrics_async(self) -> Dict[str, Any]:
         """Internal async helper to parallelize metric collection."""
@@ -152,7 +153,7 @@ class Metrics(BaseModel):
         Example:
             >>> dv.metrics.df
         """
-        return asyncio.run(self._collect_all_metrics())
+        return run_async(self._collect_all_metrics())
 
     async def _collect_all_metrics(self) -> pd.DataFrame:
         """
@@ -309,7 +310,7 @@ class Metrics(BaseModel):
         """
         Dictionary of all metrics.
         """
-        return asyncio.run(self._serialize_metrics_async())
+        return run_async(self._serialize_metrics_async())
 
     def json(self, indent: Optional[int] = 4) -> str:
         """

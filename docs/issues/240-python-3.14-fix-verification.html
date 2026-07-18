@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pyDataverse Issue #240 — Fix and Verification Report</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-alt: #eef2f8;
+      --text: #18212f;
+      --muted: #5d6a7a;
+      --border: #d8e0eb;
+      --accent: #1957a6;
+      --accent-soft: #e8f1fd;
+      --success: #176b45;
+      --success-soft: #e5f6ee;
+      --danger: #a52a2a;
+      --danger-soft: #fdeaea;
+      --warning: #805a00;
+      --warning-soft: #fff4d6;
+      --code-bg: #111827;
+      --code-text: #e5edf8;
+      --shadow: 0 8px 28px rgba(25, 45, 75, 0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1118;
+        --surface: #141c27;
+        --surface-alt: #1a2533;
+        --text: #e8eef6;
+        --muted: #a7b4c4;
+        --border: #2b3a4d;
+        --accent: #85b8ff;
+        --accent-soft: #142d50;
+        --success: #75d5aa;
+        --success-soft: #12382b;
+        --danger: #ff9b9b;
+        --danger-soft: #442222;
+        --warning: #ffd071;
+        --warning-soft: #3d3012;
+        --code-bg: #080d14;
+        --code-text: #e6edf6;
+        --shadow: none;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); }
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    code {
+      padding: 0.08rem 0.3rem;
+      border-radius: 0.3rem;
+      background: var(--surface-alt);
+      font-size: 0.92em;
+    }
+    pre {
+      overflow-x: auto;
+      margin: 0.8rem 0 0;
+      padding: 1rem;
+      border-radius: 0.65rem;
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-size: 0.83rem;
+      line-height: 1.55;
+      white-space: pre;
+    }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    h1, h2, h3 { line-height: 1.25; }
+    h2 {
+      margin-top: 0;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { margin: 1.4rem 0 0.5rem; }
+    p { margin: 0.6rem 0; }
+    ul, ol { padding-left: 1.4rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.8rem;
+      font-size: 0.94rem;
+    }
+    th, td {
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface-alt); }
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+    header {
+      padding: 3rem 0 2rem;
+      background: linear-gradient(135deg, var(--surface), var(--accent-soft));
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { margin: 0.4rem 0; font-size: clamp(2rem, 4vw, 3.2rem); }
+    header p { max-width: 850px; font-size: 1.05rem; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    nav .container {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-top: 0.7rem;
+      padding-bottom: 0.7rem;
+      white-space: nowrap;
+    }
+    nav a { text-decoration: none; font-size: 0.9rem; }
+    main { padding: 1.5rem 0 4rem; }
+    section {
+      margin: 1.25rem 0;
+      padding: 1.4rem;
+      border: 1px solid var(--border);
+      border-radius: 0.8rem;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--accent);
+    }
+    .badges, .grid, .flow, .comparison {
+      display: grid;
+      gap: 0.85rem;
+    }
+    .badges { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1.2rem; }
+    .grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .comparison { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .badge, .card, .flow > div {
+      padding: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 0.65rem;
+      background: var(--surface);
+    }
+    .badge strong { display: block; font-size: 1.15rem; }
+    .badge span, .muted { color: var(--muted); }
+    .pass { border-left: 5px solid var(--success); }
+    .fail { border-left: 5px solid var(--danger); }
+    .pending { border-left: 5px solid var(--warning); }
+    .callout {
+      margin: 1rem 0;
+      padding: 0.9rem 1rem;
+      border-left: 5px solid var(--accent);
+      border-radius: 0.4rem;
+      background: var(--accent-soft);
+    }
+    .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+    .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+    .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+    .flow {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      align-items: stretch;
+      margin-top: 0.8rem;
+    }
+    .flow > div { position: relative; }
+    .flow strong { display: block; margin-bottom: 0.25rem; }
+    .status {
+      display: inline-block;
+      padding: 0.12rem 0.48rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .status.pass { border: 0; color: var(--success); background: var(--success-soft); }
+    .status.fail { border: 0; color: var(--danger); background: var(--danger-soft); }
+    .status.pending { border: 0; color: var(--warning); background: var(--warning-soft); }
+    details {
+      margin-top: 0.8rem;
+      padding: 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      background: var(--surface-alt);
+    }
+    summary { cursor: pointer; font-weight: 700; }
+    footer {
+      padding: 1.5rem 0 3rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="eyebrow">Reproducible engineering report</div>
+      <h1>Issue #240 — Python 3.14 async fix</h1>
+      <p>
+        Exact before/after evidence for
+        <a href="https://github.com/gdcc/pyDataverse/issues/240">gdcc/pyDataverse#240</a>:
+        <code>AsyncLibraryNotFoundError</code> while constructing
+        <code>Dataverse</code> on Python 3.14.5.
+      </p>
+      <div class="badges">
+        <div class="badge fail">
+          <strong>Pre-fix reproduced</strong>
+          <span>Reported commit <code>7f56e21</code>, Python 3.14.5</span>
+        </div>
+        <div class="badge pass">
+          <strong>Fixed constructor verified</strong>
+          <span>18 metadata blocks loaded from the live demo server</span>
+        </div>
+        <div class="badge pass">
+          <strong>6 / 6 regression tests</strong>
+          <span>Both no-loop and running-loop paths</span>
+        </div>
+        <div class="badge pass">
+          <strong>Lint and static checks pass</strong>
+          <span>Ruff, diff formatting, dependency and call-site checks</span>
+        </div>
+        <div class="badge pass">
+          <strong>Full CI matrix passed</strong>
+          <span>Python 3.10, 3.11, 3.12, 3.13, and 3.14</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <a href="#verdict">Verdict</a>
+      <a href="#correction">Verification correction</a>
+      <a href="#before-after">Before vs. after</a>
+      <a href="#changes">Code changes</a>
+      <a href="#evidence">Exact evidence</a>
+      <a href="#tests">Tests</a>
+      <a href="#completion">Completion criteria</a>
+      <a href="#limits">Limits</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section id="verdict">
+      <h2>1. Verification verdict</h2>
+      <div class="callout success">
+        <strong>The original exception and the supported Python matrix are verified.</strong>
+        The reported commit was reproduced in an isolated Python 3.14.5 environment and raised
+        <code>sniffio._impl.AsyncLibraryNotFoundError</code>. Under the same Python release,
+        the fix constructed <code>Dataverse</code>, fetched metadata from
+        <code>https://demo.dataverse.org</code>, initialized the dataset factory, and reported
+        18 metadata blocks. GitHub Actions then ran the complete repository suite with an
+        action-provisioned Dataverse on Python 3.10–3.14; all five jobs passed.
+      </div>
+      <table>
+        <tbody>
+          <tr><th>Feature branch</th><td><code>fix/240-python-3.14-asynclibrarynotfound</code></td></tr>
+          <tr><th>Base commit</th><td><code>a48ab04</code> (contains reported commit <code>7f56e21</code>)</td></tr>
+          <tr><th>Exact issue interpreter</th><td>CPython 3.14.5, macOS 26.3.1, arm64</td></tr>
+          <tr><th>Live endpoint used</th><td><code>https://demo.dataverse.org</code></td></tr>
+          <tr><th>Verification date</th><td>2026-07-15</td></tr>
+          <tr><th>Fix commit</th><td><code>de3b37eb13213f5403e1299e97b80085a83bf01b</code></td></tr>
+          <tr>
+            <th>Repository state</th>
+            <td>
+              Branch pushed to
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/tree/fix/240-python-3.14-asynclibrarynotfound">
+                <code>youseihuayu-wonderful/pyDataverse</code>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="correction">
+      <h2>2. Verification correction: avoiding a false pass</h2>
+      <p>
+        A first attempt to test the old Git commit was launched while the current directory was
+        this repository. Python places the current directory at the beginning of
+        <code>sys.path</code>, so <code>import pyDataverse</code> loaded the fixed local package
+        instead of the separately installed old commit. That run succeeded, but it was an invalid
+        pre-fix test and was discarded.
+      </p>
+      <div class="comparison">
+        <div class="card fail">
+          <h3>Incorrect isolation</h3>
+          <pre><code>cwd = /Users/shihuayu/Documents/GitHub/pyDataverse
+import pyDataverse
+# Resolves ./pyDataverse before site-packages.
+# A supposed “old commit” test actually exercises new local code.</code></pre>
+          <p><strong>Observed false result:</strong> constructor passed with 18 blocks.</p>
+        </div>
+        <div class="card pass">
+          <h3>Correct isolation</h3>
+          <pre><code>cwd = /private/tmp
+print(inspect.getfile(pyDataverse))
+# .../site-packages/pyDataverse/__init__.py</code></pre>
+          <p>
+            Running outside the repository and printing the imported file proved that the old
+            installed package was used. The original exception then reproduced exactly.
+          </p>
+        </div>
+      </div>
+      <div class="callout warning">
+        <strong>Reusable verification rule:</strong> when comparing an installed baseline against
+        an uncommitted working tree, run the baseline outside the repository and always print
+        <code>inspect.getfile(package)</code>. Otherwise import-path shadowing can create a false
+        success.
+      </div>
+    </section>
+
+    <section id="before-after">
+      <h2>3. Broken path versus fixed path</h2>
+      <h3>Before the fix</h3>
+      <div class="flow">
+        <div><strong>1. Import</strong><code>from pyDataverse import Dataverse</code></div>
+        <div><strong>2. Global patch</strong><code>nest_asyncio.apply()</code> monkey-patches asyncio</div>
+        <div><strong>3. Constructor</strong>eagerly initializes the dataset factory</div>
+        <div><strong>4. Patched runner</strong><code>asyncio.run</code> enters <code>nest_asyncio.py</code></div>
+        <div><strong>5. HTTP async path</strong><code>httpx → httpcore → sniffio</code></div>
+        <div class="fail"><strong>6. Failure</strong><code>AsyncLibraryNotFoundError</code></div>
+      </div>
+
+      <h3>After the fix</h3>
+      <div class="flow">
+        <div><strong>1. Import</strong>no global event-loop mutation</div>
+        <div><strong>2. Constructor</strong>eagerly initializes the same dataset factory</div>
+        <div><strong>3. Loop detection</strong><code>run_async</code> checks <code>get_running_loop()</code></div>
+        <div><strong>4a. Script path</strong>no loop: standard <code>asyncio.run(coro)</code></div>
+        <div><strong>4b. Notebook path</strong>running loop: worker thread + fresh loop</div>
+        <div class="pass"><strong>5. Success</strong>HTTP requests complete; 18 blocks loaded</div>
+      </div>
+    </section>
+
+    <section id="changes">
+      <h2>4. Exactly what changed</h2>
+
+      <h3>4.1 Removed the incompatible global patch</h3>
+      <div class="comparison">
+        <div class="card fail">
+          <strong>Before — <code>pyDataverse/__init__.py</code></strong>
+          <pre><code>import nest_asyncio
+...
+nest_asyncio.apply()</code></pre>
+        </div>
+        <div class="card pass">
+          <strong>After</strong>
+          <pre><code># No nest_asyncio import.
+# No import-time asyncio monkey-patch.</code></pre>
+        </div>
+      </div>
+
+      <h3>4.2 Added a single loop-aware bridge</h3>
+      <p>
+        New file: <code>pyDataverse/api/utilities/async_run.py</code>. The common script path
+        stays on standard-library <code>asyncio.run</code>. A synchronous call made while an
+        event loop is already active is moved to a single worker thread where a fresh event loop
+        can safely run the coroutine.
+      </p>
+      <pre><code>from __future__ import annotations
+
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Coroutine, TypeVar
+
+T = TypeVar("T")
+_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pyDataverse-async")
+
+
+def run_async(coro: "Coroutine[Any, Any, T]") -&gt; T:
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)
+
+    return _EXECUTOR.submit(asyncio.run, coro).result()</code></pre>
+
+      <h3>4.3 Replaced all ten application call sites</h3>
+      <table>
+        <thead><tr><th>Current file</th><th>Current line</th><th>Synchronous entry point</th></tr></thead>
+        <tbody>
+          <tr><td><code>pyDataverse/dataverse/dataverse.py</code></td><td>407</td><td><code>Dataverse._dataset_factory</code></td></tr>
+          <tr><td><code>pyDataverse/api/native.py</code></td><td>503</td><td><code>NativeApi.get_datasets</code></td></tr>
+          <tr><td><code>pyDataverse/api/native.py</code></td><td>2147</td><td><code>NativeApi.crawl_collection</code></td></tr>
+          <tr><td><code>pyDataverse/api/semantic.py</code></td><td>279</td><td><code>SemanticApi.get_datasets</code></td></tr>
+          <tr><td><code>pyDataverse/dataverse/collection.py</code></td><td>628</td><td><code>Collection.graph</code></td></tr>
+          <tr><td><code>pyDataverse/dataverse/metrics.py</code></td><td>86</td><td><code>Metrics._serialize_metrics</code></td></tr>
+          <tr><td><code>pyDataverse/dataverse/metrics.py</code></td><td>156</td><td><code>Metrics.df</code></td></tr>
+          <tr><td><code>pyDataverse/dataverse/metrics.py</code></td><td>313</td><td><code>Metrics.dict</code></td></tr>
+          <tr><td><code>pyDataverse/dataverse/dataset.py</code></td><td>488</td><td><code>Dataset.graph</code></td></tr>
+          <tr><td><code>pyDataverse/mcp/server.py</code></td><td>305</td><td><code>DataverseMCP._all_metadatablocks</code></td></tr>
+        </tbody>
+      </table>
+      <p>
+        No application module calls <code>asyncio.run(...)</code> directly anymore. Its only
+        operational uses are encapsulated inside <code>run_async</code>.
+      </p>
+
+      <h3>4.4 Dependency, lockfile, CI, and tests</h3>
+      <div class="grid">
+        <div class="card">
+          <strong>Dependency removed</strong>
+          <p><code>nest-asyncio&gt;=1.6.0,&lt;2.0.0</code> was deleted from <code>pyproject.toml</code>.</p>
+        </div>
+        <div class="card">
+          <strong>Lockfile regenerated</strong>
+          <p><code>uv.lock</code> contains no <code>nest-asyncio</code> package entry.</p>
+        </div>
+        <div class="card">
+          <strong>Python 3.14 in CI</strong>
+          <p>The workflow matrix is now 3.10, 3.11, 3.12, 3.13, and 3.14.</p>
+        </div>
+        <div class="card">
+          <strong>Regression coverage</strong>
+          <p>Four bridge tests and two live constructor tests were added.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="evidence">
+      <h2>5. Exact pre-fix and post-fix evidence</h2>
+
+      <h3>5.1 Correctly isolated pre-fix run</h3>
+      <p>
+        The old package came from commit <code>7f56e219f6158eafb61711c7419b1ee12d068993</code>.
+        Versions were pinned to the original lockfile values.
+      </p>
+      <details>
+        <summary>Command</summary>
+        <pre><code>cd /private/tmp
+NO_COLOR=1 uvx --from uv@latest uv run \
+  --isolated --no-project --python 3.14.5 \
+  --with 'pyDataverse @ git+https://github.com/gdcc/pyDataverse.git@7f56e219f6158eafb61711c7419b1ee12d068993' \
+  --with 'anyio==4.12.1' \
+  --with 'httpcore==1.0.9' \
+  --with 'httpx==0.28.1' \
+  --with 'sniffio==1.3.1' \
+  --with 'nest-asyncio==1.6.0' \
+  python - &lt;&lt;'PY'
+import importlib.metadata as metadata
+import inspect
+import sys
+import traceback
+import pyDataverse
+
+print(f"Python {sys.version.split()[0]}")
+print(f"Loaded from: {inspect.getfile(pyDataverse)}")
+print(" ".join(f"{name}={metadata.version(name)}" for name in (
+    "pyDataverse", "nest-asyncio", "httpx", "httpcore", "anyio", "sniffio"
+)))
+from pyDataverse import Dataverse
+try:
+    Dataverse(base_url="https://demo.dataverse.org")
+except Exception as exc:
+    print("RESULT=FAIL")
+    print(f"EXCEPTION={type(exc).__module__}.{type(exc).__name__}")
+    print(f"MESSAGE={exc}")
+    print("RELEVANT_TRACE=")
+    for frame in traceback.extract_tb(exc.__traceback__):
+        if any(part in frame.filename for part in (
+            "pyDataverse/", "nest_asyncio.py", "sniffio/_impl.py"
+        )):
+            print(f"  {frame.filename.rsplit('/', 3)[-1]}:{frame.lineno}:{frame.name}")
+else:
+    print("RESULT=PASS (unexpected for the pre-fix commit)")
+PY</code></pre>
+      </details>
+      <strong>Exact captured output:</strong>
+      <pre><code>Python 3.14.5
+Loaded from: /private/var/folders/7b/d1s4j6zs5hv2lpmq_6j6tg8r0000gn/T/cursor-sandbox-cache/49f38cb78d369e2e640a57888a5874fa/uv/archive-v0/ohJvRGHVZhZq0Yro/lib/python3.14/site-packages/pyDataverse/__init__.py
+pyDataverse=0.4.0b1 nest-asyncio=1.6.0 httpx=0.28.1 httpcore=1.0.9 anyio=4.12.1 sniffio=1.3.1
+ℹ NativeApi: Connected to https://demo.dataverse.org
+ℹ Fetching metadata blocks...
+RESULT=FAIL
+EXCEPTION=sniffio._impl.AsyncLibraryNotFoundError
+MESSAGE=unknown async library, or not in async context
+RELEVANT_TRACE=
+  dataverse.py:188:_setup_api
+  dataverse.py:218:_ensure_factory_initialized
+  dataverse.py:406:_dataset_factory
+  nest_asyncio.py:30:run
+  nest_asyncio.py:98:run_until_complete
+  dataverse.py:712:_get_metadata_blocks
+  dataverse.py:708:_get_metadata_blocks
+  api.py:1392:_async_request
+  _impl.py:93:current_async_library</code></pre>
+
+      <h3>5.2 Fixed working-tree run</h3>
+      <details>
+        <summary>Command</summary>
+        <pre><code>cd /private/tmp
+NO_COLOR=1 uvx --from uv@latest uv run \
+  --isolated --no-project --python 3.14.5 \
+  --with-editable '/Users/shihuayu/Documents/GitHub/pyDataverse[tests,mcp]' \
+  python -c '
+import importlib.metadata as m, inspect, sys, pyDataverse
+print(f"Python {sys.version.split()[0]}")
+print(f"Loaded from: {inspect.getfile(pyDataverse)}")
+print("pyDataverse=" + m.version("pyDataverse"))
+from pyDataverse import Dataverse
+print("Imported pyDataverse")
+dv = Dataverse(base_url="https://demo.dataverse.org")
+print(f"CONSTRUCT OK, metadatablocks: {len(dv.metadatablocks)}")
+'</code></pre>
+      </details>
+      <strong>Exact captured output:</strong>
+      <pre><code>Python 3.14.5
+Loaded from: /Users/shihuayu/Documents/GitHub/pyDataverse/pyDataverse/__init__.py
+pyDataverse=0.4.0b1
+Imported pyDataverse
+ℹ NativeApi: Connected to https://demo.dataverse.org
+ℹ Fetching metadata blocks...
+ℹ Dataset factory initialized
+CONSTRUCT OK, metadatablocks: 18</code></pre>
+    </section>
+
+    <section id="tests">
+      <h2>6. Regression, lint, and static verification</h2>
+      <h3>6.1 Python 3.14.5 regression suite</h3>
+      <p>
+        The test environment used dummy non-secret token strings because the repository-wide
+        <code>tests/conftest.py</code> requires all three environment variables at session start.
+        The tested metadata endpoints are public; no authenticated mutation was performed.
+      </p>
+      <details>
+        <summary>Exact test command</summary>
+        <pre><code>cd /private/tmp
+NO_COLOR=1 \
+BASE_URL='https://demo.dataverse.org' \
+API_TOKEN='unused' \
+API_TOKEN_SUPERUSER='unused' \
+uvx --from uv@latest uv run \
+  --isolated --no-project --python 3.14.5 \
+  --with-editable '/Users/shihuayu/Documents/GitHub/pyDataverse[tests,mcp]' \
+  python -m pytest \
+  '/Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py' \
+  -vv --no-cov</code></pre>
+      </details>
+      <strong>Exact captured output:</strong>
+      <pre><code>============================= test session starts ==============================
+platform darwin -- Python 3.14.5, pytest-8.4.2, pluggy-1.6.0 -- /var/folders/7b/d1s4j6zs5hv2lpmq_6j6tg8r0000gn/T/cursor-sandbox-cache/49f38cb78d369e2e640a57888a5874fa/uv/builds-v0/.tmp5KzGDN/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/shihuayu/Documents/GitHub/pyDataverse
+configfile: pyproject.toml
+plugins: cov-5.0.0, asyncio-1.4.0, anyio-4.14.2, sugar-1.1.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 6 items
+
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_run_async_no_running_loop_returns_result PASSED [ 16%]
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_run_async_no_running_loop_runs_on_calling_thread PASSED [ 33%]
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_run_async_inside_running_loop_returns_result PASSED [ 50%]
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_run_async_inside_running_loop_uses_worker_thread PASSED [ 66%]
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_construct_dataverse_no_running_loop PASSED [ 83%]
+../../Users/shihuayu/Documents/GitHub/pyDataverse/tests/dataverse/test_async_run.py::test_construct_dataverse_inside_running_loop PASSED [100%]
+
+============================== 6 passed in 5.82s ===============================</code></pre>
+
+      <h3>6.2 What each test proves</h3>
+      <table>
+        <thead><tr><th>Test</th><th>Property verified</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td><code>test_run_async_no_running_loop_returns_result</code></td><td>Script path returns coroutine result</td><td><span class="status pass">PASS</span></td></tr>
+          <tr><td><code>test_run_async_no_running_loop_runs_on_calling_thread</code></td><td>No-loop path does not unnecessarily offload</td><td><span class="status pass">PASS</span></td></tr>
+          <tr><td><code>test_run_async_inside_running_loop_returns_result</code></td><td>Sync API works while an event loop is active</td><td><span class="status pass">PASS</span></td></tr>
+          <tr><td><code>test_run_async_inside_running_loop_uses_worker_thread</code></td><td>Running-loop path actually changes thread</td><td><span class="status pass">PASS</span></td></tr>
+          <tr><td><code>test_construct_dataverse_no_running_loop</code></td><td>Exact constructor path works in a script context</td><td><span class="status pass">PASS</span></td></tr>
+          <tr><td><code>test_construct_dataverse_inside_running_loop</code></td><td>Constructor works in notebook/async context</td><td><span class="status pass">PASS</span></td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.3 Lint and repository invariants</h3>
+      <pre><code>$ uvx --from ruff==0.4.10 ruff check [all changed Python files]
+All checks passed!
+
+$ operational nest_asyncio import/apply/dependency/lock check
+PASS: no nest_asyncio import, apply call, dependency, or lock entry
+
+$ direct asyncio.run call-site check
+PASS: asyncio.run call remains only inside run_async helper
+
+$ git diff --check
+PASS: git diff --check</code></pre>
+      <div class="callout">
+        Documentation and regression-test prose intentionally mention the name
+        <code>nest_asyncio</code>. Therefore a broad
+        <code>rg "nest_asyncio"</code> is not expected to return zero lines. The meaningful
+        invariant is that there is no import, apply call, runtime dependency, or lockfile package
+        entry.
+      </div>
+    </section>
+
+    <section id="completion">
+      <h2>7. How completion is determined</h2>
+      <table>
+        <thead><tr><th>Acceptance criterion</th><th>Evidence</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Original failure is reproducible before the fix</td>
+            <td>Isolated commit <code>7f56e21</code>, CPython 3.14.5, original locked async dependency versions</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><code>Dataverse(base_url=...)</code> succeeds after the fix</td>
+            <td>Live demo server; dataset factory initialized; 18 blocks</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Already-running-loop path succeeds</td>
+            <td>Async pytest constructor test and direct worker-thread assertion</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Global monkey-patch removed</td>
+            <td>No import or <code>apply()</code> call in package source</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>All ten sync wrappers use the shared bridge</td>
+            <td>Repository search; call-site table above</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Runtime dependency and lock entry removed</td>
+            <td><code>pyproject.toml</code> and regenerated <code>uv.lock</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Python 3.14 continuously tested</td>
+            <td>
+              3.14 added to the matrix and its
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540/job/87500075231">
+                CI job passed
+              </a>
+            </td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Focused issue regression tests</td>
+            <td>6 passed on CPython 3.14.5</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td>Entire repository suite on Python 3.10–3.14</td>
+            <td>
+              <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540">
+                Unit tests run 29459587540
+              </a>:
+              all five Dataverse-backed matrix jobs passed
+            </td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout success">
+        <strong>Final GitHub Actions evidence for commit <code>de3b37e</code>:</strong>
+        <ul>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587540">
+              Unit tests
+            </a> — success on Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+          </li>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587493">
+              Build PyDataverse
+            </a> — success.
+          </li>
+          <li>
+            <a href="https://github.com/youseihuayu-wonderful/pyDataverse/actions/runs/29459587550">
+              Ruff
+            </a> — success.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="limits">
+      <h2>8. Scope and residual notes</h2>
+      <ul>
+        <li>
+          <strong>Issue #240 itself is verified fixed.</strong> The constructor exception and both
+          sync-to-async execution branches are covered on the exact reported Python release.
+        </li>
+        <li>
+          <strong>The full repository suite was not run locally.</strong>
+          <code>tests/conftest.py</code> requires a live Dataverse plus valid
+          <code>API_TOKEN</code> and <code>API_TOKEN_SUPERUSER</code>. This verification is now
+          complete in GitHub Actions, which supplied those values through
+          <code>gdcc/dataverse-action</code> for every Python 3.10–3.14 job.
+        </li>
+        <li>
+          <strong>The complete issue example goes beyond this exception.</strong> This report
+          verifies construction and metadata initialization—the exact failing portion of the
+          reported traceback. Dataset upload behavior requires an appropriate collection and
+          credentials and is a separate concern.
+        </li>
+        <li>
+          <strong>Worker serialization is intentional.</strong> Calls made from an active loop
+          share one worker and run serially. The current pyDataverse coroutine bodies create their
+          event-loop-bound HTTP clients inside the coroutine, so resource creation, use, and
+          cleanup stay on the worker loop.
+        </li>
+        <li>
+          <strong>No upstream pull request or release has occurred.</strong> The branch is committed
+          and pushed to the authenticated user's fork; upstream review remains a separate next step.
+        </li>
+      </ul>
+      <h3>Command for future local repository-wide validation</h3>
+      <pre><code>uv pip install --system ".[tests,mcp]"
+BASE_URL="$BASE_URL" \
+API_TOKEN="$API_TOKEN" \
+API_TOKEN_SUPERUSER="$API_TOKEN_SUPERUSER" \
+pytest -vv</code></pre>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Generated from direct repository inspection and independently rerun commands on
+      <code>fix/240-python-3.14-asynclibrarynotfound</code>. Related detailed analysis:
+      <a href="240-python-3.14-asynclibrarynotfound.md">Markdown issue analysis</a>.
+    </div>
+  </footer>
+</body>
+</html>

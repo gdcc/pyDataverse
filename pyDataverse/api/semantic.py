@@ -7,6 +7,7 @@ from rdflib import Graph, URIRef
 
 from ..models import collection
 from .api import Api
+from .utilities.async_run import run_async
 
 
 class SemanticApi(Api):
@@ -275,7 +276,7 @@ class SemanticApi(Api):
             for identifier in identifiers
         ]
 
-        datasets = asyncio.run(self._get_datasets(identifiers, batch_size))
+        datasets = run_async(self._get_datasets(identifiers, batch_size))
         if as_graph:
             return self.responses_to_graph(datasets)
         else:
