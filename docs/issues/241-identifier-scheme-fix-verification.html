@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pyDataverse Issue #241 — Fix and Verification Report</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-alt: #eef2f8;
+      --text: #18212f;
+      --muted: #5d6a7a;
+      --border: #d8e0eb;
+      --accent: #1957a6;
+      --accent-soft: #e8f1fd;
+      --success: #176b45;
+      --success-soft: #e5f6ee;
+      --danger: #a52a2a;
+      --danger-soft: #fdeaea;
+      --warning: #805a00;
+      --warning-soft: #fff4d6;
+      --code-bg: #111827;
+      --code-text: #e5edf8;
+      --shadow: 0 8px 28px rgba(25, 45, 75, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1118;
+        --surface: #141c27;
+        --surface-alt: #1a2533;
+        --text: #e8eef6;
+        --muted: #a7b4c4;
+        --border: #2b3a4d;
+        --accent: #85b8ff;
+        --accent-soft: #142d50;
+        --success: #75d5aa;
+        --success-soft: #12382b;
+        --danger: #ff9b9b;
+        --danger-soft: #442222;
+        --warning: #ffd071;
+        --warning-soft: #3d3012;
+        --code-bg: #080d14;
+        --code-text: #e6edf6;
+        --shadow: none;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); }
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    code {
+      padding: 0.08rem 0.3rem;
+      border-radius: 0.3rem;
+      background: var(--surface-alt);
+      font-size: 0.92em;
+    }
+    pre {
+      overflow-x: auto;
+      margin: 0.8rem 0 0;
+      padding: 1rem;
+      border-radius: 0.65rem;
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-size: 0.83rem;
+      line-height: 1.55;
+      white-space: pre;
+    }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    h1, h2, h3 { line-height: 1.25; }
+    h2 {
+      margin-top: 0;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { margin: 1.4rem 0 0.5rem; }
+    p { margin: 0.6rem 0; }
+    ul, ol { padding-left: 1.4rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.8rem;
+      font-size: 0.94rem;
+    }
+    th, td {
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface-alt); }
+    .container {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+    header {
+      padding: 3rem 0 2rem;
+      background: linear-gradient(135deg, var(--surface), var(--accent-soft));
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { margin: 0.4rem 0; font-size: clamp(2rem, 4vw, 3.2rem); }
+    header p { max-width: 900px; font-size: 1.05rem; }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      backdrop-filter: blur(8px);
+    }
+    nav .container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    main { padding: 2rem 0 3.5rem; }
+    section {
+      margin: 1.25rem 0 1.75rem;
+      padding: 1.35rem 1.4rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+    }
+    .meta div {
+      padding: 0.85rem 1rem;
+      border-radius: 0.75rem;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+    }
+    .meta strong { display: block; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .badge.ok { background: var(--success-soft); color: var(--success); }
+    .badge.bad { background: var(--danger-soft); color: var(--danger); }
+    .badge.warn { background: var(--warning-soft); color: var(--warning); }
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 900px) {
+      .compare { grid-template-columns: 1fr; }
+    }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 0.85rem;
+      padding: 1rem;
+      background: var(--surface-alt);
+    }
+    .panel.bad { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+    .panel.ok { border-color: color-mix(in srgb, var(--success) 45%, var(--border)); }
+    .panel h3 { margin-top: 0; }
+    .callout {
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+    }
+    .callout.ok { background: var(--success-soft); border-color: color-mix(in srgb, var(--success) 35%, var(--border)); }
+    .callout.bad { background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); }
+    .callout.warn { background: var(--warning-soft); border-color: color-mix(in srgb, var(--warning) 35%, var(--border)); }
+    .checklist li { margin: 0.35rem 0; }
+    footer {
+      padding: 1.5rem 0 2.5rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <span class="eyebrow">pyDataverse · Issue #241</span>
+      <h1>ORCID Identifier Scheme Fix &amp; Verification Report</h1>
+      <p>
+        This report shows the original bug
+        (<code>TypeError: issubclass() arg 1 must be a class</code> when using
+        <code>"identifier_scheme": "ORCID"</code>), the incorrect serialization path,
+        the exact code change, and the verified outputs after the fix.
+      </p>
+      <div class="meta">
+        <div>
+          <strong>Issue</strong>
+          <a href="https://github.com/gdcc/pyDataverse/issues/241">gdcc/pyDataverse#241</a>
+        </div>
+        <div>
+          <strong>Branch</strong>
+          <code>fix/241-identifier-scheme-issubclass</code>
+        </div>
+        <div>
+          <strong>Base commit</strong>
+          <code>e1f0a5e</code> (origin/main after #240 merge)
+        </div>
+        <div>
+          <strong>Verification time</strong>
+          2026-07-20 17:53:06 UTC
+        </div>
+        <div>
+          <strong>Package path</strong>
+          <code>.../pyDataverse/pyDataverse/__init__.py</code>
+        </div>
+        <div>
+          <strong>Status</strong>
+          <span class="badge ok">Verified complete (serialization + tests)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <a href="#how-verified">How verified</a>
+      <a href="#original-issue">Original issue</a>
+      <a href="#wrong-path">Wrong path (before)</a>
+      <a href="#fix">What was fixed</a>
+      <a href="#after-output">Verified output (after)</a>
+      <a href="#matrix">Before / after matrix</a>
+      <a href="#tests">Test evidence</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section id="how-verified">
+      <h2>1. How this fix is verified as complete</h2>
+      <p>
+        Completion is <strong>not</strong> claimed from reading the diff alone.
+        Per the playbook in
+        <code>docs/issues/241-identifier-scheme-issubclass-typeerror.md</code>,
+        the fix is complete only when every acceptance criterion below is met
+        with command evidence.
+      </p>
+      <ol class="checklist">
+        <li><strong>Step 0 — Package path:</strong> loaded module is the intended checkout (not another install).</li>
+        <li><strong>Step 1 — Broken baseline:</strong> ORCID path raised <code>TypeError</code> before the edit.</li>
+        <li><strong>Step 2 — Guard applied:</strong> <code>isinstance(dtype, type) and issubclass(...)</code> present; bare <code>issubclass(field_info.dtype, ...)</code> gone.</li>
+        <li><strong>Step 3 — ORCID after:</strong> create payload includes <code>authorIdentifierScheme.value == "ORCID"</code> and <code>typeClass == "controlledVocabulary"</code>.</li>
+        <li><strong>Step 4 — Control + broader CV:</strong> omitting scheme still works; <code>contributorType</code> also serializes.</li>
+        <li><strong>Step 5 — Regression tests:</strong> <code>test_issue_241_identifier_scheme.py</code> → 3 passed.</li>
+        <li><strong>Step 5b — No regression:</strong> <code>test_to_dataverse_create_dict</code> → 1 passed.</li>
+        <li><strong>Final gate:</strong> parent re-run of Steps 0 + 3 after edits still PASS.</li>
+      </ol>
+      <div class="callout ok">
+        <strong>Definition of done met for serialization.</strong>
+        Optional live Dataverse UI upload (Step 6) was not required to prove the TypeError fix;
+        it only adds end-to-end UI confirmation when a writable token is available.
+      </div>
+    </section>
+
+    <section id="original-issue">
+      <h2>2. Original exact issue</h2>
+      <p>
+        Following the high-level docs example, creating a dataset with:
+      </p>
+<pre><code>authors=[{
+    "name": "Jane Smith",
+    "affiliation": "University of Science",
+    "identifier_scheme": "ORCID",   # &lt;-- triggers crash
+    "identifier": "0000-0000-0000-0000",
+}]</code></pre>
+      <p>
+        raised during payload conversion (<code>to_dataverse_create_dict()</code>), not during
+        author assignment:
+      </p>
+<pre><code>TypeError: issubclass() arg 1 must be a class
+  File ".../metadata.py", line 295, in _process_field_value
+    if issubclass(field_info.dtype, CompoundField):</code></pre>
+      <p>
+        Reporter workaround (commenting out <code>identifier_scheme</code>) “worked” only because
+        empty nested CV fields are skipped before <code>_process_field_value</code> runs — so
+        Identifier Type never reached the buggy <code>issubclass</code> call.
+      </p>
+    </section>
+
+    <section id="wrong-path">
+      <h2>3. What was parsed / handled wrong (before the fix)</h2>
+      <h3>3.1 Controlled vocabulary dtype is not a class</h3>
+      <p>
+        CV fields are built as <code>Optional[Annotated[str, AfterValidator(...)]]</code>
+        in <code>builder._cv_type_from_values</code>. After optional unwrap, nested field
+        <code>authorIdentifierScheme</code> still has dtype:
+      </p>
+<pre><code>typing.Annotated[str, AfterValidator(...)]
+isinstance(dtype, type) == False
+get_origin(dtype) == typing.Annotated</code></pre>
+      <p>
+        Re-checked on the fixed tree (dtype shape is unchanged; only the guard changed):
+        calling bare <code>issubclass(dtype, CompoundField)</code> still raises:
+      </p>
+<pre><code>ISSUBCLASS_RAW_ERROR: issubclass() arg 1 must be a class</code></pre>
+
+      <h3>3.2 Broken code path</h3>
+<pre><code># BEFORE (broken) — metadata.py::_process_field_value
+if issubclass(field_info.dtype, CompoundField):  # TypeError on Annotated CV
+    ...
+return value</code></pre>
+
+      <h3>3.3 Captured baseline output (Step 1, before edit)</h3>
+      <div class="callout bad">
+        <strong>Exit code 1</strong> — serialization aborted; no create JSON produced.
+      </div>
+<pre><code>ℹ NativeApi: Connected to https://demo.dataverse.org
+ℹ Fetching metadata blocks...
+ℹ Dataset factory initialized
+Traceback (most recent call last):
+  File ".../dataset.py", line 759, in to_dataverse_create_dict
+    metadata_blocks[name] = block.to_metadata_block()
+  File ".../metadata.py", line 165, in to_metadata_block
+    processed_value = self._process_field_value(value, field_info)
+  File ".../metadata.py", line 297, in _process_field_value
+    return [field.to_metadata_fields() for field in value]
+  File ".../metadata.py", line 523, in to_metadata_fields
+    processed_value = self._process_field_value(value, field_info)
+  File ".../metadata.py", line 295, in _process_field_value
+    if issubclass(field_info.dtype, CompoundField):
+TypeError: issubclass() arg 1 must be a class</code></pre>
+      <p>
+        Meaning: outer author compound recursion entered correctly; nested
+        <code>authorIdentifierScheme</code> CV dtype hit the unguarded <code>issubclass</code> and crashed
+        before any ORCID field could be emitted.
+      </p>
+    </section>
+
+    <section id="fix">
+      <h2>4. Exact code fix</h2>
+      <p>
+        File: <code>pyDataverse/dataverse/connect/metadata.py</code> ·
+        function: <code>MetadataBlockBase._process_field_value</code>
+      </p>
+      <div class="compare">
+        <div class="panel bad">
+          <h3><span class="badge bad">Before</span></h3>
+<pre><code>if issubclass(field_info.dtype, CompoundField):
+    if field_info.multiple and isinstance(value, list):
+        return [field.to_metadata_fields() for field in value]
+    return value.to_metadata_fields()
+
+return value</code></pre>
+        </div>
+        <div class="panel ok">
+          <h3><span class="badge ok">After</span></h3>
+<pre><code>dtype = field_info.dtype
+if isinstance(dtype, type) and issubclass(dtype, CompoundField):
+    if field_info.multiple and isinstance(value, list):
+        return [field.to_metadata_fields() for field in value]
+    return value.to_metadata_fields()
+
+return value</code></pre>
+        </div>
+      </div>
+      <div class="callout ok">
+        For <code>Annotated[...]</code> CV dtypes, <code>isinstance(dtype, type)</code> is
+        <code>False</code>, so the method returns the string value unchanged
+        (e.g. <code>"ORCID"</code>). Downstream <code>_create_metadata_field</code> then wraps it with
+        <code>typeClass=controlledVocabulary</code>.
+      </div>
+      <p>Verified present at line 290:</p>
+<pre><code>290:        if isinstance(dtype, type) and issubclass(dtype, CompoundField):</code></pre>
+    </section>
+
+    <section id="after-output">
+      <h2>5. Verified output after the fix</h2>
+      <p>
+        Same ORCID input as the original issue, against
+        <code>https://demo.dataverse.org</code>, with
+        <code>upload_to_collection=False</code>, then
+        <code>to_dataverse_create_dict().model_dump(by_alias=True)</code>.
+      </p>
+
+      <h3>5.1 Author object in create payload (exact JSON excerpt)</h3>
+      <div class="callout ok">
+        <strong>PASS:</strong> nested CV <code>authorIdentifierScheme</code> is present with value
+        <code>ORCID</code> and <code>typeClass</code> <code>controlledVocabulary</code>.
+      </div>
+<pre><code>{
+  "authorName": {
+    "typeClass": "primitive",
+    "typeName": "authorName",
+    "multiple": false,
+    "value": "Jane Smith"
+  },
+  "authorAffiliation": {
+    "typeClass": "primitive",
+    "typeName": "authorAffiliation",
+    "multiple": false,
+    "value": "University of Science"
+  },
+  "authorIdentifierScheme": {
+    "typeClass": "controlledVocabulary",
+    "typeName": "authorIdentifierScheme",
+    "multiple": false,
+    "value": "ORCID"
+  },
+  "authorIdentifier": {
+    "typeClass": "primitive",
+    "typeName": "authorIdentifier",
+    "multiple": false,
+    "value": "0000-0000-0000-0000"
+  }
+}</code></pre>
+
+      <h3>5.2 Control case (scheme omitted) — still correct</h3>
+<pre><code>CONTROL_HAS_SCHEME: False
+CONTROL_IDENTIFIER: {
+  "typeClass": "primitive",
+  "typeName": "authorIdentifier",
+  "multiple": false,
+  "value": "0000-0000-0000-0000"
+}</code></pre>
+
+      <h3>5.3 Broader nested CV (not ORCID-only) — contributorType</h3>
+<pre><code>{
+  "contributorName": {
+    "typeClass": "primitive",
+    "typeName": "contributorName",
+    "multiple": false,
+    "value": "Helper"
+  },
+  "contributorType": {
+    "typeClass": "controlledVocabulary",
+    "typeName": "contributorType",
+    "multiple": false,
+    "value": "Data Collector"
+  }
+}</code></pre>
+    </section>
+
+    <section id="matrix">
+      <h2>6. Before / after comparison matrix</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Before fix</th>
+            <th>After fix (verified)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>identifier_scheme="ORCID"</code></td>
+            <td><span class="badge bad">TypeError</span> — no payload</td>
+            <td><span class="badge ok">PASS</span> — scheme field emitted as CV <code>ORCID</code></td>
+          </tr>
+          <tr>
+            <td>Scheme omitted</td>
+            <td><span class="badge ok">Works</span> (field skipped)</td>
+            <td><span class="badge ok">Works</span> — scheme key absent; identifier kept</td>
+          </tr>
+          <tr>
+            <td><code>contributorType="Data Collector"</code></td>
+            <td><span class="badge bad">Same TypeError</span></td>
+            <td><span class="badge ok">PASS</span> — CV serialized</td>
+          </tr>
+          <tr>
+            <td>Top-level CV <code>subject</code></td>
+            <td><span class="badge ok">Already worked</span></td>
+            <td><span class="badge ok">Unchanged</span> (<code>test_to_dataverse_create_dict</code>)</td>
+          </tr>
+          <tr>
+            <td>Compound author recursion</td>
+            <td>Entered, then crashed on nested CV</td>
+            <td>Completes; nested CV returned as string then wrapped</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="tests">
+      <h2>7. Automated verification evidence</h2>
+      <p>Commands (env vars required by <code>tests/conftest.py</code>):</p>
+<pre><code>export BASE_URL=https://demo.dataverse.org
+export API_TOKEN=unused
+export API_TOKEN_SUPERUSER=unused
+
+uv run python -m pytest \
+  tests/dataverse/test_issue_241_identifier_scheme.py \
+  tests/dataverse/test_dataset.py::TestDataset::test_to_dataverse_create_dict \
+  -q --no-cov</code></pre>
+      <div class="callout ok">
+        <strong>Result (2026-07-20 17:53:06 UTC):</strong> 4 passed in 4.37s
+        (3 new issue #241 tests + 1 existing create-dict test).
+      </div>
+<pre><code>tests/dataverse/test_issue_241_identifier_scheme.py ...                  [ 75%]
+tests/dataverse/test_dataset.py .                                        [100%]
+============================== 4 passed in 4.37s ===============================</code></pre>
+      <h3>New regression file asserts</h3>
+      <ul>
+        <li><code>test_author_identifier_scheme_orcid_serializes</code> — ORCID CV present</li>
+        <li><code>test_contributor_type_nested_cv_serializes</code> — nested CV generality</li>
+        <li><code>test_identifier_without_scheme_still_serializes</code> — control / no false scheme</li>
+      </ul>
+    </section>
+
+    <section id="repro">
+      <h2>8. Reproduce the verification yourself</h2>
+      <ol>
+        <li>Check out branch <code>fix/241-identifier-scheme-issubclass</code>.</li>
+        <li>Confirm package path:
+<pre><code>uv run python -c "import inspect, pyDataverse; print(inspect.getfile(pyDataverse))"</code></pre>
+        </li>
+        <li>Run the ORCID script from §5 (or the pytest commands in §7).</li>
+        <li>Expect: no TypeError; JSON contains
+          <code>authorIdentifierScheme.value == "ORCID"</code>.</li>
+      </ol>
+      <div class="callout warn">
+        <strong>Pitfall:</strong> asserting with snake_case keys on
+        <code>model_dump(by_alias=True)</code> output will false-fail.
+        Use aliases (<code>typeName</code>, <code>typeClass</code>, <code>datasetVersion</code>).
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Companion markdown playbook:
+      <code>docs/issues/241-identifier-scheme-issubclass-typeerror.md</code>.
+      HTML report generated from live verification against
+      <code>https://demo.dataverse.org</code> on branch
+      <code>fix/241-identifier-scheme-issubclass</code>.
+    </div>
+  </footer>
+</body>
+</html>

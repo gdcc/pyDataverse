@@ -280,19 +280,14 @@ class MetadataBlockBase(
     ) -> Union[
         Any, Dict[str, create.MetadataField], List[Dict[str, create.MetadataField]]
     ]:
+        """Process a field value, converting CompoundField instances to metadata dicts.
+
+        Controlled-vocabulary fields are typed as Annotated[str, AfterValidator(...)]
+        (see builder._cv_type_from_values). Those typing objects are not classes, so
+        issubclass() must be guarded with isinstance(..., type). See issue #241.
         """
-        Process a field value, converting CompoundField instances to their metadata representation.
-
-        Args:
-            value: The raw field value to process.
-            field_info: Information about the field type and structure.
-
-        Returns:
-            The processed value, with CompoundField instances converted to dictionaries.
-        """
-        # Check by class name since CompoundField is defined later in this module
-
-        if issubclass(field_info.dtype, CompoundField):
+        dtype = field_info.dtype
+        if isinstance(dtype, type) and issubclass(dtype, CompoundField):
             if field_info.multiple and isinstance(value, list):
                 return [field.to_metadata_fields() for field in value]
             return value.to_metadata_fields()
