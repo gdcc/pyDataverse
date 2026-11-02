@@ -139,3 +139,30 @@ class TestQueryOptionsRepeatableParameters:
 
         with pytest.raises(ValidationError):
             QueryOptions(type=["dataset", "collection"])
+
+
+class TestQueryOptionsValidation:
+    """Test suite for QueryOptions value validation."""
+
+    @pytest.mark.parametrize("sort", ["name", "date", "score"])
+    def test_valid_sort(self, sort):
+        """Test that the documented sort fields are accepted."""
+        assert _query_params(QueryOptions(sort=sort))["sort"] == sort
+
+    def test_invalid_sort_rejected(self):
+        """Test that unknown sort fields are rejected."""
+        with pytest.raises(ValidationError):
+            QueryOptions(sort="relevance")
+
+    @pytest.mark.parametrize("per_page", [1, 1000])
+    def test_per_page_bounds_accepted(self, per_page):
+        """Test that per_page accepts values at the documented limits."""
+        assert _query_params(QueryOptions(per_page=per_page))["per_page"] == str(
+            per_page
+        )
+
+    @pytest.mark.parametrize("per_page", [0, 1001])
+    def test_per_page_out_of_range_rejected(self, per_page):
+        """Test that per_page outside 1-1000 is rejected."""
+        with pytest.raises(ValidationError):
+            QueryOptions(per_page=per_page)
