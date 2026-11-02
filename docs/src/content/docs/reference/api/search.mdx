@@ -19,19 +19,19 @@ search behavior, including filtering, sorting, pagination, and result formatting
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `type` | `Optional[Literal['dataverse', 'dataset', 'file']]` | Filter results by content type (dataverse, dataset, or file). |
-| `subtree` | `Optional[str]` | Limit search to a specific dataverse and its sub-dataverses. |
+| `type` | `Optional[Union[Literal['dataverse', 'dataset', 'file'], List[Literal['dataverse', 'dataset', 'file']]]]` | Filter results by content type (dataverse, dataset, or file). Pass a list to include several types. |
+| `subtree` | `Optional[Union[str, List[str]]]` | Limit search to a specific dataverse and its sub-dataverses. Pass a list to search several dataverses. |
 | `sort` | `Optional[str]` | Field to sort results by (e.g., 'name', 'date'). |
 | `per_page` | `int` | Number of results to return per page (1-1000, default 10). |
 | `start` | `int` | Starting index for pagination (default 0). |
 | `order` | `Literal['asc', 'desc']` | Sort order, either ascending or descending (default 'desc'). |
-| `filter_query` | `Optional[str]` | Advanced filter using Solr query syntax. |
+| `filter_query` | `Optional[Union[str, List[str]]]` | Advanced filter using Solr query syntax. Pass a list to apply several filters. |
 | `show_entity_ids` | `bool` | Whether to include entity IDs in the response. |
 | `show_relevance` | `bool` | Whether to include relevance scores in the response. |
 | `show_facets` | `bool` | Whether to include facet information for result filtering. |
 | `show_api_urls` | `bool` | Whether to include API URLs in the response. |
 | `query_entities` | `bool` | Whether to query entities for additional metadata (default True). |
-| `metadata_fields` | `Optional[str]` | Metadata fields to include for datasets (e.g., 'citation:author'). |
+| `metadata_fields` | `Optional[Union[str, List[str]]]` | Metadata fields to include for datasets (e.g., 'citation:author'). Pass a list to include several fields. |
 | `geo_point` | `Optional[str]` | Geographic point for spatial search (latitude,longitude format). |
 | `geo_radius` | `Optional[str]` | Radius for geographic search (e.g., '10km', '5mi'). |
 | `show_type_counts` | `bool` | Whether to include total counts per content type. |

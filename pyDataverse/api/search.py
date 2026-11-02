@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
@@ -14,18 +14,22 @@ class QueryOptions(BaseModel):
 
     Attributes:
         type: Filter results by content type (dataverse, dataset, or file).
+            Pass a list to include several types.
         subtree: Limit search to a specific dataverse and its sub-dataverses.
+            Pass a list to search several dataverses.
         sort: Field to sort results by (e.g., 'name', 'date').
         per_page: Number of results to return per page (1-1000, default 10).
         start: Starting index for pagination (default 0).
         order: Sort order, either ascending or descending (default 'desc').
-        filter_query: Advanced filter using Solr query syntax.
+        filter_query: Advanced filter using Solr query syntax. Pass a list
+            to apply several filters.
         show_entity_ids: Whether to include entity IDs in the response.
         show_relevance: Whether to include relevance scores in the response.
         show_facets: Whether to include facet information for result filtering.
         show_api_urls: Whether to include API URLs in the response.
         query_entities: Whether to query entities for additional metadata (default True).
         metadata_fields: Metadata fields to include for datasets (e.g., 'citation:author').
+            Pass a list to include several fields.
         geo_point: Geographic point for spatial search (latitude,longitude format).
         geo_radius: Radius for geographic search (e.g., '10km', '5mi').
         show_type_counts: Whether to include total counts per content type.
@@ -35,11 +39,16 @@ class QueryOptions(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    type: Optional[Literal["dataverse", "dataset", "file"]] = Field(
+    type: Optional[
+        Union[
+            Literal["dataverse", "dataset", "file"],
+            List[Literal["dataverse", "dataset", "file"]],
+        ]
+    ] = Field(
         default=None,
         description="Filter results by content type (dataverse, dataset, or file).",
     )
-    subtree: Optional[str] = Field(
+    subtree: Optional[Union[str, List[str]]] = Field(
         default=None,
         description="Limit search to a specific dataverse.",
     )
@@ -59,7 +68,7 @@ class QueryOptions(BaseModel):
         default="desc",
         description="Sort order (asc, desc).",
     )
-    filter_query: Optional[str] = Field(
+    filter_query: Optional[Union[str, List[str]]] = Field(
         default=None,
         alias="fq",
         description="Filter query using Solr syntax.",
@@ -84,7 +93,7 @@ class QueryOptions(BaseModel):
         default=True,
         description="Query entities for additional metadata (slower).",
     )
-    metadata_fields: Optional[str] = Field(
+    metadata_fields: Optional[Union[str, List[str]]] = Field(
         default=None,
         description="Metadata fields to include (block:field or block:*).",
     )
