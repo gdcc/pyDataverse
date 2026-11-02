@@ -32,8 +32,8 @@ search behavior, including filtering, sorting, pagination, and result formatting
 | `show_api_urls` | `bool` | Whether to include API URLs in the response. |
 | `query_entities` | `bool` | Whether to query entities for additional metadata (default True). |
 | `metadata_fields` | `Optional[Union[str, List[str]]]` | Metadata fields to include for datasets (e.g., 'citation:author'). Pass a list to include several fields. |
-| `geo_point` | `Optional[str]` | Geographic point for spatial search (latitude,longitude format). |
-| `geo_radius` | `Optional[str]` | Radius in kilometres from geo_point (e.g., '1.5'). |
+| `geo_point` | `Optional[str]` | Geographic point for spatial search (latitude,longitude format, e.g., '42.3,-71.1'). Must be set together with geo_radius. |
+| `geo_radius` | `Optional[str]` | Radius in kilometres from geo_point (e.g., '1.5'). Must be set together with geo_point. |
 | `show_type_counts` | `bool` | Whether to include total counts per content type. |
 | `show_collections` | `bool` | Whether to include parent and linked collections for datasets. |
 | `search_service` | `Optional[str]` | Name of the search service to use. |

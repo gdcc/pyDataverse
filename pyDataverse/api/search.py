@@ -1,6 +1,14 @@
+import math
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from ..models.search import SearchResponse
 from .api import Api
@@ -30,8 +38,10 @@ class QueryOptions(BaseModel):
         query_entities: Whether to query entities for additional metadata (default True).
         metadata_fields: Metadata fields to include for datasets (e.g., 'citation:author').
             Pass a list to include several fields.
-        geo_point: Geographic point for spatial search (latitude,longitude format).
-        geo_radius: Radius in kilometres from geo_point (e.g., '1.5').
+        geo_point: Geographic point for spatial search (latitude,longitude format,
+            e.g., '42.3,-71.1'). Must be set together with geo_radius.
+        geo_radius: Radius in kilometres from geo_point (e.g., '1.5'). Must be
+            set together with geo_point.
         show_type_counts: Whether to include total counts per content type.
         show_collections: Whether to include parent and linked collections for datasets.
         search_service: Name of the search service to use.
@@ -119,6 +129,45 @@ class QueryOptions(BaseModel):
         default=None,
         description="Name of the search service to use.",
     )
+
+    @field_validator("geo_point")
+    @classmethod
+    def _validate_geo_point(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        try:
+            lat, lon = (float(part) for part in value.split(","))
+        except ValueError:
+            msg = "geo_point must be 'latitude,longitude', e.g. '42.3,-71.1'"
+            raise ValueError(
+                msg
+            ) from None
+        if not -90 <= lat <= 90:
+            msg = "geo_point latitude must be between -90 and 90"
+            raise ValueError(msg)
+        if not -180 <= lon <= 180:
+            msg = "geo_point longitude must be between -180 and 180"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("geo_radius")
+    @classmethod
+    def _validate_geo_radius(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        try:
+            radius = float(value)
+        except ValueError:
+            raise ValueError("geo_radius must be a number of kilometres") from None
+        if not (math.isfinite(radius) and radius > 0):
+            raise ValueError("geo_radius must be a positive number of kilometres")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_geo_pair(self) -> "QueryOptions":
+        if (self.geo_point is None) != (self.geo_radius is None):
+            raise ValueError("geo_point and geo_radius must be set together")
+        return self
 
 
 class SearchApi(Api):

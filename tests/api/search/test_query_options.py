@@ -166,3 +166,41 @@ class TestQueryOptionsValidation:
         """Test that per_page outside 1-1000 is rejected."""
         with pytest.raises(ValidationError):
             QueryOptions(per_page=per_page)
+
+    @pytest.mark.parametrize(
+        "geo_point", ["42.3,-71.1", "0,0", "90,180", "-90,-180", "42, -71"]
+    )
+    def test_valid_geo_point(self, geo_point):
+        """Test that latitude,longitude pairs within range are accepted."""
+        options = QueryOptions(geo_point=geo_point, geo_radius="1.5")
+
+        assert _query_params(options)["geo_point"] == geo_point
+
+    @pytest.mark.parametrize(
+        "geo_point", ["42.3", "42.3,-71.1,5", "north,west", "", "91,0", "0,181"]
+    )
+    def test_invalid_geo_point_rejected(self, geo_point):
+        """Test that malformed or out-of-range geo_point values are rejected."""
+        with pytest.raises(ValidationError):
+            QueryOptions(geo_point=geo_point, geo_radius="1.5")
+
+    @pytest.mark.parametrize("geo_radius", ["1.5", "10", "0.01"])
+    def test_valid_geo_radius(self, geo_radius):
+        """Test that positive radii are accepted."""
+        options = QueryOptions(geo_point="42.3,-71.1", geo_radius=geo_radius)
+
+        assert _query_params(options)["geo_radius"] == geo_radius
+
+    @pytest.mark.parametrize("geo_radius", ["0", "-1", "10km", "nan", "inf"])
+    def test_invalid_geo_radius_rejected(self, geo_radius):
+        """Test that non-numeric or non-positive radii are rejected."""
+        with pytest.raises(ValidationError):
+            QueryOptions(geo_point="42.3,-71.1", geo_radius=geo_radius)
+
+    @pytest.mark.parametrize(
+        "kwargs", [{"geo_point": "42.3,-71.1"}, {"geo_radius": "1.5"}]
+    )
+    def test_geo_point_and_radius_required_together(self, kwargs):
+        """Test that geo_point and geo_radius cannot be set on their own."""
+        with pytest.raises(ValidationError):
+            QueryOptions(**kwargs)
