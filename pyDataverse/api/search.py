@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from ..models.search import SearchResponse
 from .api import Api
@@ -26,6 +26,8 @@ class QueryOptions(BaseModel):
         geo_point: Geographic point for spatial search (latitude,longitude format).
         geo_radius: Radius for geographic search (e.g., '10km', '5mi').
     """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     type: Optional[Literal["dataverse", "dataset", "file"]] = Field(
         default=None,
