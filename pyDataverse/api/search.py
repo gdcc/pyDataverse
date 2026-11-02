@@ -133,19 +133,26 @@ class QueryOptions(BaseModel):
     @field_validator("geo_point")
     @classmethod
     def _validate_geo_point(cls, value: Optional[str]) -> Optional[str]:
+        lat_max = 90
+        lat_min = -90
+        lon_max = 180
+        lon_min = -180
+
         if value is None:
             return value
         try:
+            if any(char.isspace() for char in value):
+                raise ValueError
             lat, lon = (float(part) for part in value.split(","))
         except ValueError:
             msg = "geo_point must be 'latitude,longitude', e.g. '42.3,-71.1'"
             raise ValueError(
                 msg
             ) from None
-        if not -90 <= lat <= 90:
+        if not lat_min <= lat <= lat_max:
             msg = "geo_point latitude must be between -90 and 90"
             raise ValueError(msg)
-        if not -180 <= lon <= 180:
+        if not lon_min <= lon <= lon_max:
             msg = "geo_point longitude must be between -180 and 180"
             raise ValueError(msg)
         return value
@@ -158,15 +165,18 @@ class QueryOptions(BaseModel):
         try:
             radius = float(value)
         except ValueError:
-            raise ValueError("geo_radius must be a number of kilometres") from None
+            msg = "geo_radius must be a number of kilometres"
+            raise ValueError(msg) from None
         if not (math.isfinite(radius) and radius > 0):
-            raise ValueError("geo_radius must be a positive number of kilometres")
+            msg = "geo_radius must be a positive number of kilometers"
+            raise ValueError(msg)
         return value
 
     @model_validator(mode="after")
     def _validate_geo_pair(self) -> "QueryOptions":
         if (self.geo_point is None) != (self.geo_radius is None):
-            raise ValueError("geo_point and geo_radius must be set together")
+            msg = "geo_point and geo_radius must be set together"
+            raise ValueError(msg)
         return self
 
 

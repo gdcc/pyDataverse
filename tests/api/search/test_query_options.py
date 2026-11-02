@@ -168,7 +168,7 @@ class TestQueryOptionsValidation:
             QueryOptions(per_page=per_page)
 
     @pytest.mark.parametrize(
-        "geo_point", ["42.3,-71.1", "0,0", "90,180", "-90,-180", "42, -71"]
+        "geo_point", ["42.3,-71.1", "0,0", "90,180", "-90,-180"]
     )
     def test_valid_geo_point(self, geo_point):
         """Test that latitude,longitude pairs within range are accepted."""
@@ -177,7 +177,17 @@ class TestQueryOptionsValidation:
         assert _query_params(options)["geo_point"] == geo_point
 
     @pytest.mark.parametrize(
-        "geo_point", ["42.3", "42.3,-71.1,5", "north,west", "", "91,0", "0,181"]
+        "geo_point",
+        [
+            "42.3",
+            "42.3,-71.1,5",
+            "north,west",
+            "",
+            "91,0",
+            "0,181",
+            "42.3, -71.1",
+            " 42.3,-71.1",
+        ],
     )
     def test_invalid_geo_point_rejected(self, geo_point):
         """Test that malformed or out-of-range geo_point values are rejected."""
