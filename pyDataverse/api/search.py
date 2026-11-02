@@ -17,7 +17,7 @@ class QueryOptions(BaseModel):
             Pass a list to include several types.
         subtree: Limit search to a specific dataverse and its sub-dataverses.
             Pass a list to search several dataverses.
-        sort: Field to sort results by (e.g., 'name', 'date').
+        sort: Field to sort results by ('name', 'date' or 'score'; server default 'score').
         per_page: Number of results to return per page (1-1000, default 10).
         start: Starting index for pagination (default 0).
         order: Sort order, either ascending or descending (default 'desc').
@@ -31,7 +31,7 @@ class QueryOptions(BaseModel):
         metadata_fields: Metadata fields to include for datasets (e.g., 'citation:author').
             Pass a list to include several fields.
         geo_point: Geographic point for spatial search (latitude,longitude format).
-        geo_radius: Radius for geographic search (e.g., '10km', '5mi').
+        geo_radius: Radius in kilometres from geo_point (e.g., '1.5').
         show_type_counts: Whether to include total counts per content type.
         show_collections: Whether to include parent and linked collections for datasets.
         search_service: Name of the search service to use.
@@ -52,12 +52,14 @@ class QueryOptions(BaseModel):
         default=None,
         description="Limit search to a specific dataverse.",
     )
-    sort: Optional[str] = Field(
+    sort: Optional[Literal["name", "date", "score"]] = Field(
         default=None,
-        description="Sort field (name, date).",
+        description="Sort field (name, date, score).",
     )
     per_page: int = Field(
         default=10,
+        ge=1,
+        le=1000,
         description="Number of results per page (default 10, max 1000).",
     )
     start: int = Field(
@@ -103,7 +105,7 @@ class QueryOptions(BaseModel):
     )
     geo_radius: Optional[str] = Field(
         default=None,
-        description="Radius for geographic search.",
+        description="Radius in kilometres for geographic search.",
     )
     show_type_counts: bool = Field(
         default=False,

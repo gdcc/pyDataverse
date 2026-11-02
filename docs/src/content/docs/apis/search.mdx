@@ -309,10 +309,10 @@ from pyDataverse.api.search import QueryOptions
 
 api = SearchApi("https://demo.dataverse.org")
 
-# Search within a geographic radius
+# Search within 10 km of a latitude,longitude point
 options = QueryOptions(
-    geo_radius="10km",
-    # Note: geo_point would typically be set via filter_query
+    geo_point="42.3,-71.1",
+    geo_radius="10",
 )
 results = api.search("climate", options)
 ```
