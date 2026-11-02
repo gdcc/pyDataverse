@@ -5,6 +5,8 @@ parameters and do not require a Dataverse instance.
 """
 
 import httpx
+import pytest
+from pydantic import ValidationError
 
 from pyDataverse.api.search import QueryOptions
 
@@ -95,3 +97,45 @@ class TestQueryOptionsParameters:
 
         for name in ("metadata_fields", "geo_point", "geo_radius", "search_service"):
             assert name not in params
+
+
+class TestQueryOptionsRepeatableParameters:
+    """Test suite for parameters that the Search API allows to repeat."""
+
+    def test_single_values(self):
+        """Test that single values are sent once."""
+        options = QueryOptions(
+            type="dataset",
+            subtree="harvard",
+            filter_query="subject:Physics",
+            metadata_fields="citation:*",
+        )
+        params = _query_params(options)
+
+        assert params.get_list("type") == ["dataset"]
+        assert params.get_list("subtree") == ["harvard"]
+        assert params.get_list("fq") == ["subject:Physics"]
+        assert params.get_list("metadata_fields") == ["citation:*"]
+
+    def test_list_values_are_repeated(self):
+        """Test that list values are sent as repeated parameters."""
+        options = QueryOptions(
+            type=["dataset", "file"],
+            subtree=["harvard", "mit"],
+            filter_query=["subject:Physics", "publicationDate:2020"],
+            metadata_fields=["citation:author", "geospatial:*"],
+        )
+        params = _query_params(options)
+
+        assert params.get_list("type") == ["dataset", "file"]
+        assert params.get_list("subtree") == ["harvard", "mit"]
+        assert params.get_list("fq") == ["subject:Physics", "publicationDate:2020"]
+        assert params.get_list("metadata_fields") == ["citation:author", "geospatial:*"]
+
+    def test_invalid_type_rejected(self):
+        """Test that unknown content types are rejected."""
+        with pytest.raises(ValidationError):
+            QueryOptions(type="collection")
+
+        with pytest.raises(ValidationError):
+            QueryOptions(type=["dataset", "collection"])
