@@ -29,8 +29,14 @@ search behavior, including filtering, sorting, pagination, and result formatting
 | `show_entity_ids` | `bool` | Whether to include entity IDs in the response. |
 | `show_relevance` | `bool` | Whether to include relevance scores in the response. |
 | `show_facets` | `bool` | Whether to include facet information for result filtering. |
-| `geo_point` | `bool` | Geographic point for spatial search (latitude,longitude format). |
+| `show_api_urls` | `bool` | Whether to include API URLs in the response. |
+| `query_entities` | `bool` | Whether to query entities for additional metadata (default True). |
+| `metadata_fields` | `Optional[str]` | Metadata fields to include for datasets (e.g., 'citation:author'). |
+| `geo_point` | `Optional[str]` | Geographic point for spatial search (latitude,longitude format). |
 | `geo_radius` | `Optional[str]` | Radius for geographic search (e.g., '10km', '5mi'). |
+| `show_type_counts` | `bool` | Whether to include total counts per content type. |
+| `show_collections` | `bool` | Whether to include parent and linked collections for datasets. |
+| `search_service` | `Optional[str]` | Name of the search service to use. |
 
 
 ## `class SearchApi`

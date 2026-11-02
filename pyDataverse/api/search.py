@@ -23,8 +23,14 @@ class QueryOptions(BaseModel):
         show_entity_ids: Whether to include entity IDs in the response.
         show_relevance: Whether to include relevance scores in the response.
         show_facets: Whether to include facet information for result filtering.
+        show_api_urls: Whether to include API URLs in the response.
+        query_entities: Whether to query entities for additional metadata (default True).
+        metadata_fields: Metadata fields to include for datasets (e.g., 'citation:author').
         geo_point: Geographic point for spatial search (latitude,longitude format).
         geo_radius: Radius for geographic search (e.g., '10km', '5mi').
+        show_type_counts: Whether to include total counts per content type.
+        show_collections: Whether to include parent and linked collections for datasets.
+        search_service: Name of the search service to use.
     """
 
     model_config = ConfigDict(populate_by_name=True)
@@ -70,9 +76,37 @@ class QueryOptions(BaseModel):
         default=False,
         description="Include facet information.",
     )
+    show_api_urls: bool = Field(
+        default=False,
+        description="Include API URLs in response.",
+    )
+    query_entities: bool = Field(
+        default=True,
+        description="Query entities for additional metadata (slower).",
+    )
+    metadata_fields: Optional[str] = Field(
+        default=None,
+        description="Metadata fields to include (block:field or block:*).",
+    )
+    geo_point: Optional[str] = Field(
+        default=None,
+        description="Point for geographic search (latitude,longitude).",
+    )
     geo_radius: Optional[str] = Field(
         default=None,
         description="Radius for geographic search.",
+    )
+    show_type_counts: bool = Field(
+        default=False,
+        description="Include total counts per content type.",
+    )
+    show_collections: bool = Field(
+        default=False,
+        description="Include parent and linked collections for datasets.",
+    )
+    search_service: Optional[str] = Field(
+        default=None,
+        description="Name of the search service to use.",
     )
 
 
