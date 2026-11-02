@@ -141,6 +141,8 @@ class QueryOptions(BaseModel):
         if value is None:
             return value
         try:
+            if any(char.isspace() for char in value):
+                raise ValueError
             lat, lon = (float(part) for part in value.split(","))
         except ValueError:
             msg = "geo_point must be 'latitude,longitude', e.g. '42.3,-71.1'"
@@ -166,7 +168,7 @@ class QueryOptions(BaseModel):
             msg = "geo_radius must be a number of kilometres"
             raise ValueError(msg) from None
         if not (math.isfinite(radius) and radius > 0):
-            msg = "geo_radius must be a positive number of kilometres"
+            msg = "geo_radius must be a positive number of kilometers"
             raise ValueError(msg)
         return value
 
