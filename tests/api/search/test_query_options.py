@@ -37,3 +37,61 @@ class TestQueryOptionsFilterQuery:
     def test_filter_query_omitted_by_default(self):
         """Test that fq is not sent when filter_query is not set."""
         assert "fq" not in _query_params(QueryOptions())
+
+
+class TestQueryOptionsParameters:
+    """Test suite for the Search API parameters exposed by QueryOptions."""
+
+    def test_defaults(self):
+        """Test the parameters sent when no options are set."""
+        params = _query_params(QueryOptions())
+
+        assert dict(params) == {
+            "per_page": "10",
+            "start": "0",
+            "order": "desc",
+            "show_entity_ids": "false",
+            "show_relevance": "false",
+            "show_facets": "false",
+            "show_api_urls": "false",
+            "query_entities": "true",
+            "show_type_counts": "false",
+            "show_collections": "false",
+        }
+
+    def test_boolean_options(self):
+        """Test that boolean options are sent as lowercase strings."""
+        options = QueryOptions(
+            show_api_urls=True,
+            query_entities=False,
+            show_type_counts=True,
+            show_collections=True,
+        )
+        params = _query_params(options)
+
+        assert params["show_api_urls"] == "true"
+        assert params["query_entities"] == "false"
+        assert params["show_type_counts"] == "true"
+        assert params["show_collections"] == "true"
+
+    def test_string_options(self):
+        """Test that string options are sent under their API names."""
+        options = QueryOptions(
+            metadata_fields="citation:author",
+            geo_point="42.3,-71.1",
+            geo_radius="1.5",
+            search_service="solr",
+        )
+        params = _query_params(options)
+
+        assert params["metadata_fields"] == "citation:author"
+        assert params["geo_point"] == "42.3,-71.1"
+        assert params["geo_radius"] == "1.5"
+        assert params["search_service"] == "solr"
+
+    def test_optional_strings_omitted_by_default(self):
+        """Test that unset string options are not sent."""
+        params = _query_params(QueryOptions())
+
+        for name in ("metadata_fields", "geo_point", "geo_radius", "search_service"):
+            assert name not in params
