@@ -439,25 +439,19 @@ class Dataverse(BaseModel):
     def search(
         self,
         query: str,
-        per_page: int = 10,
-        type: Optional[Literal["dataset", "collection", "dataverse"]] = None,
         options: Optional[QueryOptions] = None,
     ) -> SearchResult:
         """
         Search for datasets in the Dataverse instance.
+
+        Args:
+            query (str): The search query string.
+            options (Optional[QueryOptions]): Optional search configuration including
+                filtering, sorting, pagination (e.g., per_page), and content type.
         """
         from .search import SearchResult
 
         assert self._search_api is not None, "SearchApi not initialized"
-
-        if per_page is not None:
-            if options is None:
-                options = QueryOptions(per_page=per_page)
-            else:
-                options.per_page = per_page
-
-        if type is not None:
-            options.type = "dataverse" if type == "collection" else type
 
         return SearchResult(
             search_response=self._search_api.search(query, options),

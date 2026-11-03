@@ -403,14 +403,6 @@ class Collection(ContentBase):
     def search(
         self,
         query: str,
-        per_page: int = 10,
-        type: Optional[
-            Literal[
-                "dataset",
-                "collection",
-                "dataverse",
-            ]
-        ] = None,
         options: Optional[QueryOptions] = None,
     ) -> SearchResult:
         """
@@ -451,18 +443,16 @@ class Collection(ContentBase):
         Note:
             The search will automatically be scoped to this collection by setting
             the subtree parameter, regardless of whether options are provided or not.
+            The provided options are not modified.
         """
         if options is None:
             options = QueryOptions(subtree=self.alias)
         else:
-            options.subtree = self.alias
+            options = QueryOptions.model_validate(
+                {**options.model_dump(), "subtree": self.alias}
+            )
 
-        return self.dataverse.search(
-            query=query,
-            per_page=per_page,
-            type=type,
-            options=options,
-        )
+        return self.dataverse.search(query=query, options=options)
 
     def publish(self):
         """
