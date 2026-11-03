@@ -74,6 +74,7 @@ class QueryOptions(BaseModel):
     )
     start: int = Field(
         default=0,
+        ge=0,
         description="Starting index for pagination (default 0).",
     )
     order: Literal["asc", "desc"] = Field(
