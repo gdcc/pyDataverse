@@ -1,6 +1,14 @@
-from typing import Literal, Optional
+import math
+from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from ..models.search import SearchResponse
 from .api import Api
@@ -14,44 +22,66 @@ class QueryOptions(BaseModel):
 
     Attributes:
         type: Filter results by content type (dataverse, dataset, or file).
+            Pass a list to include several types.
         subtree: Limit search to a specific dataverse and its sub-dataverses.
-        sort: Field to sort results by (e.g., 'name', 'date').
+            Pass a list to search several dataverses.
+        sort: Field to sort results by ('name', 'date' or 'score'; server default 'score').
         per_page: Number of results to return per page (1-1000, default 10).
         start: Starting index for pagination (default 0).
         order: Sort order, either ascending or descending (default 'desc').
-        filter_query: Advanced filter using Solr query syntax.
+        filter_query: Advanced filter using Solr query syntax. Pass a list
+            to apply several filters.
         show_entity_ids: Whether to include entity IDs in the response.
         show_relevance: Whether to include relevance scores in the response.
         show_facets: Whether to include facet information for result filtering.
-        geo_point: Geographic point for spatial search (latitude,longitude format).
-        geo_radius: Radius for geographic search (e.g., '10km', '5mi').
+        show_api_urls: Whether to include API URLs in the response.
+        query_entities: Whether to query entities for additional metadata (default True).
+        metadata_fields: Metadata fields to include for datasets (e.g., 'citation:author').
+            Pass a list to include several fields.
+        geo_point: Geographic point for spatial search (latitude,longitude format,
+            e.g., '42.3,-71.1'). Must be set together with geo_radius.
+        geo_radius: Radius in kilometers from geo_point (e.g., '1.5'). Must be
+            set together with geo_point.
+        show_type_counts: Whether to include total counts per content type.
+        show_collections: Whether to include parent and linked collections for datasets.
+        search_service: Name of the search service to use.
     """
 
-    type: Optional[Literal["dataverse", "dataset", "file"]] = Field(
+    model_config = ConfigDict(populate_by_name=True)
+
+    type: Optional[
+        Union[
+            Literal["dataverse", "dataset", "file"],
+            List[Literal["dataverse", "dataset", "file"]],
+        ]
+    ] = Field(
         default=None,
         description="Filter results by content type (dataverse, dataset, or file).",
     )
-    subtree: Optional[str] = Field(
+    subtree: Optional[Union[str, List[str]]] = Field(
         default=None,
         description="Limit search to a specific dataverse.",
     )
-    sort: Optional[str] = Field(
+    sort: Optional[Literal["name", "date", "score"]] = Field(
         default=None,
-        description="Sort field (name, date).",
+        description="Sort field (name, date, score).",
     )
     per_page: int = Field(
         default=10,
+        ge=1,
+        le=1000,
         description="Number of results per page (default 10, max 1000).",
     )
     start: int = Field(
         default=0,
+        ge=0,
         description="Starting index for pagination (default 0).",
     )
     order: Literal["asc", "desc"] = Field(
         default="desc",
         description="Sort order (asc, desc).",
     )
-    filter_query: Optional[str] = Field(
+    filter_query: Optional[Union[str, List[str]]] = Field(
         default=None,
         alias="fq",
         description="Filter query using Solr syntax.",
@@ -68,10 +98,87 @@ class QueryOptions(BaseModel):
         default=False,
         description="Include facet information.",
     )
+    show_api_urls: bool = Field(
+        default=False,
+        description="Include API URLs in response.",
+    )
+    query_entities: bool = Field(
+        default=True,
+        description="Query entities for additional metadata (slower).",
+    )
+    metadata_fields: Optional[Union[str, List[str]]] = Field(
+        default=None,
+        description="Metadata fields to include (block:field or block:*).",
+    )
+    geo_point: Optional[str] = Field(
+        default=None,
+        description="Point for geographic search (latitude,longitude).",
+    )
     geo_radius: Optional[str] = Field(
         default=None,
-        description="Radius for geographic search.",
+        description="Radius in kilometers for geographic search.",
     )
+    show_type_counts: bool = Field(
+        default=False,
+        description="Include total counts per content type.",
+    )
+    show_collections: bool = Field(
+        default=False,
+        description="Include parent and linked collections for datasets.",
+    )
+    search_service: Optional[str] = Field(
+        default=None,
+        description="Name of the search service to use.",
+    )
+
+    @field_validator("geo_point")
+    @classmethod
+    def _validate_geo_point(cls, value: Optional[str]) -> Optional[str]:
+        lat_max = 90
+        lat_min = -90
+        lon_max = 180
+        lon_min = -180
+
+        if value is None:
+            return value
+        try:
+            if any(char.isspace() for char in value):
+                raise ValueError
+            lat, lon = (float(part) for part in value.split(","))
+        except ValueError:
+            msg = "geo_point must be 'latitude,longitude', e.g. '42.3,-71.1'"
+            raise ValueError(
+                msg
+            ) from None
+        if not lat_min <= lat <= lat_max:
+            msg = "geo_point latitude must be between -90 and 90"
+            raise ValueError(msg)
+        if not lon_min <= lon <= lon_max:
+            msg = "geo_point longitude must be between -180 and 180"
+            raise ValueError(msg)
+        return value
+
+    @field_validator("geo_radius")
+    @classmethod
+    def _validate_geo_radius(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        try:
+            radius = float(value)
+        except ValueError:
+            msg = "geo_radius must be a number of kilometers"
+            raise ValueError(msg) from None
+        if not (math.isfinite(radius) and radius > 0):
+            msg = "geo_radius must be a positive number of kilometers"
+            raise ValueError(msg)
+        return value
+
+    @model_validator(mode="after")
+    def _validate_geo_pair(self) -> "QueryOptions":
+        if (self.geo_point is None) != (self.geo_radius is None):
+            msg = "geo_point and geo_radius must be set together"
+            raise ValueError(msg)
+        return self
 
 
 class SearchApi(Api):
