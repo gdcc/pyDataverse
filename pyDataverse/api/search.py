@@ -40,7 +40,7 @@ class QueryOptions(BaseModel):
             Pass a list to include several fields.
         geo_point: Geographic point for spatial search (latitude,longitude format,
             e.g., '42.3,-71.1'). Must be set together with geo_radius.
-        geo_radius: Radius in kilometres from geo_point (e.g., '1.5'). Must be
+        geo_radius: Radius in kilometers from geo_point (e.g., '1.5'). Must be
             set together with geo_point.
         show_type_counts: Whether to include total counts per content type.
         show_collections: Whether to include parent and linked collections for datasets.
@@ -116,7 +116,7 @@ class QueryOptions(BaseModel):
     )
     geo_radius: Optional[str] = Field(
         default=None,
-        description="Radius in kilometres for geographic search.",
+        description="Radius in kilometers for geographic search.",
     )
     show_type_counts: bool = Field(
         default=False,
@@ -166,7 +166,7 @@ class QueryOptions(BaseModel):
         try:
             radius = float(value)
         except ValueError:
-            msg = "geo_radius must be a number of kilometres"
+            msg = "geo_radius must be a number of kilometers"
             raise ValueError(msg) from None
         if not (math.isfinite(radius) and radius > 0):
             msg = "geo_radius must be a positive number of kilometers"
